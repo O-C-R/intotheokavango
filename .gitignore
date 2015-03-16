@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__
+logs
+config.yaml
+housepy
+data/*
+run/*
+dev/*
+*.pem
+okavango_old
