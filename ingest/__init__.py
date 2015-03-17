@@ -1,3 +1,4 @@
+import importlib
 from housepy import config, log, server, util
 
 class Ingest(server.Handler):
@@ -5,13 +6,17 @@ class Ingest(server.Handler):
     def get(self, page=None):
         return self.not_found()        
 
-    def post(self, kind):
+    def post(self, kind=None):
         log.info("Ingest.post %s" % kind)
+        if kind is None or not len(kind):
+            kind = self.get_argument("kind", "") # if we didn't use an endpoint, check if it's in the variables
+        module_name = "ingest.%s" % kind
         try:
-            import dynamic
-        except ImportError:
-            return self.error("Kind not recognized")
-        feature = dynamic.parse(self.request)
+            module = importlib.import_module(module_name)
+            feature = module.parse(self.request)
+        except ImportError as e:
+            log.error(log.exc(e))
+            return self.error("Kind \"%s\" not recognized" % kind)
         if not feature:
             return self.error("Ingest failed")
         feature = check_geo(feature)
@@ -45,10 +50,10 @@ def check_geo(data):
     return data
 
 
-def ingest(request):
-    """Generic method for injesting a JSON file"""
+def json_ingest(request):
+    """Generic method for ingesting a JSON file"""
     log.info("ingest.ethno")
-    filename = write_file(request)    
+    filename = save_file(request)    
     try:
         with open(filename) as f:
             data = json.loads(f.read())

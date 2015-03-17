@@ -1,4 +1,4 @@
-from injest import json_ingest
+from ingest import json_ingest
 
-parse = json_injest
+parse = json_ingest
 

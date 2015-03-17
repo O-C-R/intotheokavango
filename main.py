@@ -13,7 +13,8 @@ class Home(server.Handler):
         if len(page):
             try:
                 return self.render("%s.html" % page)
-            except:
+            except Exception as e:
+                log.error(log.exc(e))
                 return self.not_found()        
         return self.text(str(self.db))
 
