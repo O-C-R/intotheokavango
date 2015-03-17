@@ -1,4 +1,4 @@
-import importlib
+import importlib, os, json
 from housepy import config, log, server, util
 
 class Ingest(server.Handler):
@@ -21,8 +21,9 @@ class Ingest(server.Handler):
             return self.error("Ingest failed")
         feature = check_geo(feature)
         if 't_utc' not in feature:
-            self.error("--> timestamp missing")
+            self.error("Missing timestamp")
         feature.update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
+        log.debug(feature)
         feature_id = self.db.features.insert_one(feature).inserted_id
         return self.text(feature_id)
 
@@ -52,7 +53,7 @@ def check_geo(data):
 
 def json_ingest(request):
     """Generic method for ingesting a JSON file"""
-    log.info("ingest.ethno")
+    log.info("ingest.json_ingest")
     filename = save_file(request)    
     try:
         with open(filename) as f:
@@ -62,12 +63,12 @@ def json_ingest(request):
         return None
     return data        
 
-def save_file(self):
-    pass
-    ## fix this code
-    # for upload in self.request.files:
-    #     filename = upload[0]['filename']
-    #     with open(os.path.abspath(os.path.join(os.path.dirname(__file__), "uploads", filename)), 'wb') as f:
-    #         f.write()
+def save_file(request):
+    for key, fileinfo in request.files.items():
+        fileinfo = fileinfo[0]
+        filename = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+        with open(filename, 'wb') as f:
+            f.write(fileinfo['body'])
+        return filename
 
 

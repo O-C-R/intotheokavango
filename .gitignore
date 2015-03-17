@@ -8,3 +8,4 @@ run/*
 dev/*
 *.pem
 okavango_old
+data/*
