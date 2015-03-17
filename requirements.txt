@@ -1,0 +1,10 @@
+geojson>=1.0.9
+Jinja2>=2.7.3
+oauth>=1.0.1
+pymongo>=3.0b0
+python-dateutil>=2.4.0
+python-geohash>=0.8.5
+pytz>=2014.10
+PyYAML>=3.11
+tornado>=4.0.2
+xmltodict>=0.9.1

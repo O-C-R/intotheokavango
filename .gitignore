@@ -1,3 +1,5 @@
+
+
 .DS_Store
 __pycache__
 logs
@@ -9,3 +11,4 @@ dev/*
 *.pem
 okavango_old
 data/*
+data.db

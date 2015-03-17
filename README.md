@@ -12,9 +12,8 @@ Add a python module in the ingest folder with the name of the endpoint. eg, `/in
 - `expedition`, `t_created`, and `kind` are added automatically.
 - coordinates are automatically formated, so maybe be specified in individual fields
 
+The generic endpoint `/ingest` can always be used if a `kind` attribute is given in the data
 
-
-Endpoint notes: post to ingest/feature
 
 conventions:
 - t_utc is a unix timestamp in UTC

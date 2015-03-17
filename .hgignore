@@ -11,3 +11,4 @@ dev/*
 *.pem
 okavango_old
 data/*
+data.db

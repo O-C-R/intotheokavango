@@ -1,5 +1,5 @@
 from housepy import server, config, log, util, strings
-from ingest import check_geo
+# from ingest import check_geo
 
 class Api(server.Handler):
 
@@ -14,7 +14,7 @@ class Api(server.Handler):
             for i, item in enumerate(value):
                 value[i] = strings.as_numeric(item)
             search[param] = value[0] if len(value) == 1 else value
-        search = check_geo(search)
+        # search = check_geo(search)
 
 
         ## have a geo range syntax (bounds?)

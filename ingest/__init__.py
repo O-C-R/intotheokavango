@@ -1,6 +1,18 @@
 import importlib, os, json
 from housepy import config, log, server, util
 
+"""
+    Ingestion is forgiving and will accept and reformat flat JSON.
+    Everything in the database is enforced as a valid GeoJSON Feature
+    with the addition of the following fields in its properties:
+        - expedition (eg okavango_15)
+        - t_utc (UTC timestamp)
+        - DateTime (set to local_tz)
+        - kind (string delineating what kind of feature it is)
+    Each of these is indexed in the database.
+
+"""
+
 class Ingest(server.Handler):
 
     def get(self, page=None):
@@ -10,6 +22,7 @@ class Ingest(server.Handler):
         log.info("Ingest.post %s" % kind)
         if kind is None or not len(kind):
             kind = self.get_argument("kind", "") # if we didn't use an endpoint, check if it's in the variables
+        kind = kind.lower().split('.')[0].strip()
         module_name = "ingest.%s" % kind
         try:
             module = importlib.import_module(module_name)
@@ -19,41 +32,16 @@ class Ingest(server.Handler):
             return self.error("Kind \"%s\" not recognized" % kind)
         if not feature:
             return self.error("Ingest failed")
-        feature = check_geo(feature)
-        if 't_utc' not in feature:
-            self.error("Missing timestamp")
-        feature.update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
+        feature = verify_geometry(feature)
+        feature = verify_t(feature)
+        feature['properties'].update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
         log.debug(feature)
         feature_id = self.db.features.insert_one(feature).inserted_id
         return self.text(feature_id)
 
-
-def check_geo(data):
-    lat, lon, alt = 0, 0, 0
-    delete = []
-    try:
-        for param in data:
-            if param.lower().strip() == 'longitude' or param.lower().strip() == 'lon' or param.lower().strip() == 'lng':
-                lon = data[param]
-                delete.append(param)
-            elif param.lower().strip() == 'latitude' or param.lower().strip() == 'lat':    
-                lat = data[param]
-                delete.append(param)
-            elif param.lower().strip() == 'altitude' or param.lower().strip() == 'alt':    
-                alt = data[param]
-                delete.append(param)
-        if lat and lon:
-            for param in delete:
-                del data[param]
-            data.update({'geo': [float(lat), float(lon), float(alt)]})
-    except Exception as e:
-        log.error("Error parsing coordinates: %s" % log.exc(e))
-    return data
-
-
-def json_ingest(request):
+def ingest_json(request):
     """Generic method for ingesting a JSON file"""
-    log.info("ingest.json_ingest")
+    log.info("ingest.ingest_json")
     filename = save_file(request)    
     try:
         with open(filename) as f:
@@ -62,6 +50,52 @@ def json_ingest(request):
         log.error(log.exc(e))
         return None
     return data        
+
+def verify_geojson(data):
+    """Verify or reformat JSON as GeoJSON"""
+    if 'id' in data:
+        del data['id']
+    try:
+        data['type'] = data['type'] if 'type' in data else "Feature"
+        data['geometry'] = data['geometry'] if 'geometry' in data else None
+        data['properties'] = data['properties'] if 'properties' in data else {}
+        for key, value in data.items():
+            if key not in ['type', 'geometry', 'properties']:
+                data['properties'][key] = value
+        data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return data
+
+def verify_geometry(data):
+    """Verify or reformat geometry data"""
+    lat, lon, alt = 0, 0, 0
+    properties = data['properties']
+    delete = []
+    try:
+        for p, value in properties.items():
+            if p.lower().strip() == 'longitude' or p.lower().strip() == 'lon' or p.lower().strip() == 'lng':
+                lon = value
+                delete.append(p)
+            elif p.lower().strip() == 'latitude' or p.lower().strip() == 'lat':    
+                lat = value
+                delete.append(p)
+            elif p.lower().strip() == 'altitude' or p.lower().strip() == 'alt':    
+                alt = value
+                delete.append(p)
+        if lat and lon:
+            for p in delete:
+                del properties[p]
+            data['geometry'] = [float(lon), float(lat), float(alt)] if data['geometry'] is None else data['geometry']
+            data['properties'] = properties
+    except Exception as e:
+        log.error("Error parsing coordinates: %s" % log.exc(e))
+    return data
+
+def verify_t(data):
+    """Verify or reformat temporal data"""
+    return data
 
 def save_file(request):
     for key, fileinfo in request.files.items():
