@@ -18,3 +18,8 @@ The generic endpoint `/ingest` can always be used if a `kind` attribute is given
 conventions:
 - t_utc is a unix timestamp in UTC
 
+
+#### recent versions
+This code relies on pymongo 3.0b, which has more concise collection queries
+mongo 3.1.0 supports altitude in the geojson fields (literally 6 days ago) -- current release version is 3.0.0
+so at the moment we are not supporting altitude, but upgrade that before launch

@@ -46,6 +46,7 @@ features = fetch_features((kind,), t - (days * (24 * 60 * 60)), t, 1)
 data = features[0]
 
 data['properties']['kind'] = kind
+print(data)
 data_str = json.dumps(data, indent=4)
 data_bytes = data_str.encode('utf-8')
 print(data_str)

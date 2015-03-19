@@ -1,5 +1,5 @@
 import importlib, os, json
-from housepy import config, log, server, util
+from housepy import config, log, server, util, strings
 
 """
     Ingestion is forgiving and will accept and reformat flat JSON.
@@ -32,12 +32,13 @@ class Ingest(server.Handler):
             return self.error("Kind \"%s\" not recognized" % kind)
         if not feature:
             return self.error("Ingest failed")
+        feature = verify_geojson(feature)
         feature = verify_geometry(feature)
         feature = verify_t(feature)
         feature['properties'].update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
         log.debug(feature)
         feature_id = self.db.features.insert_one(feature).inserted_id
-        return self.text(feature_id)
+        return self.text(str(feature_id))
 
 def ingest_json(request):
     """Generic method for ingesting a JSON file"""
@@ -58,10 +59,9 @@ def verify_geojson(data):
     try:
         data['type'] = data['type'] if 'type' in data else "Feature"
         data['geometry'] = data['geometry'] if 'geometry' in data else None
-        data['properties'] = data['properties'] if 'properties' in data else {}
-        for key, value in data.items():
-            if key not in ['type', 'geometry', 'properties']:
-                data['properties'][key] = value
+        data['properties'] = {key: strings.as_numeric(value) for (key, value) in data['properties'].items()} if 'properties' in data else {}
+        for key, value in {key: value for (key, value) in data.items() if key not in ['type', 'geometry', 'properties']}:
+            data['properties'][key] = strings.as_numeric(value)
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
     except Exception as e:
         log.error(log.exc(e))
@@ -85,10 +85,16 @@ def verify_geometry(data):
                 alt = value
                 delete.append(p)
         if lat and lon:
+            if 'geometry' not in data:
+                data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt)]}
             for p in delete:
                 del properties[p]
-            data['geometry'] = [float(lon), float(lat), float(alt)] if data['geometry'] is None else data['geometry']
-            data['properties'] = properties
+            data['properties'] = properties     
+
+        ### temporarily ditch altitude prior to mongo 3.1.0
+        if 'geometry' in data:
+            data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
+
     except Exception as e:
         log.error("Error parsing coordinates: %s" % log.exc(e))
     return data
