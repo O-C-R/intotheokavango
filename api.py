@@ -9,6 +9,9 @@ class Api(server.Handler):
 
     def get(self, page=None): # take as many as necessary
 
+        if page == "map":
+            return self.render("api/map.html", query=self.request.query)
+
         ## extract geo and t queries out of this
 
         try:
@@ -33,12 +36,12 @@ class Api(server.Handler):
         # posts.find({"date": {"$lt": d}}).sort("author").explain()["cursor"]
 
         try:
-            features = self.db.features.find(search).sort('t_utc') # when does the query happen?
-            result = geojson.FeatureCollection([fix_id(feature) for feature in features])
+            result = self.db.features.find(search).sort('t_utc')
+            features = geojson.FeatureCollection([fix_id(feature) for feature in result])
         except Exception as e:
             return self.error(log.exc(e))
 
-        return self.json(result)
+        return self.json(features)
 
 def fix_id(feature):
     feature['id'] = feature['_id']

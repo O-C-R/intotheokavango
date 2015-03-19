@@ -15,3 +15,4 @@
 - incoming as geojson or not
 - most useful 'near' query
 - date format
+- mapbox is still pulling from me

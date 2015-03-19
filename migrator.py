@@ -30,9 +30,7 @@ def fetch_features(db, kinds, start_t, stop_t, skip=1):
         features.append(feature)
     return features
 
-
-
-kind = "sighting"
+kind = "ambit_geo"
 try:
     dt = datetime.datetime.now(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%d")
     dt = util.parse_date(dt, tz=config['local_tz'])
@@ -49,6 +47,5 @@ for data in features[-200:]:
     data_str = json.dumps(data, indent=4)
     data_bytes = data_str.encode('utf-8')
     print(data_str)
-
     response = net.read("http://localhost:9999/ingest/migration", data_bytes)
     print(response)

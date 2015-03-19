@@ -14,7 +14,6 @@ def parse(request):
         return None
     t_utc = strings.as_numeric(data['properties']['t_utc'])
     t_utc -= 180000
-    data['properties']['t_utc'] = t_utc
-    data['properties']['DateTime'] = util.datestring(t_utc, tz=config['local_tz'])
+    data['properties']['t_utc'] = t_utc    
     data['expedition'] = "okavango_14"
     return data

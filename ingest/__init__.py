@@ -31,12 +31,10 @@ class Ingest(server.Handler):
             return self.error("Kind \"%s\" not recognized" % kind)
         if not feature:
             return self.error("Ingest failed")
-        log.debug(feature)
         feature = verify_geojson(feature)
         feature = verify_geometry(feature)
         feature = verify_t(feature)
         feature['properties'].update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
-        log.debug(feature)
         feature_id = self.db.features.insert_one(feature).inserted_id
         return self.text(str(feature_id))
 
@@ -110,7 +108,10 @@ def verify_geometry(data):
     return data
 
 def verify_t(data):
-    """Verify or reformat temporal data"""
+    """Verify or reformat temporal data -- t_utc is expected from all parse methods"""
+    if 't_utc' not in data['properties']:
+        return None
+    data['properties']['DateTime'] = util.datestring(data['properties']['t_utc'], tz=config['local_tz'])    
     return data
 
 def save_file(request):
