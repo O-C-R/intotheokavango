@@ -43,13 +43,12 @@ except Exception as e:
 t = util.timestamp(dt)        
 features = fetch_features((kind,), t - (days * (24 * 60 * 60)), t, 1)
 
-data = features[0]
+print("num_features", len(features))
+for data in features[-200:]:
+    data['properties']['kind'] = kind
+    data_str = json.dumps(data, indent=4)
+    data_bytes = data_str.encode('utf-8')
+    print(data_str)
 
-data['properties']['kind'] = kind
-print(data)
-data_str = json.dumps(data, indent=4)
-data_bytes = data_str.encode('utf-8')
-print(data_str)
-
-response = net.read("http://localhost:9999/ingest/feature", data_bytes)
-print(response)
+    response = net.read("http://localhost:9999/ingest/migration", data_bytes)
+    print(response)

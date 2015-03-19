@@ -1,6 +1,0 @@
-{
-    "geometry": {"coordinates": [-73.99520499, 40.71790923, 0], "type": "Point"}, 
-    "id": 172652, 
-    "properties": {"AccelerometerX": "-0.2550506591796875", "AccelerometerY": "0.3568115234375", "AccelerometerZ": "9.559982299804688", "Accuracy": "22", "Activity": "F", "Bird Name": "Squacco Heron", "CompassHeading": "0", "Count": "2", "DateTime": "Tue Aug 12 2014 20:45:18 GMT-0400 (EDT)", "Latitude": "40.71790923", "Longitude": "-73.99520499", "TeamMember": "Tom", "t_utc": "1407890718"}, 
-    "type": "Feature"
-}

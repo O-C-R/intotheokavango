@@ -6,8 +6,7 @@ from housepy import config, log, server, util, strings
     Everything in the database is enforced as a valid GeoJSON Feature
     with the addition of the following fields in its properties:
         - expedition (eg okavango_15)
-        - t_utc (UTC timestamp)
-        - DateTime (set to local_tz)
+        - t_utc (UTC timestamp) and derived DateTime (set to local_tz, in the format "%Y-%m-%dT%H:%M:%S%z")
         - kind (string delineating what kind of feature it is)
     Each of these is indexed in the database.
 
@@ -32,6 +31,7 @@ class Ingest(server.Handler):
             return self.error("Kind \"%s\" not recognized" % kind)
         if not feature:
             return self.error("Ingest failed")
+        log.debug(feature)
         feature = verify_geojson(feature)
         feature = verify_geometry(feature)
         feature = verify_t(feature)
@@ -40,7 +40,7 @@ class Ingest(server.Handler):
         feature_id = self.db.features.insert_one(feature).inserted_id
         return self.text(str(feature_id))
 
-def ingest_json(request):
+def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""
     log.info("ingest.ingest_json")
     filename = save_file(request)    
@@ -50,7 +50,17 @@ def ingest_json(request):
     except Exception as e:
         log.error(log.exc(e))
         return None
-    return data        
+    return data      
+
+def ingest_json_body(request):
+    """Generic method for ingesting a JSON in the body of the post"""
+    # print(request.body)
+    try:
+        data = json.loads(str(request.body, encoding='utf-8'))
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return data      
 
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
@@ -60,7 +70,7 @@ def verify_geojson(data):
         data['type'] = data['type'] if 'type' in data else "Feature"
         data['geometry'] = data['geometry'] if 'geometry' in data else None
         data['properties'] = {key: strings.as_numeric(value) for (key, value) in data['properties'].items()} if 'properties' in data else {}
-        for key, value in {key: value for (key, value) in data.items() if key not in ['type', 'geometry', 'properties']}:
+        for key, value in {key: value for (key, value) in data.items() if key not in ['type', 'geometry', 'properties']}.items():
             data['properties'][key] = strings.as_numeric(value)
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
     except Exception as e:
