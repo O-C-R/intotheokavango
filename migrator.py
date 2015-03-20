@@ -30,7 +30,7 @@ def fetch_features(db, kinds, start_t, stop_t, skip=1):
         features.append(feature)
     return features
 
-kind = "ambit_geo"
+kind = "sighting"
 try:
     dt = datetime.datetime.now(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%d")
     dt = util.parse_date(dt, tz=config['local_tz'])
@@ -42,7 +42,7 @@ t = util.timestamp(dt)
 features = fetch_features((kind,), t - (days * (24 * 60 * 60)), t, 1)
 
 print("num_features", len(features))
-for data in features[-200:]:
+for data in features:#[-200:]:
     data['properties']['kind'] = kind
     data_str = json.dumps(data, indent=4)
     data_bytes = data_str.encode('utf-8')

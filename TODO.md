@@ -5,6 +5,7 @@
 ### thoughts
 - return feature collections
 - folders for uploaded data and for live accessible media is different
+- meta-views, like members of an expedition (+date range), species sighted, etc
 
 ### questions for Jer
 - files vs post body
