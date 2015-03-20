@@ -1,4 +1,4 @@
-import geojson, datetime, pytz
+import geojson, datetime, pytz, json
 from housepy import server, config, log, util, strings
 # from ingest import check_geo
 
@@ -31,7 +31,13 @@ class Api(server.Handler):
                 return self.error("Bad dates")          
 
         # special parsing for location
-        ## pass  
+        # expecting bounds (upper left (NW), lower right (SE)): lon_1,lat_1,lon_2,lat_2
+        # oka: 20,-17,26,-22 nyc: -75,41,-71,40
+        geo_bounds = self.get_argument('geoBounds', None)
+        if geo_bounds:
+            lon_1, lat_1, lon_2, lat_2 = [float(coord) for coord in geo_bounds.split(',')]
+            log.debug("geo_bounds %f,%f %f,%f" % (lon_1, lat_1, lon_2, lat_2))
+            search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [[ [lon_1, lat_1], [lon_2, lat_1], [lon_2, lat_2], [lon_1, lat_2], [lon_1, lat_1] ]]}}}
 
         # get all the rest of the arguments and format as properties    
         try:
@@ -41,16 +47,17 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {"properties.%s" % param: value for (param, value) in search.items() if param != 'location' and param != 'startDate' and param != 'endDate'}
+            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param != 'geoBounds' and param != 'startDate' and param != 'endDate'}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
 
-        log.info("SEARCH %s" % search) 
-        ## filter by current expedition if none provided?
+        # http://localhost:9999/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
+        log.info("SEARCH %s" % search)
 
         try:
             result = self.db.features.find(search).sort('t_utc')
+            print(json.dumps(result.explain(), indent=4))
             features = geojson.FeatureCollection([fix_id(feature) for feature in result])
         except Exception as e:
             return self.error(log.exc(e))
