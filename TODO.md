@@ -1,6 +1,7 @@
 ### now
-- t fixes and queries
-
+- geo queries
+- launch with migrated data
+- begin ingestion modules
 
 ### thoughts
 - return feature collections
@@ -17,3 +18,6 @@
 - most useful 'near' query
 - date format
 - mapbox is still pulling from me
+
+### remember
+- will have to re-migrate with altitude
