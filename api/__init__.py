@@ -2,8 +2,17 @@ import geojson, datetime, pytz, json, os, importlib
 from housepy import server, config, log, util, strings
 
 """
-    basically, the view defines what you want back, output is the format, the query defines the filter
-    Loading async/partials    
+    Basically, it's like this: /api/<view>/<output>?<query>
+
+    The view is what kind of thing you want back (eg, a FeatureCollection (features), or a list of expeditions)
+    The output is json if it's missing, otherwise, how about a map? or HTML? a chart?
+    See templates/api/map.html for an example of how to subsequently load the JSON data asyncronously
+
+    The query defines the filter. This might be any property at all, but keyed ones are:
+    - Expedition (eg okavango_14)
+    - Member (eg Jer)
+    - startDate and endDate (endDate is one day later if omitted and startDate is present)
+    - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
 
 """
 
@@ -27,8 +36,11 @@ class Api(server.Handler):
         except ImportError as e:
             log.error(log.exc(e))
             return self.error("View \"%s\" not recognized" % view_name)
-        if output == "map":
-            return self.render("api/map.html", query=(self.request.uri).replace("/map", ""))
+        if len(output):
+            try:
+                return self.render("api/%s.html" % output, query=(self.request.uri).replace("/%s" % output, ""))
+            except Exception as e:
+                return self.error("Could not render %s" % output)
 
         # time to build our search filter
         search = {}
