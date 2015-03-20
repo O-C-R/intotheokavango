@@ -20,7 +20,7 @@ class Home(server.Handler):
 
 
 handlers = [
-    (r"/api/?([^/]*)", Api),
+    (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
     (r"/?([^/]*)", Home),    
 ]    

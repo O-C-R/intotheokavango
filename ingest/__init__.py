@@ -30,6 +30,7 @@ class Ingest(server.Handler):
         module_name = "ingest.%s" % feature_type
         try:
             module = importlib.import_module(module_name)
+            log.info("Loaded %s module" % module_name)
             feature = module.parse(self.request)
         except ImportError as e:
             log.error(log.exc(e))
@@ -113,7 +114,7 @@ def verify_expedition(data):
     """Verify we have an Expedition and Member property"""
     for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member']:
         if wrong in data['properties']:
-            data['properties']['Member'] = data['properties'][wrong].title()
+            data['properties']['Member'] = data['properties'][wrong]
             del data['properties'][wrong]
     for wrong in ['expedition']:
         if wrong in data['properties']:
@@ -121,6 +122,8 @@ def verify_expedition(data):
             del data['properties'][wrong]
     if 'Member' not in data['properties']:
         data['properties']['Member'] = None
+    if data['properties']['Member'] is not None:
+        data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data

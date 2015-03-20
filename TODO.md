@@ -1,11 +1,11 @@
 ### now
-- api views with generated meta features (cached where?)
 - launch with migrated data
 - begin ingestion modules
 - resolution filter
 
 ### thoughts
 - folders for uploaded data and for live accessible media is different
+- meta view caching
 
 ### questions
 - files vs post body
@@ -15,4 +15,11 @@
 
 ### remember
 - will have to re-migrate with altitude
+
+
+
+
+
+
+
 

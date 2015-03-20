@@ -16,6 +16,10 @@ Add a python module in the `ingest` folder with the name of the endpoint. eg, `/
 The generic endpoint `/ingest` can always be used if a `kind` attribute is given in the data
 
 
+#### Advantage to dynamic loading of ingest and api modules
+If they are bad, they won't crash the system
+
+
 #### recent versions
 This code relies on pymongo 3.0b, which has more concise collection queries  
 mongo 3.1.0 supports altitude in the geojson fields (literally 6 days ago) -- current release version is 3.0.0  

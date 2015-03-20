@@ -1,23 +1,42 @@
-import geojson, datetime, pytz, json
+import geojson, datetime, pytz, json, os, importlib
 from housepy import server, config, log, util, strings
-# from ingest import check_geo
+
+"""
+    basically, the view defines what you want back, output is the format, the query defines the filter
+    Loading async/partials    
+
+"""
 
 class Api(server.Handler):
 
     def post(self, nop=None):
         return self.not_found()
 
-    def get(self, page=None): # take as many as necessary
-        if page == "map":
-            return self.render("api/map.html", query=self.request.query)
+    def get(self, view_name=None, output=None):
 
+        # do the routing and load view module
+        if not len(view_name):
+            log.info("Listing views...")
+            views = ["/api/%s" % filename.split('.')[0] for filename in os.listdir(os.path.abspath(os.path.dirname(__file__))) if filename[0] != "_" and filename[-3:] == ".py"]
+            response = {'description': "API view endpoints", "views": views}
+            return self.json(response)
+        module_name = "api.%s" % view_name
+        try:
+            view = importlib.import_module(module_name)
+            log.info("Loaded %s module" % module_name)
+        except ImportError as e:
+            log.error(log.exc(e))
+            return self.error("View \"%s\" not recognized" % view_name)
+        if output == "map":
+            return self.render("api/map.html", query=(self.request.uri).replace("/map", ""))
+
+        # time to build our search filter
         search = {}
 
         # special parsing for startDate and endDate
         start_string = self.get_argument('startDate', None) 
-        if start_string:
+        if start_string is not None:
             try:            
-                print(start_string)
                 start_dt = util.parse_date(start_string, tz=config['local_tz'])
                 start_t = util.timestamp(start_dt)        
                 end_string = self.get_argument('endDate', (start_dt + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
@@ -34,7 +53,7 @@ class Api(server.Handler):
         # expecting bounds (upper left (NW), lower right (SE)): lon_1,lat_1,lon_2,lat_2
         # oka: 20,-17,26,-22 nyc: -75,41,-71,40
         geo_bounds = self.get_argument('geoBounds', None)
-        if geo_bounds:
+        if geo_bounds is not None:
             lon_1, lat_1, lon_2, lat_2 = [float(coord) for coord in geo_bounds.split(',')]
             log.debug("geo_bounds %f,%f %f,%f" % (lon_1, lat_1, lon_2, lat_2))
             search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [[ [lon_1, lat_1], [lon_2, lat_1], [lon_2, lat_2], [lon_1, lat_2], [lon_1, lat_1] ]]}}}
@@ -55,17 +74,8 @@ class Api(server.Handler):
         # http://localhost:9999/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
         log.info("SEARCH %s" % search)
 
+        # pass our search to the view module for execution and formatting
         try:
-            result = self.db.features.find(search).sort('t_utc')
-            print(json.dumps(result.explain(), indent=4))
-            features = geojson.FeatureCollection([fix_id(feature) for feature in result])
+            return view.assemble(self, search)
         except Exception as e:
             return self.error(log.exc(e))
-
-        log.info("Returning %s features" % len(features['features']))
-        return self.json(features)
-
-def fix_id(feature):
-    feature['id'] = feature['_id']
-    del feature['_id']
-    return feature
