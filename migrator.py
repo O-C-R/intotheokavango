@@ -30,7 +30,7 @@ def fetch_features(db, kinds, start_t, stop_t, skip=1):
         features.append(feature)
     return features
 
-kind = "sighting"
+feature_type = "ambit_geo"
 try:
     dt = datetime.datetime.now(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%d")
     dt = util.parse_date(dt, tz=config['local_tz'])
@@ -39,11 +39,11 @@ except Exception as e:
     log.error("Bad parameters: %s" % log.exc(e))
     exit()
 t = util.timestamp(dt)        
-features = fetch_features((kind,), t - (days * (24 * 60 * 60)), t, 1)
+features = fetch_features((feature_type,), t - (days * (24 * 60 * 60)), t, 1)
 
 print("num_features", len(features))
 for data in features:#[-200:]:
-    data['properties']['kind'] = kind
+    data['properties']['FeatureType'] = feature_type
     data_str = json.dumps(data, indent=4)
     data_bytes = data_str.encode('utf-8')
     print(data_str)

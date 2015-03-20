@@ -15,5 +15,6 @@ def parse(request):
     t_utc = strings.as_numeric(data['properties']['t_utc'])
     t_utc -= 180000
     data['properties']['t_utc'] = t_utc    
-    data['expedition'] = "okavango_14"
+    data['properties']['expedition'] = "okavango_14"
+    del data['properties']['ContentType']
     return data

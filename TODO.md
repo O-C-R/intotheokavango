@@ -2,6 +2,8 @@
 - geo queries
 - launch with migrated data
 - begin ingestion modules
+- resolution filter
+- max points
 
 ### thoughts
 - return feature collections
@@ -10,14 +12,10 @@
 
 ### questions for Jer
 - files vs post body
-- expedition tags
-- case sensitivity is propagated
 - email vs api
-- submission endpoints
 - incoming as geojson or not
-- most useful 'near' query
-- date format
 - mapbox is still pulling from me
 
 ### remember
 - will have to re-migrate with altitude
+

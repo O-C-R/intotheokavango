@@ -8,8 +8,9 @@ client = MongoClient(mongo['host'], mongo['port'])
 db = client[mongo['database']]
 
 try:
-    db.features.create_index("properties.expedition")
+    db.features.create_index("properties.Expedition")
     db.features.create_index("properties.t_utc")
+    db.features.create_index("properties.Member")
     db.features.create_index([("geometry", GEOSPHERE)])
 except Exception as e:
     log.error(log.exc(e))

@@ -5,10 +5,15 @@ from housepy import config, log, server, util, strings
     Ingestion is forgiving and will accept and reformat flat JSON.
     Everything in the database is enforced as a valid GeoJSON Feature
     with the addition of the following fields in its properties:
-        - expedition (eg okavango_15)
-        - t_utc (UTC timestamp) and derived DateTime (set to local_tz, in the format "%Y-%m-%dT%H:%M:%S%z")
-        - kind (string delineating what kind of feature it is)
+        - Expedition (eg okavango_15)
+        - FeatureType (string delineating what kind of feature it is)
+        - Member (who collected the data, human or otherwise)
+        - t_utc (UTC timestamp) and derived DateTime (set to local_tz, in the format "%Y-%m-%dT%H:%M:%S%z")        
     Each of these is indexed in the database.
+    Other properties should be camelcased with uppercase first letter (enforced).
+    The ingestion endpoints hit the appropriate submodule, which is responsible
+    for parsing whatever input into a dictionary with a valid t_utc and
+    hopefully good style.
 
 """
 
@@ -17,60 +22,50 @@ class Ingest(server.Handler):
     def get(self, page=None):
         return self.not_found()        
 
-    def post(self, kind=None):
-        log.info("Ingest.post %s" % kind)
-        if kind is None or not len(kind):
-            kind = self.get_argument("kind", "") # if we didn't use an endpoint, check if it's in the variables
-        kind = kind.lower().split('.')[0].strip()
-        module_name = "ingest.%s" % kind
+    def post(self, feature_type=None):
+        log.info("Ingest.post %s" % feature_type)
+        if feature_type is None or not len(feature_type):
+            feature_type = self.get_argument("FeatureType", "") # if we didn't use an endpoint, check if it's in the variables
+        feature_type = feature_type.lower().split('.')[0].strip()
+        module_name = "ingest.%s" % feature_type
         try:
             module = importlib.import_module(module_name)
             feature = module.parse(self.request)
         except ImportError as e:
             log.error(log.exc(e))
-            return self.error("Kind \"%s\" not recognized" % kind)
+            return self.error("FeatureType \"%s\" not recognized" % feature_type)
         if not feature:
             return self.error("Ingest failed")
         feature = verify_geojson(feature)
+        if not feature:
+            return self.error("Ingest failed: bad format")
         feature = verify_geometry(feature)
         feature = verify_t(feature)
-        feature['properties'].update({'expedition': config['expedition'] if 'expedition' not in feature else feature['expedition'], 'kind': kind, 't_created': util.timestamp(ms=True)})
+        if not feature:
+            return self.error("Ingest failed: missing t_utc")
+        feature = verify_expedition(feature)
+        feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
         feature_id = self.db.features.insert_one(feature).inserted_id
         return self.text(str(feature_id))
 
-def ingest_json_file(request):
-    """Generic method for ingesting a JSON file"""
-    log.info("ingest.ingest_json")
-    filename = save_file(request)    
-    try:
-        with open(filename) as f:
-            data = json.loads(f.read())
-    except Exception as e:
-        log.error(log.exc(e))
-        return None
-    return data      
-
-def ingest_json_body(request):
-    """Generic method for ingesting a JSON in the body of the post"""
-    # print(request.body)
-    try:
-        data = json.loads(str(request.body, encoding='utf-8'))
-    except Exception as e:
-        log.error(log.exc(e))
-        return None
-    return data      
-
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
+    """Enforces camelcasing of properties"""
     if 'id' in data:
         del data['id']
     try:
         data['type'] = data['type'] if 'type' in data else "Feature"
         data['geometry'] = data['geometry'] if 'geometry' in data else None
-        data['properties'] = {key: strings.as_numeric(value) for (key, value) in data['properties'].items()} if 'properties' in data else {}
+        if 'properties' not in data:
+            data['properties'] == {}
         for key, value in {key: value for (key, value) in data.items() if key not in ['type', 'geometry', 'properties']}.items():
             data['properties'][key] = strings.as_numeric(value)
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
+        for key, value in data['properties'].items():
+            fixed_key = strings.camelcase(key) if key != 't_utc' else key
+            data['properties'][fixed_key] = strings.as_numeric(value)
+            if key != fixed_key:                
+                del data['properties'][key]
     except Exception as e:
         log.error(log.exc(e))
         return None
@@ -100,7 +95,7 @@ def verify_geometry(data):
             data['properties'] = properties     
 
         ### temporarily ditch altitude prior to mongo 3.1.0
-        if 'geometry' in data:
+        if 'geometry' in data and data['geometry'] is not None:
             data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
 
     except Exception as e:
@@ -114,6 +109,44 @@ def verify_t(data):
     data['properties']['DateTime'] = util.datestring(data['properties']['t_utc'], tz=config['local_tz'])    
     return data
 
+def verify_expedition(data):
+    """Verify we have an Expedition and Member property"""
+    for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member']:
+        if wrong in data['properties']:
+            data['properties']['Member'] = data['properties'][wrong].title()
+            del data['properties'][wrong]
+    for wrong in ['expedition']:
+        if wrong in data['properties']:
+            data['properties']['Expedition'] = data['properties'][wrong]
+            del data['properties'][wrong]
+    if 'Member' not in data['properties']:
+        data['properties']['Member'] = None
+    if 'Expedition' not in data['properties']:
+        data['properties']['Expedition'] = config['expedition']
+    return data
+
+def ingest_json_file(request):
+    """Generic method for ingesting a JSON file"""
+    log.info("ingest.ingest_json")
+    filename = save_file(request)    
+    try:
+        with open(filename) as f:
+            data = json.loads(f.read())
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return data      
+
+def ingest_json_body(request):
+    """Generic method for ingesting a JSON in the body of the post"""
+    # print(request.body)
+    try:
+        data = json.loads(str(request.body, encoding='utf-8'))
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return data      
+
 def save_file(request):
     for key, fileinfo in request.files.items():
         fileinfo = fileinfo[0]
@@ -121,5 +154,4 @@ def save_file(request):
         with open(filename, 'wb') as f:
             f.write(fileinfo['body'])
         return filename
-
 
