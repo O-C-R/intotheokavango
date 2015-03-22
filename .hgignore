@@ -5,10 +5,11 @@ __pycache__
 logs
 config.yaml
 housepy
-data/*
+static/data/*
 run/*
 dev/*
 *.pem
 okavango_old
-data/*
+uploads/*
 data.db
+scripts/okavango.pem

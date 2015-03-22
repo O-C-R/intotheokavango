@@ -1,5 +1,4 @@
 ### now
-- launch with migrated data
 - begin ingestion modules
 - resolution filter
 

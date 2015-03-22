@@ -30,7 +30,8 @@ def fetch_features(db, kinds, start_t, stop_t, skip=1):
         features.append(feature)
     return features
 
-feature_type = "ambit_geo"
+# ambit, ambit_geo, audio, beacon, ethnographic, hydrosensor, image, sighting, tweet
+feature_type = "sighting"
 try:
     dt = datetime.datetime.now(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%d")
     dt = util.parse_date(dt, tz=config['local_tz'])
@@ -41,11 +42,15 @@ except Exception as e:
 t = util.timestamp(dt)        
 features = fetch_features((feature_type,), t - (days * (24 * 60 * 60)), t, 1)
 
-print("num_features", len(features))
+log.info("num_features %s" % len(features))
 for data in features:#[-200:]:
     data['properties']['FeatureType'] = feature_type
     data_str = json.dumps(data, indent=4)
     data_bytes = data_str.encode('utf-8')
-    print(data_str)
-    response = net.read("http://localhost:9999/ingest/migration", data_bytes)
-    print(response)
+    log.info(data_str)
+    try:
+        response = net.read("http://localhost:7777/ingest/migration", data_bytes)
+    except Exception as e:
+        log.error(e)
+    else:
+        log.info(response)

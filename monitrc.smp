@@ -1,0 +1,27 @@
+###
+#
+# chmod 0600 monitrc.smp
+# sudo chown root monitrc.smp
+# sudo cp monitrc.smp /etc/monit/monitrc
+# then set START=yes here: /etc/default/monit
+# sudo service monit start
+# sudo monit status
+#
+# will run as root via init.d
+#
+# remember, _everything_ under monit needs absolute paths
+# check it: 
+#
+###
+
+set logfile /home/ubuntu/logs/monit.log
+
+# poll at 2-minute intervals
+set daemon 120
+
+set httpd port 2812 and use address localhost   # configure monitoring webservice
+  allow 0.0.0.0/0.0.0.0                        # Allow everything to connect  
+
+check process main with pidfile /home/ubuntu/okavango_15/run/main.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango_15/main.py" 
+  stop program = "/bin/pwd"
