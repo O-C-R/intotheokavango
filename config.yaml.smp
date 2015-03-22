@@ -1,0 +1,18 @@
+local_tz: "Africa/Johannesburg"    # will convert from this into UTC for incoming data and API requests
+
+expedition: okavango_15
+
+server:
+    port: 7777
+
+mongo:
+    host: localhost
+    port: 27017
+    database: okavango
+
+allowed_senders:
+    - brian.house@gmail.com
+    - expedition@toad.co.za
+    - 300234011090180@ast.globalalerting.com
+
+satellite: TS090180

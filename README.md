@@ -18,6 +18,16 @@ and yo, make sure the server is on top of the time:
 
 Check it: `sudo ntpq -p`    
 
+###### nginx
+    sudo service nginx start
+    sudo update-rc.d nginx defaults
+    sudo /etc/init.d/nginx restart    
+Can use this to show syntax errors in /etc/nginx.conf: `sudo nginx -c /etc/nginx/nginx.conf`
+
+###### mongo
+    http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+    sudo service mongo start
+
 ##### The server
 
 ###### Login
@@ -35,6 +45,17 @@ Monit is used to keep main.py up and running. Check its status: `sudo monit stat
 
 ###### Check disk space
     sudo df -h
+
+###### Check current memory usage
+    top; m
+
+###### Check reasons for killed processes
+    dmesg
+http://stackoverflow.com/questions/13890789/convert-dmesg-timestamp-to-custom-date-format
+
+###### Look at file sizes
+    sudo du -ah
+
 
 
 #### Usage
