@@ -5,7 +5,7 @@ var map;                     // the map object
 function initMap () {
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
-        center: new L.LatLng(22.269287, -18.971234),
+        center: new L.LatLng(-18.971234, 22.269287),
         zoomControl: true,
         attributionControl: false,
         doubleClickZoom: true,
