@@ -1,5 +1,5 @@
 ### now
-- currently no protection on duplicates
+- currently no protection on duplicates -- unique second/type keys probably ok except for ambit
 - begin ingestion modules
 - resolution filter
 
