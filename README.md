@@ -11,7 +11,14 @@ requires housepy (https://github.com/brianhouse/housepy)
 
     sudo pip-3.4 install -r requirements.txt
 
-and yo, make sure the server is on top of the time:
+
+##### The server
+
+###### Login
+    ./scripts/login.sh    
+
+###### ntp
+yo, make sure the server is on top of the time:
 
     tzselect
     sudo apt-get install ntp
@@ -20,18 +27,15 @@ Check it: `sudo ntpq -p`
 
 ###### nginx
     sudo service nginx start
-    sudo update-rc.d nginx defaults
-    sudo /etc/init.d/nginx restart    
 Can use this to show syntax errors in /etc/nginx.conf: `sudo nginx -c /etc/nginx/nginx.conf`
 
 ###### mongo
-    http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
-    sudo service mongo start
-
-##### The server
-
-###### Login
-    ./scripts/login.sh    
+http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+data at /mnt/data
+    `sudo chown mongodb /mnt/data`
+    `sudo nano /etc/mongod.conf`
+    `sudo service mongo start`
+cat /var/log/mongodb/mongod.log
 
 ###### Running
 Mongo, nginx, and monit should be configured -- see .smp files. Then: `sudo ./scripts/start.sh`
@@ -55,7 +59,6 @@ http://stackoverflow.com/questions/13890789/convert-dmesg-timestamp-to-custom-da
 
 ###### Look at file sizes
     sudo du -ah
-
 
 
 #### Usage

@@ -5,9 +5,9 @@ var map;                     // the map object
 function initMap () {
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
-        center: new L.LatLng(-19.910768799999996,23.505462599999994),
+        center: new L.LatLng(22.269287, -18.971234),
         zoomControl: true,
-        attributionControl: true,
+        attributionControl: false,
         doubleClickZoom: true,
         scrollWheelZoom: true,
         boxZoom: true,

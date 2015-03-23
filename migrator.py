@@ -5,7 +5,7 @@ from housepy import config, log, util, net
 
 def db_call(f):
     def wrapper(*args):
-        connection = sqlite3.connect(os.path.abspath(os.path.join(os.path.dirname(__file__), "data.db")))
+        connection = sqlite3.connect(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "okavango", "data.db")))
         connection.row_factory = sqlite3.Row
         db = connection.cursor()
         results = f(db, *args)
@@ -31,7 +31,7 @@ def fetch_features(db, kinds, start_t, stop_t, skip=1):
     return features
 
 # ambit, ambit_geo, audio, beacon, ethnographic, hydrosensor, image, sighting, tweet
-feature_type = "sighting"
+feature_type = "ambit"
 try:
     dt = datetime.datetime.now(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%d")
     dt = util.parse_date(dt, tz=config['local_tz'])
