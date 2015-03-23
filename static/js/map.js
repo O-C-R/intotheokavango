@@ -14,7 +14,7 @@ function initMap () {
         touchZoom: false,
         dragging: true,
         keyboard: true,
-        zoom: 14,
+        zoom: 10,
         minZoom: 1,                    
         maxZoom: 20
     });     
