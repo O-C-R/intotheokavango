@@ -3,7 +3,8 @@ from housepy import config, log
 
 def assemble(self, search):
     log.info("features.assemble")
-    limit = self.get_argument('limit', 100)
+    # limit = self.get_argument('limit', 100) # this fails on int arguments, which I think is a tornado bug
+    limit = self.request.arguments['limit'][0] if 'limit' in self.request.arguments else 100
     try:
         result = self.db.features.find(search).limit(limit).sort('t_utc')
         # log.debug(json.dumps(result.explain(), indent=4))

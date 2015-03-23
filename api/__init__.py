@@ -80,7 +80,7 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param != 'geoBounds' and param != 'startDate' and param != 'endDate' and param != 'results'}
+            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param != 'geoBounds' and param != 'startDate' and param != 'endDate' and param != 'limit'}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
