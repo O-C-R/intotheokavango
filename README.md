@@ -36,7 +36,7 @@ Alter `/etc/mongo/mongo.conf` to store data at `mnt/data`
     sudo chown mongodb /mnt/data
     sudo nano /etc/mongod.conf
     sudo service mongo start
-cat /var/log/mongodb/mongod.log
+    cat /var/log/mongodb/mongod.log
 
 ###### Running
 Mongo, nginx, and monit should be configured -- see .smp files. Then: `sudo ./scripts/start.sh`
@@ -46,6 +46,7 @@ Mongo, nginx, and monit should be configured -- see .smp files. Then: `sudo ./sc
     ps aux | grep mongo
     ps aux | grep nginx
 
+###### Monit
 Monit is used to keep main.py up and running. Check its status: `sudo monit status`
 
 ###### Check disk space
@@ -86,7 +87,7 @@ See in-module comments for more information (`ingest/__init__.py`)
 
 ##### API (view) interface
 
-###### Calling the api
+###### Calling the API
 Basically, it's like this: `/api/<view>/<output>?<query>`
 
 The `view` is what kind of thing you want back (eg, a FeatureCollection for `features`, or a json list of expeditions)
@@ -101,10 +102,10 @@ The `query` defines the filter. This might be any property in the GeoJSON at all
 
 By default, returns the first 100 results. add limit=N for more.
 
-###### Adding a new api endpoint
+###### Adding a new API endpoint
 Add a python module in the `api` folder with the name of the endpoint. eg, `/api/lion` will load the module `lion.py`. The module should contain a single function, `assemble(tornado.Handler, search)` which receives a server Handler and an assembled Mongo search document, and which returns an HTTP response.
 
-###### Adding a new api output format
+###### Adding a new API output format
 The server will automatically look in the templates/api folder for something named the same as the output parameter it was passed. So, for example, /api/features/map will load up "map.html". So maybe we would want "chart.html" or "sonification.html" or whatever -- anything html/javascript based. See `templates/api/map.html` for an example of how to subsequently load the JSON data asynchronously.
 
 ie, add an html document in the `templates/api` folder, like `map.html`, but not that one, it's already there.

@@ -1,7 +1,11 @@
 ### now
+- BirdName -> species name
 - currently no protection on duplicates -- unique second/type keys probably ok except for ambit
 - begin ingestion modules
 - resolution filter
+- 'order' parameter "descending"
+- ExpeditionDay parameter
+- given a time stamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
 
 ### thoughts
 - might want to run everything off of /mnt/data considering static files (or use a hardlink?)
@@ -21,6 +25,19 @@
 
 
 
+#### injestion
+
+- beacon is email, probably same (unknown)
+- ambit data is email
+
+- hydrosensors --- twilio
+
+- json file attachments, or images or sounds
+    - soundcloud? API
+
+- twitter
 
 
+#### processors
 
+- heartrater

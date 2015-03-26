@@ -15,10 +15,22 @@ def parse(request):
     if 't_utc' not in data['properties']:
         log.error("t_utc missing")
         return None
-    t_utc = strings.as_numeric(data['properties']['t_utc'])
-    t_utc -= 180000
-    data['properties']['t_utc'] = t_utc    
     data['properties']['expedition'] = "okavango_14"
     if 'ContentType' in data['properties']:
         del data['properties']['ContentType']
+
+    """ hacks for correcting okavango_14 data go here """
+    
+    # Bird Name should be SpeciesName    
+    for key, item in data['properties'].items():
+        modkey = key.strip().lower().replace(' ', '')
+        if modkey == "birdname":
+            data['properties']['SpeciesName'] = item
+            del data['properties'][key]
+
+    # t_utc and DateTime dont match        
+    t_utc = strings.as_numeric(data['properties']['t_utc'])
+    t_utc -= 180000
+    data['properties']['t_utc'] = t_utc    
+
     return data
