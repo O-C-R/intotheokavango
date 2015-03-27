@@ -14,7 +14,8 @@ from housepy import server, config, log, util, strings
     - startDate and endDate (endDate is one day later if omitted and startDate is present)
     - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
 
-    By default, returns the first 100 results. limit=N for more.
+    By default, returns the first 100 results. limit=N for more. 
+    Sorted in ascending order by t_utc. To reverse, use order=descending.
 
 """
 

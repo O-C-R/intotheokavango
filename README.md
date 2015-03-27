@@ -100,7 +100,8 @@ The `query` defines the filter. This might be any property in the GeoJSON at all
 - startDate and endDate
 - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
 
-By default, returns the first 100 results. add limit=N for more.
+By default, returns the first 100 results. add `limit=N` for more.  
+Sorted in ascending order by t_utc. To reverse, use `order=descending`.  
 
 ###### Adding a new API endpoint
 Add a python module in the `api` folder with the name of the endpoint. eg, `/api/lion` will load the module `lion.py`. The module should contain a single function, `assemble(tornado.Handler, search)` which receives a server Handler and an assembled Mongo search document, and which returns an HTTP response.
