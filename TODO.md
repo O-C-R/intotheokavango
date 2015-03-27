@@ -5,7 +5,6 @@
 - currently no protection on duplicates -- unique second/type keys probably ok except for ambit
 - begin ingestion modules
 - resolution filter
-- 'order' parameter "descending"
 - ExpeditionDay parameter
 - given a time stamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
 
