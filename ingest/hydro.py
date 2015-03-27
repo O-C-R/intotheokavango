@@ -1,4 +1,6 @@
 from ingest import ingest_json_file
 
-parse = ingest_json_file
+def parse(request):
+    log.info("hydro.parse")
+    return ingest_json_file(request)
 

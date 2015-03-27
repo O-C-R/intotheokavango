@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from housepy import config, log
-from pymongo import MongoClient, GEOSPHERE, ASCENDING
+from pymongo import MongoClient, GEOSPHERE, ASCENDING, DESCENDING
 
 mongo = config['mongo']
 client = MongoClient(mongo['host'], mongo['port'])
@@ -9,7 +9,8 @@ db = client[mongo['database']]
 
 try:
     db.features.create_index("properties.Expedition")
-    db.features.create_index("properties.t_utc")
+    db.features.create_index([("properties.t_utc", ASCENDING)])
+    db.features.create_index([("properties.t_utc", DESCENDING)])
     db.features.create_index("properties.Member")
     db.features.create_index([("geometry", GEOSPHERE)])
 except Exception as e:

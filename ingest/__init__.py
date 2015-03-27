@@ -58,7 +58,7 @@ def verify_geojson(data):
         data['type'] = data['type'] if 'type' in data else "Feature"
         data['geometry'] = data['geometry'] if 'geometry' in data else None
         if 'properties' not in data:
-            data['properties'] == {}
+            data['properties'] = {}
         for key, value in {key: value for (key, value) in data.items() if key not in ['type', 'geometry', 'properties']}.items():
             data['properties'][key] = strings.as_numeric(value)
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
@@ -74,7 +74,7 @@ def verify_geojson(data):
 
 def verify_geometry(data):
     """Verify or reformat geometry data"""
-    lat, lon, alt = 0, 0, 0
+    lon, lat, alt = None, None, None
     properties = data['properties']
     delete = []
     try:
@@ -87,10 +87,10 @@ def verify_geometry(data):
                 delete.append(p)
             elif p.lower().strip() == 'altitude' or p.lower().strip() == 'alt':    
                 alt = value
-                delete.append(p)
-        if lat and lon:
-            if 'geometry' not in data:
-                data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt)]}
+                delete.append(p)    
+        if lon is not None and lat is not None:
+            if 'geometry' not in data or data['geometry'] is None:
+                data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt) if alt is not None else None]}
             for p in delete:
                 del properties[p]
             data['properties'] = properties     
@@ -151,10 +151,13 @@ def ingest_json_body(request):
     return data      
 
 def save_file(request):
-    for key, fileinfo in request.files.items():
-        fileinfo = fileinfo[0]
-        filename = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
-        with open(filename, 'wb') as f:
-            f.write(fileinfo['body'])
-        return filename
-
+    try:
+        for key, fileinfo in request.files.items():
+            fileinfo = fileinfo[0]
+            filename = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+            with open(filename, 'wb') as f:
+                f.write(fileinfo['body'])
+            return filename
+    except Exception as e:
+        log.error(log.exc(e))
+        return None

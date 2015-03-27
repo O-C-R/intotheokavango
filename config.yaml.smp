@@ -1,3 +1,5 @@
+url: http://localhost:7777
+
 local_tz: "Africa/Johannesburg"    # will convert from this into UTC for incoming data and API requests
 
 expedition: okavango_15
@@ -10,9 +12,20 @@ mongo:
     port: 27017
     database: okavango
 
-allowed_senders:
-    - brian.house@gmail.com
-    - expedition@toad.co.za
-    - 300234011090180@ast.globalalerting.com
+email:
+    imap:
+        server: mail.webfaction.com
+        username: 
+        password: 
+    smtp:
+        name: Okavango API Project
+        address: okavango@o-c-r.org
+        server: smtp.webfaction.com
+        port: 587
+        username: 
+        password:          
 
-satellite: TS090180
+allowed_senders:
+
+satellite: 
+
