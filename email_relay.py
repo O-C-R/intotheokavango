@@ -16,7 +16,10 @@ def main():
         log.info("--> subject: %s" % subject)
         if config['satellite'].lower() in subject:            
             # relay a beacon (body post)
-            net.read("%s/ingest/beacon" % config['url'], data=message['body'])
+            url = "%s/ingest/beacon" % config['url']
+            log.info("Sending to %s..." % url)
+            response = net.read(url, str(message['body']).encode('utf-8'))
+            log.info("--> %s" % response)
         else:
             # unpack the ambit zip and post each sample (to ambit or to ambit_geo)
             log.info("--> %s attachments" % len(message['attachments']))

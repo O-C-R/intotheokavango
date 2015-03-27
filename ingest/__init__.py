@@ -142,13 +142,21 @@ def ingest_json_file(request):
 
 def ingest_json_body(request):
     """Generic method for ingesting a JSON in the body of the post"""
-    # print(request.body)
     try:
         data = json.loads(str(request.body, encoding='utf-8'))
     except Exception as e:
         log.error(log.exc(e))
         return None
     return data      
+
+def ingest_plain_body(request):
+    """Generic method for ingesting the body of the post"""
+    try:
+        content = str(request.body, encoding='utf-8')
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return content      
 
 def save_file(request):
     try:
