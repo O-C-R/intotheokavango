@@ -1,7 +1,7 @@
 import geojson
 from housepy import config, log
 
-def assemble(self, search):
+def assemble(self, search, limit, order):
     log.info("expeditions.assemble")
     try:
         results = self.db.features.find(search).distinct('properties.Expedition')

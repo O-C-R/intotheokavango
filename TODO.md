@@ -1,6 +1,5 @@
 ### now
 - resolution filter
-- ExpeditionDay parameter
 - given a time stamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
 - cron 'processors', like heartrater, geo-assigner...
 - twilio hydrosensors

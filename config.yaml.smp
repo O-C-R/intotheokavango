@@ -4,6 +4,10 @@ local_tz: "Africa/Johannesburg"    # will convert from this into UTC for incomin
 
 expedition: okavango_15
 
+start_date: 
+    okavango_14:
+    okavango_15:
+
 server:
     port: 7777
 
@@ -30,7 +34,13 @@ allowed_senders:
 satellite: 
 
 twitter:
-    app_key_data: 
-    app_secret_data: 
-    oauth_token_data: 
-    oauth_token_secret_data: 
+    main:
+        app_key: 
+        app_secret: 
+        oauth_token: 
+        oauth_token_secret: 
+    data:
+        app_key: 
+        app_secret: 
+        oauth_token: 
+        oauth_token_secret: 

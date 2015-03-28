@@ -100,6 +100,8 @@ The `query` defines the filter. This might be any property in the GeoJSON at all
 - startDate and endDate
 - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
 
+Can also do expeditionDay=N for the 24 hour period N days after the expedition start date specified in the config
+
 By default, returns the first 100 results. add `limit=N` for more.  
 Sorted in ascending order by t_utc. To reverse, use `order=descending`.  
 

@@ -1,5 +1,6 @@
-import geojson, datetime, pytz, json, os, importlib
+import geojson, datetime, pytz, json, os, importlib, datetime
 from housepy import server, config, log, util, strings
+from pymongo import ASCENDING, DESCENDING
 
 """
     Basically, it's like this: /api/<view>/<output>?<query>
@@ -13,6 +14,8 @@ from housepy import server, config, log, util, strings
     - Member (eg Jer)
     - startDate and endDate (endDate is one day later if omitted and startDate is present)
     - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
+
+    Can also do expeditionDay=N for the 24 hour period N days after the expedition start date specified in the config
 
     By default, returns the first 100 results. limit=N for more. 
     Sorted in ascending order by t_utc. To reverse, use order=descending.
@@ -69,9 +72,35 @@ class Api(server.Handler):
         # oka: 20,-17,26,-22 nyc: -75,41,-71,40
         geo_bounds = self.get_argument('geoBounds', None)
         if geo_bounds is not None:
-            lon_1, lat_1, lon_2, lat_2 = [float(coord) for coord in geo_bounds.split(',')]
-            log.debug("geo_bounds %f,%f %f,%f" % (lon_1, lat_1, lon_2, lat_2))
-            search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [[ [lon_1, lat_1], [lon_2, lat_1], [lon_2, lat_2], [lon_1, lat_2], [lon_1, lat_1] ]]}}}
+            try:
+                lon_1, lat_1, lon_2, lat_2 = [float(coord) for coord in geo_bounds.split(',')]
+                log.debug("geo_bounds %f,%f %f,%f" % (lon_1, lat_1, lon_2, lat_2))
+                search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [[ [lon_1, lat_1], [lon_2, lat_1], [lon_2, lat_2], [lon_1, lat_2], [lon_1, lat_1] ]]}}}
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad geometry")
+
+        # special parsing for expeditionDay (overrides startDate / endDate)
+        expedition_day = self.get_argument('expeditionDay', None)
+        if expedition_day is not None:
+            try:
+                expedition = self.get_argument('expedition', config['expedition'])
+                expedition = self.get_argument('Expedition', expedition)
+                start_dt = util.parse_date(str(config['start_date'][expedition]), tz=config['local_tz'])
+                expedition_day = int(expedition_day) - 1
+                log.debug("%s days after %s" % (expedition_day, start_dt))
+                gt_t = util.timestamp(start_dt + datetime.timedelta(days=expedition_day))
+                lt_t = util.timestamp(start_dt + datetime.timedelta(days=expedition_day + 1))
+                search['t_utc'] = {'$gt': gt_t, '$lt': lt_t}
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad day")
+
+        # get limit and order
+        # limit = self.get_argument('limit', 100) # this fails on int arguments, which I think is a tornado bug
+        limit = self.request.arguments['limit'][0] if 'limit' in self.request.arguments else 100
+        order = self.request.arguments['order'][0].lower() if 'order' in self.request.arguments else 'ascending'
+        order = ASCENDING if order == "ascending" else DESCENDING
 
         # get all the rest of the arguments and format as properties    
         try:
@@ -81,16 +110,16 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'limit', 'order']}
+            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order']}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
 
-        # http://localhost:9999/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
+        # http://localhost:7777/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
         log.info("SEARCH %s" % search)
 
         # pass our search to the view module for execution and formatting
         try:
-            return view.assemble(self, search)
+            return view.assemble(self, search, limit, order)
         except Exception as e:
             return self.error(log.exc(e))
