@@ -29,3 +29,8 @@ allowed_senders:
 
 satellite: 
 
+twitter:
+    app_key_data: 
+    app_secret_data: 
+    oauth_token_data: 
+    oauth_token_secret_data: 

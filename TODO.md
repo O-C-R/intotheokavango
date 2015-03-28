@@ -1,10 +1,9 @@
 ### now
-- cron 'processors', like heartrater, geo-assigner...
-- cron ingestors, including email_relay, but also twitter... group all these into a module with error handling, one cron
-- twilio hydrosensors
 - resolution filter
 - ExpeditionDay parameter
 - given a time stamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
+- cron 'processors', like heartrater, geo-assigner...
+- twilio hydrosensors
 
 ### thoughts
 - might want to run everything off of /mnt/data considering static files (or use a hardlink?)
