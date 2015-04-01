@@ -1,7 +1,6 @@
 ### now
+- set up crons on server
 - resolution filter
-- given a timestamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
-- cron 'processors', like heartrater, geo-assigner...
 - twilio hydrosensors
 
 ### thoughts
