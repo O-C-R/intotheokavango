@@ -20,12 +20,29 @@ function initMap () {
     });     
 }
 
+var geojsonMarkerOptions = {
+    radius: 5,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
 /* load data file */
 function loadData () {
     $.getJSON(path_to_data, function(data) {
-        L.geoJson(data).addTo(map);
+        L.geoJson(data, {
+            pointToLayer: function (feature, latlng) {
+               return L.circleMarker(latlng, geojsonMarkerOptions);
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc']);
+            }
+        }).addTo(map);
     }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });    
 }
+
 
 /* executes on load */
 $(document).ready(function() {

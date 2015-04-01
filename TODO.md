@@ -1,6 +1,6 @@
 ### now
 - resolution filter
-- given a time stamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
+- given a timestamp find a geo -- (two pass? beacons come first, ambit data later) -- geoassigner process
 - cron 'processors', like heartrater, geo-assigner...
 - twilio hydrosensors
 
@@ -16,3 +16,15 @@
 - json file attachments, or images or sounds
     - soundcloud? API
 - twitter
+
+
+
+
+Resolution
+
+supports:
+- all
+- hourly
+- daily
+
+does this make sense for all data? it's really just for position and heartrate, and it should be averaged

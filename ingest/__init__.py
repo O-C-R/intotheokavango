@@ -15,6 +15,10 @@ from housepy import config, log, server, util, strings
     for parsing whatever input into a dictionary with a valid t_utc and
     hopefully good style.
 
+    Geo note: if there is no geometry included in a feature, the system will attempt to estimate one.
+    It does this by looking for the closest features temporally on either end and making a weighted average.
+    The geo_estimator processors will do this repeatedly until ambit data is used, presumably the most accurate.
+
 """
 
 class Ingest(server.Handler):
@@ -41,6 +45,8 @@ class Ingest(server.Handler):
         if not feature:
             return self.error("Ingest failed: bad format")
         feature = verify_geometry(feature)
+        if feature['geometry'] is None:
+            feature = estimate_geometry(feature, self.db)
         feature = verify_t(feature)
         if not feature:
             return self.error("Ingest failed: missing t_utc")
@@ -89,11 +95,11 @@ def verify_geometry(data):
                 alt = value
                 delete.append(p)    
         if lon is not None and lat is not None:
-            if 'geometry' not in data or data['geometry'] is None:
+            if data['geometry'] is None:
                 data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt) if alt is not None else None]}
             for p in delete:
                 del properties[p]
-            data['properties'] = properties     
+            data['properties'] = properties    
 
         ### temporarily ditch altitude prior to mongo 3.1.0
         if 'geometry' in data and data['geometry'] is not None:
@@ -101,6 +107,33 @@ def verify_geometry(data):
 
     except Exception as e:
         log.error("Error parsing coordinates: %s" % log.exc(e))
+    return data
+
+def estimate_geometry(data, db):
+    """Estimate the location of a geotagged object for a new feature that's missing it"""
+    log.info("Estimating geometry...")
+    t = data['properties']['t_utc']
+    log.info("--> t is %s" % t)
+    try:
+        closest_before = list(db.features.find({'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))
+        closest_after =  list(db.features.find({'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))
+        if not len(closest_before) or not len(closest_after):
+            log.warning("--> closest not found")
+            return data
+        closest_before = closest_before[0]
+        closest_after = closest_after[0]
+        data['geometry'] = closest_before['geometry']
+
+        # this is naive calculation not taking projection into account
+        t1 = closest_before['properties']['t_utc']
+        t2 = closest_after['properties']['t_utc']
+        p = (t - t1) / (t2 - t1)
+        data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
+        data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
+        log.debug(data['geometry']['coordinates'])
+        data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']
+    except Exception as e:
+        log.error(log.exc(e))
     return data
 
 def verify_t(data):

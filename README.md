@@ -78,6 +78,11 @@ Post that data to `/ingest/<FeatureType>`.
 Alternately, post it to `/ingest` if it has a `FeatureType` property inside of it. 
 A module with a corresponding name will be loaded (hopefully) to process it.
 
+Geo note: if there is no geometry included in a feature, the system will attempt to estimate one.
+It does this by looking for the closest features temporally on either end and making a weighted average.
+The geo_estimator processors will do this repeatedly until ambit data is used, presumably the most accurate.
+
+
 ###### Adding a new feature ingestion endpoint
 Add a python module in the `ingest` folder with the name of the endpoint. eg, `/ingest/rhino` will load the module `rhino.py`. The module should contain a single function, `ingest(request)` which receives tornado request variables and which returns either GeoJSON or a flat dictionary with feature attributes.
 - `t_utc` must be provided - a UNIX timestamp in UTC
