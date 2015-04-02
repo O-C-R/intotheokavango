@@ -1,9 +1,65 @@
-{% extends "page.html" %}
 
-{% block title %}This is a test page{% endblock title %}
+
+{% extends "page.html" %}
+{% block title %}Into the Okavango 2015{% endblock title %}
+
+
+
+{% block head %}
+
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+  <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+  <script type="text/javascript">
+      mapbox_username = "brianhouse";//"blprnt";
+      mapbox_map_id = "oxn5wd2a";//"vsat7sho";
+      path_to_data = "{{ query }}";
+  </script>
+
+{% endblock head %}
+
+
 
 {% block body %}
 
-  Hello world!
+  <div id="mapContainer">
+    <div id="map">
+    </div>
+  </div>
+
+  <div id="contentContainer">
+    <div id="header">
+      <ul id="navigation">
+        <li>Map</li>
+        <li>Journal</li>
+        <li>Data</li>
+        <li class="active">About</li>
+        <li class="share"><span>Share</span></li>
+      </ul>
+      <div id="title">
+        <h1>Into the Okavango 2015</h1>
+        <img src="static/img/logo.svg" alt="Into the Okavango logo"/>
+      </div>
+    </div>
+
+    <div id="pageContainer">
+      <div id="aboutPage" class="page">
+        <img src="static/img/video.png" alt="cover for Into the Okavango trailer video" width="100%">
+        <div id="introduction">
+          <h1>The beating heart of our planet</h1>
+          <p>
+            The Okavango Delta is one of the richest wildlife areas on the planet. Starting August 17th, a team of Ba'yei, scientists, artists and engineers will enter the delta to take its pulse.
+          </p>
+          <p>
+            This site displays data which was uploaded daily, via satellite, by the expedition team in the Okavango delta. Data is also available through a public API, allowing anyone to re-mix, analyze, or visualize the collected information.
+          </p>
+        </div>
+      </div>
+      <div id="mapPage" class="page hidden">
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
 
 {% endblock body %}
+

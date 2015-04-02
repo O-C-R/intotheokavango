@@ -1,4 +1,18 @@
-/*Reset CSS*/
+
+
+   /*
+  Fonts
+*/
+
+
+@import url(http://fonts.googleapis.com/css?family=Montserrat);
+
+
+   /*
+  Reset CSS
+*/
+
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -25,9 +39,6 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
   line-height: 1;
-  background-color:#DDDDDD;
-  overflow: -moz-scrollbars-vertical; 
-  overflow-y: scroll;
 }
 ol, ul {
   list-style: none;
@@ -44,118 +55,123 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-/*Reset CSS*/
+
+
+   /*
+  Reset CSS
+*/
 
 body{
-  font: 1.2em Georgia, serif;
-  color:#443D33;
+  background-color:#04001A;
+  color:#ffffff;
+  font-size: 16px;
+  letter-spacing: 0.12em;
 }
 
-p{
-  font-style: italic;
-  line-height: 1.6em;
-}
-
-a{
-  color:black;
-  text-decoration: none;
-  -webkit-transition: color 0.08s linear;
-  -moz-transition: color 0.08s linear;
-  -o-transition: color 0.08s linear;
-  -ms-transition: color 0.08s linear;
-  transition: color 0.08s linear;
-}
-
-h1{
-  height:auto;
-}
-
-h1 p{
-  width:60%;
-  position: absolute;
-  padding:0;
-  margin:0;
-  visibility: hidden;
-}
-
-h2, h3{
-  font-size: 0.8em;
-  letter-spacing: 0.15em;
-  margin-top:5px;
-  margin-bottom:50px;
-  color:white;
-}
-
-h3{
-  color:#443D33;
-  border-bottom:1px solid rgba(0,0,0,0.1);
-  margin-bottom:10px;
-  padding-bottom:10px;
-  text-align: center;
-}
-
-#bkg{
+#mapContainer{
   width:100%;
   height:100%;
-  z-index:-1000;
-  position:fixed;
-  background-image: url("/static/img/apibkg.jpg");
-  background-size:cover;
-  background-repeat:no-repeat;
+  position:absolute;
 }
 
-#content{
-  width:90%;
+  #map{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+#contentContainer{
+  width:100%;
   height:auto;
-  z-index: 1000;
-  background-color: rgba(250,174,52,0.8);
-  padding:5%;
+  position:relative;
 }
 
-#intro{
-  display:inline-block;
-  vertical-align: top;
-  width:40%;
-  min-width:400px;
-  padding-right: 2%;
-}
-
-  #content p{
-    margin-bottom:20px;
+  #contentContainer #header{
+    width:97.2%;
+    height:auto;
+    padding:35px 1.4% 30px 1.4%;
   }
 
-#data{
-  display:inline-block;
-  vertical-align: top;
-  width:55%;
-  padding-left: 2%;
-}
-  #data .category{
-    display:inline-block;
-    vertical-align: top;
-    width:41%;
-    min-width: 250px;
-    margin-bottom: 30px;
-  }
-  #data .category:nth-child(even){
-    padding-left: 4%;
-  }
-  #data .category:nth-child(odd){
-    padding-right: 4%;
+    #header #title{
+      width:500px;
+    }
+
+      #title h1{
+        display:none;
+      }
+
+    #header ul#navigation{
+      float:right;
+      width:40%;
+    }
+
+      ul#navigation li{
+        /*float:right;*/
+        display:inline-block;
+        text-align: center;
+        margin-right:-4px;
+        width:14.2%;
+        padding:0 3.5%;
+        cursor:pointer;
+        opacity: 0.6;
+        transition: opacity 0.15s;
+      }
+
+        ul#navigation li.active, ul#navigation li:hover{
+          opacity:1;
+        }
+
+        ul#navigation li.share span{
+          color: #4BFF87;
+          border: 2px solid;
+          border-color: #54996B;
+          border-radius: 3px;
+          padding: 7px 12px;
+          transition: color 0.15s;
+          transition: border-color 0.15s;
+        }
+
+          ul#navigation li.share span:hover{
+            color: #ffffff;
+            border-color: #ffffff;
+            border-radius: 3px;
+            padding: 7px 12px;
+          }
+
+        ul#navigation li:first-child{
+          padding-left:0;
+        }
+
+        ul#navigation li:last-child{
+          padding-right:0;
+          opacity: 1;
+        }
+
+  #contentContainer .page{
+
   }
 
-p.code{
-  font-size: 0.8em;
-  background-color: #1B1C1E;
-  color:#F4B04E;
-  padding:5px 8px 5px 8px;
-}
+    #aboutPage{
 
-p.code a{
-  color:#F4B04E;
-}
+    }
 
-p.code a:hover{
-  color:white;
-}
+    #aboutPage #introduction{
+      width:82.8%;
+      padding:100px 8.6%;
+    }
+
+      #introduction h1{
+        font-family: "Montserrat", Helvetica, Arial;
+        font-size: 60px;
+        color:#ffffff;
+        text-transform: uppercase;
+      }
+
+
+
+
+
+
+
 
