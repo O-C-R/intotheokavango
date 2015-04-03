@@ -31,7 +31,7 @@ function initMap () {
     	wanderer.wander();
     	var target = wanderer.update();
     	map.panTo(new L.LatLng(target.y,target.x), map.getZoom());
-    	map.setView(new L.LatLng(target.y,target.x));
+    	// map.setView(new L.LatLng(target.y,target.x));
     	// map.setView(personLatLon, map.getZoom(), {pan:{animate:false}});
     	requestAnimationFrame(aga);
     })();
