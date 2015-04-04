@@ -1,73 +1,48 @@
-from housep import log, util
+import soundcloud
+from tornado import gen
+from housepy import log, util, config
+from ingest import save_file
+
+settings = config['soundcloud']
+try:
+    client = soundcloud.Client(
+        client_id=settings['client_id'],
+        client_secret=settings['client_secret'],
+        username=settings['email'],
+        password=settings['password']
+    )
+except Exception as e:
+    log.error("Could not establish SoundCloud client: %s" % log.exc(e))
+
 
 def parse(request):
     log.info("audio.parse")
-    # date_string = path.split('/')[-1] 
-    # dt = datetime.datetime.strptime(date_string.split('_')[0], "%d%m%Y%H%M")
-    # tz = pytz.timezone(config['local_tz'])
-    # dt = tz.localize(dt)
-    # t = util.timestamp(dt)
-    # # if t <= t_protect:
-    # #     log.warning("Protected t, skipping...")
-    # #     return                    
-    # try:
-    #     image = Image.open(path)
-    #     width, height = image.size    
-    # except Exception as e:
-    #     log.error(log.exc(e))
-    #     width, height = None, None        
-    # # feature = geojson.Feature(properties={'utc_t': t, 'ContentType': "image", 'url': "/static/data/images/%s-%s.jpg" % (t, i), 'DateTime': dt.astimezone(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%dT%H:%M:%S%z"), 'size': [width, height]})
-    # feature_id = model.insert_feature('image', t, geojson.dumps(feature))
-    # new_path = os.path.join(os.path.dirname(__file__), "static", "data", "images", "%s-%s.jpg" % (t, i))
-    # shutil.copy(path, new_path)
-
-    return feature
-
-
-"""
-      log.info("ingest_audio %s" % path)
-
-    file_name = path.split('/')[-1]
-    file_name = file_name.split('.')[0]
-    front = 'mp3'
-
-    if ('_'  in file_name):
-        front = file_name.split('_')[0]
-        date_string = file_name.split('_')[1]
-    else:
-        date_string = file_name
-
-    #dt = datetime.datetime.strptime(path.split('/')[-1], "audio %d%m%Y_%H%M.mp3")
-    dt = datetime.datetime.strptime(date_string.split('_')[0], "%d%m%y%H%M%S")
+    path = save_file(request) 
+    date_string = path.split('/')[-1].split('.')[0]
+    dt = datetime.datetime.strptime(date_string.split('_')[0], "%d%m%Y%H%M")
     tz = pytz.timezone(config['local_tz'])
     dt = tz.localize(dt)
-    t = util.timestamp(dt)    
-    # if t <= t_protect:
-    #     log.warning("Protected t, skipping...")
-    #     return    
+    t = util.timestamp(dt)
 
-    """
-    fixed_path = path #.replace(".mp3", ".amr")
-    shutil.move(path, fixed_path)
-    new_path = os.path.join(os.path.dirname(__file__), "static", "data", "audio", "%s-%s.wav" % (front, t))    
+    """Would be nice to have Member with this"""
 
-    log.debug("CONVERTING SOUND.")
+    soundcloud_url = post_track(path)
+    if soundcloud_url is None:
+        return None
+
+    data = {'utc_t': t, 'FeatureType': "audio", 'SoundCloud': soundcloud_url}
+    return data
+
+
+@gen.coroutine
+def post_track(path):
     try:
-        log.debug("--> converting [%s] to [%s]" % (fixed_path, new_path))
-        log.debug("%s -y -i '%s' '%s'" % (config['ffmpeg'], os.path.abspath(fixed_path), os.path.abspath(new_path)))
-        subprocess.check_call("%s -y -i '%s' '%s'" % (config['ffmpeg'], os.path.abspath(fixed_path), os.path.abspath(new_path)), shell=True)
+        with open(path, 'rb') as f:
+            track = {'asset_data': f}
+            track = client.post('/tracks', track=track)
+            soundcloud_url = track.url
     except Exception as e:
-        log.debug("ERROR.")
-        log.error(log.exc(e))
-        return
-    log.debug("DONE CONVERTING SOUND.")
-    """
+        log.error("Could not post track to SoundCloud: %s" % log.exc(e))
+        return None
+    return soundcloud_url
 
-    new_path = os.path.join(os.path.dirname(__file__), "static", "data", "audio", "%s-%s.mp3" % (front, t))   
-    shutil.move(path, new_path)
-
-    coords = model.get_coords_by_time(t);
-    feature = geojson.Feature(geometry=coords,properties={'utc_t': t, 'ContentType': "audio", 'url': "/static/data/audio/%s-%s.mp3" % (front, t), 'DateTime': dt.astimezone(pytz.timezone(config['local_tz'])).strftime("%Y-%m-%dT%H:%M:%S%z")})
-    feature_id = model.insert_feature('audio', t, geojson.dumps(feature))
-
-"""    

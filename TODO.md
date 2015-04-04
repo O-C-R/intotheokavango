@@ -1,3 +1,6 @@
+### need
+- filename format for audio / images
+
 ### now
 - set up crons on server
 - resolution filter

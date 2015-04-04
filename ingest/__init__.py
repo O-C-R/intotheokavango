@@ -164,9 +164,9 @@ def verify_expedition(data):
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""
     log.info("ingest.ingest_json")
-    filename = save_file(request)    
+    path = save_file(request)    
     try:
-        with open(filename) as f:
+        with open(path) as f:
             data = json.loads(f.read())
     except Exception as e:
         log.error(log.exc(e))
@@ -195,10 +195,10 @@ def save_file(request):
     try:
         for key, fileinfo in request.files.items():
             fileinfo = fileinfo[0]
-            filename = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
-            with open(filename, 'wb') as f:
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+            with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
-            return filename
+            return path
     except Exception as e:
         log.error(log.exc(e))
         return None
