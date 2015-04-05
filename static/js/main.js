@@ -6,6 +6,7 @@
 	- who wears ambit?
 	- what are the start and end date of an expedition?
 	- allow cross domain queries at least for prototyping
+	- problem name on ambit
 
 */
 
@@ -124,11 +125,13 @@ function newTimeline(t){
 		.attr('x2','50%')
 		.attr('y2','100%')
 		.attr('stroke','#FFFFFF');
-	var dateCursor = timeFrame[0];
+	var timeCursor = timeFrame[0];
+	var dayCursor = 0;
 
 	return {
 		timeFrame: timeFrame,
-		dateCursor: dateCursor
+		timeCursor: timeCursor,
+		dayCursor: dayCursor
 	};
 
 }
@@ -367,6 +370,8 @@ function newMember(n, l){
 
 	var name = n;
 	var pathQueue = [];
+	var pathTimeCursor = 0;
+	var pathDayCursor = 0;
 	var latLng = l;
 	var icon = L.divIcon({className: 'memberMarker', html: '<p>' + name + '</p>', iconSize:['auto','auto']});
 	var marker = L.marker(latLng, {icon: icon}).addTo(map);
@@ -374,14 +379,43 @@ function newMember(n, l){
 	function addAmbitGeo(d, l, t){
 		if(!pathQueue[d]) pathQueue[d] = [];
 	    pathQueue[d].push({latLng:l, time:t});
+	    // if(!pathCursor) pathCursor = pathQueue[d];
+	}
+
+	function move(time, forward){
+		var len = pathQueue[pathDayCursor].length;
+		var interval = [];
+		while(interval.length == 0 && pathDayCursor >= 0 && pathDayCursor < 1){
+			for(var i=pathTimeCursor; forward?(i<len-1):(i>0); i+= (forward?1:-1)){
+				if(time >= pathQueue[pathDayCursor][i + (forward?0:-1)].time && time < pathQueue[pathDayCursor][i + (forward?1:0)].time){
+					interval = [pathQueue[pathDayCursor][i + (forward?0:-1)], pathQueue[pathDayCursor][i + (forward?1:0)]];
+					pathTimeCursor = i;
+					break;
+				}
+			}
+			if(interval.length == 0) pathDayCursor = Math.constraint(pathDayCursor+forward ? 1:-1,0,pathQueue.length-1);
+		}
+
+		if(interval.length > 0){
+			var lat = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lat, interval[1].latLng.lat);
+			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
+			latLng = new L.LatLng(lat,lng);
+			marker.setLatLng(latLng);
+		}
+	}
+
+	function getLatLng(){
+		return latLng;
 	}
 
 	return{
 		addAmbitGeo: addAmbitGeo,
-		latLng: latLng,
+		getLatLng: getLatLng,
 		name: name,
 		marker: marker,
-		pathQueue: pathQueue
+		move: move,
+		pathQueue: pathQueue,
+		pathTimeCursor: pathTimeCursor
 	}
 
 }
@@ -443,7 +477,7 @@ function loadPaths() {
 	        		timeline = newTimeline(time)
 	        	}
 	        }
-	        members[name].addAmbitGeo(day, feature.geometry.coordinates, time);
+	        members[name].addAmbitGeo(day, latLng, time);
 	    }
 	});
 	
@@ -461,17 +495,23 @@ function startAnimation() {
 	// targetLatLng[1] = focusLatLng[1];
 
 	// map.setView(members['Steve'].latLng,16, {animate:false});
-	map.panTo(members['Steve'].latLng, {animate:false});
-	console.log(members['Steve'].latLng);
-	console.log(timeline.dateCursor);	
+	// console.log(members['Steve'].latLng);
+	// console.log(timeline.timeCursor);	
 
     (function animate(lastFrameTime){
 
     	var frameTime = new Date().getTime();
     	var frameRate = 1000/(frameTime - lastFrameTime);
-
         frameCount ++;
-		// timeline.dateCursor +=
+		timeline.timeCursor += 60/frameRate;
+
+		for(m in members){
+			var member = members[m];
+			member.move(timeline.timeCursor,true);
+			if(member.name == 'Steve') {
+				map.panTo(member.getLatLng(), {animate:false});
+			}
+		}
 
 
         // var sp = daySkip ? 0.4:0.1;

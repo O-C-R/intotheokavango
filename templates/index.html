@@ -122,6 +122,9 @@
     Math.map = function(value, start1, stop1, start2, stop2) {
       return parseFloat(start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1)));
     }
+    Math.constrain = function(value, min, max) {
+      return parseFloat(Math.min(Math.max(value,min),max));
+    }
   </script>
   <script src="../static/data/ambit_geo.js"></script>
   <script src="../static/js/d3.min.js"></script>
