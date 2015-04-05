@@ -1,6 +1,5 @@
 
 
-console.log('aga');
 
 /* global variables */
 var map;
@@ -12,6 +11,9 @@ var mapbox_username = "brianhouse"; //"blprnt";
 var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
 
 var pages = {};
+var panes = [];
+
+var timeline;
 
 /* create the map */
 function init() {
@@ -44,7 +46,7 @@ function init() {
     pages.about = createPage('about');
     // pages.about.show();
     pages.map = createMapPage('map');
-    pages.map.show();
+    
     pages.journal = createJournalPage('journal');
     pages.data = createPage('data');
     pages.share = createPage('share');
@@ -72,37 +74,83 @@ function init() {
 			.style('height',(height-70)+'px');
 	}
 	resize();
+
+	var timeline = d3.select('#timeline');
+	timeline.append('line')
+		.attr('x1','50%')
+		.attr('y1',0)
+		.attr('x2','50%')
+		.attr('y2','100%')
+		.attr('stroke','#FFFFFF');
+
+	for(var i=0; i<3; i++){
+		var p = createPane(i);
+		p.hide();
+		panes.push(p);
+	}
+
+	pages.map.show();
+}
+
+
+
+
+function createPane(i){
+
+	var node = d3.select('#mapPage div.pane:nth-child(' + (i+1) + ')');
+
+	var show = function(){
+		node.classed(i==0?'dimmed':'hidden',false);
+	}
+
+	var hide = function(){
+		node.classed(i==0?'dimmed':'hidden',true);
+	}
+
+	return {
+		node: node,
+		show: show,
+		hide: hide
+	}
 }
 
 
 
 function createMapPage(){
+
 	var page = createPage('map');
 
 	page.show = function(){
-		page.element.classed('hidden',false);
+		page.node.classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
 		page.offsetHeader(page.id=='about');
+		for(var i=0; i<3; i++){
+			panes[i].hide();
+		}
 	}
 
 	return page;
 }
 
 function createJournalPage(){
+
 	var page = createPage('map');
 	page.id = 'journal';
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
-		page.element.classed('hidden',false);
+		page.node.classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
 		page.offsetHeader(page.id=='about');
+		for(var i=0; i<3; i++){
+			panes[i].show();
+		}
 	}
 
 	page.hide = function(){
-		page.element.classed('hidden',true);
+		page.node.classed('hidden',true);
 		page.button.classed('active',false);
 	}
 
@@ -113,21 +161,21 @@ function createPage(i){
 
 	var id = i;
 	var button = d3.select('#navigation li.' + i);
-	var element = d3.select('#'+ id + 'Page');
+	var node = d3.select('#'+ id + 'Page');
 
-	function show(){
-		element.classed('hidden',false);
+	var show = function(){
+		node.classed('hidden',false);
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about');
 	}
 
-	function hide(){
-		element.classed('hidden',true);
+	var hide = function(){
+		node.classed('hidden',true);
 		button.classed('active',false);
 	}
 
-	function offsetHeader(isAbout){
+	var offsetHeader = function(isAbout){
 		var header = d3.select('#header');
 		if(!isAbout){
 			header.style('width','97.2%')
@@ -137,14 +185,13 @@ function createPage(i){
 			header.style('width',(97.2 + (15/d3.select('body').node().clientWidth)*100) + '%')
 				.style('padding-right',0);
 
-			console.log((97.2 + (14/d3.select('body').node().clientWidth)*100) + '%');
 		}
 	}
 
 	return{
 		id: id,
 		button: button,
-		element: element,
+		node: node,
 		show: show,
 		hide: hide,
 		offsetHeader: offsetHeader
@@ -158,7 +205,6 @@ function createPage(i){
 
 
 function createWanderer(p){
-	console.log(p);
 	var pos = {'x':p.lng,'y':p.lat};
 	var velocity = {'x':Math.random()*0.002-0.001,'y':Math.random()*0.002-0.001};
 	var acceleration = {'x':0,'y':0};
@@ -201,7 +247,6 @@ function createWanderer(p){
 
 	function update(){
 
-		// console.log('u1', pos.x, pos.y, velocity.x, velocity.y);
 		velocity.x += acceleration.x;
 		velocity.y += acceleration.y;
 		velocity.x = Math.min(velocity.x, maxSpeed);
@@ -211,7 +256,6 @@ function createWanderer(p){
 		acceleration.x = 0;
 		acceleration.y = 0;
 
-		// console.log('u2', pos.x, pos.y, velocity.x, velocity.y);
 
 		return pos;
 	}
@@ -222,7 +266,6 @@ function createWanderer(p){
 		var wanderD = 0.004;
 		var change = 0.3;
 		wanderTheta += Math.random()*(change*2)-change;
-		// console.log(Math.round(wanderTheta*100));
 		
 		var circlePos = {'x':velocity.x,'y':velocity.y};
 		var t = Math.atan2(circlePos.y,circlePos.x);

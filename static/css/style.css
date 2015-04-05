@@ -313,10 +313,18 @@ body{
         margin-right:-6px;
       }
 
+        #mapPage div.pane.hidden{
+          display:none;
+        }
+
         #mapPage div.pane:nth-child(1){
           width:8.55%;
           background-color: rgba(4, 0, 26, 0.82);
         }
+
+          #mapPage div.pane.dimmed:nth-child(1){
+            background-color: rgba(4, 0, 26, 0);
+          }
 
         #mapPage div.pane:nth-child(2){
           width:0;
@@ -343,7 +351,6 @@ body{
         #mapPage div.pane svg#timeline{
           height:80%;
           width:100%;
-          border: 1px solid white;
           margin-top:35px;
         }
 
