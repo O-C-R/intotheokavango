@@ -1,5 +1,14 @@
 
 
+/*
+
+	API needs :
+	- who wears ambit?
+	- what are the start and end date of an expedition?
+	- allow cross domain queries at least for prototyping
+
+*/
+
 
 /* global variables */
 var map;
@@ -17,12 +26,22 @@ var panes = [];
 
 var timeline;
 
-/* create the map */
+var daySkip = false;
+var names = ["Steve","Jer","Chris","GB","Giles","Tom"];
+var pathQueues = {};
+var personMarkers = {};
+
+var focusLatLng = [-19.003049, 22.414856];
+var members = {};
+
+var speed = 60;
+
+
 function init() {
     map = new L.map('map', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        center:new L.LatLng(-19.003049, 22.414856),
+        center:new L.LatLng(focusLatLng[0],focusLatLng[1]),
         attributionControl: false,
         doubleClickZoom: false,
         scrollWheelZoom: true,
@@ -35,14 +54,14 @@ function init() {
         zoom:17
     });   
 
-    wanderer = createWanderer(map.getCenter());
+    wanderer = newWanderer(map.getCenter());
 
-    pages.about = createPage('about');
-    pages.map = createMapPage('map');
+    pages.about = newPage('about');
+    pages.map = newMapPage('map');
     
-    pages.journal = createJournalPage('journal');
-    pages.data = createPage('data');
-    pages.share = createPage('share');
+    pages.journal = newJournalPage('journal');
+    pages.data = newPage('data');
+    pages.share = newPage('share');
 
     d3.selectAll('#navigation li')
     	.on('click',function(){
@@ -55,27 +74,22 @@ function init() {
 	window.addEventListener('resize',resize);
 	resize();
 
-	var timeline = d3.select('#timeline');
-	timeline.append('line')
-		.attr('x1','50%')
-		.attr('y1',0)
-		.attr('x2','50%')
-		.attr('y2','100%')
-		.attr('stroke','#FFFFFF');
+	// var timeline = newTimeline();
 
 	for(var i=0; i<3; i++){
-		var p = createPane(i);
+		var p = newPane(i);
 		panes.push(p);
 	}
 
 	pages.map.show();
 
 	(function animate(){
-    	if(pages.active.id == 'about')
-    	frameCount ++;
-    	wanderer.wander();
-    	var target = wanderer.update();
-    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+    	if(pages.active.id == 'about'){
+	    	frameCount ++;
+	    	wanderer.wander();
+	    	var target = wanderer.update();
+	    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+	    }
     	requestAnimationFrame(animate);
     })();
 
@@ -100,7 +114,27 @@ function resize(){
 
 
 
-function createPane(i){
+function newTimeline(t){
+
+	var timeFrame = [t,new Date().getTime()];
+	var node = d3.select('#timeline');
+	node.append('line')
+		.attr('x1','50%')
+		.attr('y1',0)
+		.attr('x2','50%')
+		.attr('y2','100%')
+		.attr('stroke','#FFFFFF');
+	var dateCursor = timeFrame[0];
+
+	return {
+		timeFrame: timeFrame,
+		dateCursor: dateCursor
+	};
+
+}
+
+
+function newPane(i){
 
 	var node = d3.select('#mapPage div.pane:nth-child(' + (i+1) + ')');
 
@@ -116,14 +150,14 @@ function createPane(i){
 		node: node,
 		show: show,
 		hide: hide
-	}
+	};
 }
 
 
+function newMapPage(){
 
-function createMapPage(){
-
-	var page = createPage('map');
+	// Extends Page
+	var page = newPage('map');
 
 	page.show = function(){
 		page.node.classed('hidden',false);
@@ -138,9 +172,10 @@ function createMapPage(){
 	return page;
 }
 
-function createJournalPage(){
+function newJournalPage(){
 
-	var page = createPage('map');
+	// Extends Page
+	var page = newPage('map');
 	page.id = 'journal';
 	page.button = d3.select('#navigation li.' + page.id);
 
@@ -162,7 +197,7 @@ function createJournalPage(){
 	return page;
 }
 
-function createPage(i){
+function newPage(i){
 
 	var id = i;
 	var button = d3.select('#navigation li.' + i);
@@ -200,7 +235,7 @@ function createPage(i){
 		show: show,
 		hide: hide,
 		offsetHeader: offsetHeader
-	}
+	};
 }
 
 
@@ -209,7 +244,7 @@ function createPage(i){
 
 
 
-function createWanderer(p){
+function newWanderer(p){
 	var pos = {'x':p.lng,'y':p.lat};
 	var velocity = {'x':Math.random()*0.002-0.001,'y':Math.random()*0.002-0.001};
 	var acceleration = {'x':0,'y':0};
@@ -250,7 +285,7 @@ function createWanderer(p){
 	    	.classed('target',true)
     }
 
-	function update(){
+	var update = function(){
 
 		velocity.x += acceleration.x;
 		velocity.y += acceleration.y;
@@ -265,7 +300,7 @@ function createWanderer(p){
 		return pos;
 	}
 
-	function wander(){
+	var wander = function(){
 
 		var wanderR = 0.000018;
 		var wanderD = 0.004;
@@ -297,12 +332,12 @@ function createWanderer(p){
 
 	}
 
-	function applyForce(force){
+	var applyForce = function(force){
 		acceleration.x += force.x;
 		acceleration.y += force.y;
 	}
 
-	function seek(target){
+	var seek = function(target){
 		var desired = {'x':target.x-pos.x,'y':target.y-pos.y};
 		var t = Math.atan2(desired.y,desired.x);
 	    desired.x = maxSpeed * Math.cos(t);
@@ -327,97 +362,141 @@ document.addEventListener('DOMContentLoaded', init);
 
 
 
+
+function newMember(n, l){
+
+	var name = n;
+	var pathQueue = [];
+	var latLng = l;
+	var icon = L.divIcon({className: 'memberMarker', html: '<p>' + name + '</p>', iconSize:['auto','auto']});
+	var marker = L.marker(latLng, {icon: icon}).addTo(map);
+
+	function addAmbitGeo(d, l, t){
+		if(!pathQueue[d]) pathQueue[d] = [];
+	    pathQueue[d].push({latLng:l, time:t});
+	}
+
+	return{
+		addAmbitGeo: addAmbitGeo,
+		latLng: latLng,
+		name: name,
+		marker: marker,
+		pathQueue: pathQueue
+	}
+
+}
+
+
+
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
+
 
 
 
 
 function loadPaths() {
 
+
+	var widths = [30,26,16,12]	
+
+
+	for(var i=0; i<names.length; i++){
+		pathQueues[names[i]] = [];
+	}
+
 	console.log('loading path');
 
-	var query = '/api/members?expedition=okavango_14'
+	var day = 0;
 
-	d3.json(query, function(error, data) {
-		
-		if(error) return console.log("Failed to load " + query + ": " + e.statusText);
-		console.log('data: ', data);
-        // L.geoJson(data, {
-        //     pointToLayer: function (feature, latlng) {
-        //        return L.circleMarker(latlng, geojsonMarkerOptions);
-        //     },
-        //     onEachFeature: function (feature, layer) {
-        //         layer.bindPopup(feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc']);
-        //     }
-        // }).addTo(map);
-    });   
+	// var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay=0&limit=0'
+	// d3.json(query, function(error, data) {
+	// 	if(error) return console.log("Failed to load " + query + ": " + e.statusText);
+	//    });   
 
-
-
-	// pathMap = [];
- //    pathQueues = [];
-	// pathRevealed = [];
-
-	// for (var i = 0; i < names.length; i++) {
-	// 	console.log("MAKE QUEUE FOR " + names[i]);
- //        pathQueues[names[i]] = [];
-	// 	pathRevealed[names[i]] = [];
-	// }
-
-	// function getPathsDay(d) {
-
-		
-	// 	var pathCoors = [];
-	// 	var pathLats = [];
-
-	// 	var pc = 0;
-
-	// 	console.log("GET PATHS" + makeDate(d));
-
-	// 	$.getJSON('/api/timeline?date=' +  makeDate(d) + '&types=ambit_geo', function(data) {
-	// 		console.log('/api/timeline?date=' +  makeDate(d) + '&types=ambit_geo');
-	// 	  L.geoJson(data.features, {
-	// 	    filter: function(feature, layer) {
-	// 	    	//Filter out 0,0 points
-	// 	        return (feature.geometry.coordinates[0] != 0);
-	// 	    },
-	// 	    pointToLayer: function (feature, latlng) {
-	// 	    	pc ++;
-	// 	    	var name = feature.properties.Person;
-	// 	    	if (pathMap[name] == undefined) {
-	// 	    		console.log("new path for " + name);
-	// 	    		pathMap[name] = [];
-	// 	    	}
-	// 	        var marker = L.circleMarker(latlng);
-	// 	        //pathMap[name].push([latlng.lng, latlng.lat]);
-	// 	        pathQueues[name].push({name:name, latLon:[latlng.lat, latlng.lng], time:feature.properties.t_utc});
-		        
-	// 	        return marker;
-	// 	    },
-	// 		})
-	// 	  	//if (pc > 0) drawPaths(pathMap);
-
- //            if (pathDay >= 0) {
- //                getPathsDay(pathDay);
- //            } else {
- //                //drawPaths();
- //            }
-	// 	  	pathDay ++;
- //            if(updateMapTimelineLoading) updateMapTimelineLoading(data.features[data.features.length-1]);
-	// 	});
-
-		
-	// }
-
+	var data = pathData;
+	for(var i=0; i<names.length; i++){
+		pathQueues[names[i]][day] = [];
+	}
+    L.geoJson(data, {
+        filter: function(feature, layer) {
+	    	//Filter out 0,0 points
+	        return (feature.geometry.coordinates[0] != 0);
+	    },
+	    pointToLayer: function (feature, latLng) {
+	    	var name = feature.properties.Member;
+	    	var timestamp = feature.properties.t_utc;
+	        var marker = L.circleMarker(latLng);
+	        // pathQueues[name][day].push({latLng:[latLng.lat, latLng.lng], time:timestamp});
+	        return marker;
+	    },
+	    onEachFeature: function(feature){
+	    	var name = feature.properties.Member;
+	    	var latLng = L.latLng(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
+	    	var time = feature.properties.t_utc;
+	        if(!members[name]) {
+	        	members[name] = newMember(name, latLng);
+	        	if(Object.keys(members).length == 3) {
+	        		timeline = newTimeline(time)
+	        	}
+	        }
+	        members[name].addAmbitGeo(day, feature.geometry.coordinates, time);
+	    }
+	});
 	
-	// var pathDay = currentDay;
-	// // startAnimation();
-	// getPathsDay(pathDay);
+	startAnimation();
 }
+
+
+
+function startAnimation() {
+	
+	// focusLatLng[0] = map.getCenter().lat;
+	// focusLatLng[1] = map.getCenter().lng;
+
+	// targetLatLng[0] = focusLatLng[0];
+	// targetLatLng[1] = focusLatLng[1];
+
+	// map.setView(members['Steve'].latLng,16, {animate:false});
+	map.panTo(members['Steve'].latLng, {animate:false});
+	console.log(members['Steve'].latLng);
+	console.log(timeline.dateCursor);	
+
+    (function animate(lastFrameTime){
+
+    	var frameTime = new Date().getTime();
+    	var frameRate = 1000/(frameTime - lastFrameTime);
+
+        frameCount ++;
+		// timeline.dateCursor +=
+
+
+        // var sp = daySkip ? 0.4:0.1;
+        // for (var i = 0; i < names.length; i++) {
+        //     var n = names[i];
+        //     if(memberMarkers[n]){
+        //         var tpos = [0,0];
+        //         if(counters[n] > 1){
+        //             var r = Math.max(0,Math.min(1,map(new Date().getTime(),timeInterval[n][0],timeInterval[n][1],0,1)));
+        //             tpos[0] = map(r,0,1,previousMemberMarkersTarget[n][0],memberMarkersTarget[n][0]);
+        //             tpos[1] = map(r,0,1,previousMemberMarkersTarget[n][1],memberMarkersTarget[n][1]);
+        //             var memberLatLon = memberMarkers[n].getLatLng();
+        //             memberLatLon.lat += (tpos[0] - memberLatLon.lat) * sp * 2;
+        //             memberLatLon.lng += (tpos[1] - memberLatLon.lng) * sp * 2;
+        //             memberMarkers[n].setLatLng(memberLatLon);
+        //             if(i==0 && tpos[0] != 0) map.setView(memberLatLon, map.getZoom(), {pan:{animate:false}});
+        //         }
+        //     }
+        // }
+
+        requestAnimationFrame(function(){animate(frameTime)});
+    })(new Date().getTime()-16);
+
+}
+
 
 
 
