@@ -125,6 +125,16 @@
     Math.constrain = function(value, min, max) {
       return parseFloat(Math.min(Math.max(value,min),max));
     }
+    Math.lerp = function(value, target, ratio) {
+      return parseFloat(value + (target-value)*ratio);
+    }
+    Array.prototype.max = function() {
+      return Math.max.apply(null, this);
+    };
+
+    Array.prototype.min = function() {
+      return Math.min.apply(null, this);
+    };
   </script>
   <script src="../static/data/ambit_geo.js"></script>
   <script src="../static/js/d3.min.js"></script>

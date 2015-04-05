@@ -8,6 +8,9 @@
 	- allow cross domain queries at least for prototyping
 	- problem name on ambit
 
+	TODO: 
+	
+
 */
 
 
@@ -29,7 +32,6 @@ var timeline;
 
 var daySkip = false;
 var names = ["Steve","Jer","Chris","GB","Giles","Tom"];
-var pathQueues = {};
 var personMarkers = {};
 
 var focusLatLng = [-19.003049, 22.414856];
@@ -94,6 +96,16 @@ function init() {
     	requestAnimationFrame(animate);
     })();
 
+
+    d3.select('#contentContainer')
+    	.on('mousewheel',function(){
+    		timeline.navigate(d3.event.wheelDeltaY);
+    	})
+    d3.select('#mapPage')
+    	.on('click',function(){
+    		if(pages.active.id == 'map') timeline.togglePause();
+    	})
+
 	// LOAD PATH
 	loadPaths();
 
@@ -126,12 +138,58 @@ function newTimeline(t){
 		.attr('y2','100%')
 		.attr('stroke','#FFFFFF');
 	var timeCursor = timeFrame[0];
-	var dayCursor = 0;
+	var prevTimeCursor = timeFrame[0];
+	var speed = 1;
+	var tSpeed = 1;
+	var wheelDelta = 0;
+	var paused = false;
+
+	function update(frameRate){
+		speed = Math.lerp(speed,tSpeed,0.2);
+		prevTimeCursor = timeCursor;
+		timeCursor += speed*60/frameRate + wheelDelta;
+		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
+		wheelDelta = 0;
+	}
+
+	function navigate(delta){
+		tSpeed = 0;
+		speed = 0;
+		requestAnimationFrame(function(){
+			tSpeed = paused ? 0 : 1;
+		})
+		wheelDelta = -delta/4;
+		if(pages.active.id == 'map'){
+			d3.select('#feed').node().parentNode.scrollTop += delta;
+		}
+	}
+
+	function getTimeCursor(){
+		return {current: timeCursor, last: prevTimeCursor};
+	}
+
+	function togglePause(state){
+		if(state) paused = state == 'pause';
+		else paused = !paused;
+		tSpeed = paused ? 0 : 1;
+	}
+
+	function setTimeFrame(){
+		var lastTimestamp = [];
+		for(m in members){
+			var member = members[m];
+			var d = member.pathQueue[member.pathQueue.length-1];
+			lastTimestamp.push(d[d.length-1].time);
+		}
+		timeFrame[1] = lastTimestamp.max();
+	}
 
 	return {
-		timeFrame: timeFrame,
-		timeCursor: timeCursor,
-		dayCursor: dayCursor
+		getTimeCursor: getTimeCursor,
+		navigate: navigate,
+		update: update,
+		togglePause: togglePause,
+		setTimeFrame: setTimeFrame
 	};
 
 }
@@ -149,8 +207,12 @@ function newPane(i){
 		node.classed(i==0?'dimmed':'hidden',true);
 	}
 
+	function getNode(){
+		return node;
+	}
+
 	return {
-		node: node,
+		getNode: getNode,
 		show: show,
 		hide: hide
 	};
@@ -163,13 +225,14 @@ function newMapPage(){
 	var page = newPage('map');
 
 	page.show = function(){
-		page.node.classed('hidden',false);
+		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
 		page.offsetHeader(page.id=='about');
 		for(var i=0; i<3; i++){
 			panes[i].hide();
 		}
+		if(timeline) timeline.togglePause('resume');
 	}
 
 	return page;
@@ -183,17 +246,18 @@ function newJournalPage(){
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
-		page.node.classed('hidden',false);
+		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
 		page.offsetHeader(page.id=='about');
 		for(var i=0; i<3; i++){
 			panes[i].show();
 		}
+		if(timeline) timeline.togglePause('pause');
 	}
 
 	page.hide = function(){
-		page.node.classed('hidden',true);
+		page.getNode().classed('hidden',true);
 		page.button.classed('active',false);
 	}
 
@@ -231,10 +295,14 @@ function newPage(i){
 		}
 	}
 
+	function getNode(){
+		return node;
+	}
+
 	return{
 		id: id,
 		button: button,
-		node: node,
+		getNode: getNode,
 		show: show,
 		hide: hide,
 		offsetHeader: offsetHeader
@@ -382,18 +450,23 @@ function newMember(n, l){
 	    // if(!pathCursor) pathCursor = pathQueue[d];
 	}
 
-	function move(time, forward){
+	function move(time){
+		if(!time) return;
+		var forward = time.current >= time.last;
+		time = time.current;
 		var len = pathQueue[pathDayCursor].length;
 		var interval = [];
-		while(interval.length == 0 && pathDayCursor >= 0 && pathDayCursor < 1){
-			for(var i=pathTimeCursor; forward?(i<len-1):(i>0); i+= (forward?1:-1)){
+		var aga = 0;
+		while(interval.length == 0 && pathDayCursor >= 0 && pathDayCursor < 1 && aga < 5){
+			aga ++;
+			for(var i=Math.constrain(pathTimeCursor+(forward?-1:1),0,len-1); forward?(i<len-1):(i>0); i+= (forward?1:-1)){
 				if(time >= pathQueue[pathDayCursor][i + (forward?0:-1)].time && time < pathQueue[pathDayCursor][i + (forward?1:0)].time){
 					interval = [pathQueue[pathDayCursor][i + (forward?0:-1)], pathQueue[pathDayCursor][i + (forward?1:0)]];
 					pathTimeCursor = i;
 					break;
 				}
 			}
-			if(interval.length == 0) pathDayCursor = Math.constraint(pathDayCursor+forward ? 1:-1,0,pathQueue.length-1);
+			if(interval.length == 0) pathDayCursor = Math.constrain(pathDayCursor+forward ? 1:-1,0,pathQueue.length-1);
 		}
 
 		if(interval.length > 0){
@@ -438,10 +511,6 @@ function loadPaths() {
 	var widths = [30,26,16,12]	
 
 
-	for(var i=0; i<names.length; i++){
-		pathQueues[names[i]] = [];
-	}
-
 	console.log('loading path');
 
 	var day = 0;
@@ -452,9 +521,6 @@ function loadPaths() {
 	//    });   
 
 	var data = pathData;
-	for(var i=0; i<names.length; i++){
-		pathQueues[names[i]][day] = [];
-	}
     L.geoJson(data, {
         filter: function(feature, layer) {
 	    	//Filter out 0,0 points
@@ -464,7 +530,6 @@ function loadPaths() {
 	    	var name = feature.properties.Member;
 	    	var timestamp = feature.properties.t_utc;
 	        var marker = L.circleMarker(latLng);
-	        // pathQueues[name][day].push({latLng:[latLng.lat, latLng.lng], time:timestamp});
 	        return marker;
 	    },
 	    onEachFeature: function(feature){
@@ -480,6 +545,7 @@ function loadPaths() {
 	        members[name].addAmbitGeo(day, latLng, time);
 	    }
 	});
+	timeline.setTimeFrame();
 	
 	startAnimation();
 }
@@ -503,11 +569,11 @@ function startAnimation() {
     	var frameTime = new Date().getTime();
     	var frameRate = 1000/(frameTime - lastFrameTime);
         frameCount ++;
-		timeline.timeCursor += 60/frameRate;
+        timeline.update(frameRate);
 
 		for(m in members){
 			var member = members[m];
-			member.move(timeline.timeCursor,true);
+			member.move(timeline.getTimeCursor());
 			if(member.name == 'Steve') {
 				map.panTo(member.getLatLng(), {animate:false});
 			}

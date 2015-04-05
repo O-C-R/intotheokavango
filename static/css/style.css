@@ -344,6 +344,15 @@ body{
           height:1px;
         }
 
+          #mapPage div.pane.hidden:nth-child(3){
+            display: inline-block;
+            opacity: 0;
+          }
+
+            #mapPage div.pane.hidden:nth-child(3) *{
+              pointer-events:none;
+            }
+
           #mapPage.data div.pane:nth-child(3){
             width:74.85%;
           }
