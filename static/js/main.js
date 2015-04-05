@@ -9,6 +9,8 @@ var frameCount = 0;
 
 var mapbox_username = "brianhouse"; //"blprnt";
 var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
+// var path_to_data = "{{ query }}";
+// console.log(path_to_data);
 
 var pages = {};
 var panes = [];
@@ -30,21 +32,12 @@ function init() {
         keyboard: false,
         minZoom: 1,                    
         maxZoom: 20,
-        zoom:16
+        zoom:17
     });   
 
     wanderer = createWanderer(map.getCenter());
 
-    (function animate(){
-    	frameCount ++;
-    	wanderer.wander();
-    	var target = wanderer.update();
-    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
-    	requestAnimationFrame(animate);
-    })();
-
     pages.about = createPage('about');
-    // pages.about.show();
     pages.map = createMapPage('map');
     
     pages.journal = createJournalPage('journal');
@@ -60,19 +53,6 @@ function init() {
     	})
 
 	window.addEventListener('resize',resize);
-
-	function resize(){
-
-		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
-		var headerHeight = d3.select('#header').node().clientHeight;
-		var height = containerHeight - headerHeight;
-
-		d3.select('#mapPage')
-			.style('height',height+'px');
-
-		d3.select('#timeline')
-			.style('height',(height-70)+'px');
-	}
 	resize();
 
 	var timeline = d3.select('#timeline');
@@ -85,13 +65,38 @@ function init() {
 
 	for(var i=0; i<3; i++){
 		var p = createPane(i);
-		p.hide();
 		panes.push(p);
 	}
 
 	pages.map.show();
+
+	(function animate(){
+    	if(pages.active.id == 'about')
+    	frameCount ++;
+    	wanderer.wander();
+    	var target = wanderer.update();
+    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+    	requestAnimationFrame(animate);
+    })();
+
+	// LOAD PATH
+	loadPaths();
+
+
 }
 
+function resize(){
+
+	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
+	var headerHeight = d3.select('#header').node().clientHeight;
+	var height = containerHeight - headerHeight;
+
+	d3.select('#mapPage')
+		.style('height',height+'px');
+
+	d3.select('#timeline')
+		.style('height',(height-70)+'px');
+}
 
 
 
@@ -318,4 +323,101 @@ function createWanderer(p){
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+
+
+
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+
+
+
+
+function loadPaths() {
+
+	console.log('loading path');
+
+	var query = '/api/members?expedition=okavango_14'
+
+	d3.json(query, function(error, data) {
+		
+		if(error) return console.log("Failed to load " + query + ": " + e.statusText);
+		console.log('data: ', data);
+        // L.geoJson(data, {
+        //     pointToLayer: function (feature, latlng) {
+        //        return L.circleMarker(latlng, geojsonMarkerOptions);
+        //     },
+        //     onEachFeature: function (feature, layer) {
+        //         layer.bindPopup(feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc']);
+        //     }
+        // }).addTo(map);
+    });   
+
+
+
+	// pathMap = [];
+ //    pathQueues = [];
+	// pathRevealed = [];
+
+	// for (var i = 0; i < names.length; i++) {
+	// 	console.log("MAKE QUEUE FOR " + names[i]);
+ //        pathQueues[names[i]] = [];
+	// 	pathRevealed[names[i]] = [];
+	// }
+
+	// function getPathsDay(d) {
+
+		
+	// 	var pathCoors = [];
+	// 	var pathLats = [];
+
+	// 	var pc = 0;
+
+	// 	console.log("GET PATHS" + makeDate(d));
+
+	// 	$.getJSON('/api/timeline?date=' +  makeDate(d) + '&types=ambit_geo', function(data) {
+	// 		console.log('/api/timeline?date=' +  makeDate(d) + '&types=ambit_geo');
+	// 	  L.geoJson(data.features, {
+	// 	    filter: function(feature, layer) {
+	// 	    	//Filter out 0,0 points
+	// 	        return (feature.geometry.coordinates[0] != 0);
+	// 	    },
+	// 	    pointToLayer: function (feature, latlng) {
+	// 	    	pc ++;
+	// 	    	var name = feature.properties.Person;
+	// 	    	if (pathMap[name] == undefined) {
+	// 	    		console.log("new path for " + name);
+	// 	    		pathMap[name] = [];
+	// 	    	}
+	// 	        var marker = L.circleMarker(latlng);
+	// 	        //pathMap[name].push([latlng.lng, latlng.lat]);
+	// 	        pathQueues[name].push({name:name, latLon:[latlng.lat, latlng.lng], time:feature.properties.t_utc});
+		        
+	// 	        return marker;
+	// 	    },
+	// 		})
+	// 	  	//if (pc > 0) drawPaths(pathMap);
+
+ //            if (pathDay >= 0) {
+ //                getPathsDay(pathDay);
+ //            } else {
+ //                //drawPaths();
+ //            }
+	// 	  	pathDay ++;
+ //            if(updateMapTimelineLoading) updateMapTimelineLoading(data.features[data.features.length-1]);
+	// 	});
+
+		
+	// }
+
+	
+	// var pathDay = currentDay;
+	// // startAnimation();
+	// getPathsDay(pathDay);
+}
+
+
 
