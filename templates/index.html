@@ -8,12 +8,8 @@
 {% block head %}
 
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
-  <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
-  <script type="text/javascript">
-      mapbox_username = "brianhouse";//"blprnt";
-      mapbox_map_id = "oxn5wd2a";//"vsat7sho";
-      path_to_data = "{{ query }}";
-  </script>
+  
+  
 
 {% endblock head %}
 
@@ -29,10 +25,10 @@
   <div id="contentContainer">
     <div id="header">
       <ul id="navigation">
-        <li>Map</li>
-        <li>Journal</li>
-        <li>Data</li>
-        <li class="active">About</li>
+        <li class="map">Map</li>
+        <li class="journal">Journal</li>
+        <li class="data">Data</li>
+        <li class="about">About</li>
         <li class="share"><span>Share</span></li>
       </ul>
       <div id="title">
@@ -42,7 +38,7 @@
     </div>
 
     <div id="pageContainer">
-      <div id="aboutPage" class="page">
+      <div id="aboutPage" class="page hidden">
         <div id="video">
           <img src="static/img/video.png" alt="cover for Into the Okavango trailer video" width="100%">
           <div id="date">
@@ -97,12 +93,39 @@
         </div>
       </div>
       <div id="mapPage" class="page hidden">
+        <div class="pane">
+          <svg id="timeline"/>
+        </div>
+        <div class="pane">
+
+        </div>
+        <div class="pane">
+          <div id="feed">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod quis risus ut placerat. Duis vitae volutpat justo, non gravida dolor. Ut vel magna scelerisque, sollicitudin eros et, dictum lacus. Aenean nec tellus justo. Aliquam quis lorem nisl. Proin sed congue nulla, condimentum dignissim felis. Sed sodales libero dui, nec pulvinar ante cursus ac. Morbi eu sem pulvinar, faucibus felis et, finibus mi. Sed ut rutrum enim. Donec magna mi, iaculis et nisi at, mattis dapibus erat. Nunc bibendum nisl ac eros venenatis ornare. Duis euismod cursus lobortis. Maecenas ut sollicitudin neque. Maecenas mattis interdum neque, quis vestibulum neque aliquet in. Vivamus ac lectus tristique, consequat est in, ullamcorper justo.
+          <br>
+            Praesent sem dui, gravida eu tortor et, eleifend congue erat. Cras dictum malesuada leo, tincidunt dignissim dolor luctus et. Ut at mi finibus, aliquam sem eu, ultrices mi. Curabitur massa diam, auctor at metus ut, maximus rhoncus turpis. Mauris ullamcorper lacinia massa a gravida. Nunc congue quam nec purus suscipit vehicula. Integer odio mi, aliquam quis egestas quis, molestie et sem. Integer commodo tellus sed nunc tincidunt, a molestie sapien suscipit. Curabitur commodo neque nec tortor ornare, nec fermentum mi luctus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nunc id enim tortor. Proin porttitor rutrum libero, vel imperdiet lacus pretium auctor.
+          <br>
+            Etiam tellus arcu, tempus at pharetra ut, finibus at arcu. Aenean posuere dapibus nibh tincidunt vehicula. Curabitur ut condimentum velit. Cras non dui ac orci faucibus dapibus eu id velit. Fusce malesuada id nulla at pellentesque. Morbi ut nisi tellus. Cras non finibus sapien. Etiam posuere velit a purus dictum, faucibus rutrum nibh egestas. Morbi ultrices nisi in lobortis vehicula. Morbi venenatis felis in nisl ullamcorper, vel ultrices leo ultricies. Sed quam nisl, pulvinar at lacus maximus, ultrices commodo nunc. Aliquam at gravida est. Vestibulum condimentum, diam sit amet ultricies congue, leo nisl pellentesque ipsum, nec euismod neque libero ac justo. Praesent dapibus vehicula felis eu congue.
+          </div>
+        </div>
+      </div>
+      <div id="dataPage" class="page hidden">
+        <h1>DATA</h1>
+      </div>
+      <div id="sharePage" class="page hidden">
+        <h1>SHARE</h1>
       </div>
     </div>
   </div>
-
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>console.log('aga');</script>
+  <!-- // <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
+  <script src="static/js/d3.min.js" />
+  <script>console.log('aga');</script>
+  <!-- // <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script> -->
+  <script src="static/js/leaflet.js" />
+  <script>console.log('aga');</script>
   <script src="/static/js/main.js"></script>
+  <script>console.log('aga');</script>
 
 {% endblock body %}
 

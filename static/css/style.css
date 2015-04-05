@@ -64,6 +64,10 @@ table {
   Reset CSS
 */
 
+html{
+  height:100%;
+}
+
 body{
   background-color:#04001A;
   color:#ffffff;
@@ -72,6 +76,7 @@ body{
   letter-spacing: 0.12em;
   width:100%;
   overflow-x:hidden; 
+  height:100%;
 }
 
 #mapContainer{
@@ -91,6 +96,7 @@ body{
   width:100%;
   height:auto;
   position:relative;
+  height:100%;
 }
 
   #contentContainer #header{
@@ -157,6 +163,10 @@ body{
   #contentContainer .page{
 
   }
+
+    #contentContainer .page.hidden{
+      display:none;
+    }
 
     #aboutPage{
       background-color: rgba(4, 0, 26, 0.65);
@@ -286,6 +296,63 @@ body{
           float:right;
           margin: 5px 0 0 20px;
         }
+
+    #mapPage{
+      height: auto;
+      display: inline-block;
+      position: absolute;
+      width:100%;
+      height:100%;
+      position:fixed;
+    }
+
+      #mapPage div.pane{
+        display:inline-block;
+        vertical-align: top;
+        height:100%;
+        margin-right:-6px;
+      }
+
+        #mapPage div.pane:nth-child(1){
+          width:8.55%;
+          background-color: rgba(4, 0, 26, 0.82);
+        }
+
+        #mapPage div.pane:nth-child(2){
+          width:0;
+          background-color: rgba(4, 0, 26, 0.72);
+        }
+
+          #mapPage.data div.pane:nth-child(2){
+            width:16.65%;
+          }
+
+        #mapPage div.pane:nth-child(3){
+          width:91.5%;
+          background-color: rgba(4, 0, 26, 0.62);
+          height:auto;
+          min-height:100%;
+          overflow-y: scroll;
+          height:1px;
+        }
+
+          #mapPage.data div.pane:nth-child(3){
+            width:74.85%;
+          }
+
+        #mapPage div.pane svg#timeline{
+          height:80%;
+          width:100%;
+          border: 1px solid white;
+          margin-top:35px;
+        }
+
+        #mapPage div.pane div#feed{
+          padding:35px 300px;
+          line-height: 1.5em;
+          position:relative;
+        }
+
 
 svg.wanderer{
   width:300px;

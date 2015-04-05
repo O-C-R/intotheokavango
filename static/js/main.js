@@ -1,41 +1,159 @@
 
 
-console.log('hello world');
-
+console.log('aga');
 
 /* global variables */
 var map;
 var wanderer;
 var debug = false;
+var frameCount = 0;
+
+var mapbox_username = "brianhouse"; //"blprnt";
+var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
+
+var pages = {};
 
 /* create the map */
-function initMap () {
+function init() {
     map = new L.map('map', {
-        layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
-        center: new L.LatLng(-19.003049, 22.414856),
+        layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
+        center:new L.LatLng(-19.003049, 22.414856),
         attributionControl: false,
-        doubleClickZoom: true,
+        doubleClickZoom: false,
         scrollWheelZoom: true,
-        boxZoom: true,
+        boxZoom: false,
         touchZoom: false,
-        dragging: true,
-        keyboard: true,
-        zoom: 16,
+        dragging: false,
+        keyboard: false,
         minZoom: 1,                    
-        maxZoom: 20
+        maxZoom: 20,
+        zoom:16
     });   
 
     wanderer = createWanderer(map.getCenter());
-    (function aga(){
+
+    (function animate(){
+    	frameCount ++;
     	wanderer.wander();
     	var target = wanderer.update();
-    	map.panTo(new L.LatLng(target.y,target.x), map.getZoom());
-    	// map.setView(new L.LatLng(target.y,target.x));
-    	// map.setView(personLatLon, map.getZoom(), {pan:{animate:false}});
-    	requestAnimationFrame(aga);
+    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+    	requestAnimationFrame(animate);
     })();
+
+    pages.about = createPage('about');
+    // pages.about.show();
+    pages.map = createMapPage('map');
+    pages.map.show();
+    pages.journal = createJournalPage('journal');
+    pages.data = createPage('data');
+    pages.share = createPage('share');
+
+    d3.selectAll('#navigation li')
+    	.on('click',function(){
+    		var btn = d3.select(this);
+    		var t = btn.text().toLowerCase();
+    		pages.active.hide();
+    		pages[t].show();
+    	})
+
+	window.addEventListener('resize',resize);
+
+	function resize(){
+
+		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
+		var headerHeight = d3.select('#header').node().clientHeight;
+		var height = containerHeight - headerHeight;
+
+		d3.select('#mapPage')
+			.style('height',height+'px');
+
+		d3.select('#timeline')
+			.style('height',(height-70)+'px');
+	}
+	resize();
 }
+
+
+
+function createMapPage(){
+	var page = createPage('map');
+
+	page.show = function(){
+		page.element.classed('hidden',false);
+		page.button.classed('active',true);
+		pages.active = this;
+		page.offsetHeader(page.id=='about');
+	}
+
+	return page;
+}
+
+function createJournalPage(){
+	var page = createPage('map');
+	page.id = 'journal';
+	page.button = d3.select('#navigation li.' + page.id);
+
+	page.show = function(){
+		page.element.classed('hidden',false);
+		page.button.classed('active',true);
+		pages.active = this;
+		page.offsetHeader(page.id=='about');
+	}
+
+	page.hide = function(){
+		page.element.classed('hidden',true);
+		page.button.classed('active',false);
+	}
+
+	return page;
+}
+
+function createPage(i){
+
+	var id = i;
+	var button = d3.select('#navigation li.' + i);
+	var element = d3.select('#'+ id + 'Page');
+
+	function show(){
+		element.classed('hidden',false);
+		button.classed('active',true);
+		pages.active = this;
+		offsetHeader(id=='about');
+	}
+
+	function hide(){
+		element.classed('hidden',true);
+		button.classed('active',false);
+	}
+
+	function offsetHeader(isAbout){
+		var header = d3.select('#header');
+		if(!isAbout){
+			header.style('width','97.2%')
+				.style('padding-right','1.4%');
+		} else {
+			var containerWidth = header.node().clientWidth;
+			header.style('width',(97.2 + (15/d3.select('body').node().clientWidth)*100) + '%')
+				.style('padding-right',0);
+
+			console.log((97.2 + (14/d3.select('body').node().clientWidth)*100) + '%');
+		}
+	}
+
+	return{
+		id: id,
+		button: button,
+		element: element,
+		show: show,
+		hide: hide,
+		offsetHeader: offsetHeader
+	}
+}
+
+
+
+
 
 
 
@@ -43,7 +161,7 @@ function createWanderer(p){
 	console.log(p);
 	var pos = {'x':p.lng,'y':p.lat};
 	var velocity = {'x':Math.random()*0.002-0.001,'y':Math.random()*0.002-0.001};
-	var acceleration = {'x':Math.random()*0.002-0.001,'y':Math.random()*0.002-0.001};
+	var acceleration = {'x':0,'y':0};
 	var r = 0.0003;  // ?
 	var wanderTheta = 0;
 	// var maxSpeed = 2;
@@ -98,7 +216,6 @@ function createWanderer(p){
 		return pos;
 	}
 
-		var aga = false;
 	function wander(){
 
 		var wanderR = 0.000018;
@@ -157,10 +274,5 @@ function createWanderer(p){
 	};
 }
 
-
-
-/* executes on load */
-$(document).ready(function() {
-    initMap();
-});
+document.addEventListener('DOMContentLoaded', init);
 
