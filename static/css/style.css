@@ -452,6 +452,14 @@ body{
                   width:65.4%;
                 }
 
+    #dataPage{
+      width:100%;
+      height: auto;
+      min-height:800px;
+      background-color: rgba(4, 0, 26, 0.65);
+    }
+
+
 
 svg.wanderer{
   width:300px;

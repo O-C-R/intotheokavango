@@ -117,7 +117,7 @@ function init() {
 
     d3.select('#contentContainer')
     	.on('mousewheel',function(){
-    		timeline.navigate(d3.event.wheelDeltaY);
+    		if(pages.active.id == '') timeline.navigate(d3.event.wheelDeltaY);
     	})
     d3.select('#mapPage')
     	.on('click',function(){
@@ -204,6 +204,9 @@ function newFeed(){
         });
 
 	
+	node.on('mousewheel', function(){scroll(d3.event)});
+	function scroll(e){
+	}	
 
 	return{
 
