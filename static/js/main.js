@@ -22,6 +22,8 @@
 	- add location to post meta
 	- add lerp to map and member markers
 	- unzoom on journal
+	- add link to tweets
+	- filter photos ?
 
 */
 
@@ -53,6 +55,7 @@ var members = {};
 var speed = 60;
 
 var tweets = [];
+var photos = [];
 
 
 document.addEventListener('DOMContentLoaded', init);
@@ -159,8 +162,6 @@ function newFeed(){
         .each(function(d,i){
 
         	d = d.getData();
-        	d3.select(this).select('a')
-        		.attr('href','http://www.twitter.com')
         	var t = d.date;
         	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
         	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
@@ -180,16 +181,63 @@ function newFeed(){
         	// var _this = this;
         	// d3.select(this).selectAll('div.body, div.locationFinder')
         		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
-        })	
+        });
 
+	
+	d3.select('#feed').selectAll('div.post.photo')
+        .data(photos)
+        .enter()
+        .append('div')
+        .classed('post',true)
+        .classed('photo',true)
+        .html(photoTemplate)
+        .each(function(d,i){
+        	console.log(i,d);
+        	d = d.getData();
+        	var t = d.date;
+        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
+        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+        	d3.select(this).select('div.meta div.timestamp')
+        		.html(t);
 
+        	d3.select(this).select('div.photo')
+        		.html('<img src = "http://intotheokavango.org'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
 
+        	// var _this = this;
+        	// d3.select(this).selectAll('div.body, div.locationFinder')
+        		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
+        });
 
 	return{
 
 	};
 }
 
+
+
+function newPhoto(feature){
+
+	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	var photoUrl = feature.properties.Url;
+
+	function getData(){
+		return {
+			date: date,
+			latLng: latLng,
+			photoUrl: photoUrl
+		}
+	}
+
+	function getLatLng(){
+		return latLng;
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng
+	};
+}
 
 
 
@@ -671,6 +719,23 @@ function loadData() {
         onEachFeature: function(feature){
         	var tweet = newTweet(feature);
         	if(tweet) tweets.push(tweet);
+        }
+    });
+
+
+    // IMAGES
+
+    var data = photoData;
+
+    //Create the beacon objects
+    L.geoJson(data.features, {
+        filter: function(feature, layer) {
+            // return (feature.properties.url.indexOf('james') > -1);
+            return true;
+        },
+        onEachFeature:function(feature, layer) {
+            var photo = newPhoto(feature);
+            if(photo) photos.push(photo);
         }
     });
 
