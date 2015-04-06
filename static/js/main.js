@@ -448,7 +448,7 @@ function newPage(i){
 		node.classed('hidden',false);
 		button.classed('active',true);
 		pages.active = this;
-		offsetHeader(id=='about');
+		offsetHeader(id=='about' || id=='data');
 	}
 
 	var hide = function(){
@@ -456,9 +456,9 @@ function newPage(i){
 		button.classed('active',false);
 	}
 
-	var offsetHeader = function(isAbout){
+	var offsetHeader = function(isPageRelative){
 		var header = d3.select('#header');
-		if(!isAbout){
+		if(!isPageRelative){
 			header.style('width','97.2%')
 				.style('padding-right','1.4%');
 		} else {
