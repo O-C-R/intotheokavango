@@ -5,26 +5,25 @@
 	API needs :
 	- what are the start and end date of an expedition?
 	- allow cross domain queries at least for prototyping
-	- problem name on ambit
 	- expeditionDay reversed
+	- who wears the ambit ?
+	
 	- lighter features? lighter tweets
 	- Should we use Jer's or Brian's mapbox credentials? Should they be hidden?
 
 	TODO: 
 	- reorganize code
-	- redesign member marker
 	- handle multiple days / multiple timeline segments
 	- handle night time
 	- handle group split
 	- time control button
 	- add preloader
-	- add location to post meta
+	- add location to post meta + link
 	- add lerp to map and member markers
 	- unzoom on journal?
-	- add link to tweets
 	- filter photos ?
-	- feed chronological order
 	- pane transitions
+	- make all post type to inherit from super class
 
 */
 
@@ -149,65 +148,62 @@ function resize(){
 
 function newFeed(){
 
-	var tweetTemplate = d3.select('#feed div.tweet').remove().html();
-	var photoTemplate = d3.select('#feed div.post.photo').remove().html();
+	var node = d3.select('#feed');
+	var templates = {
+		tweet: node.select('div.post.tweet').remove().html(),
+		photo: node.select('div.post.photo').remove().html()
+	}
 	var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
-	d3.select('#feed').selectAll('div.tweet')
-        .data(tweets)
+	var posts = [];
+	posts = posts.concat(tweets);
+	posts = posts.concat(photos);
+	posts.sort(function(a, b){
+		return a.getData().date.getTime() - b.getData().date.getTime();
+	});
+
+	node.selectAll('div.post')
+        .data(posts)
         .enter()
         .append('div')
-        .classed('post',true)
-        .classed('tweet',true)
-        .html(tweetTemplate)
+        .attr("class", function(d) { return ' post ' + d.getData().type; })
+        .html(function(d){ return templates[d.getData().type] })
         .each(function(d,i){
-
         	d = d.getData();
-        	var t = d.date;
-        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
-        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-        	d3.select(this).select('div.meta div.timestamp')
-        		.html(t);
+        	if(d.type == 'tweet'){
+	        	var t = d.date;
+	        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
+	        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this).select('div.meta div.timestamp')
+	        		.html(t);
 
-        	d3.select(this).select('p.message')
-        		.html(function(){
-        			return '“'+d.message.replace(/http[^\s]*/,'')+'”';
-        		});
+	        	d3.select(this).select('p.message')
+	        		.html(function(){
+	        			return '“'+d.message.replace(/http[^\s]*/,'')+'”';
+	        		});
 
-        	if(d.photoUrl){
+	        	if(d.photoUrl){
+		        	d3.select(this).select('div.photo')
+		        		.html('<img src = "'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
+	        	}
+
+	        	// var _this = this;
+	        	// d3.select(this).selectAll('div.body, div.locationFinder')
+	        		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
+        	} else if(d.type == 'photo'){
+	        	var t = d.date;
+	        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
+	        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this).select('div.meta div.timestamp')
+	        		.html(t);
+
 	        	d3.select(this).select('div.photo')
-	        		.html('<img src = "'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
+	        		.html('<img src = "http://intotheokavango.org'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
         	}
-
-        	// var _this = this;
-        	// d3.select(this).selectAll('div.body, div.locationFinder')
-        		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
+	        d.setFeedPos(this.offsetTop);
         });
 
 	
-	d3.select('#feed').selectAll('div.post.photo')
-        .data(photos)
-        .enter()
-        .append('div')
-        .classed('post',true)
-        .classed('photo',true)
-        .html(photoTemplate)
-        .each(function(d,i){
-        	console.log(i,d);
-        	d = d.getData();
-        	var t = d.date;
-        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
-        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-        	d3.select(this).select('div.meta div.timestamp')
-        		.html(t);
-
-        	d3.select(this).select('div.photo')
-        		.html('<img src = "http://intotheokavango.org'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
-
-        	// var _this = this;
-        	// d3.select(this).selectAll('div.body, div.locationFinder')
-        		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
-        });
 
 	return{
 
@@ -218,15 +214,18 @@ function newFeed(){
 
 function newPhoto(feature){
 
+	var feedPos = 0;
 	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var photoUrl = feature.properties.Url;
 
 	function getData(){
 		return {
+			type: 'photo',
 			date: date,
 			latLng: latLng,
-			photoUrl: photoUrl
+			photoUrl: photoUrl,
+			setFeedPos: setFeedPos
 		}
 	}
 
@@ -234,9 +233,14 @@ function newPhoto(feature){
 		return latLng;
 	}
 
+	function setFeedPos(y){
+		feedPos = y;
+	}
+
 	return{
 		getData: getData,
-		getLatLng: getLatLng
+		getLatLng: getLatLng,
+		setFeedPos: setFeedPos
 	};
 }
 
@@ -244,6 +248,7 @@ function newPhoto(feature){
 
 function newTweet(feature){
 
+	var feedPos = 0;
 	var username = feature.properties.Tweet.user.name;
 	var message = feature.properties.Tweet.text;
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
@@ -260,12 +265,14 @@ function newTweet(feature){
 
 	function getData(){
 		return {
+			type: 'tweet',
 			username: username,
 			message: message,
 			date: date,
 			latLng: latLng,
 			id: id,
-			photoUrl: photoUrl
+			photoUrl: photoUrl,
+			setFeedPos: setFeedPos
 		}
 	}
 
@@ -273,9 +280,14 @@ function newTweet(feature){
 		return latLng;
 	}
 
+	function setFeedPos(y){
+		feedPos = y;
+	}
+
 	return{
 		getData: getData,
-		getLatLng: getLatLng
+		getLatLng: getLatLng,
+		setFeedPos: setFeedPos
 	};
 }
 
