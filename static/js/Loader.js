@@ -1,6 +1,10 @@
 
 
 function Loader(){
+
+	var tweets = [];
+	var photos = [];
+	var members = {};
 	
 
 	function loadDay(day, callback) {
@@ -28,7 +32,6 @@ function Loader(){
 		
 		    L.geoJson(data, {
 		        filter: function(feature, layer) {
-			    	//Filter out 0,0 points
 			        return (feature.geometry.coordinates[0] != 0);
 			    },
 			    pointToLayer: function (feature, latLng) {
@@ -76,6 +79,7 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	// ???
 		            // return (feature.properties.url.indexOf('james') > -1);
 		            return true;
 		        },
@@ -90,7 +94,10 @@ function Loader(){
 
 
 	return {
-		loadDay: loadDay
+		loadDay: loadDay,
+		members: members,
+		tweets: tweets,
+		photos: photos
 	};
 }
 
