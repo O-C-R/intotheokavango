@@ -3,13 +3,25 @@
 /*
 
 	API needs :
-	- who wears ambit?
 	- what are the start and end date of an expedition?
 	- allow cross domain queries at least for prototyping
 	- problem name on ambit
+	- expeditionDay reversed
+	- lighter features? lighter tweets
+	- Should we use Jer's or Brian's mapbox credentials? Should they be hidden?
 
 	TODO: 
-	
+	- reorganize code
+	- redesign member marker
+	- feed
+	- handle multiple days / multiple timeline segments
+	- handle night time
+	- handle group split
+	- time control button
+	- add preloader
+	- add location to post meta
+	- add lerp to map and member markers
+	- unzoom on journal
 
 */
 
@@ -29,6 +41,7 @@ var pages = {};
 var panes = [];
 
 var timeline;
+var feed;
 
 var daySkip = false;
 var names = ["Steve","Jer","Chris","GB","Giles","Tom"];
@@ -39,6 +52,10 @@ var members = {};
 
 var speed = 60;
 
+var tweets = [];
+
+
+document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     map = new L.map('map', {
@@ -75,9 +92,7 @@ function init() {
     	})
 
 	window.addEventListener('resize',resize);
-	resize();
-
-	// var timeline = newTimeline();
+	resize();	
 
 	for(var i=0; i<3; i++){
 		var p = newPane(i);
@@ -106,8 +121,10 @@ function init() {
     		if(pages.active.id == 'map') timeline.togglePause();
     	})
 
-	// LOAD PATH
-	loadPaths();
+	loadData();
+	feed = newFeed();
+	timeline = newTimeline();
+	startAnimation();
 
 
 }
@@ -126,10 +143,98 @@ function resize(){
 }
 
 
+function newFeed(){
 
-function newTimeline(t){
+	var tweetTemplate = d3.select('#feed div.tweet').remove().html();
+	var photoTemplate = d3.select('#feed div.post.photo').remove().html();
+	var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
-	var timeFrame = [t,new Date().getTime()];
+	d3.select('#feed').selectAll('div.tweet')
+        .data(tweets)
+        .enter()
+        .append('div')
+        .classed('post',true)
+        .classed('tweet',true)
+        .html(tweetTemplate)
+        .each(function(d,i){
+
+        	d = d.getData();
+        	d3.select(this).select('a')
+        		.attr('href','http://www.twitter.com')
+        	var t = d.date;
+        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
+        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+        	d3.select(this).select('div.meta div.timestamp')
+        		.html(t);
+
+        	d3.select(this).select('p.message')
+        		.html(function(){
+        			return '“'+d.message.replace(/http[^\s]*/,'')+'”';
+        		});
+
+        	if(d.photoUrl){
+	        	d3.select(this).select('div.photo')
+	        		.html('<img src = "'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
+        	}
+
+        	// var _this = this;
+        	// d3.select(this).selectAll('div.body, div.locationFinder')
+        		// .on('click',function(d){findTweetLocation(d3.select(_this).datum().latLng)});
+        })	
+
+
+
+
+	return{
+
+	};
+}
+
+
+
+
+function newTweet(feature){
+
+	var username = feature.properties.Tweet.user.name;
+	var message = feature.properties.Tweet.text;
+	if(message.substring(0,2).toLowerCase() == 'rt') return null;
+	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	// var profilePicUrl = feature.properties.Tweet.user.profile_image_url,
+	var id = feature.id;
+	var photoUrl;
+	try{
+		if(feature.properties.Tweet.extended_entities.media[0].type == 'photo'){
+			photoUrl = feature.properties.Tweet.extended_entities.media[0].media_url;
+		}
+	} catch(e){}
+
+	function getData(){
+		return {
+			username: username,
+			message: message,
+			date: date,
+			latLng: latLng,
+			id: id,
+			photoUrl: photoUrl
+		}
+	}
+
+	function getLatLng(){
+		return latLng;
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng
+	};
+}
+
+
+
+function newTimeline(){
+
+	var timeFrame = [0,new Date().getTime()];
 	var node = d3.select('#timeline');
 	node.append('line')
 		.attr('x1','50%')
@@ -143,6 +248,22 @@ function newTimeline(t){
 	var tSpeed = 1;
 	var wheelDelta = 0;
 	var paused = false;
+
+
+	var timestamps = [];
+	for(m in members){
+		var member = members[m];
+		timestamps.push(member.pathQueue[0][0].time);
+	}
+	timeFrame[0] = timestamps.min();
+	timestamps = [];
+	for(m in members){
+		var member = members[m];
+		var d = member.pathQueue[member.pathQueue.length-1];
+		timestamps.push(d[d.length-1].time);
+	}
+	timeFrame[1] = timestamps.max();
+
 
 	function update(frameRate){
 		speed = Math.lerp(speed,tSpeed,0.2);
@@ -174,22 +295,11 @@ function newTimeline(t){
 		tSpeed = paused ? 0 : 1;
 	}
 
-	function setTimeFrame(){
-		var lastTimestamp = [];
-		for(m in members){
-			var member = members[m];
-			var d = member.pathQueue[member.pathQueue.length-1];
-			lastTimestamp.push(d[d.length-1].time);
-		}
-		timeFrame[1] = lastTimestamp.max();
-	}
-
 	return {
 		getTimeCursor: getTimeCursor,
 		navigate: navigate,
 		update: update,
-		togglePause: togglePause,
-		setTimeFrame: setTimeFrame
+		togglePause: togglePause
 	};
 
 }
@@ -428,10 +538,6 @@ function newWanderer(p){
 	};
 }
 
-document.addEventListener('DOMContentLoaded', init);
-
-
-
 
 
 function newMember(n, l){
@@ -504,8 +610,7 @@ function newMember(n, l){
 
 
 
-
-function loadPaths() {
+function loadData() {
 
 
 	var widths = [30,26,16,12]	
@@ -519,6 +624,8 @@ function loadPaths() {
 	// d3.json(query, function(error, data) {
 	// 	if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 	//    });   
+
+	// PATH
 
 	var data = pathData;
     L.geoJson(data, {
@@ -538,16 +645,36 @@ function loadPaths() {
 	    	var time = feature.properties.t_utc;
 	        if(!members[name]) {
 	        	members[name] = newMember(name, latLng);
-	        	if(Object.keys(members).length == 3) {
-	        		timeline = newTimeline(time)
-	        	}
 	        }
 	        members[name].addAmbitGeo(day, latLng, time);
 	    }
 	});
-	timeline.setTimeFrame();
+
+	// TWEETS
+
+	var data = tweetData;
+
+    //Create the beacon objects
+    L.geoJson(data.features, {
+        filter: function(feature, layer) {
+            //Filter out 0,0 points and retweets
+            return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+        },
+        // pointToLayer: function (feature, latlng) {
+        //     var marker = L.marker(latlng, tweetOptions);
+        //     tweetMarkers.push(marker);
+        //     markers.push(marker);
+        //     tweetCoords.push([latlng.lng, latlng.lat]);
+        //     tweetsQueue.push({marker:marker, time:feature.properties.t_utc * 1000});
+        //     return marker;
+        // },
+        onEachFeature: function(feature){
+        	var tweet = newTweet(feature);
+        	if(tweet) tweets.push(tweet);
+        }
+    });
+
 	
-	startAnimation();
 }
 
 
@@ -571,32 +698,17 @@ function startAnimation() {
         frameCount ++;
         timeline.update(frameRate);
 
+        var coord = [0,0];
 		for(m in members){
 			var member = members[m];
 			member.move(timeline.getTimeCursor());
-			if(member.name == 'Steve') {
-				map.panTo(member.getLatLng(), {animate:false});
-			}
+			var c = member.getLatLng();
+			coord[0] += c.lat;
+			coord[1] += c.lng;
 		}
-
-
-        // var sp = daySkip ? 0.4:0.1;
-        // for (var i = 0; i < names.length; i++) {
-        //     var n = names[i];
-        //     if(memberMarkers[n]){
-        //         var tpos = [0,0];
-        //         if(counters[n] > 1){
-        //             var r = Math.max(0,Math.min(1,map(new Date().getTime(),timeInterval[n][0],timeInterval[n][1],0,1)));
-        //             tpos[0] = map(r,0,1,previousMemberMarkersTarget[n][0],memberMarkersTarget[n][0]);
-        //             tpos[1] = map(r,0,1,previousMemberMarkersTarget[n][1],memberMarkersTarget[n][1]);
-        //             var memberLatLon = memberMarkers[n].getLatLng();
-        //             memberLatLon.lat += (tpos[0] - memberLatLon.lat) * sp * 2;
-        //             memberLatLon.lng += (tpos[1] - memberLatLon.lng) * sp * 2;
-        //             memberMarkers[n].setLatLng(memberLatLon);
-        //             if(i==0 && tpos[0] != 0) map.setView(memberLatLon, map.getZoom(), {pan:{animate:false}});
-        //         }
-        //     }
-        // }
+		coord[0] /= Object.keys(members).length;
+		coord[1] /= Object.keys(members).length;
+		map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
 
         requestAnimationFrame(function(){animate(frameTime)});
     })(new Date().getTime()-16);

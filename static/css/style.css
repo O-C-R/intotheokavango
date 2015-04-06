@@ -364,10 +364,93 @@ body{
         }
 
         #mapPage div.pane div#feed{
-          padding:35px 300px;
+          padding:35px 19.4%;
           line-height: 1.5em;
           position:relative;
+          min-height: 1000px;
         }
+
+          #mapPage.data div.pane div#feed{
+            padding:35px 10.3%;
+          }
+
+          #mapPage div#feed div.post{
+            margin-bottom:70px;          
+          }
+
+            #mapPage div#feed div.post div.content img.icon{
+              display:inline-block;
+              vertical-align: top;
+              margin-right:-4px;
+              border: 2px solid rgba(173,176,255,0.5);
+              border-radius: 3px;
+              width:7.7%;
+            }
+
+              #mapPage.data div#feed div.post div.content img.icon{
+                width:9.75%;
+              }
+
+            #mapPage div#feed div.post div.content p.message{
+              display:inline-block;
+              vertical-align: middle;
+              margin:0 0 0 5%;
+              width:85%;
+              font-style: italic;
+              font-size: 20px;
+              line-height: 1.85em;
+              margin-top:-7px;
+            }
+
+              #mapPage.data div#feed div.post div.content p.message{
+                margin:0 0 0 3.8%;
+                width:65.4%;
+              }
+
+            #mapPage div#feed div.post div.photo{
+              width:100%;
+              margin-top:35px;
+            }
+
+              #mapPage div#feed div.post div.photo img{
+                width:100%;
+                pointer-events:none;
+              }
+
+            #mapPage div#feed div.post div.meta{
+              margin-top:70px;
+              height:5px;
+            }
+
+              #mapPage div#feed div.post div.meta div.separator{
+                display:inline-block;
+                vertical-align: top;
+                margin-right:-4px;
+                width:7.7%;
+                height:3px;
+                background-color: rgba(173,176,255,0.5);
+              }
+
+                #mapPage.data div#feed div.post div.meta div.separator{
+                  width:9.75%;
+                }
+
+              #mapPage div#feed div.post div.meta div.timestamp{
+                display:inline-block;
+                vertical-align: text-top;
+                margin:0 0 0 5%;
+                width:85%;
+                color: rgba(173,176,255,0.65);
+                font-family: 'Montserrat';
+                font-size: 10px;
+                text-transform: uppercase;
+                line-height: 0;
+              }
+
+                #mapPage.data div#feed div.post div.meta div.timestamp{
+                  margin:0 0 0 3.8%;
+                  width:65.4%;
+                }
 
 
 svg.wanderer{

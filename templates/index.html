@@ -101,11 +101,25 @@
         </div>
         <div class="pane hidden">
           <div id="feed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod quis risus ut placerat. Duis vitae volutpat justo, non gravida dolor. Ut vel magna scelerisque, sollicitudin eros et, dictum lacus. Aenean nec tellus justo. Aliquam quis lorem nisl. Proin sed congue nulla, condimentum dignissim felis. Sed sodales libero dui, nec pulvinar ante cursus ac. Morbi eu sem pulvinar, faucibus felis et, finibus mi. Sed ut rutrum enim. Donec magna mi, iaculis et nisi at, mattis dapibus erat. Nunc bibendum nisl ac eros venenatis ornare. Duis euismod cursus lobortis. Maecenas ut sollicitudin neque. Maecenas mattis interdum neque, quis vestibulum neque aliquet in. Vivamus ac lectus tristique, consequat est in, ullamcorper justo.
-          <br>
-            Praesent sem dui, gravida eu tortor et, eleifend congue erat. Cras dictum malesuada leo, tincidunt dignissim dolor luctus et. Ut at mi finibus, aliquam sem eu, ultrices mi. Curabitur massa diam, auctor at metus ut, maximus rhoncus turpis. Mauris ullamcorper lacinia massa a gravida. Nunc congue quam nec purus suscipit vehicula. Integer odio mi, aliquam quis egestas quis, molestie et sem. Integer commodo tellus sed nunc tincidunt, a molestie sapien suscipit. Curabitur commodo neque nec tortor ornare, nec fermentum mi luctus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nunc id enim tortor. Proin porttitor rutrum libero, vel imperdiet lacus pretium auctor.
-          <br>
-            Etiam tellus arcu, tempus at pharetra ut, finibus at arcu. Aenean posuere dapibus nibh tincidunt vehicula. Curabitur ut condimentum velit. Cras non dui ac orci faucibus dapibus eu id velit. Fusce malesuada id nulla at pellentesque. Morbi ut nisi tellus. Cras non finibus sapien. Etiam posuere velit a purus dictum, faucibus rutrum nibh egestas. Morbi ultrices nisi in lobortis vehicula. Morbi venenatis felis in nisl ullamcorper, vel ultrices leo ultricies. Sed quam nisl, pulvinar at lacus maximus, ultrices commodo nunc. Aliquam at gravida est. Vestibulum condimentum, diam sit amet ultricies congue, leo nisl pellentesque ipsum, nec euismod neque libero ac justo. Praesent dapibus vehicula felis eu congue.
+            
+
+            <div class="post tweet">
+              <div class="content">
+                <img class="icon" src="static/img/iconTweet.svg"/>
+                <p class="message">
+                </p>
+                <div class="photo">
+                </div>
+              </div>
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+            </div>
+
+            <div class="post photo">
+            </div>
+
           </div>
         </div>
       </div>
@@ -118,28 +132,11 @@
     </div>
   </div>
 
-  <script type="text/javascript">
-    Math.map = function(value, start1, stop1, start2, stop2) {
-      return parseFloat(start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1)));
-    }
-    Math.constrain = function(value, min, max) {
-      return parseFloat(Math.min(Math.max(value,min),max));
-    }
-    Math.lerp = function(value, target, ratio) {
-      return parseFloat(value + (target-value)*ratio);
-    }
-    Array.prototype.max = function() {
-      return Math.max.apply(null, this);
-    };
-
-    Array.prototype.min = function() {
-      return Math.min.apply(null, this);
-    };
-  </script>
-  <script src="../static/data/ambit_geo.js"></script>
-  <script src="../static/js/d3.min.js"></script>
+  <script src="static/js/utils.js"></script>
+  <script src="static/data/ambit_geo.js"></script>
+  <script src="static/js/d3.min.js"></script>
   <script src="static/js/leaflet.js"></script>
-  <script src="/static/js/main.js"></script>
+  <script src="static/js/main.js"></script>
 
 {% endblock body %}
 
