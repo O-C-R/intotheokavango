@@ -13,7 +13,6 @@
 	TODO: 
 	- reorganize code
 	- redesign member marker
-	- feed
 	- handle multiple days / multiple timeline segments
 	- handle night time
 	- handle group split
@@ -21,9 +20,11 @@
 	- add preloader
 	- add location to post meta
 	- add lerp to map and member markers
-	- unzoom on journal
+	- unzoom on journal?
 	- add link to tweets
 	- filter photos ?
+	- feed chronological order
+	- pane transitions
 
 */
 
