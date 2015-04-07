@@ -72,6 +72,7 @@ function Member(n, l){
 function PhotoPost(feature){
 
 	var feedPos = 0;
+	var height = 0;
 	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var photoUrl = feature.properties.Url;
@@ -86,7 +87,8 @@ function PhotoPost(feature){
 			photoUrl: photoUrl,
 			feedPos: feedPos,
 			size: size,
-			setFeedPos: setFeedPos
+			setFeedPos: setFeedPos,
+			height: height
 		}
 	}
 
@@ -97,14 +99,23 @@ function PhotoPost(feature){
 
 
 	function setFeedPos(y, h){
-		console.log(y, h);
 		feedPos = y;
+		height = h;
+	}
+
+
+	function getFeedPos(){
+		return{
+			feedPos: feedPos,
+			height: height
+		};
 	}
 
 
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
+		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos
 	};
 }
@@ -115,6 +126,7 @@ function PhotoPost(feature){
 function TweetPost(feature){
 
 	var feedPos = 0;
+	var height = 0;
 	var username = feature.properties.Tweet.user.name;
 	var message = feature.properties.Tweet.text;
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
@@ -143,7 +155,8 @@ function TweetPost(feature){
 			photoUrl: photoUrl,
 			size: size,
 			feedPos: feedPos,
-			setFeedPos: setFeedPos
+			setFeedPos: setFeedPos,
+			height: height
 		}
 	}
 
@@ -153,14 +166,24 @@ function TweetPost(feature){
 	}
 
 
-	function setFeedPos(y){
+	function setFeedPos(y, h){
 		feedPos = y;
+		height = h;
+	}
+
+
+	function getFeedPos(){
+		return{
+			feedPos: feedPos,
+			height: height
+		};
 	}
 
 
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
+		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos
 	};
 }

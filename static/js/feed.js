@@ -13,7 +13,8 @@ function Feed(){
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html()
 	}
-	var postData = [];
+	var postsByDay = [];
+	var allPosts = [];
 
 
 	function init(day){
@@ -27,10 +28,11 @@ function Feed(){
 		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
-		postData = postData.concat(newPosts);
+		postsByDay[day] = newPosts;
+		allPosts = allPosts.concat(newPosts);
 
 		var posts = node.selectAll('div.post')
-	        .data(postData)
+	        .data(allPosts)
 	        .enter()
 	        .append('div')
 	        .attr("class", function(d) { return ' post ' + d.getData().type; })
@@ -66,18 +68,27 @@ function Feed(){
 		        		.attr('height', d.size[1]*w/d.size[0]);
 	        	}
 
-		        // d.setFeedPos(this.offsetTop, this.clientHeight);
+		        d.setFeedPos(this.offsetTop, this.clientHeight);
 	        });
 	}
 
 	
 	function scroll(){
+		var day = timeline.getTimeCursor().day;
 		var y = node.node().parentNode.scrollTop;
-		// posts.each(function(d,i){
-		// 	d = d.getData();
-		// 	if(d.feedPos <= y)
-		// })
-		timeline.navigateJournal(d3.event.wheelDeltaY);
+
+		var len = postsByDay[day].length;
+		for(var i=0; i<len; i++){
+			var post = postsByDay[day][i];
+			var d1 = post.getData();
+			if(y >= d1.feedPos-35 && y < d1.feedPos+d1.height){
+				if(!postsByDay[day][i+1] && !postsByDay[day+1]) break
+				var nextPost = postsByDay[day][i+1] || postsByDay[day+1];
+				var d2 = nextPost.getData();
+				timeline.navigateJournal(Math.round(Math.map(y,d1.feedPos-35,d1.feedPos+d1.height,d1.date.getTime(),d2.date.getTime())/1000));
+				break;
+			}
+		}
 	}
 	
 

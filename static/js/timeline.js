@@ -9,6 +9,7 @@ function Timeline(){
 
 	var timeFrame = [0,new Date().getTime()];
 	var node = d3.select('#timeline');
+	var dayCursor = 0;
 	var timeCursor = timeFrame[0];
 	var prevTimeCursor = timeFrame[0];
 	var speed = 1;
@@ -53,6 +54,7 @@ function Timeline(){
 		timeCursor += speed*60/frameRate + wheelDelta;
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 		wheelDelta = 0;
+		console.log(new Date(timeCursor*1000));
 	}
 
 
@@ -69,21 +71,22 @@ function Timeline(){
 	}
 
 
-	function navigateJournal(delta){
+	function navigateJournal(t){
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : 1;
 		})
-		wheelDelta = -delta/4;
+		wheelDelta = t-timeCursor;
 		if(pages.active.id == 'map'){
+			console.log('what?');
 			d3.select('#feed').node().parentNode.scrollTop += delta;
 		}
 	}
 
 
 	function getTimeCursor(){
-		return {current: timeCursor, last: prevTimeCursor};
+		return {current: timeCursor, last: prevTimeCursor, day: dayCursor};
 	}
 
 
@@ -92,7 +95,6 @@ function Timeline(){
 		else paused = !paused;
 		tSpeed = paused ? 0 : 1;
 	}
-
 
 	return {
 		init: init,
