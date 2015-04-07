@@ -75,7 +75,7 @@ function PhotoPost(feature){
 	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var photoUrl = feature.properties.Url;
-
+	var size = feature.properties.Size;
 
 
 	function getData(){
@@ -85,6 +85,7 @@ function PhotoPost(feature){
 			latLng: latLng,
 			photoUrl: photoUrl,
 			feedPos: feedPos,
+			size: size,
 			setFeedPos: setFeedPos
 		}
 	}
@@ -121,9 +122,12 @@ function TweetPost(feature){
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
 	var photoUrl;
+	var size = [];
 	try{
 		if(feature.properties.Tweet.extended_entities.media[0].type == 'photo'){
 			photoUrl = feature.properties.Tweet.extended_entities.media[0].media_url;
+			size[0] = feature.properties.Tweet.extended_entities.media[0].sizes.large.w;
+			size[1] = feature.properties.Tweet.extended_entities.media[0].sizes.large.h;
 		}
 	} catch(e){}
 
@@ -137,6 +141,7 @@ function TweetPost(feature){
 			latLng: latLng,
 			id: id,
 			photoUrl: photoUrl,
+			size: size,
 			feedPos: feedPos,
 			setFeedPos: setFeedPos
 		}

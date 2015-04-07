@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function(){
     pages.about = Page('about');
     pages.map = MapPage('map');    
     pages.journal = JournalPage('journal');
-    pages.data = Page('data');
+    pages.data = DataPage('data');
     pages.share = Page('share');
     wanderer = Wanderer(map.getCenter());
     timeline = Timeline();
@@ -77,9 +77,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	pages.map.show();
 	setLayoutInteractions();
-	loader.loadDay(0,function(){
-		feed.init();
-		timeline.init();
+	loader.loadDay(0,function(day){
+		feed.init(day);
+		timeline.init(day);
 		animate(new Date().getTime()-16);
 	});
 
@@ -88,19 +88,18 @@ document.addEventListener('DOMContentLoaded', function(){
 		var frameTime = new Date().getTime();
 		var frameRate = 1000/(frameTime - lastFrameTime);
 	    frameCount ++;
-
 	    if(pages.active.id == 'map' || pages.active.id == 'journal'){
 		    timeline.update(frameRate);
 		    var coord = [0,0];
-			for(m in members){
-				var member = members[m];
+			for(m in loader.members){
+				var member = loader.members[m];
 				member.move(timeline.getTimeCursor());
 				var c = member.getLatLng();
 				coord[0] += c.lat;
 				coord[1] += c.lng;
 			}
-			coord[0] /= Object.keys(members).length;
-			coord[1] /= Object.keys(members).length;
+			coord[0] /= Object.keys(loader.members).length;
+			coord[1] /= Object.keys(loader.members).length;
 			map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
 		} else {
 			wanderer.wander();
@@ -120,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		pages.active.hide();
 	    		pages[t].show();
 	    	})
-
 
 		d3.select('#contentContainer')
 	    	.on('mousewheel',function(){

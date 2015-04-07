@@ -15,12 +15,14 @@ function Feed(){
 	}
 
 
-	function init(){
+	function init(day){
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		var w = node.style('width');
+		w = parseFloat(+w.slice(0,w.length-2));
 
 		var postData = [];
-		postData = postData.concat(tweets);
-		postData = postData.concat(photos);
+		postData = postData.concat(loader.getTweets()[day]);
+		postData = postData.concat(loader.getPhotos()[day]);
 		postData.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
@@ -47,11 +49,19 @@ function Feed(){
 		        		});
 		        	if(d.photoUrl){
 			        	d3.select(this).select('div.photo')
-			        		.html('<img src = "'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
+			        		.append('img')
+			        		.attr('src',d.photoUrl)
+			        		.attr('alt','Photo taken on ' + t)
+			        		.attr('width', w)
+			        		.attr('height', d.size[1]*w/d.size[0]);
 		        	}
 	        	} else if(d.type == 'photo'){
 		        	d3.select(this).select('div.photo')
-		        		.html('<img src = "http://intotheokavango.org'+d.photoUrl+'" alt="Photo taken on '+ t +'"/>');
+		        		.append('img')
+		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+		        		.attr('alt','Photo taken on ' + t)
+		        		.attr('width', w)
+		        		.attr('height', d.size[1]*w/d.size[0]);
 	        	}
 
 		        // d.setFeedPos(this.offsetTop, this.clientHeight);

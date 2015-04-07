@@ -1,7 +1,7 @@
 
 
 /*
-	Loads all features and store them day by day.
+	Loads all features day by day and stores them .
 */
 
 
@@ -9,8 +9,7 @@ function Loader(){
 
 	var tweets = [];
 	var photos = [];
-	var members = {};
-	
+	var members = {};	
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
@@ -18,10 +17,13 @@ function Loader(){
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
-				callback();
+				callback(day);
 				console.log('loading completed for day #' + day);
 			}
 		}
+
+		tweets[day] = [];
+		photos[day] = [];
 
 		loadPath(day, checkForCompletion);
 		loadTweets(day, checkForCompletion);
@@ -30,8 +32,7 @@ function Loader(){
 
 
 	function loadPath(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day-16)+'&limit=0'
-
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 		
@@ -61,7 +62,7 @@ function Loader(){
 
 
 	function loadTweets(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_14&expeditionDay='+(day-16)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 		    L.geoJson(data.features, {
@@ -70,7 +71,7 @@ function Loader(){
 		        },
 		        onEachFeature: function(feature){
 		        	var tweet = TweetPost(feature);
-		        	if(tweet) tweets.push(tweet);
+		        	if(tweet) tweets[day].push(tweet);
 		        }
 		    });
 		    callback();
@@ -79,7 +80,7 @@ function Loader(){
 
 
 	function loadPhotos(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_14&expeditionDay='+(day-16)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 		    L.geoJson(data.features, {
@@ -90,7 +91,7 @@ function Loader(){
 		        },
 		        onEachFeature:function(feature, layer) {
 		            var photo = PhotoPost(feature);
-		            if(photo) photos.push(photo);
+		            if(photo) photos[day].push(photo);
 		        }
 		    });
 		    callback();
@@ -98,11 +99,21 @@ function Loader(){
 	}
 
 
+	function getTweets(){
+		return tweets;
+	}
+
+
+	function getPhotos(){
+		return photos;
+	}
+
+
 	return {
 		loadDay: loadDay,
 		members: members,
-		tweets: tweets,
-		photos: photos
+		getTweets: getTweets,
+		getPhotos: getPhotos
 	};
 }
 

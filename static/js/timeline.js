@@ -17,27 +17,29 @@ function Timeline(){
 	var paused = false;
 
 
-	function init(){
-		node.append('line')
-			.attr('x1','50%')
-			.attr('y1',0)
-			.attr('x2','50%')
-			.attr('y2','100%')
-			.attr('stroke','#FFFFFF');
+	function init(day){
+		if(day == 0){
+			node.append('line')
+				.attr('x1','50%')
+				.attr('y1',0)
+				.attr('x2','50%')
+				.attr('y2','100%')
+				.attr('stroke','#FFFFFF');
+		}
 		setTimeFrame();
 	}	
 
 
 	function setTimeFrame(){
 		var timestamps = [];
-		for(m in members){
-			var member = members[m];
+		for(m in loader.members){
+			var member = loader.members[m];
 			timestamps.push(member.pathQueue[0][0].time);
 		}
 		timeFrame[0] = timestamps.min();
 		timestamps = [];
-		for(m in members){
-			var member = members[m];
+		for(m in loader.members){
+			var member = loader.members[m];
 			var d = member.pathQueue[member.pathQueue.length-1];
 			timestamps.push(d[d.length-1].time);
 		}
