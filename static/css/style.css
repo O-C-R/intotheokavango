@@ -64,6 +64,10 @@ table {
   Reset CSS
 */
 
+html{
+  height:100%;
+}
+
 body{
   background-color:#04001A;
   color:#ffffff;
@@ -72,6 +76,7 @@ body{
   letter-spacing: 0.12em;
   width:100%;
   overflow-x:hidden; 
+  height:100%;
 }
 
 #mapContainer{
@@ -91,6 +96,7 @@ body{
   width:100%;
   height:auto;
   position:relative;
+  height:100%;
 }
 
   #contentContainer #header{
@@ -157,6 +163,10 @@ body{
   #contentContainer .page{
 
   }
+
+    #contentContainer .page.hidden{
+      display:none;
+    }
 
     #aboutPage{
       background-color: rgba(4, 0, 26, 0.65);
@@ -287,6 +297,170 @@ body{
           margin: 5px 0 0 20px;
         }
 
+    #mapPage{
+      height: auto;
+      display: inline-block;
+      position: absolute;
+      width:100%;
+      height:100%;
+      position:fixed;
+    }
+
+      #mapPage div.pane{
+        display:inline-block;
+        vertical-align: top;
+        height:100%;
+        margin-right:-6px;
+      }
+
+        #mapPage div.pane.hidden{
+          display:none;
+        }
+
+        #mapPage div.pane:nth-child(1){
+          width:8.55%;
+          background-color: rgba(4, 0, 26, 0.82);
+        }
+
+          #mapPage div.pane.dimmed:nth-child(1){
+            background-color: rgba(4, 0, 26, 0);
+          }
+
+        #mapPage div.pane:nth-child(2){
+          width:0;
+          background-color: rgba(4, 0, 26, 0.72);
+        }
+
+          #mapPage.data div.pane:nth-child(2){
+            width:16.65%;
+          }
+
+        #mapPage div.pane:nth-child(3){
+          width:91.5%;
+          background-color: rgba(4, 0, 26, 0.62);
+          height:auto;
+          min-height:100%;
+          overflow-y: scroll;
+          height:1px;
+        }
+
+          #mapPage div.pane.hidden:nth-child(3){
+            display: inline-block;
+            opacity: 0;
+          }
+
+            #mapPage div.pane.hidden:nth-child(3) *{
+              pointer-events:none;
+            }
+
+          #mapPage.data div.pane:nth-child(3){
+            width:74.85%;
+          }
+
+        #mapPage div.pane svg#timeline{
+          height:80%;
+          width:100%;
+          margin-top:35px;
+        }
+
+        #mapPage div.pane div#feed{
+          padding:35px 19.4%;
+          line-height: 1.5em;
+          position:relative;
+          min-height: 1000px;
+        }
+
+          #mapPage.data div.pane div#feed{
+            padding:35px 10.3%;
+          }
+
+          #mapPage div#feed div.post{
+            margin-bottom:70px;          
+          }
+
+            #mapPage div#feed div.post div.content img.icon{
+              display:inline-block;
+              vertical-align: top;
+              margin-right:-4px;
+              border: 2px solid rgba(173,176,255,0.5);
+              border-radius: 3px;
+              width:7.7%;
+            }
+
+              #mapPage.data div#feed div.post div.content img.icon{
+                width:9.75%;
+              }
+
+            #mapPage div#feed div.post div.content p.message{
+              display:inline-block;
+              vertical-align: middle;
+              margin:0 0 0 5%;
+              width:85%;
+              font-style: italic;
+              font-size: 20px;
+              line-height: 1.85em;
+              margin-top:-7px;
+            }
+
+              #mapPage.data div#feed div.post div.content p.message{
+                margin:0 0 0 3.8%;
+                width:65.4%;
+              }
+
+            #mapPage div#feed div.post div.photo{
+              width:100%;
+              margin-top:35px;
+            }
+
+              #mapPage div#feed div.post div.photo img{
+                width:100%;
+                pointer-events:none;
+              }
+
+            #mapPage div#feed div.post div.meta{
+              margin-top:70px;
+              height:5px;
+            }
+
+              #mapPage div#feed div.post div.meta div.separator{
+                display:inline-block;
+                vertical-align: top;
+                margin-right:-4px;
+                width:7.7%;
+                height:3px;
+                background-color: rgba(173,176,255,0.5);
+              }
+
+                #mapPage.data div#feed div.post div.meta div.separator{
+                  width:9.75%;
+                }
+
+              #mapPage div#feed div.post div.meta div.timestamp{
+                display:inline-block;
+                vertical-align: text-top;
+                margin:0 0 0 5%;
+                width:85%;
+                color: rgba(173,176,255,0.65);
+                font-family: 'Montserrat';
+                font-size: 10px;
+                text-transform: uppercase;
+                line-height: 0;
+              }
+
+                #mapPage.data div#feed div.post div.meta div.timestamp{
+                  margin:0 0 0 3.8%;
+                  width:65.4%;
+                }
+
+    #dataPage{
+      width:100%;
+      height: auto;
+      min-height:800px;
+      background-color: rgba(4, 0, 26, 0.65);
+    }
+
+
+
 svg.wanderer{
   width:300px;
   height:300px;
@@ -296,3 +470,14 @@ svg.wanderer{
   position:absolute;
 }
 
+.memberMarker {
+  border-left: 2px solid #FFB637;
+  background-color:rgba(255,255,255,0.7);
+  border-radius:2px;
+  font-family: "Montserrat";
+  color:rgba(4,0,26,0.9);;
+  font-size:14px;
+  width:auto;
+  padding:4px;
+  height:14px !important;
+}

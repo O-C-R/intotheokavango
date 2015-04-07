@@ -8,12 +8,8 @@
 {% block head %}
 
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
-  <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
-  <script type="text/javascript">
-      mapbox_username = "brianhouse";//"blprnt";
-      mapbox_map_id = "oxn5wd2a";//"vsat7sho";
-      path_to_data = "{{ query }}";
-  </script>
+  
+  
 
 {% endblock head %}
 
@@ -29,10 +25,10 @@
   <div id="contentContainer">
     <div id="header">
       <ul id="navigation">
-        <li>Map</li>
-        <li>Journal</li>
-        <li>Data</li>
-        <li class="active">About</li>
+        <li class="map">Map</li>
+        <li class="journal">Journal</li>
+        <li class="data">Data</li>
+        <li class="about">About</li>
         <li class="share"><span>Share</span></li>
       </ul>
       <div id="title">
@@ -42,7 +38,7 @@
     </div>
 
     <div id="pageContainer">
-      <div id="aboutPage" class="page">
+      <div id="aboutPage" class="page hidden">
         <div id="video">
           <img src="static/img/video.png" alt="cover for Into the Okavango trailer video" width="100%">
           <div id="date">
@@ -97,12 +93,64 @@
         </div>
       </div>
       <div id="mapPage" class="page hidden">
+        <div class="pane dimmed">
+          <svg id="timeline"/>
+        </div>
+        <div class="pane hidden">
+
+        </div>
+        <div class="pane hidden">
+          <div id="feed">
+            
+
+            <div class="post tweet">
+              <div class="content">
+                <img class="icon" src="static/img/iconTweet.svg"/>
+                <p class="message">
+                </p>
+                <div class="photo">
+                </div>
+              </div>
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+            </div>
+
+            <div class="post photo">
+              <div class="content">
+                <div class="photo">
+                </div>
+              </div>
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div id="dataPage" class="page hidden">
+        <h1>DATA</h1>
+      </div>
+      <div id="sharePage" class="page hidden">
+        <h1>SHARE</h1>
       </div>
     </div>
   </div>
 
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="/static/js/main.js"></script>
+  <script src="static/js/d3.min.js"></script>
+  <script src="static/js/leaflet.js"></script>
+  
+  <script src="static/js/feed.js"></script>
+  <script src="static/js/features.js"></script>
+  <script src="static/js/layout.js"></script>
+  <script src="static/js/loader.js"></script>
+  <script src="static/js/timeline.js"></script>
+  <script src="static/js/wanderer.js"></script>
+  <script src="static/js/utils.js"></script>
+  <script src="static/js/main.js"></script>
 
 {% endblock body %}
 
