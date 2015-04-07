@@ -4,6 +4,7 @@ from ingest import ingest_plain_body
 def parse(request):
     log.info("twilio.parse")
     content = ingest_plain_body(request)
+    content = strings.singlespace(content)
     tokens = content.split(" ")
     try:
         data = {'t_utc': tokens[0], 'SensorName': tokens[1], strings.camelcase(tokens[2]): tokens[3]}

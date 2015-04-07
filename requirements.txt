@@ -8,3 +8,4 @@ PyYAML>=3.11
 tornado>=4.0.2
 xmltodict>=0.9.1
 twython>=3.2.0
+soundcloud>=0.4.1
