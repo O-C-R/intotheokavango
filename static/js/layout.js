@@ -1,5 +1,10 @@
 
 
+/*
+	Several classes handling website's pages and tabs/panes
+*/
+
+
 function Page(i){
 
 	var id = i;

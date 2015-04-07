@@ -1,5 +1,10 @@
 
 
+/*
+	Used on the about page to move the map randomly.
+*/
+
+
 function Wanderer(p){
 
 	var pos = {'x':p.lng,'y':p.lat};

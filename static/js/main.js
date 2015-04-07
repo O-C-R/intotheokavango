@@ -25,14 +25,14 @@
 	- API error handling
 	- layout transitions
 	- replace data loading with promises
+	- minify and merge for production
 
 
 */
 
 
+// These should eventually be moved into the closure.
 
-
-// this is currently kept out of the closure in case Genevieve needs access to this for now.
 var debug = false;
 var frameCount = 0;
 
@@ -45,8 +45,6 @@ var map;
 var timeline;
 var feed;
 var wanderer;
-
-
 
 
 document.addEventListener('DOMContentLoaded', function(){

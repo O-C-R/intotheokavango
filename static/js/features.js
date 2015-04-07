@@ -1,5 +1,10 @@
 
 
+/*
+	Describes every features as displayed on the map and journal's page.
+*/
+
+
 function Member(n, l){
 
 	var name = n;
@@ -14,7 +19,6 @@ function Member(n, l){
 	function addAmbitGeo(d, l, t){
 		if(!pathQueue[d]) pathQueue[d] = [];
 	    pathQueue[d].push({latLng:l, time:t});
-	    // if(!pathCursor) pathCursor = pathQueue[d];
 	}
 
 
@@ -115,7 +119,6 @@ function TweetPost(feature){
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
 	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
-	// var profilePicUrl = feature.properties.Tweet.user.profile_image_url,
 	var id = feature.id;
 	var photoUrl;
 	try{

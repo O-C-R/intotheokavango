@@ -1,5 +1,10 @@
 
 
+/*
+	Interactive timeline on the map and journal page. Also handles all time related interactions.
+*/
+
+
 function Timeline(){
 
 	var timeFrame = [0,new Date().getTime()];

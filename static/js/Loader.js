@@ -1,5 +1,10 @@
 
 
+/*
+	Loads all features and store them day by day.
+*/
+
+
 function Loader(){
 
 	var tweets = [];
