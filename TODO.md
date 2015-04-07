@@ -1,6 +1,5 @@
 ### need
 - filename format for audio / images
-- yeah, that would be cool to show within the Members call, which FeatureTypes have that Member. can do that.
 
 ### now
 - set up crons on server
