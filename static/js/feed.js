@@ -13,6 +13,7 @@ function Feed(){
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html()
 	}
+	var postData = [];
 
 
 	function init(day){
@@ -20,12 +21,13 @@ function Feed(){
 		var w = node.style('width');
 		w = parseFloat(+w.slice(0,w.length-2));
 
-		var postData = [];
-		postData = postData.concat(loader.getTweets()[day]);
-		postData = postData.concat(loader.getPhotos()[day]);
-		postData.sort(function(a, b){
+		var newPosts = [];
+		newPosts = newPosts.concat(loader.getTweets()[day]);
+		newPosts = newPosts.concat(loader.getPhotos()[day]);
+		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
+		postData = postData.concat(newPosts);
 
 		var posts = node.selectAll('div.post')
 	        .data(postData)

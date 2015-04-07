@@ -33,21 +33,24 @@
 
 // These should eventually be moved into the closure.
 
-var debug = false;
-var frameCount = 0;
-
-var mapbox_username = "brianhouse"; //"blprnt";
-var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
-
-var loader;
-var pages = {};
-var map;
-var timeline;
-var feed;
-var wanderer;
-
 
 document.addEventListener('DOMContentLoaded', function(){
+
+
+	var debug = false;
+	var frameCount = 0;
+
+	var mapbox_username = "brianhouse"; //"blprnt";
+	var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
+
+	var loader;
+	var pages = {};
+	var map;
+	var timeline;
+	var feed;
+	var wanderer;
+
+
 
     map = new L.map('map', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
