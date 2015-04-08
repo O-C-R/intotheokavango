@@ -15,21 +15,18 @@
 	- time control button
 	- add preloader graphics
 	- add location to post meta + link
-	- add lerp to map and member markers
-	- unzoom on journal?
 	- make all post type to inherit from super class
-	- try without smooth scroll
-	- localstorage?
+	- test without smooth scroll
+	- localstorage for caching data?
 	- API error handling
 	- layout transitions
 	- replace data loading with promises
-	- minify and merge for production
-	- replace 16 with actual expedition duration
-	- daysPassed will be a problem when jumping on the timeline
+	- set expedition duration
 	- pause when blurred
 	- filter crazy path points
 	- remove feed elements that happened before of after the expedition
 	- highlight new days' meta node
+	- handle scrollbar event for feed navigation?
 
 */
 
@@ -80,7 +77,8 @@ document.addEventListener('DOMContentLoaded', function(){
     timeline = Timeline();
 	feed = Feed();
 
-	pages.map.show();
+	pages.about.show();
+	// pages.map.show();
 	setLayoutInteractions();
 	loader.loadDay(timeline.getTimeCursor().day,function(day){
 		timeline.setTimeFrame();
@@ -151,6 +149,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		d3.select('#timeline')
 			.style('height',(height-70)+'px');
+
+		d3.select('#video')
+			.style('height',Math.round(document.body.clientWidth*0.53) + 'px');
+
+		d3.select('#video iframe')
+			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
+			.style('width',document.body.clientWidth + 'px');
 	}
 });
 

@@ -41,7 +41,7 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
   width:100%;
-  overflow-x:hidden; 
+  /*overflow-x:hidden; */
 }
 ol, ul {
   list-style: none;
@@ -75,8 +75,8 @@ body{
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
-  overflow-x:hidden; 
   height:100%;
+  min-width:960px;
 }
 
 #mapContainer{
@@ -147,15 +147,21 @@ body{
           opacity:1;
         }
 
-        ul#navigation li.share span{
+        ul#navigation li.teaser{
+          width:auto;
+          float:right;
+          margin-right: 20px;
+        }
+
+        ul#navigation li.teaser span{
           color: #4BFF87;
           border: 2px solid;
           border-color: #54996B;
           border-radius: 3px;
           padding: 7px 12px;
-          transition: color 0.15s;
-          transition: border-color 0.15s;
+          cursor:normal;
         }
+
 
           ul#navigation li.share span:hover{
             color: #ffffff;
@@ -206,15 +212,24 @@ body{
 
     #aboutPage #video{
       text-align: center;
+      height:auto;
+      position:relative;
     }
 
+      #video .vimeoContainer{
+        position:absolute;
+        z-index:0;
+      }
+
       #video #date{
-        margin: -33px auto;
-        padding: 10px 20px;        
-        display: inline-block;
-        vertical-align: top;
+        padding: 0px 20px;        
+        display: block;
         height:20px;
         width:450px;
+        position:absolute;
+        left: 50%;
+        z-index:1;
+        bottom:0;
       }
 
         #video #date span{
@@ -225,19 +240,28 @@ body{
           vertical-align: middle;
           margin-top:-18px; 
           text-transform: uppercase;
+          position:absolute;
+          left:-50%;
+          bottom:-8px;
+          width:100%;
         }
 
         #video #date .bkg{
           width:100%;
           height:100%;
-          background-color: rgba(4, 0, 26, 0.8);
+          background-color: rgba(4, 0, 26, 0.5);
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
+          position:absolute;
+          left:-50%;
         }
 
     #aboutPage #introduction{
       width:82.8%;
+      height:auto;
       padding:105px 8.6%;
+      overflow-x:hidden; 
+      position:relative;
     }
 
       #introduction h1{
@@ -273,7 +297,7 @@ body{
           display:block;
           position:relative;
           /*left:0;*/
-          margin-top:-180px;
+          margin-top:-160px;
           /*width:100%;*/
           /*margin:auto;*/
           left:-50%;
@@ -494,3 +518,50 @@ svg.wanderer{
   padding:4px;
   height:14px !important;
 }
+
+
+
+@media (max-width: 767px) {
+  body{
+    min-width:540px;
+  }
+
+  #header{
+    padding-bottom: 80px !important;
+    width:80% !important;
+  }
+
+  #navigation{
+    float:none;
+    position:absolute;
+    top:80px;
+    width:80% !important;
+  }
+
+    #navigation li.teaser{
+      float:none !important;
+    }
+
+  #aboutPage #introduction{
+    padding-top:65px;
+  }
+
+  #aboutPage #introduction h1{
+    margin-bottom:70px;
+    line-height: 1.25em;
+  }
+
+  #aboutPage div.column{
+    display: block;
+    width:100%;
+    margin-right:auto !important;
+    margin-left:auto !important;
+    padding:0 !important;
+  }
+
+  #aboutPage div.column:not(:first-child){
+    margin-top: 70px;
+  }
+
+}
+
