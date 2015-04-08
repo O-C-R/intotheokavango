@@ -13,6 +13,7 @@ function Member(n, l, d){
 	var timeCursor = 0;
 	var dayCursor = d;
 	var latLng = l;
+	var tLatLng = new L.LatLng(l.lat,l.lng);
 	var icon = L.divIcon({className: 'memberMarker', html: '<p>' + name + '</p>', iconSize:['auto','auto']});
 	var marker = L.marker(latLng, {icon: icon}).addTo(map);
 
@@ -54,11 +55,14 @@ function Member(n, l, d){
 		if(interval.length == 2){
 			var lat = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lat, interval[1].latLng.lat);
 			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
-			latLng = new L.LatLng(lat,lng);
-			marker.setLatLng(latLng);
+			tLatLng = new L.LatLng(lat,lng);
 		} else {
 			// console.log('could not find path: ' + name);
 		}
+
+		latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
+		latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
+		marker.setLatLng(latLng);
 
 	}
 

@@ -22,6 +22,7 @@ function Feed(){
 		var w = node.style('width');
 		w = parseFloat(+w.slice(0,w.length-2));
 
+		// Definitely not optimized
 		var newPosts = [];
 		newPosts = newPosts.concat(loader.getTweets()[day]);
 		newPosts = newPosts.concat(loader.getPhotos()[day]);
@@ -30,6 +31,13 @@ function Feed(){
 		});
 		postsByDay[day] = newPosts;
 		allPosts = allPosts.concat(newPosts);
+		allPosts.sort(function(a, b){
+			return a.getData().date.getTime() - b.getData().date.getTime();
+		});
+
+		// for(var i=0; i<allPosts.length; i++){
+		// 	console.log(allPosts[i].getData().date);
+		// }
 
 		var posts = node.selectAll('div.post')
 	        .data(allPosts)

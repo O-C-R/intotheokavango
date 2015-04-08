@@ -28,6 +28,7 @@
 	- daysPassed will be a problem when jumping on the timeline
 	- pause when blurred
 	- filter crazy path points
+	- remove feed elements that happened before of after the expedition
 
 */
 
