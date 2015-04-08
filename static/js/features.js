@@ -5,69 +5,6 @@
 */
 
 
-function Member(n, l){
-
-	var name = n;
-	var pathQueue = [];
-	var pathTimeCursor = 0;
-	var pathDayCursor = 0;
-	var latLng = l;
-	var icon = L.divIcon({className: 'memberMarker', html: '<p>' + name + '</p>', iconSize:['auto','auto']});
-	var marker = L.marker(latLng, {icon: icon}).addTo(map);
-
-
-	function addAmbitGeo(d, l, t){
-		if(!pathQueue[d]) pathQueue[d] = [];
-	    pathQueue[d].push({latLng:l, time:t});
-	}
-
-
-	function move(time){
-		if(!time) return;
-		var forward = time.current >= time.last;
-		time = time.current;
-		var len = pathQueue[pathDayCursor].length;
-		var interval = [];
-		var aga = 0;
-		while(interval.length == 0 && pathDayCursor >= 0 && pathDayCursor < 1 && aga < 5){
-			aga ++;
-			for(var i=Math.constrain(pathTimeCursor+(forward?-1:1),0,len-1); forward?(i<len-1):(i>0); i+= (forward?1:-1)){
-				if(time >= pathQueue[pathDayCursor][i + (forward?0:-1)].time && time < pathQueue[pathDayCursor][i + (forward?1:0)].time){
-					interval = [pathQueue[pathDayCursor][i + (forward?0:-1)], pathQueue[pathDayCursor][i + (forward?1:0)]];
-					pathTimeCursor = i;
-					break;
-				}
-			}
-			if(interval.length == 0) pathDayCursor = Math.constrain(pathDayCursor+forward ? 1:-1,0,pathQueue.length-1);
-		}
-
-		if(interval.length > 0){
-			var lat = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lat, interval[1].latLng.lat);
-			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
-			latLng = new L.LatLng(lat,lng);
-			marker.setLatLng(latLng);
-		}
-	}
-
-
-	function getLatLng(){
-		return latLng;
-	}
-
-
-	return{
-		addAmbitGeo: addAmbitGeo,
-		getLatLng: getLatLng,
-		name: name,
-		marker: marker,
-		move: move,
-		pathQueue: pathQueue,
-		pathTimeCursor: pathTimeCursor
-	}
-}
-
-
-
 
 function PhotoPost(feature){
 

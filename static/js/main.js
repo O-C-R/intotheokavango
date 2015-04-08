@@ -11,8 +11,6 @@
 	- Should we use Jer's or Brian's mapbox credentials? Should they be hidden?
 
 	TODO IAN: 
-	- handle multiple days / multiple timeline segments
-	- handle night time
 	- handle group split
 	- time control button
 	- add preloader graphics
@@ -26,7 +24,10 @@
 	- layout transitions
 	- replace data loading with promises
 	- minify and merge for production
-
+	- replace 16 with actual expedition duration
+	- daysPassed will be a problem when jumping on the timeline
+	- pause when blurred
+	- filter crazy path points
 
 */
 
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function(){
         minZoom: 1,                    
         maxZoom: 20,
         zoom:17
-    });   
+    });
 
     loader = Loader();
     pages.about = Page('about');
@@ -77,7 +78,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	pages.map.show();
 	setLayoutInteractions();
-	loader.loadDay(0,function(day){
+	loader.loadDay(timeline.getTimeCursor().day,function(day){
+		timeline.setTimeFrame();
 		feed.init(day);
 		timeline.init(day);
 		animate(new Date().getTime()-16);

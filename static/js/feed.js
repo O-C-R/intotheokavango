@@ -83,7 +83,8 @@ function Feed(){
 			var d1 = post.getData();
 			if(y >= d1.feedPos-35 && y < d1.feedPos+d1.height){
 				if(!postsByDay[day][i+1] && !postsByDay[day+1]) break
-				var nextPost = postsByDay[day][i+1] || postsByDay[day+1];
+				var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
+				// console.log(nextPost);
 				var d2 = nextPost.getData();
 				timeline.navigateJournal(Math.round(Math.map(y,d1.feedPos-35,d1.feedPos+d1.height,d1.date.getTime(),d2.date.getTime())/1000));
 				break;

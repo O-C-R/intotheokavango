@@ -7,6 +7,7 @@
 
 function Loader(){
 
+	var loading = [];
 	var tweets = [];
 	var photos = [];
 	var members = {};	
@@ -17,8 +18,8 @@ function Loader(){
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
-				callback(day);
 				console.log('loading completed for day #' + day);
+				callback(day);
 			}
 		}
 
@@ -32,6 +33,7 @@ function Loader(){
 
 
 	function loadPath(day, callback){
+		loading[day] = true;
 		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
@@ -51,11 +53,22 @@ function Loader(){
 			    	var latLng = L.latLng(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
 			    	var time = feature.properties.t_utc;
 			        if(!members[name]) {
-			        	members[name] = Member(name, latLng);
+			        	members[name] = Member(name, latLng, day);
 			        }
 			        members[name].addAmbitGeo(day, latLng, time);
 			    }
 			});
+			for(m in members) members[m].initPathQueue();
+			var activityInterval = [0, 10000000000];
+			for(m in members){
+				var member = members[m];
+				var pathQueue = member.getPathQueueByDay(day);
+				if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
+				if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+			}
+			activityInterval[0]+(10*60);
+			activityInterval[1]-(10*60);
+			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
 	}
@@ -86,8 +99,9 @@ function Loader(){
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// ???
-		            // return (feature.properties.url.indexOf('james') > -1);
-		            return true;
+		        	// console.log(feature.properties.Url);
+		            return (feature.properties.Url.indexOf('james') > -1);
+		            // return true;
 		        },
 		        onEachFeature:function(feature, layer) {
 		            var photo = PhotoPost(feature);
@@ -108,12 +122,17 @@ function Loader(){
 		return photos;
 	}
 
+	function getLoading(){
+		return loading;
+	}
+
 
 	return {
 		loadDay: loadDay,
 		members: members,
 		getTweets: getTweets,
-		getPhotos: getPhotos
+		getPhotos: getPhotos,
+		getLoading: getLoading
 	};
 }
 
