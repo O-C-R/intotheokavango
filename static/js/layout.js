@@ -17,6 +17,8 @@ function Page(i){
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
+		console.log(id);
+		map.setZoom(id == 'journal' ? 15 : 17);
 	}
 
 
@@ -74,6 +76,7 @@ function MapPage(){
 			}
 		}
 		if(timeline) timeline.togglePause('resume');
+		map.setZoom(page.id == 'journal' ? 15 : 17);
 	}
 
 
@@ -106,6 +109,8 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
+		map.setZoom(page.id == 'journal' ? 15 : 17);
+		feed.jump(timeline.getTimeCursor());
 	}
 
 

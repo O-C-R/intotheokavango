@@ -29,6 +29,7 @@
 	- pause when blurred
 	- filter crazy path points
 	- remove feed elements that happened before of after the expedition
+	- highlight new days' meta node
 
 */
 
@@ -47,6 +48,8 @@ var map;
 var timeline;
 var feed;
 var wanderer;
+
+var timeOffset = 8*3600;
 
 
 document.addEventListener('DOMContentLoaded', function(){
