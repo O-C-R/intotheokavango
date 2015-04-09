@@ -59,7 +59,7 @@ class Ingest(server.Handler):
             log.error(log.exc(e))
             return self.error("Ingest failed")
         log.info("--> success (%s)" % feature_id)
-        return self.text(str(feature_id))
+        return self.text(str(feature_id)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
 
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
