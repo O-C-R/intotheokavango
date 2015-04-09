@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    timeline = Timeline();
 		feed = Feed();
 	} else {
+		console.log('creating about');
 		pages.about = AboutPage('about');
 	}
     wanderer = Wanderer(map.getCenter());

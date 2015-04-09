@@ -9,7 +9,7 @@ function AboutPage(){
 
 	// Extends Page
 	var page = Page('about');
-
+	console.log('AboutPage');
 	(function switchBackground(){
 		if(pages.active && pages.active.id == 'about'){
 			
