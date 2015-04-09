@@ -434,6 +434,7 @@ hr{
           text-align: right;
           margin-bottom: 35px;
           width:100%;
+          overflow: hidden;
         }
 
         #team div.logos{
