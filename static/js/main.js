@@ -77,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function(){
 	    pages.share = Page('share');
 	    timeline = Timeline();
 		feed = Feed();
-	} else pages.about = AboutPage('about');
+	} else {
+		pages.about = AboutPage('about');
+	}
     wanderer = Wanderer(map.getCenter());
 
 	// pages.about.show();
