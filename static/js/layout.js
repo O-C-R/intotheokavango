@@ -9,7 +9,6 @@ function AboutPage(){
 
 	// Extends Page
 	var page = Page('about');
-	console.log('AboutPage');
 	(function switchBackground(){
 		if(pages.active && pages.active.id == 'about'){
 			
@@ -24,7 +23,6 @@ function AboutPage(){
 		setTimeout(switchBackground,10000);
 	})();	
 
-	console.log(page);
 	return page;
 }
 
@@ -36,14 +34,12 @@ function Page(i){
 	var id = i;
 	var button = d3.select('#navigation li.' + i);
 	var node = d3.select('#'+ id + 'Page');
-	console.log(id, node);
 
 	var show = function(){
 		node.classed('hidden',false);
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		console.log(id);
 		map.setZoom(id == 'journal' ? 15 : 17);
 	}
 
