@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		var t = btn.text().toLowerCase();
 	    		pages.active.hide();
 	    		pages[t].show();
+	    		resize();
 	    	})
 
 		d3.select('#contentContainer')
@@ -185,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('width',document.body.clientWidth + 'px');
 	}
 });
-
 
 
 
