@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', function(){
 	} else {
 		console.log('creating about');
 		pages.about = AboutPage('about');
+		pages.about.show();
 	}
     wanderer = Wanderer(map.getCenter());
 
-	// pages.about.show();
-	pages.map.show();
     if(d3.selectAll('#navigation li')[0].length > 1){
+		pages.map.show();
 		setLayoutInteractions();
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
 			timeline.setTimeFrame();
