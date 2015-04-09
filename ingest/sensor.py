@@ -6,6 +6,7 @@ def parse(request):
     content = ingest_plain_body(request)
     content = strings.singlespace(content)
     tokens = content.split(" ")
+    log.debug(tokens)
     try:
         data = {'t_utc': tokens[0], 'SensorName': tokens[1], strings.camelcase(tokens[2]): tokens[3]}
     except Exception as e:
