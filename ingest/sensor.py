@@ -2,7 +2,7 @@ from housepy import config, log, strings
 from ingest import ingest_plain_body
 
 def parse(request):
-    log.info("twilio.parse")
+    log.info("sensor.parse")
     content = ingest_plain_body(request)
     content = strings.singlespace(content)
     tokens = content.split(" ")
