@@ -47,6 +47,7 @@ var feed;
 var wanderer;
 
 var timeOffset = 8*3600;
+var paused = false;
 
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -67,50 +68,60 @@ document.addEventListener('DOMContentLoaded', function(){
         zoom:17
     });
 
-    loader = Loader();
-    pages.about = Page('about');
-    pages.map = MapPage('map');    
-    pages.journal = JournalPage('journal');
-    pages.data = DataPage('data');
-    pages.share = Page('share');
+    if(d3.selectAll('#navigation li')[0].length > 1){
+	    loader = Loader();
+	    pages.about = AboutPage('about');
+	    pages.map = MapPage('map');    
+	    pages.journal = JournalPage('journal');
+	    pages.data = DataPage('data');
+	    pages.share = Page('share');
+	    timeline = Timeline();
+		feed = Feed();
+	} else pages.about = AboutPage('about');
     wanderer = Wanderer(map.getCenter());
-    timeline = Timeline();
-	feed = Feed();
 
-	pages.about.show();
-	// pages.map.show();
-	setLayoutInteractions();
-	loader.loadDay(timeline.getTimeCursor().day,function(day){
-		timeline.setTimeFrame();
-		feed.init(day);
-		timeline.init(day);
+	// pages.about.show();
+	pages.map.show();
+    if(d3.selectAll('#navigation li')[0].length > 1){
+		setLayoutInteractions();
+		loader.loadDay(timeline.getTimeCursor().day,function(day){
+			timeline.setTimeFrame();
+			feed.init(day);
+			timeline.init(day);
+			animate(new Date().getTime()-16);
+		});
+	} else {
+		window.addEventListener('resize',resize);
+		resize();	
+		setPause();
 		animate(new Date().getTime()-16);
-	});
+	}
 
 
 	function animate(lastFrameTime){
-		var frameTime = new Date().getTime();
-		var frameRate = 1000/(frameTime - lastFrameTime);
-	    frameCount ++;
-	    if(pages.active.id == 'map' || pages.active.id == 'journal'){
-		    timeline.update(frameRate);
-		    var coord = [0,0];
-			for(m in loader.members){
-				var member = loader.members[m];
-				member.move(timeline.getTimeCursor());
-				var c = member.getLatLng();
-				coord[0] += c.lat;
-				coord[1] += c.lng;
+		if(!paused){
+			var frameTime = new Date().getTime();
+			var frameRate = 1000/(frameTime - lastFrameTime);
+		    frameCount ++;
+		    if(pages.active.id == 'map' || pages.active.id == 'journal'){
+			    timeline.update(frameRate);
+			    var coord = [0,0];
+				for(m in loader.members){
+					var member = loader.members[m];
+					member.move(timeline.getTimeCursor());
+					var c = member.getLatLng();
+					coord[0] += c.lat;
+					coord[1] += c.lng;
+				}
+				coord[0] /= Object.keys(loader.members).length;
+				coord[1] /= Object.keys(loader.members).length;
+				map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
+			} else {
+				wanderer.wander();
+		    	var target = wanderer.update();
+		    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
 			}
-			coord[0] /= Object.keys(loader.members).length;
-			coord[1] /= Object.keys(loader.members).length;
-			map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
-		} else {
-			wanderer.wander();
-	    	var target = wanderer.update();
-	    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
 		}
-
 		requestAnimationFrame(function(){animate(frameTime)});
 	}
 
@@ -135,7 +146,20 @@ document.addEventListener('DOMContentLoaded', function(){
 	    	})
 		
 		window.addEventListener('resize',resize);
-		resize();	
+		resize();
+
+		setPause();	
+	}
+
+	function setPause(){
+		d3.select('body, iframe')
+			.on('blur',function(){
+				paused = true;
+			})
+		d3.select('body, iframe')
+			.on('focus',function(){
+				paused = false;
+			})
 	}
 
 
