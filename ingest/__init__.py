@@ -1,4 +1,4 @@
-import importlib, os, json
+import importlib, os, json, tornado
 from housepy import config, log, server, util, strings
 
 """
@@ -26,6 +26,7 @@ class Ingest(server.Handler):
     def get(self, page=None):
         return self.not_found()        
 
+    @tornado.web.asynchronous
     def post(self, feature_type=None):
         log.info("Ingest.post %s" % feature_type)
         if feature_type is None or not len(feature_type):
@@ -52,7 +53,11 @@ class Ingest(server.Handler):
             return self.error("Ingest failed: missing t_utc")
         feature = verify_expedition(feature)
         feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
-        feature_id = self.db.features.insert_one(feature).inserted_id
+        try:
+            feature_id = self.db.features.insert_one(feature).inserted_id
+        except Exception as e:
+            log.error(log.exc(e))
+            return self.error("Ingest failed")
         return self.text(str(feature_id))
 
 def verify_geojson(data):
@@ -195,7 +200,7 @@ def save_file(request):
     try:
         for key, fileinfo in request.files.items():
             fileinfo = fileinfo[0]
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
             with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
             return path

@@ -30,3 +30,5 @@ supports:
 - daily
 
 does this make sense for all data? it's really just for position and heartrate, and it should be averaged
+
+http://motor.readthedocs.org/en/stable/differences.html

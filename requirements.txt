@@ -9,3 +9,4 @@ tornado>=4.0.2
 xmltodict>=0.9.1
 twython>=3.2.0
 soundcloud>=0.4.1
+requests>=2.5.1
