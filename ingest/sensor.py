@@ -2,6 +2,14 @@ from housepy import config, log, strings, net, util
 from ingest import ingest_plain_body
 from pymongo import ASCENDING, DESCENDING
 from housepy.server import Application
+from twilio.rest import TwilioRestClient
+
+"""
+Receive sensor data via SMS in the format `<time> <SensorName> <Reading> <value>`
+Send an SMS in the format `location <SensorName> <Latitude> <Longitude>` to update 
+geometry for that sensor going forward
+
+"""
 
 def parse(request):
     log.info("sensor.parse")
@@ -9,6 +17,7 @@ def parse(request):
         message = ingest_plain_body(request)
         data = net.urldecode(message)    
         log.debug(data)
+        number = data['From']
         body = data['Body']
         content = strings.singlespace(body)
         tokens = content.split(" ")
@@ -17,6 +26,9 @@ def parse(request):
             lon, lat = tokens[3], tokens[2]   ## note reversal                        
             # insert a record for this location update
             data = {'t_utc': util.timestamp(), 'SensorName': tokens[1], 'longitude': lon, 'latitude': lat, 'LocationUpdate': True}
+
+            # send a verification
+            send_sms(number, tokens[1], lon, lat)
 
         else:
             # find the most recent location update for this sensor
@@ -32,10 +44,15 @@ def parse(request):
         return None
     return data
 
-"""
-if a sensor is placed without geometry, it will get picked up in the estimator
 
-assigning a location defines the geometry from then on out
-and any retroactive ones that are estimated
-
-"""
+## this should be async
+def send_sms(number, sensor_name, lon, lat):
+    message = "Successfully updated location of %s to %s,%s" % (sensor_name, lat, lon)
+    log.info("Sending message: %s" % message)
+    settings = config['twilio']
+    try:
+        client = TwilioRestClient(settings['account_sid'], settings['auth_token'])
+        response = client.messages.create(body=message, to=number, from_=settings['number']) # Replace with your Twilio number
+        log.info(response.sid)
+    except Exception as e:
+        log.error(log.exc(e))
