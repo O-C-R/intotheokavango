@@ -5,19 +5,41 @@
 */
 
 
+function AboutPage(){
+
+	// Extends Page
+	var page = Page('about');
+	(function switchBackground(){
+		if(pages.active && pages.active.id == 'about'){
+			
+			page.node.select('#team div.slides img:first-child')
+				.transition()
+				.style('opacity',0)
+				.each('end',function(){
+					d3.select(this).remove().style('opacity',1);
+					page.node.select('#team div.slides').node().appendChild(this)
+				});
+		}
+		setTimeout(switchBackground,10000);
+	})();	
+
+	return page;
+}
+
+
+
+
 function Page(i){
 
 	var id = i;
 	var button = d3.select('#navigation li.' + i);
 	var node = d3.select('#'+ id + 'Page');
 
-
 	var show = function(){
 		node.classed('hidden',false);
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		console.log(id);
 		map.setZoom(id == 'journal' ? 15 : 17);
 	}
 
@@ -52,7 +74,8 @@ function Page(i){
 		getNode: getNode,
 		show: show,
 		hide: hide,
-		offsetHeader: offsetHeader
+		offsetHeader: offsetHeader,
+		node: node
 	};
 }
 
