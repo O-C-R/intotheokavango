@@ -24,7 +24,7 @@ function AboutPage(){
 		setTimeout(switchBackground,10000);
 	})();	
 
-
+	console.log(page);
 	return page;
 }
 
