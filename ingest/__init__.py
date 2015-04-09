@@ -35,7 +35,7 @@ class Ingest(server.Handler):
         module_name = "ingest.%s" % feature_type
         try:
             module = importlib.import_module(module_name)
-            log.info("Loaded %s module" % module_name)
+            log.info("--> loaded %s module" % module_name)
             feature = module.parse(self.request)
         except ImportError as e:
             log.error(log.exc(e))
@@ -58,7 +58,8 @@ class Ingest(server.Handler):
         except Exception as e:
             log.error(log.exc(e))
             return self.error("Ingest failed")
-        return self.text(str(feature_id))
+        log.info("--> success (%s)" % feature_id)
+        return self.text(str(feature_id)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
 
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
@@ -100,7 +101,7 @@ def verify_geometry(data):
                 alt = value
                 delete.append(p)    
         if lon is not None and lat is not None:
-            if data['geometry'] is None:
+            if data['geometry'] is None:    ## this retains geometry if it exists, is that ok?
                 data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt) if alt is not None else None]}
             for p in delete:
                 del properties[p]

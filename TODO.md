@@ -1,10 +1,10 @@
 ### need
 - filename format for audio / images
+- async
 
 ### now
 - set up crons on server
 - resolution filter
-- twilio hydrosensors
 
 ### thoughts
 - might want to run everything off of /mnt/data considering static files (or use a hardlink?)
