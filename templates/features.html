@@ -1,0 +1,237 @@
+{% extends "page.html" %}
+
+{% block head %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../static/css/api.css">
+    <script type="text/javascript" src="../../static/js/d3.min.js"></script>
+{% endblock head %}
+
+{% block body %}
+    {{ search }}
+    <div id="dataPage">
+        <h1>Features</h1>
+        <div id="api">
+            <pre id="query-endpoint">"http://dev.intotheokavango.org/api/features?limit=2000"</pre>
+            <h2>Totals</h2>
+            <div id="totalsViz"></div>
+            <h2>Activity</h2>
+            <div id="timelineViz">
+                <!-- Radio buttons -->
+                <div class="api-query-control">
+                    <h2>Filter</h2>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="ambit" id="feature-filter-ambit"><label for="feature-filter-ambit">ambit</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="ambit-geo" id="feature-filter-ambit-geo"><label for="feature-filter-ambit-geo">ambit-geo</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="audio" id="feature-filter-audio"><label for="feature-filter-audio">audio</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="beacon" id="feature-filter-beacon"><label for="feature-filter-beacon">beacon</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="ethno" id="feature-filter-ethno"><label for="feature-filter-ethno">ethno</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="hydro" id="feature-filter-hydro"><label for="feature-filter-hydro">hydro</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="migration" id="feature-filter-migration"><label for="feature-filter-migration">migration</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="sighting" id="feature-filter-sighting"><label for="feature-filter-sighting">sighting</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="tweet" id="feature-filter-tweet"><label for="feature-filter-tweet">tweet</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script type="text/javascript">
+
+            //TOTALS VIZ
+            var dummyData = [ 
+                                { "featureType" : "ambit", "total" : 1300 },
+                                { "featureType" : "ambit_geo", "total" : 1060 },
+                                { "featureType" : "audio", "total" : 400 },
+                                { "featureType" : "beacon", "total" : 1000 },
+                                { "featureType" : "ethnography", "total" : 204 },
+                                { "featureType" : "hydrosensor", "total" : 3500 },
+                                { "featureType" : "image", "total" : 2300 },
+                                { "featureType" : "migration", "total" : 480 },
+                                { "featureType" : "sighting", "total" : 1500 },
+                                { "featureType" : "tweet", "total" : 790 }
+                            ];
+            
+            var makeTotalsViz = function(data) {
+
+                var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+                    width = 800 - margin.left - margin.right,
+                    barHeight = 20,
+                    height = barHeight * data.length,
+                    left_width = 100;
+
+                var xScale = d3.scale.linear()
+                    .domain([0, d3.max(data, function(d) { return d.total; })])
+                    .range([0, width - left_width]);
+
+                var yScale = d3.scale.ordinal()
+                    .domain(data, function(d) { 
+                        return d.featureType; 
+                        console.log(d.featureType); //hmm it doesn't console anything
+                    })
+                    .rangeBands([0, height]);
+               
+                var svg = d3.select("#totalsViz").append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                var bar = svg.selectAll("g")
+                        .data(data)
+                    .enter().append("g")
+                        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+                bar.append("rect")
+                    .attr("x", left_width)
+                    .attr("y", yScale)
+                    .attr("width", function(d) { return xScale(d.total); })
+                    .attr("height", barHeight - 1);
+
+                bar.append("text")
+                    .attr("x", function(d) { return xScale(d.total) - 3 + left_width; })
+                    //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                    .attr("y", barHeight / 2)
+                    .attr("dy", "0.35em")
+                    .attr("text-anchor", "end")
+                    .text(function(d) { return d.total; });
+
+                bar.append("text")
+                    .attr("x", left_width * 0.85)
+                    //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                    .attr("y", barHeight / 2)
+                    .attr("dy", "0.35em")
+                    .attr("text-anchor", "middle")
+                    .style("fill", "black")
+                    .text(function(d) { return d.featureType; });
+            }
+            
+            makeTotalsViz(dummyData);
+            
+            //TIMESERIES VIZ
+                var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+                width = 800 - margin.left - margin.right,
+                barHeight = 20,
+                //height = barHeight * data.length,
+                left_width = 100;
+
+                var parseFeatures = function(item) {
+                    if(item["properties"].hasOwnProperty("FeatureType")) {
+                        var feature = {};
+                        feature.time = new Date(+item["properties"]["t_utc"] * 1000);
+                        feature.type = item["properties"]["FeatureType"];
+                        //console.log(feature.time + ", " + feature.type);
+                        return feature;
+                    }
+                }
+
+                var url = "http://dev.intotheokavango.org/api/features?limit=200";
+                d3.json(url, function(error, data) {
+                    //var dta = data.features;
+                    //console.log(dta);
+                    var f;
+                    //empty histogram
+                    var hist = [];
+
+                    for(d in data.features) {
+                        item = data.features[d];
+                        //console.log(item);
+                        f = parseFeatures(item);
+                        //console.log(f.time);
+                        if(f.type === 'tweet') {
+                            //get the date range
+                            var dateRange = d3.extent(data.features, function(d) {return new Date(d.properties.DateTime); });
+                            console.log("Data range", dateRange);
+                            console.log("Data range [0]" + dateRange[0]);
+                            console.log("Data range [1]" + dateRange[1]);
+
+                            //compute time bins
+                            var binner = d3.time.scale();
+
+                            //pick time interval to bin with
+                            var interval = d3.time.hour;
+                            console.log("Interval", interval);
+
+                            //compute time intervals
+                            var allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
+                            console.log("Intervals", allIntervals); //array of all the hours between min and max date
+
+                            //input domain mapped to output range
+                            binner.domain([allIntervals[0], allIntervals[allIntervals.length - 1]]);
+                            binner.range([0, allIntervals.length - 1]);
+
+                            //only output integers to fill the array
+                            binner.interpolate(d3.interpolateRound);
+
+                            //fill histogram with 0
+                            for (var i = 0; i < allIntervals.length; i++) { hist[i] = 0; }
+
+                            data.features.forEach(function(d) {
+                                //compute hour index
+                                //var t = d["properties"]["DateTime"];
+                                //console.log("t: " + t);
+                                var tid = binner(interval.floor(new Date(d.properties.DateTime)));
+                                console.log("Map " + d.properties.DateTime + " to " + tid);
+
+                                if(!hist[tid]) {
+                                    hist[tid] = 1;
+                                } else {
+                                    hist[tid]++;
+                                }
+                            });
+                        }
+                        }
+
+                            // Here is the histogram.
+                            console.log("Hist:", hist);
+
+                            var height = 300;
+                            console.log("height:", height);
+
+                            var drawHistogram = function() {
+                                // Quick vis
+                                var svg = d3.select('#timelineViz').append('svg').attr({width: width, height: height});
+
+                                var xScale = d3.scale.linear()
+                                            .domain([0,allIntervals.length])
+                                            .range([0,width - left_width]);
+                                var yScale = d3.scale.linear()
+                                            .domain([0,d3.max(hist)])
+                                            .range([height,0]);
+                                var bars = svg.selectAll('rect.bar')
+                                    .data(hist)
+                                    .enter()
+                                    .append('rect')
+                                    .classed('bar',true)
+                                    .style('fill','steelblue');
+
+                                var w = xScale(1);
+
+                                console.log(d3.extent(hist),yScale(1));
+
+                                bars.attr('x', function(d,i) { return left_width + xScale(i); })
+                                    .attr('y', function(d) { return yScale(d); })
+                                    .attr('width', w)
+                                    .attr('height', function(d) { return height - yScale(d); 
+                                });
+                            }
+      
+                            drawHistogram();
+                    
+                });
+
+        </script>
+{% endblock body %}
