@@ -11,7 +11,7 @@
     <div id="dataPage">
         <h1>Features</h1>
         <div id="api">
-            <pre id="query-endpoint">"http://dev.intotheokavango.org/api/features?limit=2000"</pre>
+            <pre id="query-endpoint">"http://dev.intotheokavango.org/api/features"</pre>
             <h2>Totals</h2>
             <div id="totalsViz"></div>
             <h2>Activity</h2>
@@ -124,8 +124,7 @@
             //TIMESERIES VIZ
                 var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
                 width = 800 - margin.left - margin.right,
-                barHeight = 20,
-                //height = barHeight * data.length,
+                height = 400 - margin.top - margin.bottom,
                 left_width = 100;
 
                 var parseFeatures = function(item) {
@@ -138,13 +137,15 @@
                     }
                 }
 
-                var url = "http://dev.intotheokavango.org/api/features?limit=200";
+                var url = "http://dev.intotheokavango.org/api/features";
                 d3.json(url, function(error, data) {
                     //var dta = data.features;
                     //console.log(dta);
                     var f;
                     //empty histogram
                     var hist = [];
+                    var allIntervals;
+                    var dateRange;
 
                     for(d in data.features) {
                         item = data.features[d];
@@ -153,7 +154,7 @@
                         //console.log(f.time);
                         if(f.type === 'tweet') {
                             //get the date range
-                            var dateRange = d3.extent(data.features, function(d) {return new Date(d.properties.DateTime); });
+                            dateRange = d3.extent(data.features, function(d) {return new Date(d.properties.DateTime); });
                             console.log("Data range", dateRange);
                             console.log("Data range [0]" + dateRange[0]);
                             console.log("Data range [1]" + dateRange[1]);
@@ -166,7 +167,7 @@
                             console.log("Interval", interval);
 
                             //compute time intervals
-                            var allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
+                            allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
                             console.log("Intervals", allIntervals); //array of all the hours between min and max date
 
                             //input domain mapped to output range
@@ -193,43 +194,145 @@
                                 }
                             });
                         }
-                        }
+                    }
 
-                            // Here is the histogram.
-                            console.log("Hist:", hist);
+                    //Draw the data
+                    var svg, xAxis, yAxis, xScale, yScale;
 
-                            var height = 300;
-                            console.log("height:", height);
+                    var drawLineGraph = function() {
+                        // create svg element
+                        svg = d3.select('#timelineViz').append('svg')
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom) 
+                            .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top +")");
 
-                            var drawHistogram = function() {
-                                // Quick vis
-                                var svg = d3.select('#timelineViz').append('svg').attr({width: width, height: height});
+                        //define axis ranges and scales
+                        xScaleTime = d3.time.scale()
+                            .domain([dateRange[0], dateRange[1]])
+                            .range([0, width - left_width]);
+                        //need another xScale for drawing shapes
+                        xScale = d3.scale.linear()
+                            .domain([0, allIntervals.length])
+                            .range([0, width - left_width]);
+                        
+                        yScale = d3.scale.linear()
+                            .domain([0,d3.max(hist)])
+                            .range([height,0]);
 
-                                var xScale = d3.scale.linear()
-                                            .domain([0,allIntervals.length])
-                                            .range([0,width - left_width]);
-                                var yScale = d3.scale.linear()
-                                            .domain([0,d3.max(hist)])
-                                            .range([height,0]);
-                                var bars = svg.selectAll('rect.bar')
-                                    .data(hist)
-                                    .enter()
-                                    .append('rect')
-                                    .classed('bar',true)
-                                    .style('fill','steelblue');
+                        //define lines
+                        var line = d3.svg.line()
+                                .x(function(d, i) { return xScale(i); })
+                                .y(function(d) { return yScale(d); });
 
-                                var w = xScale(1);
+                        //define X axis
+                        xAxis = d3.svg.axis()
+                            .scale(xScaleTime)
+                            .orient('bottom')
+                            .ticks(5);
 
-                                console.log(d3.extent(hist),yScale(1));
+                        //define Y axis
+                        yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient('left')
+                            .ticks(5)
 
-                                bars.attr('x', function(d,i) { return left_width + xScale(i); })
-                                    .attr('y', function(d) { return yScale(d); })
-                                    .attr('width', w)
-                                    .attr('height', function(d) { return height - yScale(d); 
-                                });
-                            }
-      
-                            drawHistogram();
+                        //add X axis
+                        svg.append('g')
+                            .attr('class', 'axis')
+                            .attr("transform", "translate(0 ," + height + ")")
+                            .call(xAxis);
+
+                        //add Y axis
+                        svg.append("g")
+                            .attr("class", "y axis")
+                            //.attr("transform", "translate(" + left_width + ", 0)")
+                            .call(yAxis);
+
+                        //add line
+                        svg.append('svg:path')
+                            .attr('d', line(hist));
+
+                        //add circles
+                        var circles = svg.selectAll('circle')
+                            .data(hist)
+                            .enter().append('circle')
+                            .attr('cx', function(d, i) { return xScale(i); })
+                            .attr('cy', function(d) { return yScale(d); })
+                            .attr('r', 3);
+
+                    }
+
+                    //Using for ScatterPlot and Histogram Viz
+                    var setupGraph = function() {
+                        // create svg element
+                        svg = d3.select('#timelineViz').append('svg')
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom) 
+                            .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top +")");
+
+                        //define axis ranges & scales
+                        xScale = d3.scale.linear()
+                                    .domain([0,allIntervals.length])
+                                    .range([0,width - left_width]);
+                        yScale = d3.scale.linear()
+                                    .domain([0,d3.max(hist)])
+                                    .range([height,0]);
+
+                        xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom");
+
+                        yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left");
+
+                        svg.append("g")
+                            .attr("class", "x axis")
+                            .attr("transform", "translate(0 ," + height + ")")
+                            .call(xAxis);
+
+                        svg.append("g")
+                            .attr("class", "y axis")
+                            //.attr("transform", "translate(" + left_width + ", 0)")
+                            .call(yAxis);
+                    }
+
+                    var drawScatterPlot = function() {
+                        var circles = svg.selectAll('scatter-dots')
+                            .data(hist)
+                            .enter()
+                            .append("svg:circle")
+                                .attr("cx", function(d,i) { return xScale(i); })
+                                .attr("cy", function(d) { return yScale(d); })
+                                .attr("r", 4);
+                    }
+
+                    var drawHistogram = function() {
+                    
+                        var bars = svg.selectAll('rect.bar')
+                            .data(hist)
+                            .enter()
+                            .append('rect')
+                            .classed('bar',true)
+                            .style('fill','steelblue');
+
+                        var w = xScale(1);
+
+                        console.log(d3.extent(hist),yScale(1));
+
+                        bars.attr('x', function(d,i) { return xScale(i); })
+                            .attr('y', function(d) { return yScale(d); })
+                            .attr('width', w)
+                            .attr('height', function(d) { return height - yScale(d); 
+                        });
+                    }
+                    
+                    //setupGraph();
+                    //drawHistogram();
+                    //drawScatterPlot();
+                    drawLineGraph();
                     
                 });
 
