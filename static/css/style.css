@@ -201,17 +201,17 @@ hr{
 
       #aboutPage div.column{
         display: inline-block;
-        width:48.2%;
+        width:47.2%;
         margin-right:-4px;
         vertical-align: top;
       }
 
         #aboutPage div.column:first-child{
-          padding-right:1.4%;
+          padding-right:2.4%;
         }
 
         #aboutPage div.column:last-child{
-          padding-left:1.4%;
+          padding-left:2.4%;
         }
 
     #aboutPage #video{
@@ -270,21 +270,21 @@ hr{
 
       #aboutPage h1{
         font-family: "Montserrat", Helvetica, Arial;
-        font-size: 60px;
+        font-size: 56px;
         color:#ffffff;
         text-transform: uppercase;
         text-align: right;
         letter-spacing: 0.15em;
-        line-height: 1.12em; 
-        margin-top:-3px;
+        line-height: 1.32em; 
+        margin-top:-5px;
       }
 
       #introduction p{
         /*font-family: Georgia, serif;*/
         font-size: 18px;
         font-style: italic;
-        letter-spacing: 0.11em;
-        line-height: 1.8em;
+        letter-spacing: 0.12em;
+        line-height: 2em;
       }
 
         #introduction p:not(:first-child){
@@ -312,7 +312,7 @@ hr{
       }
 
       #aboutPage h2{
-        font-family: 'Montserrat';
+        font-family: 'Montserrat', arial, sans-serif;
         font-size: 22px;
         text-transform: uppercase;
         line-height: 1.5em;
@@ -402,21 +402,14 @@ hr{
             z-index:3;
         }
 
-          #team h1{
-            position:relative;
-            text-align: center;
-            width:100%;
-            margin-bottom:70px;
-          }
-
           #team h2{
-            margin-bottom: 20px;
+            margin-bottom: 8px;
           }
 
           #team p{
             margin-bottom: 70px;
             font-size: 16px;
-            line-height: 1.3em;
+            line-height: 1.5em;
           }
 
           #team p:last-child{
@@ -424,21 +417,21 @@ hr{
           }
 
             #team p span{
-              font-size: 11px;
-              font-style: italic;
-              text-transform: lowercase;
+              font-family: 'Montserrat', arial, sans-serif;
+              font-size: 9px;
+              text-transform: uppercase;
               opacity: 0.75;
             }
 
         #team div.social{
-          text-align: right;
+          text-align: left;
           margin-bottom: 35px;
           width:100%;
           overflow: hidden;
         }
 
         #team div.logos{
-          text-align: right;
+          text-align: left;
           position:absolute;
           bottom:100px;
           width:40%;
@@ -447,7 +440,7 @@ hr{
           #team div.logos img{
             display: inline-block;
             vertical-align: bottom;
-            margin-left:10px;
+            margin-right:10px;
           }
 
 
@@ -597,7 +590,7 @@ hr{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                font-family: 'Montserrat';
+                font-family: 'Montserrat', arial, sans-serif;
                 font-size: 10px;
                 text-transform: uppercase;
                 line-height: 0;
@@ -667,7 +660,7 @@ svg.wanderer{
 
   #aboutPage #introduction h1{
     margin-bottom:70px;
-    line-height: 1.25em;
+    line-height: 1.32em;
   }
 
   #aboutPage div.column{
