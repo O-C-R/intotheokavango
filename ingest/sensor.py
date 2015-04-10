@@ -9,6 +9,8 @@ Receive sensor data via SMS in the format `<time> <SensorName> <Reading> <value>
 Send an SMS in the format `location <SensorName> <Latitude> <Longitude>` to update 
 geometry for that sensor going forward
 
+If time is '*', then have the server generate the timestamp.
+
 """
 
 def parse(request):
@@ -19,7 +21,7 @@ def parse(request):
         log.debug(data)
         number = data['From']
         body = data['Body']
-        content = strings.singlespace(body)
+        content = strings.singlespace(body.strip())
         tokens = content.split(" ")
 
         if tokens[0] == 'location':
@@ -37,7 +39,8 @@ def parse(request):
             georef = results[0] if len(results) else None
             geometry = georef['geometry'] if georef is not None else None
             log.debug(geometry)
-            data = {'t_utc': tokens[0], 'SensorName': tokens[1], strings.camelcase(tokens[2]): tokens[3], 'LocationUpdate': False, 'geometry': geometry}
+            t = util.timestamp() if tokens[0] == "*" else tokens[0]
+            data = {'t_utc': t, 'SensorName': tokens[1], strings.camelcase(tokens[2]): tokens[3], 'LocationUpdate': False, 'geometry': geometry}
 
     except Exception as e:
         log.error("Twilio post is malformed: %s" % log.exc(e))
