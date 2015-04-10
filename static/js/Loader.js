@@ -51,7 +51,7 @@ function Loader(){
 			    onEachFeature: function(feature){
 			    	var name = feature.properties.Member;
 			    	var latLng = L.latLng(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
-			    	var time = feature.properties.t_utc + timeOffset;
+			    	var time = feature.properties.t_utc;
 			        if(!members[name]) {
 			        	members[name] = Member(name, latLng, day);
 			        }

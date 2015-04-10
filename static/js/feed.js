@@ -15,7 +15,6 @@ function Feed(){
 	}
 	var postsByDay = [];
 	var allPosts = [];
-	var postCursor = 0;
 
 
 	function init(day){
@@ -36,6 +35,10 @@ function Feed(){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
 
+		// for(var i=0; i<allPosts.length; i++){
+		// 	console.log(allPosts[i].getData().date);
+		// }
+
 		var posts = node.selectAll('div.post')
 	        .data(allPosts)
 	        .enter()
@@ -46,7 +49,7 @@ function Feed(){
 	        	d = d.getData();
 	        	
 	        	var t = d.date;
-	        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + t.getTimezoneOffset()) * 60 * 1000))
+	        	t.setTime(t.getTime() + ((new Date().getTimezoneOffset() + 2) * 60 * 1000))
 	        	t = ((parseInt(t.getDate())+1) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
 	        	d3.select(this).select('div.meta div.timestamp')
 	        		.html(t);
@@ -81,35 +84,17 @@ function Feed(){
 	function scroll(){
 		var day = timeline.getTimeCursor().day;
 		var y = node.node().parentNode.scrollTop;
-		var forward = d3.event.wheelDeltaY <= 0;
-		var fw = forward ? 1:-1;
 
-		var len = allPosts.length;
-		for(var i=Math.constrain(postCursor-fw,0,len-1); forward?(i<len-1):(i>=0); i+=fw){
-			var post = allPosts[i];
-			var d1 = post.getData();
-			if(y >= d1.feedPos && y < d1.feedPos+d1.height + 70){
-				var nextPost = allPosts[i+1];
-				var d2 = nextPost.getData();
-				timeline.navigateJournal(Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d2.date.getTime())/1000));
-				postCursor = i;
-				return;
-			}
-		}
-	}
-
-
-	function jump(t){
-		var day = t.day;
 		var len = postsByDay[day].length;
 		for(var i=0; i<len; i++){
-			if(!postsByDay[day][i+1] && !postsByDay[day+1]) break;
 			var post = postsByDay[day][i];
-			var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
-			var t1 = post.getData().date.getTime()/1000;
-			var t2 = nextPost.getData().date.getTime()/1000;
-			if(t.current >= t1 && t.current < t2){
-				node.node().parentNode.scrollTop = post.getData().feedPos;
+			var d1 = post.getData();
+			if(y >= d1.feedPos-35 && y < d1.feedPos+d1.height){
+				if(!postsByDay[day][i+1] && !postsByDay[day+1]) break
+				var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
+				// console.log(nextPost);
+				var d2 = nextPost.getData();
+				timeline.navigateJournal(Math.round(Math.map(y,d1.feedPos-35,d1.feedPos+d1.height,d1.date.getTime(),d2.date.getTime())/1000));
 				break;
 			}
 		}
@@ -117,8 +102,7 @@ function Feed(){
 	
 
 	return{
-		init: init,
-		jump: jump
+		init: init
 	};
 }
 

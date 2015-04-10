@@ -1,4 +1,4 @@
-import importlib, os, json, tornado
+import importlib, os, json
 from housepy import config, log, server, util, strings
 
 """
@@ -26,7 +26,6 @@ class Ingest(server.Handler):
     def get(self, page=None):
         return self.not_found()        
 
-    @tornado.web.asynchronous
     def post(self, feature_type=None):
         log.info("Ingest.post %s" % feature_type)
         if feature_type is None or not len(feature_type):
@@ -35,7 +34,7 @@ class Ingest(server.Handler):
         module_name = "ingest.%s" % feature_type
         try:
             module = importlib.import_module(module_name)
-            log.info("--> loaded %s module" % module_name)
+            log.info("Loaded %s module" % module_name)
             feature = module.parse(self.request)
         except ImportError as e:
             log.error(log.exc(e))
@@ -53,13 +52,8 @@ class Ingest(server.Handler):
             return self.error("Ingest failed: missing t_utc")
         feature = verify_expedition(feature)
         feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
-        try:
-            feature_id = self.db.features.insert_one(feature).inserted_id
-        except Exception as e:
-            log.error(log.exc(e))
-            return self.error("Ingest failed")
-        log.info("--> success (%s)" % feature_id)
-        return self.text(str(feature_id)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
+        feature_id = self.db.features.insert_one(feature).inserted_id
+        return self.text(str(feature_id))
 
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
@@ -101,7 +95,7 @@ def verify_geometry(data):
                 alt = value
                 delete.append(p)    
         if lon is not None and lat is not None:
-            if data['geometry'] is None:    ## this retains geometry if it exists, is that ok?
+            if data['geometry'] is None:
                 data['geometry'] = {'type': "Point", 'coordinates': [float(lon), float(lat), float(alt) if alt is not None else None]}
             for p in delete:
                 del properties[p]
@@ -201,7 +195,7 @@ def save_file(request):
     try:
         for key, fileinfo in request.files.items():
             fileinfo = fileinfo[0]
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
             with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
             return path

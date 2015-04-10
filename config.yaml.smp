@@ -44,8 +44,3 @@ twitter:
         app_secret: 
         oauth_token: 
         oauth_token_secret: 
-
-twilio:
-    account_sid: 
-    auth_token: 
-    number: 

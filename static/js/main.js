@@ -15,18 +15,20 @@
 	- time control button
 	- add preloader graphics
 	- add location to post meta + link
+	- add lerp to map and member markers
+	- unzoom on journal?
 	- make all post type to inherit from super class
-	- test without smooth scroll
-	- localstorage for caching data?
+	- try without smooth scroll
+	- localstorage?
 	- API error handling
 	- layout transitions
 	- replace data loading with promises
-	- set expedition duration
+	- minify and merge for production
+	- replace 16 with actual expedition duration
+	- daysPassed will be a problem when jumping on the timeline
 	- pause when blurred
 	- filter crazy path points
 	- remove feed elements that happened before of after the expedition
-	- highlight new days' meta node
-	- handle scrollbar event for feed navigation?
 
 */
 
@@ -45,9 +47,6 @@ var map;
 var timeline;
 var feed;
 var wanderer;
-
-var timeOffset = 8*3600;
-var paused = false;
 
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -68,63 +67,49 @@ document.addEventListener('DOMContentLoaded', function(){
         zoom:17
     });
 
-    if(d3.selectAll('#navigation li')[0].length > 1){
-	    loader = Loader();
-	    pages.about = AboutPage('about');
-	    pages.map = MapPage('map');    
-	    pages.journal = JournalPage('journal');
-	    pages.data = DataPage('data');
-	    pages.share = Page('share');
-	    timeline = Timeline();
-		feed = Feed();
-	} else {
-		console.log('creating about');
-		pages.about = AboutPage('about');
-		pages.about.show();
-	}
+    loader = Loader();
+    pages.about = Page('about');
+    pages.map = MapPage('map');    
+    pages.journal = JournalPage('journal');
+    pages.data = DataPage('data');
+    pages.share = Page('share');
     wanderer = Wanderer(map.getCenter());
+    timeline = Timeline();
+	feed = Feed();
 
-    if(d3.selectAll('#navigation li')[0].length > 1){
-		pages.map.show();
-		setLayoutInteractions();
-		loader.loadDay(timeline.getTimeCursor().day,function(day){
-			timeline.setTimeFrame();
-			feed.init(day);
-			timeline.init(day);
-			animate(new Date().getTime()-16);
-		});
-	} else {
-		window.addEventListener('resize',resize);
-		resize();	
-		setPause();
+	pages.map.show();
+	setLayoutInteractions();
+	loader.loadDay(timeline.getTimeCursor().day,function(day){
+		timeline.setTimeFrame();
+		feed.init(day);
+		timeline.init(day);
 		animate(new Date().getTime()-16);
-	}
+	});
 
 
 	function animate(lastFrameTime){
-		if(!paused){
-			var frameTime = new Date().getTime();
-			var frameRate = 1000/(frameTime - lastFrameTime);
-		    frameCount ++;
-		    if(pages.active.id == 'map' || pages.active.id == 'journal'){
-			    timeline.update(frameRate);
-			    var coord = [0,0];
-				for(m in loader.members){
-					var member = loader.members[m];
-					member.move(timeline.getTimeCursor());
-					var c = member.getLatLng();
-					coord[0] += c.lat;
-					coord[1] += c.lng;
-				}
-				coord[0] /= Object.keys(loader.members).length;
-				coord[1] /= Object.keys(loader.members).length;
-				map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
-			} else {
-				wanderer.wander();
-		    	var target = wanderer.update();
-		    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+		var frameTime = new Date().getTime();
+		var frameRate = 1000/(frameTime - lastFrameTime);
+	    frameCount ++;
+	    if(pages.active.id == 'map' || pages.active.id == 'journal'){
+		    timeline.update(frameRate);
+		    var coord = [0,0];
+			for(m in loader.members){
+				var member = loader.members[m];
+				member.move(timeline.getTimeCursor());
+				var c = member.getLatLng();
+				coord[0] += c.lat;
+				coord[1] += c.lng;
 			}
+			coord[0] /= Object.keys(loader.members).length;
+			coord[1] /= Object.keys(loader.members).length;
+			map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
+		} else {
+			wanderer.wander();
+	    	var target = wanderer.update();
+	    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
 		}
+
 		requestAnimationFrame(function(){animate(frameTime)});
 	}
 
@@ -136,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		var t = btn.text().toLowerCase();
 	    		pages.active.hide();
 	    		pages[t].show();
-	    		resize();
 	    	})
 
 		d3.select('#contentContainer')
@@ -150,20 +134,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    	})
 		
 		window.addEventListener('resize',resize);
-		resize();
-
-		setPause();	
-	}
-
-	function setPause(){
-		d3.select('body, iframe')
-			.on('blur',function(){
-				paused = true;
-			})
-		d3.select('body, iframe')
-			.on('focus',function(){
-				paused = false;
-			})
+		resize();	
 	}
 
 
@@ -177,15 +148,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		d3.select('#timeline')
 			.style('height',(height-70)+'px');
-
-		d3.select('#video')
-			.style('height',Math.round(document.body.clientWidth*0.53) + 'px');
-
-		d3.select('#video iframe')
-			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
-			.style('width',document.body.clientWidth + 'px');
 	}
 });
+
 
 
 

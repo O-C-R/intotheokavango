@@ -9,7 +9,7 @@ function Timeline(){
 
 	var timeFrame = [0,new Date().getTime()];
 	var node = d3.select('#timeline');
-	var dayCursor = 0;
+	var dayCursor = 1;
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
@@ -68,7 +68,7 @@ function Timeline(){
 	function update(frameRate){
 		speed = Math.lerp(speed,tSpeed,0.2);
 		prevTimeCursor = timeCursor;
-		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
+		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 		wheelDelta = 0;
 		if(new Date(timeCursor*1000).getDate() != new Date(prevTimeCursor*1000).getDate()) newDay();
@@ -76,7 +76,6 @@ function Timeline(){
 			if(timeCursor < nightTime[dayCursor][i] && prevTimeCursor >= nightTime[dayCursor][i]) toggleNightTime(i,false); 
 			if(timeCursor >= nightTime[dayCursor][i] && prevTimeCursor < nightTime[dayCursor][i]) toggleNightTime(i,true); 
 		}
-		// console.log(new Date(timeCursor*1000));
 	}
 
 	function toggleNightTime(i,forward){
@@ -109,7 +108,14 @@ function Timeline(){
 	function navigateJournal(t){
 		tSpeed = 0;
 		speed = 0;
+		requestAnimationFrame(function(){
+			tSpeed = paused ? 0 : 1;
+		})
 		wheelDelta = t-timeCursor;
+		if(pages.active.id == 'map'){
+			console.log('what?');
+			d3.select('#feed').node().parentNode.scrollTop += delta;
+		}
 	}
 
 
@@ -121,7 +127,7 @@ function Timeline(){
 	function togglePause(state){
 		if(state) paused = state == 'pause';
 		else paused = !paused;
-		tSpeed = paused ? 0 : autoSpeed;
+		tSpeed = paused ? 0 : 1;
 	}
 
 	function setNightTime(day, interval){
@@ -139,6 +145,4 @@ function Timeline(){
 		setNightTime: setNightTime
 	};
 }
-
-
 

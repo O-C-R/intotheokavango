@@ -13,4 +13,3 @@ okavango_old
 uploads/*
 data.db
 scripts/okavango.pem
-tests
