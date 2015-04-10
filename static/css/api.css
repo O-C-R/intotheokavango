@@ -1,0 +1,116 @@
+    #dataPage{
+      width:100%;
+      height: auto;
+      min-height:800px;
+      padding: 10px;
+      background-color: rgba(4, 0, 26, 0.65);
+    }
+    #dataPage h1{
+      font-family: 'Montserrat';
+      font-size: 22px;
+      text-transform: uppercase;
+      line-height: 1.5em;
+      letter-spacing: 0.1em;
+    }
+
+    #dataPage h2 {
+      font-family: 'Montserrat';
+      font-size: 14px;
+      text-transform: uppercase;
+      line-height: 1.0em;
+      letter-spacing: 0.1em;
+    }
+
+    .api-query-control h2 {
+      font-family: 'Montserrat';
+      font-size: 14px;
+      text-transform: uppercase;
+      line-height: 1.0em;
+      letter-spacing: 0.1em;
+      color: #333;
+    }
+
+    .radio label {
+        color: #333;
+        font-size: 14px;
+    }
+
+    #api pre {
+        font-size: 12px;
+        margin-top: 4ex;
+        width: 800px;
+    }
+
+    #totalsViz {
+        width: 800px;
+        height: 200px;
+        background-color: #eff4fb;
+        padding: 9.5px;
+        margin-top:8px;
+        margin-bottom:20px;
+    }
+
+    pre, code, code span {
+        font-family: Monaco, Consolas, "Lucida Console", monospace !important;
+        background-color: #eff4fb;
+    }
+
+    pre {
+        display: block;
+        padding: 9.5px;
+        margin: 0 0 20px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #timelineViz {
+      width:800px;
+      height: auto;
+      min-height:800px;
+      padding: 10px;
+      margin-top:8px;
+      background-color: #eff4fb;
+    }
+
+    #totalsViz rect {
+        fill: steelblue;
+    }
+
+    #totalsViz text {
+        fill: white;
+        font: 10px sans-serif;
+        text-anchor: end;
+    }
+
+    .axis text {
+      font: 10px sans-serif;
+      fill: #fff;
+    }
+
+    .axis .title {
+      font-weight: bold;
+      text-anchor: end;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #fff;
+      shape-rendering: crispEdges;
+    }
+
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
+
+    .line {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    } 
