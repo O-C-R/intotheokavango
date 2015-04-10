@@ -41,7 +41,7 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
   width:100%;
-  overflow-x:hidden; 
+  /*overflow-x:hidden; */
 }
 ol, ul {
   list-style: none;
@@ -75,8 +75,12 @@ body{
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
-  overflow-x:hidden; 
   height:100%;
+  min-width:960px;
+}
+
+hr{
+  opacity: 0.5;
 }
 
 #mapContainer{
@@ -147,15 +151,21 @@ body{
           opacity:1;
         }
 
-        ul#navigation li.share span{
+        ul#navigation li.teaser{
+          width:auto;
+          float:right;
+          margin-right: 20px;
+        }
+
+        ul#navigation li.teaser span{
           color: #4BFF87;
           border: 2px solid;
           border-color: #54996B;
           border-radius: 3px;
           padding: 7px 12px;
-          transition: color 0.15s;
-          transition: border-color 0.15s;
+          cursor:normal;
         }
+
 
           ul#navigation li.share span:hover{
             color: #ffffff;
@@ -191,30 +201,39 @@ body{
 
       #aboutPage div.column{
         display: inline-block;
-        width:48.2%;
+        width:47.2%;
         margin-right:-4px;
         vertical-align: top;
       }
 
         #aboutPage div.column:first-child{
-          padding-right:1.4%;
+          padding-right:2.4%;
         }
 
         #aboutPage div.column:last-child{
-          padding-left:1.4%;
+          padding-left:2.4%;
         }
 
     #aboutPage #video{
       text-align: center;
+      height:auto;
+      position:relative;
     }
 
+      #video .vimeoContainer{
+        position:absolute;
+        z-index:0;
+      }
+
       #video #date{
-        margin: -33px auto;
-        padding: 10px 20px;        
-        display: inline-block;
-        vertical-align: top;
+        padding: 0px 20px;        
+        display: block;
         height:20px;
         width:450px;
+        position:absolute;
+        left: 50%;
+        z-index:1;
+        bottom:0;
       }
 
         #video #date span{
@@ -225,38 +244,47 @@ body{
           vertical-align: middle;
           margin-top:-18px; 
           text-transform: uppercase;
+          position:absolute;
+          left:-50%;
+          bottom:-8px;
+          width:100%;
         }
 
         #video #date .bkg{
           width:100%;
           height:100%;
-          background-color: rgba(4, 0, 26, 0.8);
+          background-color: rgba(4, 0, 26, 0.5);
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
+          position:absolute;
+          left:-50%;
         }
 
     #aboutPage #introduction{
       width:82.8%;
+      height:auto;
       padding:105px 8.6%;
+      overflow-x:hidden; 
+      position:relative;
     }
 
-      #introduction h1{
+      #aboutPage h1{
         font-family: "Montserrat", Helvetica, Arial;
-        font-size: 60px;
+        font-size: 56px;
         color:#ffffff;
         text-transform: uppercase;
         text-align: right;
         letter-spacing: 0.15em;
-        line-height: 1.12em; 
-        margin-top:-3px;
+        line-height: 1.32em; 
+        margin-top:-5px;
       }
 
       #introduction p{
         /*font-family: Georgia, serif;*/
         font-size: 18px;
         font-style: italic;
-        letter-spacing: 0.11em;
-        line-height: 1.8em;
+        letter-spacing: 0.12em;
+        line-height: 2em;
       }
 
         #introduction p:not(:first-child){
@@ -273,7 +301,7 @@ body{
           display:block;
           position:relative;
           /*left:0;*/
-          margin-top:-180px;
+          margin-top:-160px;
           /*width:100%;*/
           /*margin:auto;*/
           left:-50%;
@@ -284,7 +312,7 @@ body{
       }
 
       #aboutPage h2{
-        font-family: 'Montserrat';
+        font-family: 'Montserrat', arial, sans-serif;
         font-size: 22px;
         text-transform: uppercase;
         line-height: 1.5em;
@@ -309,6 +337,114 @@ body{
           float:right;
           margin: 5px 0 0 20px;
         }
+
+
+      #aboutPage #team{
+        width:100%;
+        height:auto;
+        padding:0;
+        position:relative;
+        overflow: hidden;
+      }
+
+
+        #team div.background{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+          #team div.background div.slides{
+            z-index: 1;
+            height: auto;
+            width: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
+
+            #team div.background div.slides img{
+              display:block;
+              position:absolute;
+              width:100%;
+              z-index:1;
+            }
+
+            #team div.background div.slides img:not(:first-child){
+              display:block;
+              position:absolute;
+              width:100%;
+              z-index:-2;
+              opacity: 0 !important;
+            }
+
+            #team div.background div.slides img:nth-child(2){
+              z-index:-1;
+            }
+
+          #team div.background div.overlay{
+              z-index: 2;
+              height: 100%;
+              width: 100%;
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              background-color: rgba(4, 0, 26, 0.7);
+          }
+
+        #team div.content{
+            width: 82.8%;
+            height: auto;
+            position: relative;
+            padding: 100px 8.6%;
+            z-index:3;
+        }
+
+          #team h2{
+            margin-bottom: 8px;
+          }
+
+          #team p{
+            margin-bottom: 70px;
+            font-size: 16px;
+            line-height: 1.5em;
+          }
+
+          #team p:last-child{
+            margin-bottom: 0;
+          }
+
+            #team p span{
+              font-family: 'Montserrat', arial, sans-serif;
+              font-size: 9px;
+              text-transform: uppercase;
+              opacity: 0.75;
+            }
+
+        #team div.social{
+          text-align: left;
+          margin-bottom: 35px;
+          width:100%;
+          overflow: hidden;
+        }
+
+        #team div.logos{
+          text-align: left;
+          position:absolute;
+          bottom:100px;
+          width:40%;
+        }
+
+          #team div.logos img{
+            display: inline-block;
+            vertical-align: bottom;
+            margin-right:10px;
+          }
+
+
+
 
     #mapPage{
       height: auto;
@@ -454,7 +590,7 @@ body{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                font-family: 'Montserrat';
+                font-family: 'Montserrat', arial, sans-serif;
                 font-size: 10px;
                 text-transform: uppercase;
                 line-height: 0;
@@ -494,3 +630,50 @@ svg.wanderer{
   padding:4px;
   height:14px !important;
 }
+
+
+
+@media (max-width: 767px) {
+  body{
+    min-width:540px;
+  }
+
+  #header{
+    padding-bottom: 80px !important;
+    width:80% !important;
+  }
+
+  #navigation{
+    float:none;
+    position:absolute;
+    top:80px;
+    width:80% !important;
+  }
+
+    #navigation li.teaser{
+      float:none !important;
+    }
+
+  #aboutPage #introduction{
+    padding-top:65px;
+  }
+
+  #aboutPage #introduction h1{
+    margin-bottom:70px;
+    line-height: 1.32em;
+  }
+
+  #aboutPage div.column{
+    display: block;
+    width:100%;
+    margin-right:auto !important;
+    margin-left:auto !important;
+    padding:0 !important;
+  }
+
+  #aboutPage div.column:not(:first-child){
+    margin-top: 70px;
+  }
+
+}
+

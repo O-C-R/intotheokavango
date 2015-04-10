@@ -126,7 +126,7 @@ If they are bad, they won't crash the system
 This code relies on pymongo 3.0b, which has more concise collection queries  
 
 mongo 3.1.0 supports altitude in the geojson fields (literally 6 days ago) -- current release version is 3.0.0  
-We want this, so at the moment we are not supporting altitude, but upgrade that before launch so we don't lose that data  
+We want this, so at the moment we are not supporting altitude, but upgrade that before launch so we don't lose that data. (this is not going to happen before launch)
 
 
 #### Copyright/License
