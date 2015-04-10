@@ -33,6 +33,7 @@ function Member(n, l, d){
 		var len = pathQueue.length;
 
 
+		// UGLY
 		if(timeCursor > -1){
 			for(var i = Math.constrain(timeCursor-fw,0,len-1); forward?(i<len-1):(i>0); i+=fw){
 				if(time >= pathQueue[i + (forward?0:-1)].time && time < pathQueue[i + (forward?1:0)].time){
