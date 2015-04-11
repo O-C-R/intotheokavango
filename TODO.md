@@ -3,6 +3,7 @@
 - verify ambit 3 format
 
 ### now
+- front end to graph changes over time
 - verify_t should be smarter
 - async for soundcloud and twilio
 - set up crons on server
