@@ -269,6 +269,20 @@ hr{
     }
 
       #aboutPage h1{
+        font-size: 56px;
+        color:#ffffff;
+        text-transform: uppercase;
+        text-align: right;
+        letter-spacing: 0.15em;
+        line-height: 1.32em; 
+        margin-top:-5px;
+
+        font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+        font-weight: 700;
+        font-style: normal;
+      }
+
+      /*#aboutPage h1{
         font-family: "Montserrat", Helvetica, Arial;
         font-size: 56px;
         color:#ffffff;
@@ -277,7 +291,7 @@ hr{
         letter-spacing: 0.15em;
         line-height: 1.32em; 
         margin-top:-5px;
-      }
+      }*/
 
       #introduction p{
         /*font-family: Georgia, serif;*/
@@ -312,7 +326,10 @@ hr{
       }
 
       #aboutPage h2{
-        font-family: 'Montserrat', arial, sans-serif;
+        /*font-family: 'Montserrat', arial, sans-serif;*/
+        font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+        font-weight: 700;
+        font-style: normal;
         font-size: 22px;
         text-transform: uppercase;
         line-height: 1.5em;
@@ -417,7 +434,10 @@ hr{
           }
 
             #team p span{
-              font-family: 'Montserrat', arial, sans-serif;
+              /*font-family: 'Montserrat', arial, sans-serif;*/
+              font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+              font-weight: 700;
+              font-style: normal;
               font-size: 9px;
               text-transform: uppercase;
               opacity: 0.75;
@@ -590,7 +610,10 @@ hr{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                font-family: 'Montserrat', arial, sans-serif;
+                /*font-family: 'Montserrat', arial, sans-serif;*/
+                font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+                font-weight: 700;
+                font-style: normal;
                 font-size: 10px;
                 text-transform: uppercase;
                 line-height: 0;
@@ -623,7 +646,10 @@ svg.wanderer{
   border-left: 2px solid #FFB637;
   background-color:rgba(255,255,255,0.7);
   border-radius:2px;
-  font-family: "Montserrat";
+  /*font-family: "Montserrat";*/
+  font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+  font-weight: 700;
+  font-style: normal;
   color:rgba(4,0,26,0.9);;
   font-size:14px;
   width:auto;
