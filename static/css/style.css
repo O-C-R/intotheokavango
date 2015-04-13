@@ -71,7 +71,8 @@ html{
 body{
   background-color:#04001A;
   color:#ffffff;
-  font-family: 'Lora', Georgia, serif;
+  /*font-family: 'Lora', Georgia, serif;*/
+  font-family: 'Sentinel SSm A', 'Sentinel SSm B'; font-weight: 400; font-style: normal;
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
