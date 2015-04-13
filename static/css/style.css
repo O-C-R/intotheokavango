@@ -158,14 +158,16 @@ hr{
           margin-right: 20px;
         }
 
-        ul#navigation li.teaser span{
+        ul#navigation li.teaser a{
           color: #4BFF87;
-          border: 2px solid;
-          border-color: #54996B;
-          border-radius: 3px;
-          padding: 7px 12px;
-          cursor:normal;
+          text-decoration: none;
+          transition: color 0.15s;
         }
+
+          ul#navigation li.teaser a:hover{
+            color: white;
+            text-decoration: none;
+          }
 
 
           ul#navigation li.share span:hover{
@@ -299,7 +301,7 @@ hr{
         font-size: 18px;
         /*font-style: italic;*/
         letter-spacing: 0.12em;
-        line-height: 2em;
+        line-height: 1.98em;
       }
 
         #introduction p:not(:first-child){
