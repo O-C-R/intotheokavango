@@ -297,7 +297,7 @@ hr{
       #introduction p{
         /*font-family: Georgia, serif;*/
         font-size: 18px;
-        font-style: italic;
+        /*font-style: italic;*/
         letter-spacing: 0.12em;
         line-height: 2em;
       }
@@ -566,7 +566,7 @@ hr{
               vertical-align: middle;
               margin:0 0 0 5%;
               width:85%;
-              font-style: italic;
+              /*font-style: italic;*/
               font-size: 20px;
               line-height: 1.85em;
               margin-top:-7px;
