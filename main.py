@@ -16,7 +16,7 @@ class Home(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.not_found()        
-        return self.text(str(self.db))
+        return self.render("indexTeaser.html")
 
 
 handlers = [
