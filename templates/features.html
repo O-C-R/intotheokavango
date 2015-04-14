@@ -11,7 +11,7 @@
     <div id="dataPage">
         <h1>Features</h1>
         <div id="api">
-            <pre id="query-endpoint">"http://dev.intotheokavango.org/api/features"</pre>
+            <pre id="query-endpoint">"http://dev.intotheokavango.org/api/features?limit=1000"</pre>
             <h2>Totals</h2>
             <div id="totalsViz"></div>
             <h2>Activity</h2>
@@ -19,6 +19,9 @@
                 <!-- Radio buttons -->
                 <div class="api-query-control">
                     <h2>Filter</h2>
+                        <div class="radio">
+                            <input name="mode" type="radio" checked="checked" id="all-activity" value="all-activity" id="feature-filter-all-activity"><label for="feature-filter-all-activity">all activity</label>
+                        </div>
                         <div class="radio">
                             <input name="mode" type="radio" value="ambit" id="feature-filter-ambit"><label for="feature-filter-ambit">ambit</label>
                         </div>
@@ -32,10 +35,13 @@
                             <input name="mode" type="radio" value="beacon" id="feature-filter-beacon"><label for="feature-filter-beacon">beacon</label>
                         </div>
                         <div class="radio">
-                            <input name="mode" type="radio" value="ethno" id="feature-filter-ethno"><label for="feature-filter-ethno">ethno</label>
+                            <input name="mode" type="radio" value="ethno" id="feature-filter-ethno"><label for="feature-filter-ethno">ethnography</label>
                         </div>
                         <div class="radio">
-                            <input name="mode" type="radio" value="hydro" id="feature-filter-hydro"><label for="feature-filter-hydro">hydro</label>
+                            <input name="mode" type="radio" value="hydro" id="feature-filter-hydro"><label for="feature-filter-hydro">hydrosensor</label>
+                        </div>
+                        <div class="radio">
+                            <input name="mode" type="radio" value="image" id="feature-filter-image"><label for="feature-filter-image">image</label>
                         </div>
                         <div class="radio">
                             <input name="mode" type="radio" value="migration" id="feature-filter-migration"><label for="feature-filter-migration">migration</label>
@@ -137,204 +143,435 @@
                     }
                 }
 
-                var url = "http://dev.intotheokavango.org/api/features";
-                d3.json(url, function(error, data) {
-                    //var dta = data.features;
-                    //console.log(dta);
-                    var f;
-                    //empty histogram
-                    var hist = [];
-                    var allIntervals;
-                    var dateRange;
+                //empty histogram
+                var hist = [];
+                var allIntervals;
+                var dateRange;
+                var label = "all activity per hour";
+                //array to store data by feature type
+                var parsedActivity = [];
+                var parsedAmbit = [];
+                var parsedAmbitGeo = [];
+                var parsedAudio = [];
+                var parsedBeacon = [];
+                var parsedEthno = [];
+                // var parsedHydro = [];
+                var parsedImage = [];
+                var parsedMigration = [];
+                var parsedSighting = [];
+                var parsedTweet = [];
 
-                    for(d in data.features) {
-                        item = data.features[d];
-                        //console.log(item);
-                        f = parseFeatures(item);
-                        //console.log(f.time);
-                        if(f.type === 'tweet') {
-                            //get the date range
-                            dateRange = d3.extent(data.features, function(d) {return new Date(d.properties.DateTime); });
-                            console.log("Data range", dateRange);
-                            console.log("Data range [0]" + dateRange[0]);
-                            console.log("Data range [1]" + dateRange[1]);
+                var url = "http://dev.intotheokavango.org/api/features?limit=200";
+                
+                function loadData(callback) {
+                    d3.json(url, function(error, data) {
+                        var f;
 
-                            //compute time bins
-                            var binner = d3.time.scale();
+                        for(d in data.features) {
+                            item = data.features[d];
+                            //console.log(item);
+                            f = parseFeatures(item);
+                            //console.log(f);
 
-                            //pick time interval to bin with
-                            var interval = d3.time.hour;
-                            console.log("Interval", interval);
+                            if (typeof f !== 'undefined') {
+                                parsedActivity.push(f);
 
-                            //compute time intervals
-                            allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
-                            console.log("Intervals", allIntervals); //array of all the hours between min and max date
-
-                            //input domain mapped to output range
-                            binner.domain([allIntervals[0], allIntervals[allIntervals.length - 1]]);
-                            binner.range([0, allIntervals.length - 1]);
-
-                            //only output integers to fill the array
-                            binner.interpolate(d3.interpolateRound);
-
-                            //fill histogram with 0
-                            for (var i = 0; i < allIntervals.length; i++) { hist[i] = 0; }
-
-                            data.features.forEach(function(d) {
-                                //compute hour index
-                                //var t = d["properties"]["DateTime"];
-                                //console.log("t: " + t);
-                                var tid = binner(interval.floor(new Date(d.properties.DateTime)));
-                                console.log("Map " + d.properties.DateTime + " to " + tid);
-
-                                if(!hist[tid]) {
-                                    hist[tid] = 1;
-                                } else {
-                                    hist[tid]++;
+                                if( f.type === 'ambit') {
+                                    parsedAmbit.push(f);
+                                } else if ( f.type === 'ambit_geo') {
+                                    parsedAmbitGeo.push(f);
+                                } else if ( f.type === 'audio') {
+                                    parsedAudio.push(f);
+                                } else if( f.type === 'beacon') {
+                                    parsedBeacon.push(f);
+                                } else if ( f.type === 'ethnographic') {
+                                    parsedEthno.push(f);
+                                } else if ( f.type === 'image') {
+                                    parsedImage.push(f);
+                                } else if ( f.type === 'migration') {
+                                    parsedMigration.push(f);
+                                } else if ( f.type === 'sighting') {
+                                    parsedSighting.push(f);
+                                } else if ( f.type === 'tweet') {
+                                    parsedTweet.push(f);
                                 }
-                            });
+                                
+                            }
+
+                        }
+                        // console.log("ACTIVITY");
+                        // console.log(parsedActivity);
+                        // console.log("AMBIT");
+                        // console.log(parsedAmbit);
+                        // console.log("BEACON");
+                        // console.log(parsedBeacon);
+                        // console.log("IMAGE");
+                        // console.log(parsedImage);
+                        // console.log("TWEET");
+                        // console.log(parsedTweet);
+
+                        makeBinnedData(parsedActivity); //make sure data is loaded before binning
+                        drawLineGraph(parsedActivity);
+
+                    });
+
+
+
+                }
+
+                var makeBinnedData = function(parsedData) {
+                    // console.log("inside makeBinnedData");
+                    // console.log("PARSED DATA");
+                    // console.log(parsedData);
+                    // console.log("HIST empty");
+                    // console.log(hist);
+                    // console.log(hist.length);
+                    dateRange = d3.extent(parsedData, function(d) { return d.time; });
+                    // console.log("data range: " + dateRange);
+                    // console.log("Data range [0]" + dateRange[0]);
+                    // console.log("Data range [1]" + dateRange[1]);
+
+                    //compute time bins
+                    var binner = d3.time.scale();
+
+                    //pick time interval to bin with
+                    var interval = d3.time.hour;
+                    //console.log("Interval", interval);
+
+                    //compute time intervals
+                    allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
+                    //console.log("Intervals", allIntervals); //array of all the hours between min and max date
+
+                    //input domain mapped to output range
+                    binner.domain([allIntervals[0], allIntervals[allIntervals.length - 1]]);
+                    binner.range([0, allIntervals.length - 1]);
+
+                    //only output integers to fill the array
+                    binner.interpolate(d3.interpolateRound);
+
+                    //fill histogram with 0
+                    for (var i = 0; i < allIntervals.length; i++) { hist[i] = 0; }
+
+                    parsedData.forEach(function(d) {
+                        //compute hour index
+                        var tid = binner(interval.floor(new Date(d.time)));
+                        // console.log("Map " + d.time + " to " + tid);
+
+                        if(!hist[tid]) {
+                            hist[tid] = 1;
+                        } else {
+                            hist[tid]++;
+                        }
+                    });
+
+                    console.log("HIST filled");
+                    console.log(hist);
+                    console.log(hist.length);
+                }
+
+                //Draw the data
+                var xAxis, yAxis, xScale, yScale, linegraph, line, circles;
+
+                var drawLineGraph = function(parsedData) {
+                    console.log("in drawLineGraph");
+                    console.log("HIST drawLineGraph");
+                    console.log(hist);
+                    console.log(hist.length);
+
+                    // create svg element
+                    var svg = d3.select('#timelineViz')
+                            .append('svg')
+                                .attr("width", width + margin.left + margin.right)
+                                .attr("height", height + margin.top + margin.bottom) 
+                            .append("g")
+                                .attr("transform", "translate(" + margin.left + "," + margin.top +")");
+
+                    //define axis ranges and scales
+                    xScaleTime = d3.time.scale()
+                        .domain([dateRange[0], dateRange[1]])
+                        .range([0, width - left_width]);
+                    //need another xScale for drawing shapes
+                    xScale = d3.scale.linear()
+                        .domain([0, hist.length])
+                        .range([0, width - left_width]);
+                    
+                    console.log(d3.max(hist));
+                    yScale = d3.scale.linear()
+                        .domain([0,d3.max(hist)])
+                        .range([height,0]);
+
+                    //define lines
+                    line = d3.svg.line()
+                            .x(function(d, i) { 
+                                return xScale(i); })
+                            .y(function(d) { 
+                                return yScale(d); });
+                            // .interpolate('linear');
+
+                    //define X axis
+                    xAxis = d3.svg.axis()
+                        .scale(xScaleTime)
+                        .orient('bottom')
+                        .ticks(5);
+
+                    //define Y axis
+                    yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient('left')
+                        .ticks(5)
+
+                    //add X axis
+                    svg.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0 ," + height + ")")
+                        .call(xAxis);
+
+                    //add Y axis
+                    svg.append("g")
+                        .attr("class", "y axis")
+                        //.attr("transform", "translate(" + left_width + ", 0)")
+                        .call(yAxis)
+                      .append("text")
+                        .attr("class", "title")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .text(label);
+
+                    //add line
+                    linegraph = svg.append("path")
+                        .attr("class", "line")
+                        .attr("d", line(hist));
+
+                    //add circles
+                    linegraph.append("circle")
+                        .data([hist])
+                        .enter().append("circle")
+                        .attr("cx", function(d, i) { return xScale(i); })
+                        .attr("cy", function(d) { return yScale(d); })
+                        .attr("r", 3);
+
+                }
+
+                var updateLineGraph = function(parsedData) {
+                    console.log("HIST updateLineGraph");
+                    console.log(hist);
+                    console.log(hist.length);
+
+                    xScale.domain([0, hist.length]); //make sure this is hist length, not dateRange values
+                    xScaleTime.domain([dateRange[0], dateRange[1]]);
+                    yScale.domain([0,d3.max(hist)]);
+                    
+                    var chart =  d3.select('#timelineViz').transition();
+
+                    chart.select(".line")
+                        .duration(750)
+                        .attr("d", line(hist)); //magic that updates graph
+                        console.log(hist.length);
+
+                    // chart.selectAll('.circle')
+                    //     .data(hist)
+                    //     .transition()
+                    //     .duration(750)
+                    //     .attr('cx', function(d, i) { return xScale(i); })
+                    //     .attr('cy', function(d) { return yScale(d); })
+                    //     .attr('r', 3);
+
+                    chart.select('.x.axis')
+                        .transition()
+                        .duration(750)
+                        .call(xAxis);
+
+                    chart.select('.y.axis') 
+                        .transition()
+                        .duration(750)
+                        .call(yAxis);
+                        //.text(label);
+                }
+
+                var onRadioChange = function(radioMode) {
+                    if (radioMode === "all-activity") {
+                        if (0 < parsedActivity.length) {
+                            makeBinnedData(parsedActivity);
+                            updateLineGraph(parsedActivity);
+                            label = "all activity per hour"
+                            console.log("update all activity graph");
+                        } else {
+                            console.log("there is no activity in these results");
+                        } 
+                    } else if (radioMode === 'ambit') {
+                        if (0 < parsedAmbit.length) {
+                            makeBinnedData(parsedAmbit);
+                            updateLineGraph(parsedAmbit);
+                            label = "ambit readings per hour";
+                            console.log("update ambit graph");
+                        } else {
+                            console.log("there are no ambit readings in these results");
+                        }
+                    } else if (radioMode === 'ambit-geo') {
+                        if (0 < parsedAmbitGeo.length) {
+                            makeBinnedData(parsedAmbitGeo);
+                            updateLineGraph(parsedAmbitGeo);
+                            console.log("update ambit-geo graph");
+                        } else {
+                            console.log("there are no ambit-geo readings in these results");
+                        }
+                        
+                    } else if (radioMode === 'audio') {
+                        if (0 < parsedAudio.length) {
+                            makeBinnedData(parsedAudio);
+                            updateLineGraph(parsedAudio);
+                            console.log("update audio graph");
+                        } else {
+                            console.log("there are no audio readings in these results");
+                        }  
+                    } else if (radioMode === 'beacon') {
+                        if (0 < parsedBeacon.length) {
+                            makeBinnedData(parsedBeacon);
+                            updateLineGraph(parsedBeacon);
+                            console.log("update beacon graph");
+                        } else {
+                            console.log("there are no beacon readings in these results");
+                        }
+                    } else if (radioMode === 'ethno') {
+                        if (0 < parsedEthno.length) {
+                            makeBinnedData(parsedEthno);
+                            updateLineGraph(parsedEthno);
+                            console.log("update ethno graph");
+                        } else {
+                            console.log("there are no ethnography readings in these results");
+                        }
+                    } else if (radioMode === 'image') {
+                        if (0 < parsedImage.length) {
+                            makeBinnedData(parsedImage);
+                            updateLineGraph(parsedImage);
+                            console.log("update image graph");
+                        } else {
+                            console.log("there are no image readings in these results");
+                        }
+                    } else if (radioMode === 'migration') {
+                        if (0 < parsedMigration.length) {
+                            makeBinnedData(parsedMigration);
+                            updateLineGraph(parsedMigration);
+                            console.log("update migration graph");
+                        } else {
+                            console.log("there are no migration readings in these results");
+                        }  
+                    } else if (radioMode === 'sighting') {
+                        if (0 < parsedSighting.length) {
+                            makeBinnedData(parsedSighting);
+                            updateLineGraph(parsedSighting);
+                            console.log("update sighting graph");
+                        } else {
+                            console.log("there are no migration readings in these results");
+                        }
+                        
+                    } else if (radioMode === 'tweet') {
+                        if (0 < parsedTweet.length) {
+                            makeBinnedData(parsedTweet);
+                            updateLineGraph(parsedTweet);
+                            label = "tweets per hour";
+                            console.log("update tweet graph");
+                        } else {
+                            console.log("there are no migration readings in these results");
                         }
                     }
+                }
 
-                    //Draw the data
-                    var svg, xAxis, yAxis, xScale, yScale;
-
-                    var drawLineGraph = function() {
-                        // create svg element
-                        svg = d3.select('#timelineViz').append('svg')
-                            .attr("width", width + margin.left + margin.right)
-                            .attr("height", height + margin.top + margin.bottom) 
-                            .append("g")
-                            .attr("transform", "translate(" + margin.left + "," + margin.top +")");
-
-                        //define axis ranges and scales
-                        xScaleTime = d3.time.scale()
-                            .domain([dateRange[0], dateRange[1]])
-                            .range([0, width - left_width]);
-                        //need another xScale for drawing shapes
-                        xScale = d3.scale.linear()
-                            .domain([0, allIntervals.length])
-                            .range([0, width - left_width]);
-                        
-                        yScale = d3.scale.linear()
-                            .domain([0,d3.max(hist)])
-                            .range([height,0]);
-
-                        //define lines
-                        var line = d3.svg.line()
-                                .x(function(d, i) { return xScale(i); })
-                                .y(function(d) { return yScale(d); });
-
-                        //define X axis
-                        xAxis = d3.svg.axis()
-                            .scale(xScaleTime)
-                            .orient('bottom')
-                            .ticks(5);
-
-                        //define Y axis
-                        yAxis = d3.svg.axis()
-                            .scale(yScale)
-                            .orient('left')
-                            .ticks(5)
-
-                        //add X axis
-                        svg.append('g')
-                            .attr('class', 'axis')
-                            .attr("transform", "translate(0 ," + height + ")")
-                            .call(xAxis);
-
-                        //add Y axis
-                        svg.append("g")
-                            .attr("class", "y axis")
-                            //.attr("transform", "translate(" + left_width + ", 0)")
-                            .call(yAxis);
-
-                        //add line
-                        svg.append('svg:path')
-                            .attr('d', line(hist));
-
-                        //add circles
-                        var circles = svg.selectAll('circle')
-                            .data(hist)
-                            .enter().append('circle')
-                            .attr('cx', function(d, i) { return xScale(i); })
-                            .attr('cy', function(d) { return yScale(d); })
-                            .attr('r', 3);
-
-                    }
-
-                    //Using for ScatterPlot and Histogram Viz
-                    var setupGraph = function() {
-                        // create svg element
-                        svg = d3.select('#timelineViz').append('svg')
-                            .attr("width", width + margin.left + margin.right)
-                            .attr("height", height + margin.top + margin.bottom) 
-                            .append("g")
-                            .attr("transform", "translate(" + margin.left + "," + margin.top +")");
-
-                        //define axis ranges & scales
-                        xScale = d3.scale.linear()
-                                    .domain([0,allIntervals.length])
-                                    .range([0,width - left_width]);
-                        yScale = d3.scale.linear()
-                                    .domain([0,d3.max(hist)])
-                                    .range([height,0]);
-
-                        xAxis = d3.svg.axis()
-                            .scale(xScale)
-                            .orient("bottom");
-
-                        yAxis = d3.svg.axis()
-                            .scale(yScale)
-                            .orient("left");
-
-                        svg.append("g")
-                            .attr("class", "x axis")
-                            .attr("transform", "translate(0 ," + height + ")")
-                            .call(xAxis);
-
-                        svg.append("g")
-                            .attr("class", "y axis")
-                            //.attr("transform", "translate(" + left_width + ", 0)")
-                            .call(yAxis);
-                    }
-
-                    var drawScatterPlot = function() {
-                        var circles = svg.selectAll('scatter-dots')
-                            .data(hist)
-                            .enter()
-                            .append("svg:circle")
-                                .attr("cx", function(d,i) { return xScale(i); })
-                                .attr("cy", function(d) { return yScale(d); })
-                                .attr("r", 4);
-                    }
-
-                    var drawHistogram = function() {
-                    
-                        var bars = svg.selectAll('rect.bar')
-                            .data(hist)
-                            .enter()
-                            .append('rect')
-                            .classed('bar',true)
-                            .style('fill','steelblue');
-
-                        var w = xScale(1);
-
-                        console.log(d3.extent(hist),yScale(1));
-
-                        bars.attr('x', function(d,i) { return xScale(i); })
-                            .attr('y', function(d) { return yScale(d); })
-                            .attr('width', w)
-                            .attr('height', function(d) { return height - yScale(d); 
-                        });
-                    }
-                    
-                    //setupGraph();
-                    //drawHistogram();
-                    //drawScatterPlot();
-                    drawLineGraph();
-                    
+                // Enable mode buttons
+                d3.selectAll("input[name=mode]").on("click", function() {
+                    console.log('clicked button');
+                    console.log(this.value);
+                    onRadioChange(this.value);
                 });
+
+                //On Page Load, load data for all activity
+
+                var checkedButton = document.getElementById("all-activity");
+                //console.log(checkedButton);
+
+                if(checkedButton.checked) {
+                    console.log(checkedButton.value);
+
+                    if( checkedButton.value === 'all-activity') {
+                        loadData();
+                    }
+                }
+
+                //Using for ScatterPlot and Histogram Viz
+                var setupGraph = function() {
+                    // create svg element
+                    svg = d3.select('#timelineViz').append('svg')
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom) 
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top +")");
+
+                    //define axis ranges & scales
+                    xScale = d3.scale.linear()
+                                .domain([0,allIntervals.length])
+                                .range([0,width - left_width]);
+                    yScale = d3.scale.linear()
+                                .domain([0,d3.max(hist)])
+                                .range([height,0]);
+
+                    xAxis = d3.svg.axis()
+                        .scale(xScale)
+                        .orient("bottom");
+
+                    yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left");
+
+                    svg.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0 ," + height + ")")
+                        .call(xAxis);
+
+                    svg.append("g")
+                        .attr("class", "y axis")
+                        //.attr("transform", "translate(" + left_width + ", 0)")
+                        .call(yAxis);
+                }
+
+                var drawScatterPlot = function() {
+                    var circles = svg.selectAll('scatter-dots')
+                        .data(hist)
+                        .enter()
+                        .append("svg:circle")
+                            .attr("cx", function(d,i) { return xScale(i); })
+                            .attr("cy", function(d) { return yScale(d); })
+                            .attr("r", 4);
+                }
+
+                var drawHistogram = function() {
+                
+                    var bars = svg.selectAll('rect.bar')
+                        .data(hist)
+                        .enter()
+                        .append('rect')
+                        .classed('bar',true)
+                        .style('fill','steelblue');
+
+                    var w = xScale(1);
+
+                    console.log(d3.extent(hist),yScale(1));
+
+                    bars.attr('x', function(d,i) { return xScale(i); })
+                        .attr('y', function(d) { return yScale(d); })
+                        .attr('width', w)
+                        .attr('height', function(d) { return height - yScale(d); 
+                    });
+                }
+
+
+                
+                //setupGraph();
+                //drawHistogram();
+                //drawScatterPlot();
+
+                    
+
 
         </script>
 {% endblock body %}
