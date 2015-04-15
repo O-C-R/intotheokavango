@@ -20,6 +20,26 @@
     </div>
         <script type="text/javascript">
 
+        //chart margins
+        var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+        width = 800 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom,
+        left_width = 100;
+
+        var xScale = d3.time.scale()
+            .range([0, width]);
+
+        var yScale = d3.scale.linear()
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+
         var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting&limit=200";
 
         var loadSightingsData = function(callback) {
