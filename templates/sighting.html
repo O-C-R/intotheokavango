@@ -46,11 +46,29 @@
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting&limit=200";
+        var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting";
+
+        var parseSighting = function(item) {
+            if(item["properties"].hasOwnProperty("FeatureType")){
+                var sighting = {};
+                sighting.species = item["properties"]["BirdName"];
+                sighting.time =  new Date(+item["properties"]["t_utc"] * 1000);
+                sighting.count = item["properties"]["Count"];
+                return sighting;
+            }
+        }
 
         var loadSightingsData = function(callback) {
             d3.json(url, function(error,data) {
                 console.log("Initial Data", data);
+                var f;
+
+                for (d in data.features) {
+                    item = data.features[d];
+                    f = parseSighting(item);
+                    console.log(f);
+                }
+
             })
         }
 
