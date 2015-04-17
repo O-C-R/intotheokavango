@@ -14,37 +14,11 @@
     <div id="dataPage">
         <h1>Sightings</h1>
         <div id="api">
-            <div id="timelineViz">
+            <div id="totalsViz" style="background-color:rgba(4, 0, 26, 0.65)">
             </div>
         </div>
     </div>
         <script type="text/javascript">
-
-        //chart margins
-        var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
-        width = 800 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom,
-        left_width = 100;
-
-        var xScale = d3.time.scale()
-            .range([0, width]);
-
-        var yScale = d3.scale.linear()
-            .range([height, 0]);
-
-        var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("bottom");
-
-        var yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left");
-
-        var svg = d3.select("#timelineViz").append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting";
 
@@ -82,15 +56,11 @@
             for (var i = 0; i < sightings.length; ++i) {
                 if (!speciesCountObj.hasOwnProperty(sightings[i].properties.BirdName)) {
                     speciesCountObj[sightings[i].properties.BirdName] = 0;
-                    // speciesCountObj[sightings[i].properties.BirdName] =;
-                    // speciesCountObj[sightings[i].properties.BirdName] = 0;
                     console.log("doesn't have species property");
                 }
                 speciesCountObj[sightings[i].properties.BirdName] += sightings[i].properties.Count;
             }
             console.log(Object.keys(speciesCountObj));
-
-            speciesCountObj['species'] = Object.keys(speciesCountObj);
 
             for (s in speciesCountObj){
                 myObj = {};
@@ -101,13 +71,75 @@
             console.log(speciesCountArray);
         }
 
+        var makeTotalsViz = function(data) {
+
+            var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+                width = 800 - margin.left - margin.right,
+                barHeight = 20,
+                height = barHeight * data.length,
+                left_width = 200;
+
+            d3.select("#totalsViz")
+                .style("height", height + "px") //adjust div height to fit data
+                .style("background-color", "#eff4fb");
+
+            var xScale = d3.scale.linear()
+                .domain([0, d3.max(data, function(d) { return d.count; })])
+                .range([0, width - left_width]);
+
+            var yScale = d3.scale.ordinal()
+                .domain(data, function(d) { 
+                    return d.species; 
+                    console.log(d.species);
+                })
+                .range([0, height]);
+
+            var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+           
+            var svg = d3.select("#totalsViz").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var bar = svg.selectAll("g")
+                    .data(data)
+                .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+            bar.append("rect")
+                .attr("x", left_width)
+                .attr("y", yScale)
+                .attr("width", function(d) { return xScale(d.count); })
+                .attr("height", barHeight - 1);
+
+            bar.append("text")
+                .attr("x", function(d) { return xScale(d.count) - 3 + left_width; })
+                .attr("y", barHeight / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "end")
+                .text(function(d) { return d.count; });
+
+            bar.append("text")
+                .attr("x", left_width * 0.85)
+                .attr("y", barHeight / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .style("fill", "black")
+                .text(function(d) { return d.species; });
+        }
+
         var loadSightingsData = function(callback) {
             d3.json(url, function(error,data) {
                 console.log("Initial Data", data.features); //data.features is an array of sightings objects
                 
                 //listSpecies(data.features);
                 getSpeciesCount(data.features);
-                //console.log(speciesCountArray);
+                makeTotalsViz(speciesCountArray);
 
                 // var f;
 
