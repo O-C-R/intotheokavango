@@ -75,24 +75,39 @@
         }
         
         var speciesCountObj = {};
+        var speciesCountArray = [];
 
         var getSpeciesCount = function(sightings) {
 
             for (var i = 0; i < sightings.length; ++i) {
                 if (!speciesCountObj.hasOwnProperty(sightings[i].properties.BirdName)) {
                     speciesCountObj[sightings[i].properties.BirdName] = 0;
+                    // speciesCountObj[sightings[i].properties.BirdName] =;
+                    // speciesCountObj[sightings[i].properties.BirdName] = 0;
+                    console.log("doesn't have species property");
                 }
                 speciesCountObj[sightings[i].properties.BirdName] += sightings[i].properties.Count;
             }
-            console.log(speciesCountObj);
+            console.log(Object.keys(speciesCountObj));
+
+            speciesCountObj['species'] = Object.keys(speciesCountObj);
+
+            for (s in speciesCountObj){
+                myObj = {};
+                myObj.species = s;
+                myObj.count  = speciesCountObj[s];
+                speciesCountArray.push(myObj);
+            }
+            console.log(speciesCountArray);
         }
 
         var loadSightingsData = function(callback) {
             d3.json(url, function(error,data) {
                 console.log("Initial Data", data.features); //data.features is an array of sightings objects
                 
-                listSpecies(data.features);
+                //listSpecies(data.features);
                 getSpeciesCount(data.features);
+                //console.log(speciesCountArray);
 
                 // var f;
 
