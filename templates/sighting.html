@@ -58,18 +58,51 @@
             }
         }
 
+        var listSpecies = function(sightings) {
+            
+            var result = {};
+
+            for (var i = 0; i < sightings.length; ++i) {
+                var species = sightings[i].properties.BirdName;
+                result[(typeof species) + ' ' + species] = species;
+            }
+
+            for (id in result) {
+                if (result.hasOwnProperty(id)) {
+                    console.log(result[id]);
+                }
+            }
+        }
+        
+        var speciesCountObj = {};
+
+        var getSpeciesCount = function(sightings) {
+
+            for (var i = 0; i < sightings.length; ++i) {
+                if (!speciesCountObj.hasOwnProperty(sightings[i].properties.BirdName)) {
+                    speciesCountObj[sightings[i].properties.BirdName] = 0;
+                }
+                speciesCountObj[sightings[i].properties.BirdName] += sightings[i].properties.Count;
+            }
+            console.log(speciesCountObj);
+        }
+
         var loadSightingsData = function(callback) {
             d3.json(url, function(error,data) {
-                console.log("Initial Data", data);
-                var f;
+                console.log("Initial Data", data.features); //data.features is an array of sightings objects
+                
+                listSpecies(data.features);
+                getSpeciesCount(data.features);
 
-                for (d in data.features) {
-                    item = data.features[d];
-                    f = parseSighting(item);
-                    console.log(f);
-                }
+                // var f;
 
-            })
+                // for (d in data.features) {
+                //     item = data.features[d];
+                //     f = parseSighting(item);
+                //     console.log(f);
+                // }
+
+            });
         }
 
         loadSightingsData();
