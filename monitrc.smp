@@ -21,6 +21,6 @@ set daemon 120
 set httpd port 2812 and use address localhost   # configure monitoring webservice
   allow 0.0.0.0/0.0.0.0                        # Allow everything to connect  
 
-check process main with pidfile /home/ubuntu/okavango_15/run/main.pid
-  start program = "/usr/bin/python3 /home/ubuntu/okavango_15/main.py" 
+check process main with pidfile /mnt/okavango_15/run/main.pid
+  start program = "/usr/bin/python3 /mnt/okavango_15/main.py" 
   stop program = "/bin/pwd"

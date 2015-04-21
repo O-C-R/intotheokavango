@@ -14,3 +14,4 @@ uploads/*
 data.db
 scripts/okavango.pem
 tests
+passwords.txt

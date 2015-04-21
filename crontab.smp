@@ -1,1 +1,1 @@
-*/5 * * * * /home/ubuntu/okavango_15/cron.py
+*/5 * * * * /mnt/okavango_15/cron.py

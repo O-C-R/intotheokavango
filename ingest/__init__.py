@@ -7,6 +7,7 @@ from housepy import config, log, server, util, strings
     with the addition of the following fields in its properties:
         - Expedition (eg okavango_15)
         - FeatureType (string delineating what kind of feature it is)
+        - FeatureSubType (a subtype. default is null)
         - Member (who collected the data, human or otherwise)
         - t_utc (UTC timestamp) and derived DateTime (set to local_tz, in the format "%Y-%m-%dT%H:%M:%S%z")        
     Each of these is indexed in the database.

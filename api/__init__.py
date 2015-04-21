@@ -43,8 +43,9 @@ class Api(server.Handler):
             log.error(log.exc(e))
             return self.error("View \"%s\" not recognized" % view_name)
         if len(output):
+            feature_type = self.get_argument('FeatureType', None)
             try:
-                return self.render("api/%s.html" % output, query=(self.request.uri).replace("/%s" % output, ""))
+                return self.render("api/%s.html" % output, query=(self.request.uri).replace("/%s" % output, ""), feature_type=feature_type)
             except Exception as e:
                 return self.error("Could not render %s" % output)
 
