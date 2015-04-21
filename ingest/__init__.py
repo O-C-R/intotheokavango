@@ -197,6 +197,17 @@ def ingest_plain_body(request):
         return None
     return content      
 
+def ingest_form_vars(request):
+    """Generic method for ingesting POST data in form format"""
+    data = {}
+    for param, value in request.arguments.items():
+        for i, item in enumerate(value):
+            item = item.decode('utf-8')
+            item = strings.as_numeric(item)
+            value[i] = item
+        data[param] = value[0] if len(value) == 1 else value
+    return data
+
 def save_file(request):
     try:
         for key, fileinfo in request.files.items():

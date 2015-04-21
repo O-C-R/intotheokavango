@@ -1,70 +1,19 @@
 {% extends "page.html" %}
 
-{% block head %}
-<script type="text/javascript" src="/static/js/jquery.form.js"> </script>
-<script type="text/javascript">
-$(document).ready(function() {
-    // var options = { 
-    //     url: "/ingest/image",
-    //     type: "POST",
-    //     contentType: "text/xml", 
-    //     success: function() { 
-    //         alert('Thanks for your comment!'); 
-    //     }
-    // }; 
-    // $('#image').ajaxForm(options); 
-    $("#image .submit").click(function(event) {
-        var data = {};
-        console.log($("#image").attr('files'));
-        $.each($("#image").serializeArray(), function() {
-            console.log(this.name);
-            if (data[this.name] !== undefined) {
-                if (!data[this.name].push) {
-                    data[this.name] = [data[this.name]];
-                }
-                data[this.name].push(this.value || '');
-            } else {
-                data[this.name] = this.value || '';
-            }
-        });
-        console.log(data);
-        $.post("/ingest/image", function(data) {
-            $("#result").html(data);
-        }).fail(function() {
-            $("#result").html("Error");
-        });
-    });    
-});
-</script>
-{% endblock head %}
-
 {% block body %}
-
-
-<div id="result"></div>
-
-
-<!-- SIGHTING<br />
-<form id="sighting">
-    Member<input type="text" class="member" /><br />
-    <input class="submit" type="button" value="POST" />
-</form> -->
-
 
 IMAGE<br />
 <br />
-<form id="image" enctype="multipart/form-data">
+<form id="image" action="/ingest/image" method="POST" enctype="multipart/form-data">
     MEMBER<br />
-    <input type="text" name="member" /><br />
+    <input type="text" name="Member" /><br />
     <br />
     TAGS<br />
-    <input type="text" name="tags" /><br />
+    <input type="text" name="Tags" /><br />
     <br />
     <input type="file" name="imagefile" /><br />
     <br />
-    <input type="button" class="submit" value="POST" /><br />
-    <input type="hidden" name="data" />
-    
+    <input type="submit" value="POST" /><br />    
 </form>
 
 {% endblock body %}

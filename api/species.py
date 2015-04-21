@@ -10,4 +10,5 @@ def assemble(self, search, limit, order):
         species.sort()
     except Exception as e:
         return self.error(log.exc(e))
-    return self.json(species)
+    total = returned = len(species)        
+    return species, total, returned
