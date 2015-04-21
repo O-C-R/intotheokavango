@@ -13,7 +13,7 @@ def assemble(self, search, limit, order):
     except Exception as e:
         return self.error(log.exc(e))
     log.info("Found %s features" % len(features['features']))
-    return features, total
+    return features, total, returned
 
 
 def fix_id(feature):

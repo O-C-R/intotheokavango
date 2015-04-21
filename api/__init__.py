@@ -124,8 +124,8 @@ class Api(server.Handler):
 
         # pass our search to the view module for execution and formatting
         try:         
-            results, total = view.assemble(self, search, limit, order)   
+            results, total, returned = view.assemble(self, search, limit, order)   
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}
-            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results), 'filter': search, 'results': results})
+            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results})
         except Exception as e:
             return self.error(log.exc(e))

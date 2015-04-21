@@ -11,4 +11,5 @@ def assemble(self, search, limit, order):
             members[member] = feature_types
     except Exception as e:
         return self.error(log.exc(e))
-    return members, len(members)
+    total = returned = len(members)        
+    return members, total, returned

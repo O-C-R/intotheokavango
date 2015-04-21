@@ -15,4 +15,5 @@ def assemble(self, search, limit, order):
             expeditions[expedition] = {'StartDate': start_date, 'Days': duration.days}
     except Exception as e:
         return self.error(log.exc(e))
-    return expeditions, len(expeditions)
+    total = returned = len(expeditions)
+    return expeditions, total, returned
