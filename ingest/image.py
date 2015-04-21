@@ -1,7 +1,8 @@
-from housep import log, util
+from housepy import log, util
 
 def parse(request):
     log.info("image.parse")
+    log.info(request.body)
     # date_string = path.split('/')[-1] 
     # dt = datetime.datetime.strptime(date_string.split('_')[0], "%d%m%Y%H%M")
     # tz = pytz.timezone(config['local_tz'])

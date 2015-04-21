@@ -3,19 +3,18 @@
 - backups to s3
 - http auth
 - multiple tornado frontends
+- set up crons on server
 
+### security
 
-### need
-- format for tablet ingestion, see email to Ellery
-- verify ambit 3 format
 
 ### now
-- front end to graph changes over time
 - verify_t should be smarter
 - async for soundcloud and twilio
-- set up crons on server
 - resolution filter
-- send this shit to Ari and co
+
+- http://www.gbif.org/developer/species
+
 
 - "estimate geography" is only for shit from the main posting
 - tweets have to be geotagged to the expedition members, not the general data
@@ -26,6 +25,7 @@ habitat (gopro) + documentary (people's photos)
 
 
 ### thoughts
+- send this shit to Ari and co
 - need a backup strategy, ebs snapshots
 - move everything to /mnt/data?
 - api view caching, especially with processing
