@@ -1,0 +1,123 @@
+{% extends "page.html" %}
+
+{% block head %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../static/css/api.css">
+    <script type="text/javascript" src="../../static/js/d3.min.js"></script>
+    <style type="text/css">
+
+    </style>
+{% endblock head %}
+
+{% block body %}
+    {{ search }}
+    <div id="dataPage">
+        <h1>Species</h1>
+        <div id="api">
+            <div id="timelineViz" >
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        // var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting&BirdName=African%20Pygmy%20Goose";
+        var url = "{{ query }}";
+
+        var parseSpeciesSighting = function(item) {
+            if(item["properties"].hasOwnProperty("BirdName")) {
+                var speciesSighting = {};
+                speciesSighting.count = item["properties"]["Count"];
+                speciesSighting.time = new Date(+item["properties"]["t_utc"] * 1000);
+                //console.log(speciesSighting.time + ", " + speciesSighting.count);
+                return speciesSighting;
+            }
+        }
+
+        var makeTimeSeriesViz = function(parsedData) {
+            //TIMESERIES VIZ
+            var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+            width = 800 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom,
+            left_width = 100;
+
+            //Fri Aug 29 2014 05:06:40 GMT-0400 (EDT)
+            //%a %b %e %Y %H:%M:%S %LZ
+            var dateRange = d3.extent(parsedData, function(d) { 
+                return d.time; 
+            });
+            console.log(dateRange);
+
+            var parseDate = d3.time.format("%m %d").parse;
+
+            var xScale = d3.time.scale()
+                .range([0, width]);
+
+            var yScale = d3.scale.linear()
+                .range([height, 0]);
+
+            var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+
+            var line = d3.svg.line()
+                .x(function(d) { return xScale(d.time); })
+                .y(function(d) { return yScale(d.count); });
+
+            var svg = d3.select("#timelineViz").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
+            yScale.domain(d3.extent(parsedData, function(d) { return d.count; }));
+
+            svg.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + height + ")")
+                  .call(xAxis);
+
+            svg.append("g")
+                  .attr("class", "y axis")
+                  .call(yAxis)
+                .append("text")
+                  .attr("class", "title")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", 6)
+                  .attr("dy", ".71em")
+                  .text("Count");
+
+            svg.append("path")
+                  .data([parsedData])
+                  .attr("class", "line")
+                  .attr("d", line);
+
+        }
+
+        var parsedSpeciesSighting = [];
+
+        var loadSpeciesData = function() {
+            d3.json(url, function(error, data) {
+                console.log("Initial Data", data.features);
+
+                for (d in data.features) {
+                    item = data.features[d];
+
+                    f = parseSpeciesSighting(item);
+                    parsedSpeciesSighting.push(f);
+                }
+
+                makeTimeSeriesViz(parsedSpeciesSighting);
+                
+            });
+            
+        }
+
+        loadSpeciesData();
+
+    </script>
+{% endblock body %}
