@@ -11,5 +11,4 @@ def assemble(self, search, limit, order):
             members[member] = feature_types
     except Exception as e:
         return self.error(log.exc(e))
-    response = members
-    return self.json(response)
+    return members, len(members)

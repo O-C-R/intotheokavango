@@ -32,7 +32,8 @@ var geojsonMarkerOptions = {
 /* load data file */
 function loadData () {
     $.getJSON(path_to_data, function(data) {
-        L.geoJson(data, {
+        var featureCollection = data['results'];
+        L.geoJson(featureCollection, {
             pointToLayer: function (feature, latlng) {
                return L.circleMarker(latlng, geojsonMarkerOptions);
             },

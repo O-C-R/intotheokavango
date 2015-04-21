@@ -117,13 +117,15 @@ class Api(server.Handler):
             return self.error("bad parameters")
 
         # http://localhost:7777/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
-        log.info("SEARCH %s" % search)
+        log.info("FILTER %s" % search)
 
         # add a header for unrestricted access
         self.set_header("Access-Control-Allow-Origin", "*")
 
         # pass our search to the view module for execution and formatting
-        try:
-            return view.assemble(self, search, limit, order)
+        try:         
+            results, total = view.assemble(self, search, limit, order)   
+            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results), 'filter': search, 'results': results})
         except Exception as e:
             return self.error(log.exc(e))
