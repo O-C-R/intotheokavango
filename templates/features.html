@@ -161,7 +161,7 @@
                 var parsedSighting = [];
                 var parsedTweet = [];
 
-                var url = "http://dev.intotheokavango.org/api/features?limit=200";
+                var url = "http://dev.intotheokavango.org/api/features?limit=2000";
                 
                 function loadData(callback) {
                     d3.json(url, function(error, data) {
@@ -199,8 +199,8 @@
                             }
 
                         }
-                        // console.log("ACTIVITY");
-                        // console.log(parsedActivity);
+                        console.log("ACTIVITY");
+                        console.log(parsedActivity);
                         // console.log("AMBIT");
                         // console.log(parsedAmbit);
                         // console.log("BEACON");
