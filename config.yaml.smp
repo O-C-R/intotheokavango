@@ -44,7 +44,9 @@ twitter:
         app_secret: 
         oauth_token: 
         oauth_token_secret: 
-
+    accounts:
+    hashtag: okavango15
+    
 twilio:
     account_sid: 
     auth_token: 

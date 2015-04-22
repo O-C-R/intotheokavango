@@ -39,34 +39,5 @@ indexes
 - t_utc
 - coordinates
 
-//
-
-db.collection.createIndex( { <location field> : "2dsphere" } )
-db.collection.createIndex( { geometry : "2dsphere" } )
-
-//
-
-db.<collection>.find( { <location field> :
-                         { $near :
-                           { $geometry :
-                              { type : "Point" ,
-                                coordinates : [ <longitude> , <latitude> ] } ,
-                             $maxDistance : <distance in meters>
-                      } } } )
-
-
-Mongo started allowing altitude in the coordinates field 6 days ago
-
-//
-
-so what does a query on a property look like?
-
-features = db.features.find({'properties.expedition': "okavango_15", 'properties.Person': "Brian"}).sort('t_utc')
-
-posts.find({"date": {"$lt": d}}).sort("author").explain()["cursor"]
-
-
-
-
 
 """

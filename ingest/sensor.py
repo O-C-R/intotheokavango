@@ -1,3 +1,4 @@
+import pytz
 from housepy import config, log, strings, net, util
 from ingest import ingest_plain_body
 from pymongo import ASCENDING, DESCENDING
@@ -10,6 +11,8 @@ Send an SMS in the format `location <SensorName> <Latitude> <Longitude>` to upda
 geometry for that sensor going forward
 
 If time is '*', then have the server generate the timestamp.
+
+The time is reported in local time.
 
 """
 
@@ -39,7 +42,10 @@ def parse(request):
             georef = results[0] if len(results) else None
             geometry = georef['geometry'] if georef is not None else None
             log.debug(geometry)
-            t = util.timestamp() if tokens[0] == "*" else tokens[0]
+            if tokens[0] == "*":
+                t = util.timestamp()
+            else:                    
+                t = util.delocalize_timestamp(tokens[0], config['local_tz']) # converts from local time timestamp to t_utc
             data = {'t_utc': t, 'SensorName': tokens[1], strings.camelcase(tokens[2]): tokens[3], 'LocationUpdate': False, 'geometry': geometry}
 
     except Exception as e:
