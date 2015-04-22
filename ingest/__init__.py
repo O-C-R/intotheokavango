@@ -181,6 +181,7 @@ def ingest_json_file(request):
 
 def ingest_json_body(request):
     """Generic method for ingesting a JSON in the body of the post"""
+    log.info(request.body)
     try:
         data = json.loads(str(request.body, encoding='utf-8'))
     except Exception as e:
@@ -216,6 +217,20 @@ def save_file(request):
             with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
             return path
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+
+def save_files(request):
+    try:
+        paths = []
+        for key, fileinfo in request.files.items():
+            fileinfo = fileinfo[0]
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
+            with open(path, 'wb') as f:
+                f.write(fileinfo['body'])
+            paths.append(path)
+        return paths
     except Exception as e:
         log.error(log.exc(e))
         return None

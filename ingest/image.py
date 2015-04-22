@@ -11,6 +11,14 @@ def parse(request):
     if path is None:
         return None
 
+    data = ingest_json_body(request)
+    if data is None:
+        log.debug("JSON body failed, trying arguments...")
+        data = ingest_form_vars(request)
+        log.debug(data)
+        if 'Member' not in data:
+            return None            
+
     # try to get EXIF data
     try:    
         image = Image.open(path)  
@@ -25,18 +33,13 @@ def parse(request):
             date_field = ''.join(date_field)
         date = util.parse_date(date_field, tz=config['local_tz'])
         t_utc = util.timestamp(date)
+        if 'Make' in exif and exif['Make'].strip() == "Gopro":
+            data['FeatureType'] = ""
         log.debug(date)
     except Exception as e:
         log.error(log.exc(e))
         return None
 
-    data = ingest_json_body(request)
-    if data is None:
-        log.debug("JSON body failed, trying arguments...")
-        data = ingest_form_vars(request)
-        print(data)
-        if 'Member' not in data:
-            return None    
 
     filename = "%s_%s.jpg" % (t_utc, str(uuid.uuid4()))
     new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
