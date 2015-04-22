@@ -446,6 +446,7 @@ attemptUploadImage = function(filePath, memberName, cameraName, tags) {
                 photoType: photoType,
                 tags: tags
             }
+        }
     };
     sending = true;
     var r = request.post({'uri': 'http://intotheokavango.org/ingest/image', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
@@ -499,6 +500,7 @@ attemptUploadSound = function(filePath) {
                 memberName: memberName,
                 tags: tags
             }
+        }
     };
     sending = true;
     var r = request.post({'uri': 'http://intotheokavango.org/ingest/sound', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
