@@ -15,6 +15,8 @@
 - multiple tornado frontends
 - set up crons on server
 
+- ambits go to posts
+
 ### security
 
 
@@ -37,6 +39,8 @@
 tweets, images, audio
 
 - is there a calculated exhibition core?
+
+core is Steve's ambit
 
 
 ### auth
@@ -64,6 +68,8 @@ supports:
 - daily
 
 does this make sense for all data? it's really just for position and heartrate, and it should be averaged, which means that it involves processing, which is complicated
+
+specify in seconds
 
 
 ##### timetable

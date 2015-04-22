@@ -1,5 +1,7 @@
-import importlib, os, json, tornado
+import importlib, os, json, tornado, json, shutil, uuid, os
+from PIL import ExifTags, Image
 from housepy import config, log, server, util, strings
+from housepy.server import Application
 
 """
     Ingestion is forgiving and will accept and reformat flat JSON.
@@ -32,34 +34,43 @@ class Ingest(server.Handler):
         if feature_type is None or not len(feature_type):
             feature_type = self.get_argument("FeatureType", "") # if we didn't use an endpoint, check if it's in the variables
         feature_type = feature_type.lower().split('.')[0].strip()
-        module_name = "ingest.%s" % feature_type
-        try:
-            module = importlib.import_module(module_name)
-            log.info("--> loaded %s module" % module_name)
-            feature = module.parse(self.request)
-        except ImportError as e:
-            log.error(log.exc(e))
-            return self.error("FeatureType \"%s\" not recognized" % feature_type)
-        if not feature:
-            return self.error("Ingest failed")
-        feature = verify_geojson(feature)
-        if not feature:
-            return self.error("Ingest failed: bad format")
-        feature = verify_geometry(feature)
-        if feature['geometry'] is None:
-            feature = estimate_geometry(feature, self.db)
-        feature = verify_t(feature)
-        if not feature:
-            return self.error("Ingest failed: missing t_utc")
-        feature = verify_expedition(feature)
-        feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
-        try:
-            feature_id = self.db.features.insert_one(feature).inserted_id
-        except Exception as e:
-            log.error(log.exc(e))
-            return self.error("Ingest failed")
-        log.info("--> success (%s)" % feature_id)
-        return self.text(str(feature_id)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
+        success, value = ingest_request(feature_type, self.request)
+        if success:
+            return self.text(str(value)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
+        else:
+            return self.error(value)
+
+def ingest_request(feature_type, request):
+    db = Application.instance.db
+    log.info("ingest_request")
+    module_name = "ingest.%s" % feature_type
+    try:
+        module = importlib.import_module(module_name)
+        log.info("--> loaded %s module" % module_name)
+        feature = module.parse(request)
+    except ImportError as e:
+        log.error(log.exc(e))
+        return False, "FeatureType \"%s\" not recognized" % feature_type
+    if not feature:
+        return False, "Ingest failed"
+    feature = verify_geojson(feature)
+    if not feature:
+        return False, "Ingest failed: bad format"
+    feature = verify_geometry(feature)
+    if feature['geometry'] is None:
+        feature = estimate_geometry(feature, db)
+    feature = verify_t(feature)
+    if not feature:
+        return False, "Ingest failed: missing t_utc"
+    feature = verify_expedition(feature)
+    feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
+    try:
+        feature_id = db.features.insert_one(feature).inserted_id
+    except Exception as e:
+        log.error(log.exc(e))
+        return False, "Ingest failed"
+    log.info("--> success (%s)" % feature_id)
+    return True, feature_id
 
 def verify_geojson(data):
     """Verify or reformat JSON as GeoJSON"""
@@ -169,7 +180,6 @@ def verify_expedition(data):
 
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""
-    log.info("ingest.ingest_json")
     path = save_file(request)    
     try:
         with open(path) as f:
@@ -209,28 +219,52 @@ def ingest_form_vars(request):
         data[param] = value[0] if len(value) == 1 else value
     return data
 
-def save_file(request):
+def save_files(request):
+    log.info("ingest.save_files")
+    paths = []    
     try:
         for key, fileinfo in request.files.items():
             fileinfo = fileinfo[0]
             path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
             with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
-            return path
+                log.info("--> saved %s" % path)
+            paths.append(path)
     except Exception as e:
         log.error(log.exc(e))
+    return paths
+
+def save_file(request):
+    files = save_files(request)
+    if len(files):
+        return files[0]
+    else:
         return None
 
-def save_files(request):
-    try:
-        paths = []
-        for key, fileinfo in request.files.items():
-            fileinfo = fileinfo[0]
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s_%s" % (util.timestamp(), fileinfo['filename'])))
-            with open(path, 'wb') as f:
-                f.write(fileinfo['body'])
-            paths.append(path)
-        return paths
+def process_image(path, member=None):
+    # try to get EXIF data
+    data = {'Member': member}
+    try:    
+        image = Image.open(path)  
+        width, height = image.size
+        data['Dimensions'] = width, height
+        exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
+        # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
+        date_field = exif['DateTime']
+        if date_field[4] == ":" and date_field[7] == ":":
+            date_field = list(date_field)
+            date_field[4] = "-"
+            date_field[7] = "-"
+            date_field = ''.join(date_field)
+        date = util.parse_date(date_field, tz=config['local_tz'])
+        data['t_utc'] = util.timestamp(date)                            ## careful about this overriding
+        data['Make'] = exif['Make'].strip() if 'Make' in exif else None
+        data['Model'] = exif['Model'].strip() if 'Model' in exif else None
+        filename = "%s_%s.jpg" % (data['t_utc'], str(uuid.uuid4()))
+        new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
+        shutil.copy(path, new_path)
+        data['URL'] = "/static/data/images/%s" % filename
     except Exception as e:
         log.error(log.exc(e))
         return None
+    return data

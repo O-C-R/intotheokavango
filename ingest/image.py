@@ -1,57 +1,46 @@
-import json, shutil, uuid, os
-from housepy import log, util, config
-from PIL import ExifTags, Image
-from ingest import save_file, ingest_json_body, ingest_form_vars
+import json
+from ingest import ingest_json_body, save_files, process_image
+from housepy import config, log, util, strings
 
-"""Expecting JSON or form metadata with Member, Tags, and a timestamp in the local timezone"""
+"""Expecting JSON or form metadata with Member and a timestamp in the local timezone"""
 
 def parse(request):
     log.info("image.parse")
-    path = save_file(request) 
-    if path is None:
+
+    paths = save_files(request) ## ends up being redundant if called through sighting
+    if not len(paths):
         return None
 
-    data = ingest_json_body(request)
+    # process the json
+    data = None
+    for path in paths:
+        if path[-4:] == "json":
+            try:
+                with open(path) as f:
+                    data = json.loads(f.read())
+            except Exception as e:
+                log.error(log.exc(e))
+                return None
+            break
     if data is None:
-        log.debug("JSON body failed, trying arguments...")
-        data = ingest_form_vars(request)
-        log.debug(data)
-        if 'Member' not in data:
-            return None            
-
-    # try to get EXIF data
-    try:    
-        image = Image.open(path)  
-        width, height = image.size      
-        exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
-        # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
-        date_field = exif['DateTime']
-        if date_field[4] == ":" and date_field[7] == ":":
-            date_field = list(date_field)
-            date_field[4] = "-"
-            date_field[7] = "-"
-            date_field = ''.join(date_field)
-        date = util.parse_date(date_field, tz=config['local_tz'])
-        t_utc = util.timestamp(date)
-        if 'Make' in exif and exif['Make'].strip() == "Gopro":
-            data['FeatureType'] = ""
-        log.debug(date)
-    except Exception as e:
-        log.error(log.exc(e))
         return None
 
+    # fix things
+    if 'TeamMember' in data:
+        data['Member'] = data['TeamMember']
+        del data['TeamMember']                
 
-    filename = "%s_%s.jpg" % (t_utc, str(uuid.uuid4()))
-    new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
-    shutil.copy(path, new_path)
-    url = "/static/data/images/%s" % filename
+    # adjust for sightings data making an extra feature (filter the fields we don't want)
+    if 'FeatureType' in data and data['FeatureType'] == "sighting" or 'Bird Name' in data:
+        data = {key: value for (key, value) in data.items() if key in ['Member', 'Expedition', 'Latitude', 'Longitude', 'Altitude', 'ResourceURL']}
+        data['FeatureType'] = "image"
 
-    data['FeatureType'] = "image"
-    data['Url'] = url
-    data['t_utc'] = t_utc
-    data['Width'] = width
-    data['Height'] = height
-
-    log.debug(data)
+    # process the image
+    for path in paths:
+        if path[-4:] != "json":
+            image_data = process_image(path, data['Member'] if 'Member' in data else None)
+            data.update(image_data)
+            break
 
     return data
+
