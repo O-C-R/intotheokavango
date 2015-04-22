@@ -3,16 +3,22 @@
 import geojson, json, random, time, os, datetime
 from twython import Twython, TwythonError
 from housepy import config, log, util, process, net
+from mongo import db
+
+"""
+    Grab tweets from main timeline and hashtagged tweets from associated accounts
+    Note that this goes through the ingest endpoint in order to take advantage of the checks there.
+    Database is checked here solely for the purpose of avoiding dups.
+
+"""
+
 
 AUTH = config['twitter']['main']
-ACCOUNTS = list(config['twitter']['accounts'].keys())
-MEMBERS = list(config['twitter']['accounts'].values())
+ACCOUNTS = [list(item.keys())[0] for item in config['twitter']['accounts']]
+MEMBERS = [list(item.values())[0] for item in config['twitter']['accounts']]
 HASHTAG = config['twitter']['hashtag']
 
-
 def main():
-
-    """Grab tweets from main timeline and associated accounts with tags"""
 
     twitter = Twython(AUTH['app_key'], AUTH['app_secret'], AUTH['oauth_token'], AUTH['oauth_token_secret'])
     twitter.verify_credentials() ## what does this do if it fails?
@@ -25,7 +31,8 @@ def main():
             log.error(log.exc(e))
             continue        
         log.info("--> %s has %s total tweets" % (account, len(timeline)))
-        for tweet in timeline:            
+        for t, tweet in enumerate(timeline):
+            log.info("Tweet %s:%s" % (a, t))
             text = tweet.get('text')
             if a == 0 or HASHTAG.lower() in text.lower():  # the first entry in the accounts is the official account -- all tweets are processed
                 try:
@@ -37,6 +44,11 @@ def main():
                     data['Text'] = text
                     data['Retweet'] = text[:2] == "RT"
                     data['Url'] = "https://twitter.com/%s/status/%s" % (account, tweet.get('id'))
+                    data['TweetID'] = tweet.get('id')
+                    dup = db.features.find_one({'properties.FeatureType': 'tweet', 'properties.TweetID': data['TweetID']})
+                    if dup is not None:
+                        log.info("--> skipping duplicate tweet")
+                        continue
                     log.info("--> %s (RT: %s): %s" % (account, data['Retweet'], data['Text']))
                     url = "%s/ingest/tweet" % config['url']
                     log.info("Sending to %s..." % url)
