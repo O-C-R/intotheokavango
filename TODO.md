@@ -1,9 +1,10 @@
---> procedure for uploading images and audio
+### unresolved
+- procedure for uploading images and audio
     member, 
---> gopro differentiation
---> sightings have photos, that are photo features, linked to sightings
---> what timezone are shah's sensors?
---> tweet members should not be null
+- gopro differentiation
+- sightings have photos, that are photo features, linked to sightings
+- add SensorType to shah
+- tweet members should not be null -- except what about organizations?
 
 ### server
 - migrate to huge instance

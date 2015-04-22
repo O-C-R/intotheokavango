@@ -44,7 +44,7 @@ def parse(request):
     url = "/static/data/images/%s" % filename
 
     data['FeatureType'] = "image"
-    data['url'] = url
+    data['Url'] = url
     data['t_utc'] = t_utc
     data['Width'] = width
     data['Height'] = height

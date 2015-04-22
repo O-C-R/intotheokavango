@@ -5,8 +5,10 @@ from twython import Twython, TwythonError
 from housepy import config, log, util, process, net
 
 AUTH = config['twitter']['main']
-ACCOUNTS = config['twitter']['accounts']
+ACCOUNTS = list(config['twitter']['accounts'].keys())
+MEMBERS = list(config['twitter']['accounts'].values())
 HASHTAG = config['twitter']['hashtag']
+
 
 def main():
 
@@ -16,23 +18,35 @@ def main():
     twitter.verify_credentials() ## what does this do if it fails?
     
     for a, account in enumerate(ACCOUNTS):
+        log.info("Checking %s..." % account)
         try: 
             timeline = twitter.get_user_timeline(screen_name=account)
         except TwythonError as e:
             log.error(log.exc(e))
-        else:
-            for tweet in timeline:
-                if a == 0 or HASHTAG in tweet:  # the first entry in the accounts is the official account -- all tweets are processed
+            continue        
+        log.info("--> %s has %s total tweets" % (account, len(timeline)))
+        for tweet in timeline:            
+            text = tweet.get('text')
+            if a == 0 or HASHTAG.lower() in text.lower():  # the first entry in the accounts is the official account -- all tweets are processed
+                try:
+                    data = {}
                     dt = datetime.datetime.strptime(tweet.get('created_at'), '%a %b %d %H:%M:%S +0000 %Y')
-                    tweet['t_utc'] = util.timestamp(dt)
-                    try:
-                        url = "%s/ingest/tweet" % config['url']
-                        log.info("Sending to %s..." % url)
-                        response = net.read(url, str(json.dumps(tweet)).encode('utf-8'))
-                        log.info("--> %s" % response)                                                        
-                    except Exception as e:
-                        log.error(log.exc(e))
-                        continue
+                    data['t_utc'] = util.timestamp(dt)
+                    data['Member'] = MEMBERS[a]
+                    data['Handle'] = account                    
+                    data['Text'] = text
+                    data['Retweet'] = text[:2] == "RT"
+                    data['Url'] = "https://twitter.com/%s/status/%s" % (account, tweet.get('id'))
+                    log.info("--> %s (RT: %s): %s" % (account, data['Retweet'], data['Text']))
+                    url = "%s/ingest/tweet" % config['url']
+                    log.info("Sending to %s..." % url)
+                    response = net.read(url, str(json.dumps(data)).encode('utf-8'))
+                    log.info("--> %s" % response)                                                        
+                except Exception as e:
+                    log.error(log.exc(e))
+                    continue
+            else:
+                log.info("--> skipping unrelated tweet")
 
 
 main()
