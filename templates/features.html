@@ -175,7 +175,7 @@
                     .text(function(d) { return d.featureType; });
             }
             
-            makeTotalsViz(featuresCountArray);
+            //makeTotalsViz(featuresCountArray);
             
             //TIMESERIES VIZ
                 var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
@@ -211,7 +211,7 @@
                 var parsedSighting = [];
                 var parsedTweet = [];
 
-                var url = "http://dev.intotheokavango.org/api/features?limit=2000";
+                var url = "http://dev.intotheokavango.org/api/features?limit=200";
                 
                 function loadData(callback) {
                     d3.json(url, function(error, data) {
