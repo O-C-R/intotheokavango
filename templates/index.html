@@ -177,17 +177,26 @@
         </div>
       </div>
       <div id="dataPage" class="page hidden">
-        <h1>DATA</h1>
-        <div id="api-overview">
-          <h2>Expedition Data</h2>
-          <p>This is where we embed a few endpoint viz highlights</p>
+        <div id="data-header">
+          <ul id="data-navigation">
+            <li>Documentation</li>
+            <li>Explorer</li>
+            <li>Overview</li>
+          </ul>
+          <div class="title" id="api-overview-title">API Overview</div>
+          <div class="title" id="api-explorer-title" style="display:none">API Explorer</div>
+          <div class="title" id="api-documentation-title" style="display:none">API Documentation</div>
         </div>
-        <div id="api-explorer"></div>
-        <h2>Explore the API</h2>
-        <p>This is where we embed a form with fields to query the api</p>
-        <div id="api-docs">
-          <h2>API Documentation</h2>
-          <p>This is where we add information about the API</p>
+        <div id="data-content">
+          <div id="api-overview">
+            <p>This is where we embed a few endpoint viz highlights</p>
+          </div>
+          <div id="api-explorer" style="display: none">
+            <p>This is where we embed a form with fields to query the api</p>
+          </div>
+          <div id="api-docs" style="display: none">
+            <p>This is where we add information about the API</p>
+          </div>
         </div>
       </div>
       <div id="sharePage" class="page hidden">
