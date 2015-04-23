@@ -41,7 +41,6 @@ class Ingest(server.Handler):
             return self.error(value)
 
 def ingest_request(feature_type, request):
-    db = Application.instance.db
     log.info("ingest_request")
     module_name = "ingest.%s" % feature_type
     try:
@@ -52,7 +51,12 @@ def ingest_request(feature_type, request):
         log.error(log.exc(e))
         return False, "FeatureType \"%s\" not recognized" % feature_type
     if not feature:
-        return False, "Ingest failed"
+        return False, "Ingest failed"        
+    return ingest_data(feature_type, feature)
+
+def ingest_data(feature_type, feature):
+    log.info("ingest_request")    
+    db = Application.instance.db
     feature = verify_geojson(feature)
     if not feature:
         return False, "Ingest failed: bad format"
