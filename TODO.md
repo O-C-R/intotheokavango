@@ -1,6 +1,6 @@
-### unresolved
+### new
 - add SensorType (FeatureSubType) to SMS sensors
-
+- WordPress RSS -- handles just like tweets
 
 ### server
 - migrate to huge instance
@@ -9,7 +9,6 @@
 - multiple tornado frontends
 - set up crons on server
 - are we returning proper error codes?
-
 
 ### security
 
@@ -59,6 +58,11 @@ does this make sense for all data? it's really just for position and heartrate, 
 
 specify in seconds
 
+
+### conceptual
+- ingest defines anything that needs to be parsed differently, a loose correlation to FeatureTypes
+- ingest might end up producing multiple features, via ingest_request, ingest_data
+- whether ingest always happens through http or not is somewhat compromised
 
 
 ##### backup

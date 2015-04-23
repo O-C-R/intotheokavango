@@ -56,7 +56,10 @@ def ingest_request(feature_type, request):
 
 def ingest_data(feature_type, feature):
     log.info("ingest_request")    
-    db = Application.instance.db
+    try:
+        db = Application.instance.db
+    except AttributeError:
+        from mongo import db
     feature = verify_geojson(feature)
     if not feature:
         return False, "Ingest failed: bad format"
