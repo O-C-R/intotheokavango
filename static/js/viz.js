@@ -3,7 +3,9 @@ var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting'
 var index = 0;    
 var featuresCountArray = [];
 var parsedSpeciesSighting = [];
-var parsedAmbitData = [];
+var parsedAmbitHR = [];
+var parsedAmbitEnergy = [];
+var parsedAmbitSpeed = [];
 
 var parseSpeciesSighting = function(item) {
     if(item["properties"].hasOwnProperty("BirdName")) {
@@ -15,31 +17,110 @@ var parseSpeciesSighting = function(item) {
     }
 }
 
-var parseAmbitData = function(item) {
+var parseAmbitHeartRate = function(item) {
     //parse for heart rate
-    if (item["properties"].hasOwnProperty("HR")) {
-        var ambitData = {};
-        ambitData.heartRate = item["properties"]["HR"] * 60; //convert beats per sec to beats per min
-        ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        // console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
-        // return ambitData;
-    } 
+    var ambitData = {};
+    ambitData.heartRate = item["properties"]["HR"] * 60; //convert beats per sec to beats per min
+    ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
+    // console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
+    return ambitData;
+}
+
+var parseAmbitEnergy = function(item) {
     //parse for energy consumption
-    if (item["properties"].hasOwnProperty("EnergyConsumption")) {
-        var ambitData = {};
-        ambitData.energy = item["properties"]["EnergyConsumption"];
-        ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        // console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
-        // return ambitData;
-    }
+    var ambitData = {};
+    ambitData.energy = item["properties"]["EnergyConsumption"];
+    ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
+    // console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
+    return ambitData;
+}
+
+var parseAmbitSpeed = function(item) {
     //parse for rate (speed?) by dividing Distance by Time
-    if (item["properties"].hasOwnProperty("Distance") && item["properties"].hasOwnProperty("Time")) {
-        var ambitData = {};
-        ambitData.speed = item["properties"]["Distance"] / item["properties"]["Time"];
-        ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
-        return ambitData;
+    var ambitData = {};
+    ambitData.speed = item["properties"]["Distance"] / item["properties"]["Time"];
+    ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
+    //console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
+    return ambitData;
+}
+
+var makeHistogramPlot = function(parsedData) {
+    //HISTOGRAM VIZ
+    var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+    width = 800 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom,
+    left_width = 100;
+
+    var dateRange = d3.extent(parsedData, function(d) { 
+        return d.time; 
+    });
+    var parseDate = d3.time.format("%m %d").parse;
+
+    var xScale = d3.time.scale()
+        .range([0, width]);
+
+    var yScale = d3.scale.linear()
+        .range([height, 0]);
+
+    var svg = d3.select("#timelineViz").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("class", "vizContainer")
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    if (feature_type === "sighting") {
+        yAxisLabel = "Count";
+        graphTitle = "Sightings";
+
+        var barWidth = width / parsedData.length;
+        
+        xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient("bottom");
+
+        yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+
+        xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
+        yScale.domain(d3.extent(parsedData, function(d) { return d.count; }));
+
+        var bar = svg.selectAll("g")
+                .data(parsedData)
+            .enter().append("g")
+                .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+
+        bar.append("rect")
+            .attr("y", function(d) { return yScale(d.count); })
+            .attr("class", "rect")
+            .attr("height", function(d) { return height - yScale(d.count); })
+            .attr("width", barWidth);
     }
+
+    svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+
+    svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+        .append("text")
+          .attr("class", "title")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .text(yAxisLabel);
+
+    svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - 0.8*(margin.top / 2))
+        .attr("text-anchor", "middle") 
+        .attr("class", "title") 
+        .style("font-size", "16px")  
+        .text(graphTitle); 
+
 }
 
 var makeTimeSeriesViz = function(parsedData) {
@@ -48,6 +129,9 @@ var makeTimeSeriesViz = function(parsedData) {
     width = 800 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     left_width = 100;
+
+    var yAxisLabel = "";
+    var graphTitle = "";
 
     var dateRange = d3.extent(parsedData, function(d) { 
         return d.time; 
@@ -70,32 +154,17 @@ var makeTimeSeriesViz = function(parsedData) {
     var svg = d3.select("#timelineViz").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
+            .attr("class", "vizContainer")
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    if (feature_type === "sighting") {
-        var line = d3.svg.line()
-            .x(function(d) { return xScale(d.time); })
-            .y(function(d) { return yScale(d.count); });
-        
-        xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient("bottom");
-
-        yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient("left");
-
-        xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
-        yScale.domain(d3.extent(parsedData, function(d) { return d.count; }));
-
-
-    } else if (feature_type === "ambit") {
+    if (feature_type === "ambit") {
         console.log("feature_type is ambit");
         console.log(parsedData);
         for (var i = 0; i < parsedData.length; i++) {
             if (parsedData[i].hasOwnProperty("heartRate")) {
                 yAxisLabel = "Beats per Minute";
+                graphTitle = "Heart Rate";
                 var line = d3.svg.line()
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.heartRate); });
@@ -104,7 +173,8 @@ var makeTimeSeriesViz = function(parsedData) {
                     yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
 
             } else if (parsedData[i].hasOwnProperty("energy")) {
-                yAxisLabel = "Energy Consumption";
+                yAxisLabel = "Calories?";
+                graphTitle = "Energy Consumption";
                 var line = d3.svg.line()
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.energy); });
@@ -115,6 +185,7 @@ var makeTimeSeriesViz = function(parsedData) {
             } else if (parsedData[i].hasOwnProperty("speed")) {
                 console.log("data has speed key");
                 yAxisLabel = "Meters per Second";
+                graphTitle = "Speed";
                 var line = d3.svg.line()
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.speed); });
@@ -152,6 +223,14 @@ var makeTimeSeriesViz = function(parsedData) {
           .data([parsedData])
           .attr("class", "line")
           .attr("d", line);
+
+    svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - 0.8*(margin.top / 2))
+        .attr("text-anchor", "middle") 
+        .attr("class", "title") 
+        .style("font-size", "16px")  
+        .text(graphTitle); 
 
 }
 
@@ -239,8 +318,6 @@ var getFeatureTotalData = function(featureType) {
     });
 }
 
-
-
 var public_path = 'http://dev.intotheokavango.org' + path_to_data;
 console.log(public_path);
 
@@ -267,14 +344,25 @@ var loadData = function(url) {
                         item = data.results.features[d];
 
                         if (item["properties"].hasOwnProperty("HR")) {
-                            f = parseAmbitData(item);
-
-                            parsedAmbitData.push(f);
+                            f = parseAmbitHeartRate(item);
+                            parsedAmbitHR.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("EnergyConsumption")) {
+                            f = parseAmbitEnergy(item);
+                            parsedAmbitEnergy.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Speed") && item["properties"].hasOwnProperty("Distance")) {
+                            f = parseAmbitSpeed(item);
+                            parsedAmbitSpeed.push(f);
                         }
                     }
                     timelineVizDiv.fadeIn();
-                    //console.log(parsedAmbitData);
-                    makeTimeSeriesViz(parsedAmbitData);
+                    console.log(parsedAmbitHR);
+                    console.log(parsedAmbitEnergy);
+                    console.log(parsedAmbitSpeed);
+                    makeTimeSeriesViz(parsedAmbitHR);
+                    makeTimeSeriesViz(parsedAmbitEnergy);
+                    makeTimeSeriesViz(parsedAmbitSpeed);
             }
             if (feature_type === "sighting") {
                 //make sightings viz - totals of all the SpeciesNames sightings
@@ -287,7 +375,7 @@ var loadData = function(url) {
                         parsedSpeciesSighting.push(f);
                     }
                     timelineVizDiv.fadeIn();
-                    makeTimeSeriesViz(parsedSpeciesSighting);
+                    makeHistogramPlot(parsedSpeciesSighting);
                 }
             }
             if (feature_type === "tweet") {
