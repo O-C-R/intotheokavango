@@ -1,6 +1,8 @@
 ### new
 - add SensorType (FeatureSubType) to SMS sensors
 - WordPress RSS -- handles just like tweets
+- resolution should be in the response metadata
+- add totals to species counts
 
 ### server
 - migrate to huge instance
@@ -45,18 +47,6 @@ core is Steve's ambit
 ### remember
 - will have to clear out and re-migrate old with altitude once Mongo updates to 3.1.0 (hopefully soon!)
 
-
-
-##### resolution filtering
-
-supports:
-- all
-- hourly
-- daily
-
-does this make sense for all data? it's really just for position and heartrate, and it should be averaged, which means that it involves processing, which is complicated
-
-specify in seconds
 
 
 ### conceptual
