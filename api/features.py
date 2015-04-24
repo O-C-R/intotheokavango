@@ -8,7 +8,7 @@ def assemble(self, search, limit, order, resolution):
         total = self.db.features.find(search).count()
         results = list(self.db.features.find(search).sort([('properties.t_utc', order)]).limit(limit))
         # log.debug(json.dumps(result.explain(), indent=4))
-        temporal_filter(results)
+        # temporal_filter(results)
         features = [fix_id(feature) for feature in results]
         returned = len(features)        
         features = geojson.FeatureCollection(features)                
