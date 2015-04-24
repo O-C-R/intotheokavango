@@ -1,11 +1,11 @@
-from housepy import util, log, config
+from housepy import util, log, config, strings
 from ingest import ingest_json_file, ingest_data
 
 def parse(request):
     log.info("databoat.parse")
     data = ingest_json_file(request)
     try:
-        t_local = data['t_local']
+        t_local = strings.as_numeric(data['t_local'])
         data = data['data']        
         data['FeatureType'] = "sensor"
         data['FeatureSubType'] = "hybrid"
