@@ -357,9 +357,7 @@ var loadData = function(url) {
                         }
                     }
                     timelineVizDiv.fadeIn();
-                    console.log(parsedAmbitHR);
-                    console.log(parsedAmbitEnergy);
-                    console.log(parsedAmbitSpeed);
+
                     makeTimeSeriesViz(parsedAmbitHR);
                     makeTimeSeriesViz(parsedAmbitEnergy);
                     makeTimeSeriesViz(parsedAmbitSpeed);

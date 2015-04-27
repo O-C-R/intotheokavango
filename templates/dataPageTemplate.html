@@ -1,0 +1,15 @@
+{% raw %}
+    <script type='text/ractive'>
+    <div id="data-header">
+        <ul id="data-navigation">
+            <li>Documentation</li>
+            <li>Explorer</li>
+            <li>Overview</li>
+        </ul>
+            
+        {{ #each dataPageInfo }}
+            <div class="title" id="api-view-title">{{ view_title }}</div>
+        {{ /each }}  
+    </div>
+    </script>
+{% endraw %}
