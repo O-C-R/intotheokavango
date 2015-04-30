@@ -1731,3 +1731,80 @@
 {"level":"error","message":"Error taking pics: /bin/sh: /home/pi/okavango/gopro/./download_master.sh: No such file or directory\n","timestamp":"2015-04-24T19:51:47.107Z"}
 {"level":"error","message":"Error taking pics: /bin/sh: /home/pi/okavango/gopro/./download_master.sh: No such file or directory\n","timestamp":"2015-04-24T19:51:47.108Z"}
 {"level":"info","message":"UPTIME: 1800s","timestamp":"2015-04-24T19:51:48.974Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:50:11.919Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:50:11.926Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:50:12.930Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_boat.jpg.json","timestamp":"2015-04-30T00:50:12.936Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:52:19.487Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:52:19.493Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:52:20.503Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_boat.jpg.json","timestamp":"2015-04-30T00:52:20.508Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:52:21.506Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:54:52.372Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:54:52.383Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:54:53.384Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:55:45.718Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:55:45.724Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:55:46.727Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:56:05.415Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:56:05.421Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:56:06.422Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_boat.jpg.json","timestamp":"2015-04-30T00:56:06.435Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:56:07.425Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:56:24.630Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:56:24.636Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:56:25.639Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_boat.jpg.json","timestamp":"2015-04-30T00:56:25.653Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:56:26.641Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:57:21.249Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:57:21.260Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:57:22.262Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T00:57:22.269Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:57:23.264Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417df55e6a2772df8898a5","timestamp":"2015-04-30T00:57:26.630Z"}
+{"level":"info","message":"Archived:./public/archive/290415/json/gopro_test.jpg.json","timestamp":"2015-04-30T00:57:26.634Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:57:27.279Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T00:57:27.280Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:57:28.280Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417dfe5e6a2772df8898a7","timestamp":"2015-04-30T00:57:35.233Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T00:59:40.587Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T00:59:40.598Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T00:59:41.609Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T00:59:41.616Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T00:59:42.612Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T01:01:12.296Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T01:01:12.307Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:01:13.317Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:01:13.323Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:01:14.319Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417ede5e6a2772df8898ab","timestamp":"2015-04-30T01:01:19.197Z"}
+{"level":"info","message":"Archived:./public/archive/290415/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:01:19.199Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:01:19.336Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:01:19.345Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:01:20.338Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T01:02:13.209Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T01:02:13.220Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:02:14.229Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:02:14.236Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:02:15.231Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417f1c5e6a2772df8898ad","timestamp":"2015-04-30T01:02:21.407Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T01:03:05.508Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T01:03:05.517Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:03:06.518Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:03:06.533Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:03:07.521Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417f4e5e6a2772df8898af","timestamp":"2015-04-30T01:03:11.752Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T01:03:58.416Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T01:03:58.424Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:03:59.436Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_boat.jpg.json","timestamp":"2015-04-30T01:03:59.443Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:04:00.439Z"}
+{"level":"info","message":"Upload successful!  Server responded with: <html>\r\n<head><title>413 Request Entity Too Large</title></head>\r\n<body bgcolor=\"white\">\r\n<center><h1>413 Request Entity Too Large</h1></center>\r\n<hr><center>nginx/1.4.6 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n","timestamp":"2015-04-30T01:04:01.008Z"}
+{"level":"info","message":"LISTENING ON 3000","timestamp":"2015-04-30T01:05:44.473Z"}
+{"level":"info","message":"UPTIME: 0s","timestamp":"2015-04-30T01:05:44.479Z"}
+{"level":"info","message":"Found JPG to upload.","timestamp":"2015-04-30T01:05:45.481Z"}
+{"level":"info","message":"JSON saved to ./public/uploads/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:05:45.486Z"}
+{"level":"info","message":"Found JSON to upload.","timestamp":"2015-04-30T01:05:46.483Z"}
+{"level":"info","message":"Upload successful!  Server responded with: 55417fec5e6a2772df8898b1","timestamp":"2015-04-30T01:05:49.326Z"}
+{"level":"info","message":"Archived:./public/archive/290415/json/gopro_test.jpg.json","timestamp":"2015-04-30T01:05:49.330Z"}
+{"level":"info","message":"Archived:./public/archive/290415/jpg/gopro/test.jpg","timestamp":"2015-04-30T01:05:49.330Z"}
