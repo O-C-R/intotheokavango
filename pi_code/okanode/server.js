@@ -22,6 +22,7 @@ var exec        = require('child_process').exec;
 var execFile    = require('child_process').execFile;
 var gm          = require('gm').subClass({imageMagick: true});
 var Twit        = require('twit');
+var rest        = require('restler');
 var colors      = require('colors');
 
 var portNum = 3000;
@@ -32,6 +33,9 @@ var upFreq = 5 * 60 * 1000;
 
 var picInterval = 10 * 60 * 1000; 
 var upTweet = false;
+
+var mothership = "http://intotheokavango.org/"
+//var mothership = "http://granu.local:7777/";
 
 //Make the Express app
 var app = express();
@@ -108,7 +112,7 @@ app.get('/takePic', function(req, res){
    });
 });
 
-app.get('/resetNetwtork', function(req, res){
+app.get('/resetNetwork', function(req, res){
    exec('sudo /home/pi/okavango/gopro/./setRoutes.sh', function(error, stdout, stderr) {
        res.json({output: stdout, error: stderr});
        if (stderr == ""){
@@ -173,7 +177,8 @@ resetNetwork = function(){
 
 //Queue & File Upload
 doQueue = function() {
-    if (!sending && active_connection) {
+
+    if (!sending) {
     	var jsonList = fs.readdirSync(filePath + "json");
     	//var imageList = fs.readdirSync(filePath + "jpg");
         var goProLeftList = fs.readdirSync(filePath + "jpg/left");
@@ -187,7 +192,7 @@ doQueue = function() {
     		for (var i = 0; i < jsonList.length; i++) {
     			if (jsonList[i].indexOf('json') != '-1') {
     				logger.log('info', "Found JSON to upload.");
-    				attemptUploadSighting(filePath + "json/" + jsonList[i]);
+    				attemptUploadJSON(filePath + "json/" + jsonList[i]);
                     chk = true;
     				break;
     			}	
@@ -394,7 +399,7 @@ resizeAndUpload = function(dirPath, fileName) {
 attemptUpload = function(filePath, endpoint) {
 	console.log("Attempting an upload on " + filePath);
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/upload', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+    var r = request.post({'uri': mothership + 'upload', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
         if (err) {
             sending = false;
             //Delete small file
@@ -416,7 +421,7 @@ attemptUpload = function(filePath, endpoint) {
 attemptUploadSensor = function(filePath) {
     console.log("Attempting an upload on " + filePath);
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sensor', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+    var r = request.post({'uri': mothership + 'ingest/sensor', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
         if (err) {
             sending = false;
             //Delete small file
@@ -435,6 +440,37 @@ attemptUploadSensor = function(filePath) {
 }
 
 attemptUploadImage = function(filePath, memberName, cameraName, tags) {
+
+    console.log("Attempting an image upload on " + filePath);
+    sending = true;
+
+    var json = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+    request({
+        method: 'POST',
+        uri: mothership + 'ingest/image',
+        //body: fs.createReadStream(filePath),
+        
+        attachments: [
+            {
+                'content-type': 'application/json',
+                body: JSON.stringify(json)
+            }
+        ],
+        
+      },
+      function (error, response, body) {
+        if (error) {
+          return console.error('Image upload failed:', error);
+        } else {
+            console.log('Image upload successful!  Server responded with:', body);
+            archive(filePath);
+        }
+        sending = false;
+      })
+
+
+    /*
     console.log("Attempting an upload on " + filePath);
     var formData = {
         custom_file: {
@@ -449,7 +485,7 @@ attemptUploadImage = function(filePath, memberName, cameraName, tags) {
         }
     };
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/image', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+    var r = request.post({'uri': mothership + 'ingest/image', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
         if (err) {
             sending = false;
             //Delete small file
@@ -463,16 +499,111 @@ attemptUploadImage = function(filePath, memberName, cameraName, tags) {
             sending = false;
         }
     });
+*/
 
     //var form = r.form();
     //form.append('filemeta', fs.createReadStream(filePath));
     //form.append('filearg', fs.createReadStream(filePath));
 }
 
-attemptUploadSighting = function(filePath) {
-    console.log("Attempting an upload on " + filePath);
+attemptUploadJSON = function(url) {
+    console.log("Attempting a JSON upload on " + url);
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sighting', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+
+    var file = fs.createReadStream(url);
+    var json = JSON.parse(fs.readFileSync(url, "utf8"));
+
+    var ingestType = '';
+    var ingestPath = 'jpg';
+    //Sighting
+    console.log(json);
+    if (json.Count != null) {
+        ingestType = "sighting";
+    } else if (json.ImageType != null) {
+        ingestType = "image";
+        ingestPath = "jpg";
+    } else if (json.SoundType != null) {
+        ingestType = "audio";
+        ingestPath = "mp3"
+    } else if (json.data != null) {
+        ingestType = "databoat"
+    }
+
+
+
+    var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) { 
+        if (err) {
+            sending = false;
+            return logger.error('upload failed:', err);
+        } else {
+            logger.info('Upload successful!  Server responded with:', body);
+            archive(url);
+            sending = false;
+        }
+    });
+
+    var form = r.form();
+    form.append('json', fs.createReadStream(url));
+    if (json.ResourceURL != null) {
+        var rPath = filePath + ingestPath + "/" + json.ResourceURL;
+        console.log("ADDING RESOURCE:" + rPath);
+        form.append('resource', fs.createReadStream(rPath));
+    }
+    /*
+
+    var formData = {
+      msg:"HELLO BRIAN.",
+      attachments: [
+        fs.createReadStream(filePath),
+      ]
+    };
+
+    request.post({url:mothership + "ingest/sighting", formData: formData}, function optionalCallback(err, httpResponse, body) {
+      if (err) {
+        return console.error('upload failed:', err);
+      }
+      console.log('Upload successful!  Server responded with:', body);
+    });
+*/
+
+    /*
+    
+    var file = fs.createReadStream(filePath);
+    console.log("FILE:" + file);
+
+    request({
+        method: 'POST',
+        uri: mothership + 'ingest/sighting',
+        preambleCRLF: true,
+        postambleCRLF: true,
+        //body: JSON.stringify(json),
+        
+        multipart: [
+                { body:'this is a test.'},
+                { body:'this is another test'},
+                { body:file }
+        ]   
+        
+        
+      },
+      function (error, response, body) {
+        if (error) {
+          return console.error('Sighting upload failed:', error);
+        } else {
+            console.log('Sighting upload successful!  Server responded with:', body);
+            archive(filePath);
+        }
+        sending = false;
+      })
+    */
+
+    
+
+    /*
+
+    
+
+    var r = request.post({'uri': mothership + 'ingest/sighting', formData:json, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
         if (err) {
             sending = false;
             //Delete small file
@@ -489,21 +620,23 @@ attemptUploadSighting = function(filePath) {
 
     var form = r.form();
     form.append('filearg', fs.createReadStream(filePath));
+    */
 }
 
 attemptUploadSound = function(filePath) {
+    /*
     console.log("Attempting an upload on " + filePath);
     var formData = {
         custom_file: {
             value:  fs.createReadStream(filePath),
             options: {
-                memberName: memberName,
-                tags: tags
+                memberName: "unknown",
+                tags: "null"
             }
         }
     };
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sound', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+    var r = request.post({'uri': mothership + 'ingest/sound', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
         if (err) {
             sending = false;
             //Delete small file
@@ -517,6 +650,7 @@ attemptUploadSound = function(filePath) {
             sending = false;
         }
     });
+   */
 }
 
 archive = function(filePath) {
@@ -661,35 +795,6 @@ app.post('/upload', function(req, res) {
         	res.send("FAIL. Unsupported extension.")
         }
     } else {
-        // JSON post - species report & sensor data
-        /*
-            SPECIES
-            { name: 'Open Billed Stork',
-              activity: 'R',
-              count: '2',
-              heading: '359.02390476',
-              lat: '42.749587235',
-              lon: '-73.39846097',
-              accuracy: '10.2',
-              accelX: '2.4',
-              accelY: '10.7',
-              accelZ: '5.2',
-              datetime: '298356893465' }
-            
-            ETHNO
-            { exhaustion: '5',
-              mood: 'excited',
-              lastSpoken: 'GB',
-              heading: '359.02390476',
-              lat: '42.749587235',
-              lon: '-73.39846097',
-              accuracy: '10.2',
-              accelX: '2.4',
-              accelY: '10.7',
-              accelZ: '5.2',
-              datetime: '298356893465' }
-
-        */
         //Just save JSON - upload to server will be handled by the queue
 
         if (!req.body.t_utc) {
