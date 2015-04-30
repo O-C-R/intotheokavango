@@ -135,10 +135,10 @@
 
         var loadSightingsData = function(callback) {
             d3.json(url, function(error,data) {
-                console.log("Initial Data", data.features); //data.features is an array of sightings objects
+                console.log("Initial Data", data); //data.features is an array of sightings objects
                 
                 //listSpecies(data.features);
-                getSpeciesCount(data.features);
+                getSpeciesCount(data.results.features);
                 makeTotalsViz(speciesCountArray);
 
                 // var f;

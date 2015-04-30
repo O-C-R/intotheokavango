@@ -634,6 +634,50 @@ hr{
       background-color: rgba(4, 0, 26, 0.65);
     }
 
+    #dataPage #data-header {
+      width: 100%;
+      height: auto;
+      background-color: rgba(4, 0, 26, 0.85);
+      padding:5px 1.4% 10px 1.4%;
+    }
+
+    #dataPage .title {
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+      font-weight: 700;
+      font-style: normal;
+      font-size: 44px;
+      text-transform: uppercase;
+      line-height: 1.5em;
+      letter-spacing: 0.2em;
+    }
+
+    #data-header ul#data-navigation{
+      float:right;
+      width:50%;
+      padding: 30px 1.4% 40px 1.4%;
+    }
+
+      ul#data-navigation li{
+        float:right;
+        display:inline-block;
+        text-align: center;
+/*      margin-right:-4px;
+        width:14.2%;*/
+        padding:0 3.0%;
+        cursor:pointer;
+        opacity: 0.6;
+        transition: opacity 0.15s;
+      }
+
+        ul#data-navigation li.active, ul#data-navigation li:hover{
+          opacity:1;
+        }
+
+    #data-content {
+      min-height: 800px;
+      padding: 30px 1.4% 40px 1.4%;
+    }
+
 
 
 svg.wanderer{

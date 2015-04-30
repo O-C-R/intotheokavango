@@ -76,6 +76,10 @@
       background-color: #eff4fb;
     }
 
+    #vizContainer {
+      margin-bottom: 20px;
+    }
+
     #totalsViz rect {
         fill: steelblue;
     }
@@ -103,6 +107,12 @@
       shape-rendering: crispEdges;
     }
 
+    .title {
+      font-weight: bold;
+      font: 12px sans-serif;
+      fill: #333;
+    }
+
     .line {
       fill: none;
       stroke: steelblue;
@@ -114,6 +124,11 @@
       stroke: steelblue;
       stroke-width: 1.5px;
     } 
+
+    .rect {
+      fill: steelblue;
+      stroke: none;
+    }
 
     circle {
         fill: none;

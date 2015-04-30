@@ -72,9 +72,59 @@
                                 { "featureType" : "sighting", "total" : 1500 },
                                 { "featureType" : "tweet", "total" : 790 }
                             ];
+
+            
+            var featuresCountArray = [];
+
+
+            //get the subtotals for all features
+            var getFeatureTypeTotals = function(callback) {
+                getFeatureTotalData("ambit");
+                getFeatureTotalData("ambit_geo");
+                getFeatureTotalData("audio");
+                getFeatureTotalData("beacon");
+                getFeatureTotalData("image");//subtypes for documentary, habitat(gopro) or specimen
+                getFeatureTotalData("sensor");//subtypes for air, water, etc
+                getFeatureTotalData("sighting");
+                getFeatureTotalData("tweet");
+                
+            }
+
+            //get the total for a feature_type
+            var getFeatureTotalData = function(featureType) {
+                var url = "http://dev.intotheokavango.org/api/features?FeatureType=" + featureType + "";
+                d3.json(url, function(error, data) {
+                    console.log(featureType + " data");
+                    // console.log(data);
+                    var featuresCountObj = {};
+                    featuresCountObj.featureType = featureType;
+                    featuresCountObj.total = data.total;
+                    featuresCountArray.push(featuresCountObj);
+                });
+            }
+
+            var getFeaturesCount = function(features) {
+
+                for (var i = 0; i < features.length; ++i) {
+                    if (!featuresCountObj.hasOwnProperty(sightings[i].properties.BirdName)) {
+                        featuresCountObj[sightings[i].properties.BirdName] = 0;
+                        console.log("doesn't have species property");
+                    }
+                    featuresCountObj[sightings[i].properties.BirdName] += sightings[i].properties.Count;
+                }
+                console.log(Object.keys(speciesCountObj));
+
+                for (s in featuresCountObj){
+                    myObj = {};
+                    myObj.species = s;
+                    myObj.count  = featuresCountObj[s];
+                    featuresCountArray.push(myObj);
+                }
+                console.log(featuresCountArray);
+            }
             
             var makeTotalsViz = function(data) {
-
+                console.log("MAKE TOTALS VIZ");
                 var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
                     width = 800 - margin.left - margin.right,
                     barHeight = 20,
@@ -125,7 +175,7 @@
                     .text(function(d) { return d.featureType; });
             }
             
-            makeTotalsViz(dummyData);
+            //makeTotalsViz(featuresCountArray);
             
             //TIMESERIES VIZ
                 var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
@@ -161,14 +211,15 @@
                 var parsedSighting = [];
                 var parsedTweet = [];
 
-                var url = "http://dev.intotheokavango.org/api/features?limit=2000";
+                var url = "http://dev.intotheokavango.org/api/features?limit=200";
                 
                 function loadData(callback) {
                     d3.json(url, function(error, data) {
+                        console.log(data);
                         var f;
 
-                        for(d in data.features) {
-                            item = data.features[d];
+                        for(d in data.results.features) {
+                            item = data.results.features[d];
                             //console.log(item);
                             f = parseFeatures(item);
                             //console.log(f);
@@ -209,11 +260,12 @@
                         // console.log(parsedImage);
                         // console.log("TWEET");
                         // console.log(parsedTweet);
-
+                        getFeatureTypeTotals();
                         makeBinnedData(parsedActivity); //make sure data is loaded before binning
                         drawLineGraph(parsedActivity);
-
+                        makeTotalsViz(featuresCountArray);
                     });
+                    
 
 
 

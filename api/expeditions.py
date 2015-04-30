@@ -2,7 +2,7 @@ import geojson
 from housepy import config, log, util
 from pymongo import ASCENDING, DESCENDING
 
-def assemble(self, search, limit, order):
+def assemble(self, search, limit, order, resolution):
     log.info("expeditions.assemble")
     expeditions = {}
     try:

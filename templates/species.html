@@ -20,8 +20,8 @@
     </div>
     <script type="text/javascript">
 
-        // var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting&BirdName=African%20Pygmy%20Goose";
-        var url = "{{ query }}";
+         var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting&BirdName=Hippo";
+        // var url = "{{ query }}";
 
         var parseSpeciesSighting = function(item) {
             if(item["properties"].hasOwnProperty("BirdName")) {
@@ -102,10 +102,10 @@
 
         var loadSpeciesData = function() {
             d3.json(url, function(error, data) {
-                console.log("Initial Data", data.features);
+                console.log("Initial Data", data);
 
-                for (d in data.features) {
-                    item = data.features[d];
+                for (d in data.results.features) {
+                    item = data.results.features[d];
 
                     f = parseSpeciesSighting(item);
                     parsedSpeciesSighting.push(f);

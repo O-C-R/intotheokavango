@@ -1,7 +1,7 @@
 import geojson
 from housepy import config, log
 
-def assemble(self, search, limit, order):
+def assemble(self, search, limit, order, resolution):
     log.info("expeditions.assemble")
     members = {}
     try:
