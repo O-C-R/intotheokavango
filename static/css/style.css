@@ -478,20 +478,34 @@ hr{
         }
 
           #team h2{
-            margin-bottom: 8px;
+            margin-bottom: 30px;
           }
+
+            #team h2 span.title{
+              /*font-family: 'Montserrat', arial, sans-serif;*/
+              font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+              font-weight: 700;
+              font-style: normal;
+              font-size: 9px;
+              text-transform: uppercase;
+              color:#4BFF87;
+              line-height: 0;
+              margin-top:8px;
+              margin-bottom:8px;
+              display:block;
+            }
 
           #team p{
             margin-bottom: 70px;
             font-size: 16px;
-            line-height: 1.5em;
+            line-height: 1.8em;
           }
 
           #team p:last-child{
             margin-bottom: 0;
           }
 
-            #team p span{
+            #team p span.title{
               /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
@@ -499,17 +513,24 @@ hr{
               font-size: 9px;
               text-transform: uppercase;
               opacity: 0.75;
+              text-align: right;
+              display: block;
+              float:right;
+            }
+
+            #team p span.explorer{
+              color:#4BFF87;
             }
 
         #team div.social{
           text-align: left;
-          margin-bottom: 35px;
+          margin-bottom: -5px;
           width:100%;
           overflow: hidden;
         }
 
         #team div.logos{
-          text-align: left;
+          text-align: right;
           position:absolute;
           bottom:100px;
           width:40%;
