@@ -347,7 +347,7 @@ hr{
 
         #introduction #intro div.column:first-child p{
           text-align: right;
-          padding-left:25%;
+          padding-left:27%;
           margin-bottom:40px;
         }
 
@@ -509,12 +509,12 @@ hr{
               font-style: normal;
               font-size: 9px;
               text-transform: uppercase;
-              color:#4BFF87;
               line-height: 0;
               margin-top:8px;
               margin-bottom:8px;
               display:block;
               position: absolute;
+              color:rgba(255,255,255,0.75);
             }
 
           #team p{
@@ -540,8 +540,20 @@ hr{
               float:right;
             }
 
-            #team p span.explorer{
-              color:#4BFF87;
+            span.explorerBox{
+              display:inline-block;
+              width:5px;
+              height:8px;
+              border: 2px solid #f6d13a;
+              vertical-align: middle;
+              margin-left: 5px;
+              margin-top:-2px;
+            }
+
+            span.explorerBox.legend{
+              margin-left: 0;
+              margin-right: 5px;
+              margin-top:-3px;
             }
 
         #team div.social{
