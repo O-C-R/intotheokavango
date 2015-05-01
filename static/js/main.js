@@ -212,11 +212,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 	function setVimeoCover(){
+		console.log('1');
 		var player = d3.select('iframe').node();
 	    var playerOrigin = '*';
 
         window.addEventListener('message', onMessageReceived, false);
 	    function onMessageReceived(event) {
+	    	console.log('2');
 	        if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
 	            return false;
 	        }	        
@@ -224,11 +226,13 @@ document.addEventListener('DOMContentLoaded', function(){
 	            playerOrigin = event.origin;
 	        }
 	        var data = JSON.parse(event.data);
+	    	console.log(data.event);
 	        if(data.event == 'ready') onReady();
 	        if(data.event == 'play') onPlay();
 	    }
 
 	    function onReady() {
+	    	console.log('3');
 	        var data = {
 	          method: 'addEventListener',
 	          value: 'play'
@@ -238,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    }
 
 	    function onPlay(){
+	    	console.log('4');
 	    	d3.select('#aboutPage #video div.cover')
 	    		.transition()
 	    		.style('opacity',0)
