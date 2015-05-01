@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         window.addEventListener('message', onMessageReceived, false);
 	    function onMessageReceived(event) {
-	    	console.log('2');
+	    	console.log('2', event.origin);
 	        if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
 	            return false;
 	        }	        
