@@ -54,6 +54,8 @@ var paused = false;
 
 document.addEventListener('DOMContentLoaded', function(){
 
+	setVimeoCover();
+
     map = new L.map('map', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
@@ -133,7 +135,8 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
 
 
-	function setLayoutInteractions(){	
+	function setLayoutInteractions(){			
+
 		d3.selectAll('#navigation li')
 	    	.on('click',function(){
 	    		var btn = d3.select(this);
@@ -197,14 +200,51 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
 
-		timeline.resize();
+		if(timeline) timeline.resize();
 	}
+
 
 	function getBodyHeight(){
 		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
 		var headerHeight = d3.select('#header').node().clientHeight;
 		return containerHeight - headerHeight;
 	}
+
+
+	function setVimeoCover(){
+		var player = d3.select('iframe').node();
+	    var playerOrigin = '*';
+
+        window.addEventListener('message', onMessageReceived, false);
+	    function onMessageReceived(event) {
+	        if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
+	            return false;
+	        }	        
+	        if (playerOrigin === '*') {
+	            playerOrigin = event.origin;
+	        }
+	        var data = JSON.parse(event.data);
+	        if(data.event == 'ready') onReady();
+	        if(data.event == 'play') onPlay();
+	    }
+
+	    function onReady() {
+	        var data = {
+	          method: 'addEventListener',
+	          value: 'play'
+	        };
+	        var message = JSON.stringify(data);
+	        player.contentWindow.postMessage(data, playerOrigin);
+	    }
+
+	    function onPlay(){
+	    	d3.select('#aboutPage #video div.cover')
+	    		.transition()
+	    		.style('opacity',0)
+	    		.remove();
+	    }
+	}
+
 });
 
 

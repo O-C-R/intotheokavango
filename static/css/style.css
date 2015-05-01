@@ -243,6 +243,23 @@ hr{
       position:relative;
     }
 
+      #aboutPage #video div.cover{
+        position:absolute;
+        z-index:10;
+        display: block;
+        height:100%;
+        width:100%;
+        background-image: url("../img/vimeoCover.jpg");
+      }
+
+        #aboutPage #video div.cover img{
+          top:50%;
+          position:absolute;
+          opacity:0.6;
+          margin-top:-17.5px;
+          margin-left:-17.5px;
+        }
+
       #video .vimeoContainer{
         position:absolute;
         z-index:0;
