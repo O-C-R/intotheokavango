@@ -493,10 +493,11 @@ hr{
               margin-top:8px;
               margin-bottom:8px;
               display:block;
+              position: absolute;
             }
 
           #team p{
-            margin-bottom: 70px;
+            margin-bottom: 75px;
             font-size: 16px;
             line-height: 1.8em;
           }
@@ -857,16 +858,10 @@ svg.wanderer{
     min-width:540px;
   }
 
-  #header{
-    padding-bottom: 80px !important;
-    width:80% !important;
-  }
-
   #navigation{
     float:none;
     position:absolute;
     top:80px;
-    width:80% !important;
   }
 
     #navigation li.teaser{
@@ -892,6 +887,47 @@ svg.wanderer{
 
   #aboutPage div.column:not(:first-child){
     margin-top: 70px;
+  }
+
+  #team div.logos{
+    text-align: left;
+    width:100%;
+  }
+
+  #header{
+    padding: 70px 0 120px 0 !important;
+  }
+
+  #header #title{
+    width:100%;
+  }
+
+  #header #title{
+    text-align: center;
+  }
+
+  #header #navigation{
+    text-align: center;
+    width:93% !important;
+    padding:0 !important;
+    margin:auto;
+    margin-top:35px;
+  }
+
+  #cta{
+    margin-top:16px;
+  }
+
+  #team div.background{
+    display:none;
+  }
+
+  #team div.content{
+    padding-top:0;
+  }
+
+  #team div.logos{
+    bottom:75px;
   }
 
 }
