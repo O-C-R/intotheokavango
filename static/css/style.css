@@ -472,12 +472,13 @@ hr{
               display:block;
               position:absolute;
               width:100%;
-              z-index:-2;
+              z-index:0;
               opacity: 0 !important;
             }
 
             #team div.background div.slides img:nth-child(2){
-              z-index:-1;
+              opacity: 1 !important;
+              z-index:0;
             }
 
           #team div.background div.overlay{
