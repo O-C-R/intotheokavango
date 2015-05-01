@@ -11,6 +11,7 @@ function Loader(){
 	var tweets = [];
 	var photos = [];
 	var members = {};	
+	var dayOffset = 5;
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
@@ -34,10 +35,10 @@ function Loader(){
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
-		
+			data = data.results;		
 		    L.geoJson(data, {
 		        filter: function(feature, layer) {
 			        return (feature.geometry.coordinates[0] != 0);
@@ -75,9 +76,10 @@ function Loader(){
 
 
 	function loadTweets(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
+			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		            return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
@@ -93,9 +95,10 @@ function Loader(){
 
 
 	function loadPhotos(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_14&expeditionDay='+(day+5)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
+			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// ???

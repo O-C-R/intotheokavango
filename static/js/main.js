@@ -27,6 +27,8 @@
 	- remove feed elements that happened before of after the expedition
 	- highlight new days' meta node
 	- handle scrollbar event for feed navigation?
+	- tweets offset by one day
+	- there are 2 getBodyHeight functions
 
 */
 
@@ -68,7 +70,9 @@ document.addEventListener('DOMContentLoaded', function(){
         zoom:17
     });
 
-    if(d3.selectAll('#navigation li')[0].length > 1){
+
+
+    if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
 	    pages.about = AboutPage('about');
 	    pages.map = MapPage('map');    
@@ -84,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
     wanderer = Wanderer(map.getCenter());
 
-    if(d3.selectAll('#navigation li')[0].length > 1){
+    if(d3.selectAll('#navigation li')[0].length > 3){
 		pages.map.show();
 		setLayoutInteractions();
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
@@ -137,17 +141,27 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		pages.active.hide();
 	    		pages[t].show();
 	    		resize();
-	    	})
+	    	});
 
 		d3.select('#contentContainer')
 	    	.on('mousewheel',function(){
 	    		if(pages.active.id == 'map') timeline.navigateMap(d3.event.wheelDeltaY);
-	    	})
+	    	});
 
 	    d3.select('#mapPage')
 	    	.on('click',function(){
 	    		if(pages.active.id == 'map') timeline.togglePause();
-	    	})
+	    	});
+
+	    d3.select('a.control-zoom-out')
+	    	.on('click',function(){
+	    		map.setZoom(Math.constrain(map.getZoom()-1,9,17));
+	    	});
+
+	    d3.select('a.control-zoom-in')
+	    	.on('click',function(){
+	    		map.setZoom(Math.constrain(map.getZoom()+1,9,17));
+	    	});
 		
 		window.addEventListener('resize',resize);
 		resize();
@@ -168,15 +182,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 	function resize(){
-		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
-		var headerHeight = d3.select('#header').node().clientHeight;
-		var height = containerHeight - headerHeight;
+		var height = getBodyHeight();
 
 		d3.select('#mapPage')
 			.style('height',height+'px');
 
 		d3.select('#timeline')
-			.style('height',(height-70)+'px');
+			.style('height',(height-60)+'px');
 
 		d3.select('#video')
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px');
@@ -184,6 +196,14 @@ document.addEventListener('DOMContentLoaded', function(){
 		d3.select('#video iframe')
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
+
+		timeline.resize();
+	}
+
+	function getBodyHeight(){
+		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
+		var headerHeight = d3.select('#header').node().clientHeight;
+		return containerHeight - headerHeight;
 	}
 });
 
