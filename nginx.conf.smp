@@ -21,7 +21,7 @@ http {
 
     server {        
         listen       80;
-        server_name  intotheokavango.org 54.250.153.221;
+        server_name  intotheokavango.org 23.23.124.78;
         location / {
             proxy_pass_header Server;   
             proxy_set_header Host $http_host;
