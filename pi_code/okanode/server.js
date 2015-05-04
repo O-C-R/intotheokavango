@@ -63,7 +63,7 @@ totalsOut['mp3'] = 0
 
 var connectedW1 = false;
 var connectedB1 = false;
-var connectedB2 = false;
+var connectedW2 = false;
 
 // connect to iridium network
 var checking_connection = false;
@@ -143,13 +143,13 @@ testConnect = function(callback){
         logger.error("Connected to w1");
         connectedW1 = true;
     }
-    exec('ping -I wlan2 -c 2 wlan1 10.5.5.9', function(error, stdout, stderr) {
+    exec('ping -I wlan2 -c 2 10.5.5.9', function(error, stdout, stderr) {
       if (error != null){
-        logger.error("Can't connect to b2");
-        connectedB2 = false;
+        logger.error("Can't connect to w2");
+        connectedW2 = false;
       } else {
-        logger.error("Connected to b2")
-        connectedB2 = true;
+        logger.error("Connected to w2")
+        connectedW2 = true;
       }
       exec('ping -I wlan3 -c 2 10.5.5.8', function(error, stdout, stderr) {
       if (error != null){
@@ -453,7 +453,7 @@ archive = function(filePath) {
 	mkdirSync("./public/archive/" + dt + "/json");
 	mkdirSync("./public/archive/" + dt + "/mp3");
 	mkdirSync("./public/archive/" + dt + "/jpg");
-        mkdirSync("./public/archive/" + dt + "/jpg/gopro");
+  mkdirSync("./public/archive/" + dt + "/jpg/gopro");
 	mkdirSync("./public/archive/" + dt + "/tweet");
 
 	var archPath = filePath.replace('uploads', 'archive/' + dt);
@@ -610,7 +610,7 @@ app.post('/upload', function(req, res) {
 //Status report!
 app.get('/status', function(req, res){
   testConnect(function(){
-     res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to B2 (right):' + connectedB2 + '</h3></body></html>');
+     res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
   });
 });
 
