@@ -68,6 +68,9 @@ function TweetPost(feature){
 	var message = feature.properties.Tweet.text;
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
 	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
+
+	// console.log(new Date(feature.properties.t_utc*1000), t.message);
+
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
 	var photoUrl;

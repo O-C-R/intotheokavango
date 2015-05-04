@@ -9,7 +9,8 @@
 
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
   <link rel="stylesheet" type="text/css" href="//cloud.typography.com/6479954/729546/css/fonts.css" />
-  
+  <script src="static/js/d3.min.js"></script>
+  <script src="static/js/vimeoCover.js"></script>
 
 {% endblock head %}
 
@@ -24,8 +25,22 @@
 
   <div id="contentContainer">
     <div id="header">
-      <ul id="navigation">
-        <li class="teaser">Expedition starts on May 16th, <a href="https://twitter.com/intotheokavango">follow us!</a></li>
+      <ul id="navigation" class="logos">
+        <li>
+          <a href="http://www.nationalgeographic.com/">
+            <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+          </a>
+        </li>
+        <li>
+          <a href="http://www.o-c-r.org/">
+            <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+          </a>
+        </li>
+        <li>
+          <a href="http://www.wildbirdtrust.com/">
+            <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+          </a>
+        </li>
       </ul>
       <div id="title">
         <h1>Into the Okavango 2015</h1>
@@ -36,13 +51,20 @@
     <div id="pageContainer">
       <div id="aboutPage" class="page hidden">
         <div id="video">
+          <div class="cover">
+            <img src="static/img/spinner.gif" alt="loader">
+          </div>
           <div class="vimeoContainer">
-            <iframe src="https://player.vimeo.com/video/124421450?autoplay=1" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            <iframe src="https://player.vimeo.com/video/124421450?autoplay=1&api=1" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
           </div>
         </div>
         <div id="introduction">
-          <div class="row">
+          <div id="cta">
+            <a href="https://twitter.com/intotheokavango"><p>Expedition starts on May 16<span>th</span>, follow us!</p></a>
+          </div>
+          <div class="row" id="intro">
             <div class="column">
+              <p>90 days, 1,000 miles, 3 countries, 2 rivers, 31 adventurers, 100% open data.<br> Join us in real-time as we explore</p>
               <h1>The beating heart of our planet</h1>
             </div>
             <div class="column">
@@ -90,7 +112,6 @@
               <img src="static/img/slides/0.jpg"/>
               <img src="static/img/slides/1.jpg"/>
               <img src="static/img/slides/2.jpg"/>
-              <img src="static/img/slides/3.jpg"/>
             </div>
             <div class="overlay"></div>
           </div>
@@ -98,26 +119,12 @@
           <div class="content">
             <div class="column">
               <h2>
-                Expedition team
+                Expedition team<br><span class="title"><span class="explorerBox legend"></span> National Geographic Emerging Explorers</span>
               </h2>
               <p>
-                Alex Paullin <span>(Camp Logistics)</span>Asher Jay <span>(Artist), </span>Brian House <span>(Data Artist), </span>Chris Boyes <span>(Expedition Leader), </span>Giles Trevethick <span>(Research Coordinator), </span>Gobonamang Kgetho <span>(Poler), </span>Goitseone Basiamang <span>(Poler), </span>Gregg Treinish <span>(Sensor Network Deployment), </span>James Kydd <span>(Expedition photographer), </span>Jer Thorp <span>(Data Artist), </span>John Hilton <span>(Expedition Director), </span>Karen Ross <span>(Botswana WHS Bid Leader), </span>Kgalalela Mpetsang <span>(Poler), </span>Khunowa Mathare  <span>(Poler), </span>Leillamang Kgetho <span>(Poler), </span>Pieter Hugo <span>(Camp Logistics), </span>Shah Selbe <span>(Expedition Technologist), </span>Steve Boyes <span>(Project Leader), </span>
+                Alex Paullin <span class="title">Camp Logistics</span><br>Asher Jay<span class="explorerBox"></span> <span class="title">Artist</span><br>Brian House <span class="title">Data Artist</span><br>Chris Boyes <span class="title">Expedition Leader</span><br>Giles Trevethick <span class="title">Research Coordinator</span><br>Gobonamang Kgetho <span class="title">Poler</span><br>Goitseone Basiamang <span class="title">Poler</span><br>Gregg Treinish<span class="explorerBox"></span> <span class="title">Sensor Network Deployment</span><br>James Kydd <span class="title">Expedition photographer</span><br>Jer Thorp<span class="explorerBox"></span> <span class="title">Data Artist</span><br>John Hilton <span class="title">Expedition Director</span><br>Karen Ross <span class="title">Botswana WHS Bid Leader</span><br>Kgalalela Mpetsang <span class="title">Poler</span><br>Khunowa Mathare  <span class="title">Poler</span><br>Leillamang Kgetho <span class="title">Poler</span><br>Pieter Hugo <span class="title">Camp Logistics</span><br>Shah Selbe<span class="explorerBox"></span> <span class="title">Expedition Technologist</span><br>Steve Boyes<span class="explorerBox"></span> <span class="title">Project Leader</span><br>
               </p>
-              <h2>
-                Scientific team
-              </h2>
-              <p>
-                Adjany Costa <span>(Ichthyologist and Ornithologist), </span>Bill Branch <span>(Herpetologist), </span>David Goyder <span>(Botanist - Kew Gardens), </span>Gotz Neef <span>(Botanist & Entomologist)</span>Matt Janks <span>(Botanist), </span>Nigel Barker <span>(Botanist), </span>Nkosinathi Mazungula <span>(Ichthyologist), </span>Paul Skelton <span>(Ichthyologist), </span>Francisco Maiato <span>(Botsanist), </span>
-              </p>
-            </div>
-            <div class="column">
-              <h2>
-                Documentary team
-              </h2>
-              <p>
-                Alexandra Fuller <span>(Writer)</span>Cory Richards <span>(Photographer), </span>Mark Stone <span>(Assistant), </span>Neil Gelinas <span>(Filmmaker), </span>
-              </p>
-              <h2>And you!<br>Help us spread the word</h2>
+              <h2>And you! Help us spread the word</h2>
               <div class="social">
                 <span class='st_sharethis_large' displayText='ShareThis'></span>
                 <span class='st_facebook_large' displayText='Facebook'></span>
@@ -125,9 +132,31 @@
                 <span class='st_googleplus_large' displayText='Google +'></span>
                 <span class='st_email_large' displayText='Email'></span>
               </div>
+            </div>
+            <div class="column">
+              <h2>
+                Scientific team
+              </h2>
+              <p>
+                Adjany Costa <span class="title">Ichthyologist and Ornithologist</span><br>Bill Branch <span class="title">Herpetologist</span><br>David Goyder <span class="title">Botanist - Kew Gardens</span><br>Gotz Neef <span class="title">Botanist & Entomologist</span><br>Matt Janks <span class="title">Botanist</span><br>Nigel Barker <span class="title">Botanist</span><br>Nkosinathi Mazungula <span class="title">Ichthyologist</span><br>Paul Skelton <span class="title">Ichthyologist</span><br>Francisco Maiato <span class="title">Botsanist</span><br>
+              </p>
+              <h2>
+                Documentary team
+              </h2>
+              <p>
+                Alexandra Fuller<span class="title">Writer</span><br>Cory Richards<span class="title">Photographer</span><br>Mark Stone <span class="title">Assistant</span><br>Neil Gelinas <span class="title">Filmmaker</span>
+              </p>
+              
               <div class="logos">
-                <img src="static/img/natgeoLogo.svg" width="30%"/>
-                <img src="static/img/ocrLogo.svg" width="12%"/>
+                <a href="http://www.nationalgeographic.com/">
+                  <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+                </a>
+                <a href="http://www.o-c-r.org/">
+                  <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+                </a>
+                <a href="http://www.wildbirdtrust.com/">
+                  <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+                </a>
               </div>
             </div>
           </div>
@@ -186,7 +215,6 @@
   <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
   <script type="text/javascript">stLight.options({publisher: "7765ee40-a267-44e3-81df-557c161bd941", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 
-  <script src="static/js/d3.min.js"></script>
   <script src="static/js/leaflet.js"></script>
   <script src="static/js/dataPage.js"></script>
   <script src="static/js/feed.js"></script>

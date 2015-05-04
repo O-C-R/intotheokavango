@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3 (11970) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard 2 Copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="MAP" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="MAP-Copy" sketch:type="MSLayerGroup" transform="translate(7.000000, -14.000000)" fill="#000000">
+            <g id="Zoom" sketch:type="MSShapeGroup">
+                <path d="M11.1428571,28 L12,28 L12,26 L11.1428571,26 L0.857142857,26 L0,26 L0,28 L0.857142857,28 L11.1428571,28 Z" id="Line-2"></path>
+                <path d="M5,32.1428571 L5,33 L7,33 L7,32.1428571 L7,21.8571429 L7,21 L5,21 L5,21.8571429 L5,32.1428571 L5,32.1428571 Z" id="Line-3"></path>
+            </g>
+        </g>
+        <g id="Artboard-2-Copy" sketch:type="MSArtboardGroup"></g>
+    </g>
+</svg>

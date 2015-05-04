@@ -21,20 +21,7 @@ http {
 
     server {        
         listen       80;
-        server_name  intotheokavango.org;
-        location / {
-            proxy_pass_header Server;   
-            proxy_set_header Host $http_host;
-            proxy_set_header Destination $http_destination;           
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Scheme $scheme;
-            proxy_pass http://127.0.0.1:9999;
-        }
-    }
-    
-    server {        
-        listen       80;
-        server_name  54.250.153.221;
+        server_name  intotheokavango.org 23.23.124.78;
         location / {
             proxy_pass_header Server;   
             proxy_set_header Host $http_host;
