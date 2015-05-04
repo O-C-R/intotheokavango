@@ -143,7 +143,7 @@ testConnect = function(callback){
         logger.error("Connected to w1");
         connectedW1 = true;
     }
-    exec('ping -I wlan2 -c 2 wlan1 10.5.5.10', function(error, stdout, stderr) {
+    exec('ping -I wlan2 -c 2 wlan1 10.5.5.9', function(error, stdout, stderr) {
       if (error != null){
         logger.error("Can't connect to b2");
         connectedB2 = false;
@@ -181,9 +181,6 @@ doQueue = function() {
     if (!sending) {
     	var jsonList = fs.readdirSync(filePath + "json");
     	var goproList = fs.readdirSync(filePath + "jpg/gopro");
-        var goProLeftList = fs.readdirSync(filePath + "jpg/left");
-        var goProCenterList = fs.readdirSync(filePath + "jpg/center");
-        var goProRightList = fs.readdirSync(filePath + "jpg/right");
     	var mp3List = fs.readdirSync(filePath + "mp3");
         var tweetList = fs.readdirSync(filePath + "tweet");
         var chk = false;
@@ -257,8 +254,6 @@ doQueue = function() {
                     }); 
 
                     // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    //attemptUploadImage(filePath + "jpg/left/" + imageList[i], "NULL", "left", "NULL");
                     chk = true;
                     break;
                 }   
@@ -268,54 +263,11 @@ doQueue = function() {
 
             
         }
-        if (goProLeftList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProLeftList.length; i++) {
-                if (goProLeftList[i].indexOf('jpg') != '-1') {
-                    logger.log('info', "Found JPG to upload.");
-
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/left/" + imageList[i], "NULL", "left", "NULL");
-                    chk = true;
-                    break;
-                }   
-            }
-        }
-        if (goProCenterList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProCenterList.length; i++) {
-                if (goProCenterList[i].indexOf('jpg') != '-1') {
-                    logger.log('info', "Found JPG to upload.");
-
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/center/" + imageList[i], "NULL", "center", "NULL");
-                    chk = true;
-                    break;
-                }   
-            }
-        }
-        if (goProRightList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProRightList.length; i++) {
-                if (goProRightList[i].indexOf('jpg') != '-1') {
-                    logger.log('info', "Found JPG to upload.");
-
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/right/" + imageList[i], "NULL", "right", "NULL");
-                    chk = true;
-                    break;
-                }   
-            }
-        }
     	if (mp3List.length > 0 && !chk) {
     		//Or at last resort, a sound file!
     		for (var i = 0; i < mp3List.length; i++) {
     			if (mp3List[i].indexOf('mp3') != '-1') {
     				//console.log("Found mp3 to upload.");
-    				attemptUploadSound(filePath + "mp3/" + mp3List[i]);
     				break;
     			}	
     		}
@@ -399,101 +351,23 @@ var __fileName;
 var __newName;
 var toArchive = null;
 
-resizeAndUpload = function(dirPath, fileName) {
+resize = function(dirPath, fileName, callback) {
     __dirPath = dirPath;
     __fileName = fileName;
     fileFront = fileName.split('.')[0];
     fileExt = fileName.split('.')[1];
     __newName = dirPath + fileFront + "_small." + fileExt;
     __newName = __newName.replace('uploads', 'temp')
+    console.log("resize name " + __newName);
     logger.info("filename: " + dirPath + fileName);
-    sending= true;
-    gm(dirPath + fileName).resize(50).write(__newName, function(err) {
+    gm(dirPath + fileName).resize(1024).write(__newName, function(err) {
         if (err) {
             logger.error(err);
+            console.log(err);
         } else {
-            attemptUpload(__newName);
-            //This needs to only happen at the end.
-            toArchive = __dirPath + __fileName;
-            //archive(__dirPath + __fileName)
+            callback(__newName);
         }
     });
-    
-}
-
-attemptUpload = function(filePath, endpoint) {
-	console.log("Attempting an upload on " + filePath);
-    sending = true;
-    var r = request.post({'uri': mothership + 'upload', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            //Delete small file
-            if (filePath.indexOf('small') != -1) fs.unlinkSync(filePath);
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
-            sending = false;
-        }
-	});
-
-    var form = r.form();
-    form.append('filearg', fs.createReadStream(filePath));
-}
-
-attemptUploadSensor = function(filePath) {
-    console.log("Attempting an upload on " + filePath);
-    sending = true;
-    var r = request.post({'uri': mothership + 'ingest/sensor', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
-            sending = false;
-        }
-    });
-    var form = r.form();
-    form.append('filearg', fs.createReadStream(filePath));
-}
-
-attemptUploadImage = function(filePath, memberName, cameraName, tags) {
-
-    console.log("Attempting an image upload on " + filePath);
-    sending = true;
-
-    var json = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-    request({
-        method: 'POST',
-        uri: mothership + 'ingest/image',
-        //body: fs.createReadStream(filePath),
-        
-        attachments: [
-            {
-                'content-type': 'application/json',
-                body: JSON.stringify(json)
-            }
-        ],
-        
-      },
-      function (error, response, body) {
-        if (error) {
-          return console.error('Image upload failed:', error);
-        } else {
-            console.log('Image upload successful!  Server responded with:', body);
-            archive(filePath);
-        }
-        sending = false;
-      })
-
 
 }
 
@@ -508,6 +382,7 @@ attemptUploadJSON = function(url) {
     var ingestPath = 'jpg';
 
     var rPath = null;
+    var origPic = null;
     //Sighting
     console.log(json);
     if (json.Count != null) {
@@ -522,9 +397,8 @@ attemptUploadJSON = function(url) {
         ingestType = "databoat"
     }
 
-
-
-    var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) { 
+    if (ingestType != "image"){
+	var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
         if (err) {
             sending = false;
             return logger.error('upload failed:', err);
@@ -535,47 +409,39 @@ attemptUploadJSON = function(url) {
             if (rPath) archive(rPath);
             sending = false;
         }
-    });
-
-    var form = r.form();
-    form.append('json', fs.createReadStream(url));
-    if (json.ResourceURL != null) {
-        rPath = filePath + ingestPath + "/" + json.ResourceURL;
-        console.log("ADDING RESOURCE:" + rPath);
-        form.append('resource', fs.createReadStream(rPath));
-        //
-    }
-
-}
-
-attemptUploadSound = function(filePath) {
-    /*
-    console.log("Attempting an upload on " + filePath);
-    var formData = {
-        custom_file: {
-            value:  fs.createReadStream(filePath),
-            options: {
-                memberName: "unknown",
-                tags: "null"
-            }
-        }
-    };
-    sending = true;
-    var r = request.post({'uri': mothership + 'ingest/sound', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+       });
+       var form = r.form();
+       form.append('json', fs.createReadStream(url));
+       if (json.ResourceURL != null) {
+          rPath = filePath + ingestPath + "/" + json.ResourceURL;
+          console.log("ADDING RESOURCE:" + rPath);
+          form.append('resource', fs.createReadStream(rPath));
+       }
+    } else {
+      resize(filePath + ingestPath + "/", json.ResourceURL, function(newName){
+       var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
         if (err) {
             sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
             return logger.error('upload failed:', err);
         } else {
             logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
+            console.log("ARCHIVING " + url);
+            archive(url);
+            if (rPath) archive(rPath);
+            if (origPic) archive(origPic);
             sending = false;
         }
+       });
+       var form = r.form();
+       form.append('json', fs.createReadStream(url));
+       if (json.ResourceURL != null) {
+             rPath = newName;
+             origPic = filePath + ingestPath + "/" + json.ResourceURL;
+             console.log("ADDING RESOURCE:" + rPath);
+             form.append('resource', fs.createReadStream(rPath));
+       }
     });
-   */
+   }	     
 }
 
 archive = function(filePath) {
@@ -587,10 +453,7 @@ archive = function(filePath) {
 	mkdirSync("./public/archive/" + dt + "/json");
 	mkdirSync("./public/archive/" + dt + "/mp3");
 	mkdirSync("./public/archive/" + dt + "/jpg");
-    mkdirSync("./public/archive/" + dt + "/jpg/left");
-    mkdirSync("./public/archive/" + dt + "/jpg/center");
-    mkdirSync("./public/archive/" + dt + "/jpg/right");
-    mkdirSync("./public/archive/" + dt + "/jpg/gopro");
+        mkdirSync("./public/archive/" + dt + "/jpg/gopro");
 	mkdirSync("./public/archive/" + dt + "/tweet");
 
 	var archPath = filePath.replace('uploads', 'archive/' + dt);
