@@ -21,18 +21,18 @@ set daemon 120
 set httpd port 2812 and use address localhost   # configure monitoring webservice
   allow 0.0.0.0/0.0.0.0                         # Allow everything to connect  
 
-check process main6666 with pidfile /mnt/okavango_15/run/main6666.pid
-  start program = "/usr/bin/python3 /mnt/okavango_15/main.py 6666" 
+check process main6666 with pidfile /home/ubuntu/okavango/run/main6666.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 6666" 
   stop program = "/bin/pwd"
 
-check process main7777 with pidfile /mnt/okavango_15/run/main7777.pid
-  start program = "/usr/bin/python3 /mnt/okavango_15/main.py 7777" 
+check process main7777 with pidfile /home/ubuntu/okavango/run/main7777.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 7777" 
   stop program = "/bin/pwd"
 
-check process main8888 with pidfile /mnt/okavango_15/run/main8888.pid
-  start program = "/usr/bin/python3 /mnt/okavango_15/main.py 8888" 
+check process main8888 with pidfile /home/ubuntu/okavango/run/main8888.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 8888" 
   stop program = "/bin/pwd"
 
-check process main9999 with pidfile /mnt/okavango_15/run/main9999.pid
-  start program = "/usr/bin/python3 /mnt/okavango_15/main.py 9999" 
+check process main9999 with pidfile /home/ubuntu/okavango/run/main9999.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 9999" 
   stop program = "/bin/pwd"
