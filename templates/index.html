@@ -177,36 +177,7 @@
         </div>
       </div>
       <div id="dataPage" class="page hidden">
-        
-        <div id="dataPageContainer">
-          {% raw %}
-          <script id='template' type='text/ractive'>
-            <div id='data-header'>
-              <ul id='data-navigation'>
-                  <li on-click='activateDoc'>Documentation</li>
-                  <li on-click='activateExp'>Explorer</li>
-                  <li on-click='activateOver'>Overview</li>
-              </ul>
-                
-              {{#pages:num}}
-                {{#if pageActive}}
-                  <div class="title" id="api-documentation-title">{{view_title}}</div>
-                {{/if}}
-              {{/pages}}
-                
-            </div>
-            {{#pages}}
-            {{#if pageActive}}
-            <div id="data-content">
-              <p>{{content}}</p>
-            <div>
-            {{/if}}
-            {{/pages}}
-
-          </script>
-          {% endraw %}
-        </div>
-
+        <div id="dataPageContainer"></div>
       </div>
       <div id="sharePage" class="page hidden">
         <h1>SHARE</h1>
@@ -221,6 +192,7 @@
   <script src="static/js/d3.min.js"></script>
   <script src="static/js/leaflet.js"></script>
   <script src="http://cdn.ractivejs.org/latest/ractive.js"></script>
+  <script src="http://cdn.jsdelivr.net/ractive.load/latest/ractive-load.min.js"></script>
   <script src="static/js/dataPage.js"></script>
   <script src="static/js/feed.js"></script>
   <script src="static/js/features.js"></script>
