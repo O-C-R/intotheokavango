@@ -183,27 +183,7 @@
         </div>
       </div>
       <div id="dataPage" class="page hidden">
-        <div id="data-header">
-          <ul id="data-navigation">
-            <li>Documentation</li>
-            <li>Explorer</li>
-            <li>Overview</li>
-          </ul>
-          <div class="title" id="api-overview-title">API Overview</div>
-          <div class="title" id="api-explorer-title" style="display:none">API Explorer</div>
-          <div class="title" id="api-documentation-title" style="display:none">API Documentation</div>
-        </div>
-        <div id="data-content">
-          <div id="api-overview">
-            <p>This is where we embed a few endpoint viz highlights</p>
-          </div>
-          <div id="api-explorer" style="display: none">
-            <p>This is where we embed a form with fields to query the api</p>
-          </div>
-          <div id="api-docs" style="display: none">
-            <p>This is where we add information about the API</p>
-          </div>
-        </div>
+        <div id="dataPageContainer"></div>
       </div>
       <div id="sharePage" class="page hidden">
         <h1>SHARE</h1>
@@ -217,7 +197,8 @@
 
   <script src="static/js/d3.min.js"></script>
   <script src="static/js/leaflet.js"></script>
-  
+  <script src="http://cdn.ractivejs.org/latest/ractive.js"></script>
+  <script src="http://cdn.jsdelivr.net/ractive.load/latest/ractive-load.min.js"></script>
   <script src="static/js/dataPage.js"></script>
   <script src="static/js/feed.js"></script>
   <script src="static/js/features.js"></script>

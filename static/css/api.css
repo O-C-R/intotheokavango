@@ -50,6 +50,37 @@
         margin-bottom:20px;
     }
 
+/* Button styles */
+  .btn-group,
+  .btn-group-vertical {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+        touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    background-color: steelblue;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+/******** QUERY AREA ************/
+
     pre, code, code span {
         font-family: Monaco, Consolas, "Lucida Console", monospace !important;
         background-color: #eff4fb;
@@ -66,6 +97,81 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+
+/* RACTIVE DROP DOWN CSS */
+.ractive-dropdown {
+  color: steelblue;
+  width: 270px;
+  border: 1px solid steelblue;
+  border-radius: 5px;
+  position: relative;
+  float: left;
+}
+.ractive-dropdown * {
+  box-sizing: border-box;
+}
+.ractive-dropdown .label {
+  display: block;
+  padding: 10px;
+  outline: none;
+  position: relative;
+  background: #fff;
+  font-size: 1.25em;
+}
+.ractive-dropdown .label:after {
+  position: absolute;
+  right: 10px;
+  content: '\29BF';
+  font-size: 1em;
+}
+.ractive-dropdown ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  outline: none;
+  display: none;
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+  width: 100%;
+  border: 1px solid steelblue;
+  overflow-y: auto;
+}
+.ractive-dropdown ul * {
+  outline: none;
+}
+.ractive-dropdown ul li {
+  padding: 10px 0;
+  color: steelblue;
+  position: relative;
+  font-weight: bold;
+}
+.ractive-dropdown ul li.active {
+  color: #004347;
+  padding-left: 10px;
+}
+.ractive-dropdown ul li.active:before {
+  position: absolute;
+  color: #ffd100;
+  left: 0;
+  top: 12px;
+  content: '\25B8';
+  font-size: 12px;
+}
+.ractive-dropdown.opened .label:after {
+  content: '\29BE';
+}
+.ractive-dropdown.opened ul {
+  display: block;
+}
+
+.choice {
+  font-size: 1.5em;
+  color: #ffd100;
+}
+
+/******** D3 STYLES ******/    
 
     #timelineViz {
       width:800px;

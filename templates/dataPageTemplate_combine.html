@@ -1,0 +1,906 @@
+{% extends "page.html" %}
+
+{% block head %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../static/css/api.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+
+{% endblock head %}
+
+{% block body %}
+     <script src='http://cdn.ractivejs.org/latest/ractive.js'></script><script src='https://rawgit.com/ractivejs/ractive-events-keys/master/dist/ractive-events-keys.min.js'></script><script src='https://rawgit.com/ractivejs/ractive-events-tap/master/dist/ractive-events-tap.js'></script><script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script type="text/javascript" src="../../static/js/d3.min.js"></script>
+
+    {{ search }}
+    <div id="dataPage">
+    
+        
+        <div id="data-header">
+            <ul id="data-navigation">
+                <li>Documentation</li>
+                <li>Explorer</li>
+                <li>Overview</li>
+            </ul>
+                
+            
+                <div class="title" id="api-view-title">API EXPLORER</div>
+             
+        </div>
+        
+        <div id="data-content">
+            <div id="features-area">
+                <h2>Feature Totals</h2>
+                <div id="features-totals"> <!--Ractive template--> </div>
+            </div>
+
+            <div id="query-area"> <!--Ractive template--> </div>
+                
+            
+            
+        </div>
+        
+        {%raw %}
+        <script id='query-template' type='text/ractive'>
+        <h2>Query String</h2>
+    
+        <pre id="query-endpoint">{{renderedURL}}</pre>
+        
+        <button id="query-button" on-click="runQuery">Run Query</button>
+        
+        <Tag queryTags="{{queryTags}}"></Tag>
+        
+        <div class="input-section">
+            <h2>View</h2>
+            <label><input type='radio' name='{{view}}' value='viz'>VIZ</label>
+            <label><input type='radio' name='{{view}}' value='map'>MAP</label>
+            <label><input type='radio' name='{{view}}' value='json'>JSON</label>
+        </div>
+        <div class="input-section">
+            <h2>Limit to <input type='number' value='{{limit}}' show="{{limit}}" min='1' max="2000" /></h2>
+        </div>
+        <div class="input-section">
+            <h2>Order by</h2>
+            <label><input type='radio' name='{{order}}' value='ascending'>ascending</label>
+            <label><input type='radio' name='{{order}}' value='descending'>descending</label>
+        </div>
+        <div class="input-section">
+            <h2>Filter by</h2>
+
+            <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select the filter" />
+            <div id="dropdown-child" style="display:{{dropDownDisplay}}">
+            <RactiveDropdownComponent  items="{{categoriesItems}}" selector="categories" show="{{show}}" selectedText="select {{selector}}" />
+            </div>
+            <div id="dropdown-grandchild" style="display:{{dropDownGrandchild}}">
+            <RactiveDropdownComponent  items="{{modelsItems}}"
+            selector="models" show="{{show}}" selectedText="select {{selector}}" />
+            </div>
+        </div>
+        
+        </script>
+        
+        {% endraw %}
+
+        {% raw %}
+        <script id='featuresTemplate' type='text/ractive'>
+            <div id="features-left">
+            {{ >totals}}
+            </div>
+            <div id="features-right">
+            {{ >featureTypes}}
+            </div>
+            
+            {{#partial featureTypes}}
+            {{#each featuresArray}}
+            <ul>
+                <li>{{ title }}</li>
+            </ul>
+            {{/each}}
+            {{/partial}}
+            
+            {{#partial totals}}
+            {{#each featuresArray}}
+            <ul>
+                <li>{{ total }}</li>
+            </ul>
+            {{/each}}
+            {{/partial}}
+        </script>
+        {% endraw %}
+            
+        {% raw %}
+        <!-- Dropdown Template -->
+            <script id='RactiveDropdownComponentTemplate' type='text/ractive'>
+            <div class="{{selectorClass}} {{ isOpened ? 'opened' : '' }}" id="ractiveDropdown">
+                <span class="label" on-enter="selectItem" on-tap="toggleDropdown" on-uparrow="move:up" on-downarrow="move:down" on-leftarrow="move:up" on-rightarrow="move:down" tabindex="0">{{ selectedText }}</span>
+                <ul style="height: {{ liHeight * show + (padding * 2) }}px">
+                    {{#each items: i}}
+                    <li tabindex="0" on-tap="selectItem:{{i}}" class="{{ (selectedIndex == i) ? 'active' : '' }}">{{.}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            </script>
+        {% endraw %}
+
+        {% raw %}
+        <!-- tag component template -->
+        <script id="tagTemplate" type="text/ractive">
+        <div class="btn-group">
+            {{#each queryTags:i}}
+            <span class="btn btn-primary" >
+                <span>{{.}}</span>
+                <span on-click="splice('queryTags', i, 1)">x</span>
+            </span>
+            {{/each}}
+        </div>
+        </script>
+        {% endraw %}
+        
+        <script type="text/javascript">
+        //get features totals
+        //get the totals for all features, recursively draw?
+        
+        var index = 0;  
+        var featuresCountArray = [];
+
+        var featureTotals = [
+            { featureType : "ambit", total: 13000, title: "Ambit Readings" }, 
+            { featureType : "ambit_geo", total: 2111, title: "Ambit-Geo Readings" }, 
+            { featureType : "audio", total: 57, title: "Audio Recordings" }, 
+            { featureType : "beacon", total: 141, title: "Beacon Readings" }, 
+            { featureType : "image", total: 842, title: "Images" }, 
+            { featureType : "sensor", total: 1931, title: "Sensor Readings" }, 
+            { featureType : "sighting", total: 413, title: "Sightings" }, 
+            { featureType : "tweet", total: 264, title: "Tweets" }, 
+        ];
+
+        var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
+        
+        //how to update query string based on text input
+        var queryString="";
+        var viewString="";
+        var apiUrl = "http://dev.intotheokavango.org/api/"
+
+        /*
+        #####################
+        ### Tag Component ###
+        #####################
+        */
+
+
+        var Tag = Ractive.extend({
+            isolated: true,
+            template: '#tagTemplate',
+            data: function() {
+                return {
+                    message: 'No message specified, using the default',
+                    queryTag: '',
+                    queryTags: [] //try to pass in as an argument on initializiation 
+                };
+            }
+        });
+
+        /*
+        ################################
+        ### RactiveDropdownComponent ###
+        ################################
+        */
+
+        var RactiveDropdownComponent = Ractive.extend({
+
+            isolated: false,
+
+            template: '#RactiveDropdownComponentTemplate',
+
+            // configuration
+            data: function() {
+                return {
+                    selectorClass: 'ractive-dropdown',
+                    keycode: null,
+                    selectedIndex: -1,
+                    isOpened: false,
+                    liHeight: 40,
+                    padding: 20,
+                    show: 3,
+                    limit: 100,
+                    selector: 'Nothing',
+                    selectedText: 'Select from dropdown',
+                    items2: ['apples', 'oranges', 'nada'],
+                    items: [] // should be passed as an argument on object initialization
+                };
+            },
+
+            // the onrender function will be called as soon as the instance has finished rendering
+            oninit: function() {
+
+                var self = this;
+
+                var defaultText = self.get('selectedText');
+
+                self.observe('items', function(){
+                    self.set('selectedText', defaultText);
+                });
+
+                // save the items in a object variable
+                self.items = self.get('items');
+
+                self.selector = self.get('selector');
+
+                // set the active item
+                self.setActiveItem = function(index) {
+
+                    // set the explicit index if it has been passed
+                    if (typeof(index) != 'undefined') {
+                        self.set('selectedIndex', index);
+                    }
+
+                    var currentIndex = self.get('selectedIndex');
+                    var items = self.get('items');
+                    var defaultText = self.get('selectedText');
+
+                    if (currentIndex > -1 && currentIndex <= items.length) {
+                        self.set({
+                            selectedIndex: currentIndex,
+                            selectedText: items[currentIndex]
+                        });
+                    } else {
+                        self.set('selectedText', defaultText);
+                    }
+
+                };
+
+                // open/close the dropdown
+                self.toggleDropdown = function() {
+                    self.toggle('isOpened');
+                };
+
+                // tagging the toggling
+                self.on('toggleDropdown', function() {
+                    self.toggleDropdown();
+                });
+
+                // event to select the item
+                self.on('selectItem', function(event, index) {
+
+                    self.setActiveItem(index);
+
+                    self.toggleDropdown();
+
+                    var items = self.get('items');
+
+                    // fire a onSelect event to the ractive object where the component is being used
+                    // pass the selected item
+                    self.fire('onSelect', items[self.get('selectedIndex')], self.selector);
+
+                });
+
+                // move up/down through the list using the arrow keys
+                self.on('move', function(event, direction) {
+
+                    var currentIndex = self.get('selectedIndex'),
+                        items = self.get('items');
+
+                    if (direction == 'down') {
+                        if (currentIndex < items.length - 1) {
+                            self.set('selectedIndex', currentIndex + 1);
+
+                            // scroll the list upwards
+                            this.ul.scrollTop = this.ul.scrollTop + this.liHeight;
+                        }
+                    } else if (direction == 'up') {
+                        if (currentIndex > 0) {
+                            self.set('selectedIndex', currentIndex - 1);
+
+                            // scroll the list downwards
+                            this.ul.scrollTop = this.ul.scrollTop - this.liHeight;
+                        }
+                    }
+
+                    self.setActiveItem();
+
+                });
+            },
+
+            oncomplete: function() {
+                    
+              var self = this;
+
+               // calculate item height
+               self.resizeList = function() {
+
+                    var visibleElements = self.get('show'),
+                        selectorClass = self.get('selectorClass'),
+                        ul = self.find('.' + selectorClass + ' ul'),
+                        li = self.find('.' + selectorClass + ' ul li'),
+                        ulHeight,
+                        liHeight;
+
+                    // get the height of the li
+                    ul.style.display = 'block';
+                    ul.style.visibility = 'hidden';
+                    liHeight = li.offsetHeight;
+                        ulHeight = ul.offsetHeight;
+                        ul.style.height = ulHeight - liHeight * visibleElements;
+                    ul.style.display='none';
+                        ul.style.visibility='visible';
+                 
+                 
+                    // save them in object variables to make them accessible for external usage
+                    self.liHeight = liHeight;
+                    self.ulHeight = ulHeight;
+                    self.ul = ul;
+
+                    self.set('liHeight', liHeight);
+                };
+                self.observe('selectedText', function(newValue, oldValue, keypath) {
+                    //console.info('new value:', newValue);
+                    //console.info('key path:', keypath);
+                });
+              
+              self.observe('show', function(newValue, oldValue, event) {
+                console.info('new value:', newValue);
+                console.info('ul', self.ul);
+              });
+
+            }
+
+        });
+
+        /*
+        #############
+        ### USAGE ###/*
+        #############
+        ### USAGE ###
+        #############
+        */
+
+        var ractive_features = new Ractive({
+                        el: "#features-totals",
+                        template: "#featuresTemplate",
+                        data:  {
+                            featuresArray : featureTotals
+                        }
+                    });
+
+    (function() {
+        var ractive = new Ractive({
+            el: "#query-area",
+            template: "#query-template",
+            components: {
+                RactiveDropdownComponent: RactiveDropdownComponent,
+                Tag: Tag
+            },
+
+            oninit: function() {
+                var self = this;
+
+                self.observe('*', this.parseQuery.bind(this));
+
+                self.set('dropDownDisplay', 'none');
+                self.set('dropDownGrandchild', 'none');
+
+                self.on('RactiveDropdownComponent.onSelect', function(item, selector) {
+
+
+
+                    self.set('selectedItem', item);
+                    console.info('callback fired!', selector, item);
+                    //console.log('queryTag: ' + ractive.get('queryTag'));
+
+                    switch (selector) {
+                        case "items":
+                            var items2 = self.get('itemsKeys.' + item);
+                            self.set('categoriesItems', items2);
+
+                            self.set('dropDownDisplay', 'visible');
+                            self.set('dropDownGrandchild', 'none');
+                            // $("#dropdown-grandchild").hide();
+
+                            ractive.set('queryObj.filter', item);
+                            //Not updating tags on top filter - uncomment if you want to
+                            // ractive.set('queryTag', queryObj["filter"]);
+                            // console.log("query filter: " + ractive.get('queryTag')); 
+                            break
+
+                        case "categories":
+                            var items2 = self.get('categoriesKeys.' + item);
+                            //console.log("items2: " + items2);
+                            self.set('modelsItems', items2);
+                            //console.log('modelsItems: ' + self.get('modelsItems'));
+
+                            //trying to update label, not working yet
+                            //console.log("selectedText: " + self.get('selectedText'));
+                            var state = 'none';
+                            if (items2 && items2.length > 1) state = 'visible';
+
+                            self.set('dropDownGrandchild', state);
+
+                            if (ractive.get('queryObj.filter') === 'expeditions') {
+                                ractive.set('queryObj.expedition', 'Expedition=' + item);
+                                
+                            } else if (ractive.get('queryObj.filter') === 'members') {
+                                ractive.set('queryObj.member', 'Member=' + item);
+
+                            } else if (ractive.get('queryObj.filter') === 'features') {
+                                ractive.set('queryObj.featureType', 'FeatureType=' + item);
+                                
+                                console.log('QUERY SENSORTYPE: ' + ractive.get('queryObj.sensor'));
+                                console.log('QUERY IMAGETYPE: ' + ractive.get('queryObj.image'));
+                                console.log('QUERY SPECIES: ' + ractive.get('queryObj.species'));
+                            }
+
+                            break
+
+                        case "models":
+                            //console.log('in models');
+                            //console.log(queryObj);
+                            if (ractive.get('queryObj.featureType') === 'FeatureType=image') {
+                                ractive.set('queryObj.image', 'ImageType=' + item);
+
+                            } else if (ractive.get('queryObj.featureType') === 'FeatureType=sensor') {
+                                ractive.set('queryObj.sensor', 'SensorType=' + item);
+
+                            } else if (ractive.get('queryObj.featureType') === 'FeatureType=sighting') { 
+                                
+                                if(item.indexOf(' ') > -1) {
+                                    //TODO: get rid of space?? - not here in parser?
+                                }
+                                ractive.set('queryObj.species', 'BirdName=' + item); //TODO: change to SpeciesName for OK15
+                            }
+                            break
+                    }
+                });
+            },
+
+            parseQuery: function(){
+                var serializeTags = function(obj) {
+                    if(!obj) return ''; //reset URL here? to account for deleting view?
+                    var str = [];
+                    for(var p in obj)
+                        if (obj.hasOwnProperty(p)) {
+                            //console.log('serialize obj[p]: '+ obj[p]);
+                            if(obj[p].indexOf('view') > -1) {
+                                //console.log('dont add view to query as tag');
+                            } else {
+                               str.push(obj[p]); 
+                            }
+                        }
+                    if(!str.length) return '';
+                    return '?' + str.join("&");
+                };
+                var url = this.get('apiUrl');
+                var path = this.get('query');
+                var query = serializeTags(this.get('queryTags'));
+                if(path) url += path;
+                if(query) url += query;
+
+                this.set('renderedURL', url);
+                console.log(this.get('queryTags.*'));
+                console.log(this.get('queryTags.length'));
+            },
+            data: function() {
+                return {
+                    apiUrl: "http://dev.intotheokavango.org/api/features",
+                    
+                    queryObj : {
+                        filter: "",
+                        featureType: "",
+                        member: "",
+                        expedition: "",
+                        species: "",
+                        image: "",
+                        sensor:"",
+                        view: "",
+                        order: "",
+                        limit: ""
+                    },
+                    queryTags: [],
+                    items: ['expeditions', 'members', 'features'],
+                    categoriesItems: [],
+                    modelsItems: [],
+
+                    itemsKeys: {
+                        expeditions: ['okavango_14', 'okavango_15'],
+                        members: ["Steve", "GB", "Giles", "Chris", "Jer", "Tom", "null"],
+                        features: ["ambit", "ambit_geo", "audio", "beacon", "image", "sensor", 'sighting', 'tweet'],
+                    },
+                    categoriesKeys: {
+                        ambit: [],
+                        ambit_geo: [],
+                        audio: [],
+                        beacon: [],
+                        image: ['habitat', 'documentary', 'specimen'],
+                        sensor: ['databoat1', 'sensor2', 'databoat'],
+                        sighting: [
+                            "African Crake",
+                            "African Darter",
+                            "African Fish Eagle",
+                            "African Jacana",
+                            "African Marsh Harrier",
+                            "African Openbill Stork",
+                            "African Pygmy Goose",
+                            "African Skimmer",
+                            "African Spoonbill",
+                            "Baillon's Crake",
+                            "Black Crake",
+                            "Black-crowned Night-Heron",
+                            "Black-winged Stilt",
+                            "Blacksmith Lapwing",
+                            "Boat",
+                            "Cattle Egret",
+                            "Collared Pratincole",
+                            "Comb Duck",
+                            "Common Moorhen",
+                            "Common Whimbrel",
+                            "Coppery-tailed Coucal",
+                            "Crocodile",
+                            "Egyptian Goose",
+                            "Elephant",
+                            "Fishing",
+                            "Glossy Ibis",
+                            "Glossy IbisWestern Marsh Harrier",
+                            "Glossy IbisWestern Marsh HarrierGlossy Ibis",
+                            "Goliath Heron",
+                            "Great Egret",
+                            "Great White Pelican",
+                            "Greater Reed Warbler",
+                            "Green-backed Heron",
+                            "Grey Heron",
+                            "Grey-headed Gull",
+                            "Hadeda Ibis",
+                            "Hamerkop",
+                            "Hippo",
+                            "Lesser Jacana",
+                            "Lesser Swamp Warbler",
+                            "Little Egret",
+                            "Little Grebe",
+                            "Little Rush-Warbler",
+                            "Little Stint",
+                            "Long-toed Lapwing",
+                            "Malachite Kingfisher",
+                            "Marabou Stork",
+                            "Mokoro",
+                            "People",
+                            "Pied Avocet",
+                            "Pied Kingfisher",
+                            "Purple Heron",
+                            "Red Lechwe",
+                            "Reed Cormorant",
+                            "RuffGlossy Ibis",
+                            "Rufous-bellied Heron",
+                            "Sacred Ibis",
+                            "Saddle-billed Stork",
+                            "Slaty Egret",
+                            "Spur-winged Goose",
+                            "Squacco Heron",
+                            "Swamp Boubou",
+                            "Test",
+                            "Thick-billed Weaver",
+                            "Three-banded Plover",
+                            "Water Thick-knee",
+                            "Wattled Crane",
+                            "Whiskered Tern",
+                            "White Otelia",
+                            "White-backed Duck",
+                            "White-browed Coucal",
+                            "White-faced Duck",
+                            "Yellow-billed Stork",
+                            "banded bluber ",
+                            "black egret",
+                            "glossy ibis",
+                            "glossy ibisGlossy Ibis",
+                            "grey headed gull",
+                            "openbill",
+                            "openbill ",
+                            "water dikop "
+                        ],
+                        tweet: []
+                    },
+                    selectedItem: '',
+                    show: 4,
+                    limit: 100
+                }
+            }
+        });
+        
+
+
+        //send new query on button press
+        ractive.on({
+            runQuery: function() {
+                console.log(ractive.get('renderedURL'));
+                window.open(ractive.get('renderedURL'), '_blank');
+            }
+        });
+
+        ractive.observe('view', function(newValue, oldValue) {
+            //console.log('view: ' + newValue);
+            if (newValue != undefined) {
+                ractive.set('queryObj.view', 'view=' + newValue);
+            }
+
+            //TODO: take view/url parsing out of view, so that if you delete tag, the URL updates too
+            //console.log('view: ' + newValue);
+            var updatedUrl = '';
+            if (newValue === 'map' || newValue === 'viz') {
+                updatedUrl = "http://dev.intotheokavango.org/api/features/" + newValue;
+                //ractive.set('queryObj.view', "features/" + newValue);
+            } else {
+                updatedUrl = "http://dev.intotheokavango.org/api/features/";
+            }
+            //console.log(updatedUrl);
+            ractive.set('apiUrl', updatedUrl);
+        });
+
+        ractive.observe('limit', function(newValue, oldValue) {
+            //console.log('limit newValue: ' + newValue + ', oldValue: ' + oldValue);
+            if (oldValue != undefined && newValue != undefined) {
+                ractive.set('queryObj.limit', 'limit=' + newValue);
+                //console.log(ractive.get('query')); //try and make query string
+            }
+        });
+
+        ractive.observe('order', function(newValue, oldValue) {
+            //console.log('order: ' + newValue);
+            if (newValue != undefined) {
+                var val;
+                if (newValue === 'ascending') {
+                    val = 1;
+                } else {
+                    val = -1;
+                }
+                ractive.set('queryObj.order', 'order=' + val);
+                //ractive.set('query', ractive.get('queryTag')); 
+            }
+        });
+
+        ractive.observe('queryTags.length', function(n, o, k) {
+            console.log('array length', k, 'changed from', o, 'to', n);
+
+            if(n === 0) {
+                console.log("array is empty, so reset apiUrl");
+                ractive.set('apiUrl', "http://dev.intotheokavango.org/api/features/");
+                ractive.set('dropDownDisplay', 'none');
+                ractive.set('dropDownGrandchild', 'none');
+            }
+        });
+
+        ractive.observe('queryTags.*', function(newValue, oldValue, event) {
+            console.log(ractive.get('queryTags'));
+            console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
+            
+        });
+
+        var addElement = function(arrayLength, splitValue, newVal) {
+            console.log("ARRAY HAS ELEMENTS");
+            //splice if old and new are the same
+            for (var i = 0; i < arrayLength; i++) {
+                var item = ractive.get('queryTags[' + i +']');
+                console.log("ITEM: " + item);
+                
+                if(item.indexOf(splitValue) > -1 ) {
+                    console.log("SPLICE THE NEW VALUE AT: " + item);
+                    ractive.splice('queryTags', i, 1, newVal);
+                    return
+                } 
+                if (i === arrayLength - 1) { //only push it if checked against whole array
+                 console.log("PUSH " + newVal);
+                 ractive.push('queryTags', newVal);
+                }                        
+            }
+        }
+
+        ractive.observe('queryObj.*', function(newValue, oldValue, keypath) {
+            console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
+
+            var tagArrayLength = ractive.get('queryTags.length');
+
+            if(newValue) { //if the value is not undefined or an empty string
+
+                var splitNew = newValue.split('=');
+
+                switch(keypath) {
+                    case 'queryObj.limit':
+                        //iterate through array, either splice or push new limit
+
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+
+                    case 'queryObj.order':
+                        //iterate through array, either splice or push new order
+
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+
+                    case 'queryObj.view':
+                        //iterate through array, either splice or push new view
+
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break 
+
+                    case 'queryObj.filter':
+
+                    //don't add tag for first dropdown filter
+
+                        break
+
+                    case 'queryObj.expedition':
+                        
+                        //iterate through array, either splice or push new expedition
+
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+                        
+                        break
+
+                    case 'queryObj.member':
+                        //iterate through array, either splice or push new member
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+
+                    case 'queryObj.featureType':
+
+                        //iterate through array, either splice or push new featureType
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            //addElement(tagArrayLength, splitNew[0], newValue);
+
+                            console.log("ARRAY HAS ELEMENTS");
+                                //splice if old and new are the same
+                                for (var i = 0; i < tagArrayLength; i++) {
+                                    var item = ractive.get('queryTags[' + i +']');
+                                    console.log("ITEM: " + item);
+                                    
+                                    //if array item is a FeatureType
+                                    if(item.indexOf(splitNew[0]) > -1 ) {
+
+                                        //before you splice remove the other element???
+                                        for (var j = 0; j < tagArrayLength; j++) {
+                                            var item2 = ractive.get('queryTags['+j+']');
+                                            console.log("ITEM2: " + item2);
+
+                                            if(item2 != undefined) {
+                                                if(item2.indexOf('BirdName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
+                                                    console.log('item: ' + item2 + ' is a subcategory');
+                                                    ractive.splice('queryTags', j, 1);
+                                                    console.log('STATE OF THE ARRAY: ' + ractive.get('queryTags'));
+                                                    var arrayState = ractive.get('queryTags');
+                                                    //ractive.set('queryTags', arrayState);
+                                                }
+                                            }
+
+                                        }
+
+                                        console.log("SPLICE THE NEW VALUE AT: " + item);
+                                        ractive.splice('queryTags', i, 1, newValue);
+
+                                        break
+                                    } 
+                                    if (i === tagArrayLength - 1) { //only push it if checked against whole array
+                                     console.log("PUSH " + newValue);
+                                     ractive.push('queryTags', newValue);
+                                    }                        
+                                }
+
+                                if(ractive.get('queryObj.sensor').indexOf('SensorType') > -1) {
+
+                                }
+                            }
+                        
+                        break
+
+                    case 'queryObj.sensor':
+                        //iterate through array, either splice or push new sensor
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+
+                    case 'queryObj.image':
+
+                        //iterate through array, either splice or push new sensor
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+
+                    case 'queryObj.species':
+
+                        //iterate through array, either splice or push new sensor
+                        if(ractive.get('queryTags.length') === 0) {
+                            ractive.push('queryTags', newValue);
+                            console.log("PUSH : " + newValue);
+                        } else {
+
+                            addElement(tagArrayLength, splitNew[0], newValue);
+                        }
+
+                        break
+                }   
+            } 
+        });
+    })();
+
+        var getFeatureTotalData = function(featureType) {
+            var url = "http://dev.intotheokavango.org/api/features?FeatureType=" + featureType + "";
+            d3.json(url, function(error, data) {
+                //console.log(featureType + " data");
+                
+                var featuresCountObj = {};
+                featuresCountObj.featureType = featureType;
+                featuresCountObj.total = data.total;
+                featuresCountArray.push(featuresCountObj);
+
+                // console.log("index: " + index);
+                // console.log(ractive_features.get("featuresArray[" + index + "].total"));
+                ractive_features.set("featuresArray[" + index + "].total", featuresCountObj.total);
+                
+                if(index < features.length -1){
+                    index++;
+                    setTimeout(getFeatureTotalData(features[index], 100));
+                }
+                else {
+                    // console.log("featuresCountArray");
+                    // console.log(featuresCountArray);
+                    // console.log("featuresArray at index: " + index);
+                    // console.log(ractive_features.get("featuresArray"));
+                    
+                    // totalsVizDiv.fadeIn();
+                    // makeTotalsViz(featuresCountArray);
+                }
+            });
+        }
+
+        getFeatureTotalData(features[index]);
+        //console.log("these are the features");
+
+        </script>
+    
+    </div>
+
+{% endblock body %}
