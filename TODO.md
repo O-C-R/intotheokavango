@@ -3,6 +3,7 @@
 - WordPress RSS -- handles just like tweets
 - resolution should be in the response metadata
 - add totals to species counts
+- okavango 13
 
 ### server
 - migrate to huge instance

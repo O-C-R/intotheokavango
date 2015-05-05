@@ -94,6 +94,7 @@ def verify_geojson(data):
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
         for key, value in data['properties'].items():
             fixed_key = strings.camelcase(key) if key != 't_utc' else key
+            fixed_key = "pH" if fixed_key == "Ph" else fixed_key
             data['properties'][fixed_key] = strings.as_numeric(value)
             if key != fixed_key:                
                 del data['properties'][key]
