@@ -1,0 +1,16 @@
+{
+    "TeamMember": "Chaps",
+    "Bird Name": "Hadeda Ibis",
+    "Activity": "N",
+    "Count": "12",
+    "CompassHeading": "257.218994140625",
+    "Latitude": "40.71787238",
+    "Longitude": "-73.99526013",
+    "Accuracy": "12",
+    "AccelerometerX": "0.0285491943359375",
+    "AccelerometerY": "0.2205047607421875",
+    "AccelerometerZ": "9.7132568359375",
+    "DateTime": "Wed Apr 22 2015 16:22:30 GMT-0400 (EDT)",
+    "t_utc": "1429734152",
+    "ResourceURL":"test.jpg"
+}

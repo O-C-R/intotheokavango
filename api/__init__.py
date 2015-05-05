@@ -97,6 +97,10 @@ class Api(server.Handler):
                 log.error(log.exc(e))
                 return self.error("Bad day")
 
+        # special parsing for resolution
+        resolution = strings.as_numeric(self.request.arguments['resolution'][0]) if 'resolution' in self.request.arguments else 0
+
+
         # get limit and order
         # limit = self.get_argument('limit', 100) # this fails on int arguments, which I think is a tornado bug
         limit = strings.as_numeric(self.request.arguments['limit'][0]) if 'limit' in self.request.arguments else 100
@@ -111,7 +115,7 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order']}
+            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution']}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
@@ -124,7 +128,7 @@ class Api(server.Handler):
 
         # pass our search to the view module for execution and formatting
         try:         
-            results, total, returned = view.assemble(self, search, limit, order)   
+            results, total, returned = view.assemble(self, search, limit, order, resolution)   
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results})
         except Exception as e:

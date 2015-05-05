@@ -14,6 +14,8 @@ def main():
     """
     Filters for finding great content go here
 
+    Should also flag the content
+
     """
 
     data = {"test": "data"}

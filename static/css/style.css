@@ -59,6 +59,10 @@ table {
   border-spacing: 0;
 }
 
+a{
+  text-decoration: none;
+}
+
 
    /*
   Reset CSS
@@ -121,70 +125,90 @@ hr{
     width:97.2%;
     height:auto;
     padding:35px 1.4% 30px 1.4%;
+    transition: background-color 0.4s;
   }
 
-    #header #title{
-      width:500px;
+    #header.dark{
+      background-color: rgba(4, 0, 26, 0.62);
     }
 
-      #title h1{
-        display:none;
+      #header #title{
+        width:500px;
       }
 
-    #header ul#navigation{
-      float:right;
-      width:40%;
-    }
+        #title h1{
+          display:none;
+        }
 
-      ul#navigation li{
-        /*float:right;*/
-        display:inline-block;
-        text-align: center;
-        margin-right:-4px;
-        width:14.2%;
-        padding:0 3.5%;
-        cursor:pointer;
-        opacity: 0.6;
-        transition: opacity 0.15s;
+      #header ul#navigation{
+        float:right;
+        width:40%;
       }
 
-        ul#navigation li.active, ul#navigation li:hover{
-          opacity:1;
+        ul#navigation li{
+          /*float:right;*/
+          display:inline-block;
+          text-align: center;
+          margin-right:-4px;
+          width:14.2%;
+          padding:0 3.5%;
+          cursor:pointer;
+          opacity: 0.6;
+          transition: opacity 0.15s;
+          vertical-align: top;
         }
 
-        ul#navigation li.teaser{
-          width:auto;
-          float:right;
-          margin-right: 20px;
-        }
+          ul#navigation.logos{
+            margin-top:-9px;
+            text-align: right;
+            padding-right:20px;
+            width:60% !important;
+          }
 
-        ul#navigation li.teaser a{
-          color: #4BFF87;
-          text-decoration: none;
-          transition: color 0.15s;
-        }
+          ul#navigation.logos li{
+            opacity:1;
+            width: auto;
+            padding: 0;
+            margin-left:35px;
+          }
 
-          ul#navigation li.teaser a:hover{
-            color: white;
+          ul#navigation li.active, ul#navigation li:hover{
+            opacity:1;
+          }
+
+          ul#navigation li.teaser{
+            width:auto;
+            float:right;
+            margin-right: 20px;
+          }
+
+          ul#navigation li.teaser a{
+            color: #4BFF87;
             text-decoration: none;
+            transition: color 0.15s;
           }
 
+            ul#navigation li.teaser a:hover{
+              color: white;
+              text-decoration: none;
+            }
 
-          ul#navigation li.share span:hover{
-            color: #ffffff;
-            border-color: #ffffff;
-            border-radius: 3px;
-            padding: 7px 12px;
+
+            ul#navigation li.share span:hover{
+              color: #ffffff;
+              border-color: #ffffff;
+              border-radius: 3px;
+              padding: 7px 12px;
+            }
+
+          ul#navigation li:first-child{
+            padding-left:0;
           }
 
-        ul#navigation li:first-child{
-          padding-left:0;
-        }
-
-        ul#navigation li:last-child{
-          padding-right:0;
-          opacity: 1;
-        }
+          ul#navigation li:last-child{
+            padding-right:0;
+            opacity: 1;
+          }
 
   #contentContainer .page{
 
@@ -222,6 +246,23 @@ hr{
       height:auto;
       position:relative;
     }
+
+      #aboutPage #video div.cover{
+        position:absolute;
+        z-index:10;
+        display: block;
+        height:100%;
+        width:100%;
+        background-image: url("../img/vimeoCover.jpg");
+      }
+
+        #aboutPage #video div.cover img{
+          top:50%;
+          position:absolute;
+          opacity:0.6;
+          margin-top:-17.5px;
+          margin-left:-17.5px;
+        }
 
       #video .vimeoContainer{
         position:absolute;
@@ -263,6 +304,8 @@ hr{
           left:-50%;
         }
 
+      
+
     #aboutPage #introduction{
       width:82.8%;
       height:auto;
@@ -297,15 +340,52 @@ hr{
       }*/
 
       #introduction p{
-        /*font-family: Georgia, serif;*/
         font-size: 18px;
-        /*font-style: italic;*/
         letter-spacing: 0.12em;
         line-height: 1.98em;
       }
 
         #introduction p:not(:first-child){
           margin-top:35px;
+        }
+
+        #introduction #intro div.column:first-child p{
+          text-align: right;
+          padding-left:20%;
+          margin-bottom:15px;
+        }
+
+
+      #cta{
+        /*position:absolute;
+        bottom:-22px;*/
+        width:100%;
+        left:0;
+        text-align: center;
+        margin-top:-35px;
+        margin-bottom:70px;
+      }
+
+        #cta p{
+          position:relative;
+          margin:auto;
+          display:inline-block;
+          border-radius: 3px;
+          padding:14px 26px;
+          border: 2px solid white;
+          text-transform: uppercase;
+          font-size: 11px;
+          color: #4BFF87;
+          transition: color 0.15s;
+          text-decoration: none;
+        }
+
+        #cta p span{
+          text-transform: lowercase;
+        }
+
+        #cta a:hover p{
+          color: white;
         }
 
       #aboutPage #beaconContainer{
@@ -396,12 +476,13 @@ hr{
               display:block;
               position:absolute;
               width:100%;
-              z-index:-2;
+              z-index:0;
               opacity: 0 !important;
             }
 
             #team div.background div.slides img:nth-child(2){
-              z-index:-1;
+              opacity: 1 !important;
+              z-index:0;
             }
 
           #team div.background div.overlay{
@@ -423,20 +504,35 @@ hr{
         }
 
           #team h2{
-            margin-bottom: 8px;
+            margin-bottom: 30px;
           }
 
+            #team h2 span.title{
+              /*font-family: 'Montserrat', arial, sans-serif;*/
+              font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+              font-weight: 700;
+              font-style: normal;
+              font-size: 9px;
+              text-transform: uppercase;
+              line-height: 0;
+              margin-top:8px;
+              margin-bottom:8px;
+              display:block;
+              position: absolute;
+              color:rgba(255,255,255,0.75);
+            }
+
           #team p{
-            margin-bottom: 70px;
+            margin-bottom: 75px;
             font-size: 16px;
-            line-height: 1.5em;
+            line-height: 1.8em;
           }
 
           #team p:last-child{
             margin-bottom: 0;
           }
 
-            #team p span{
+            #team p span.title{
               /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
@@ -444,17 +540,36 @@ hr{
               font-size: 9px;
               text-transform: uppercase;
               opacity: 0.75;
+              text-align: right;
+              display: block;
+              float:right;
+            }
+
+            span.explorerBox{
+              display:inline-block;
+              width:5px;
+              height:8px;
+              border: 2px solid #f6d13a;
+              vertical-align: middle;
+              margin-left: 5px;
+              margin-top:-3px;
+            }
+
+            span.explorerBox.legend{
+              margin-left: 0;
+              margin-right: 5px;
+              margin-top:-3px;
             }
 
         #team div.social{
           text-align: left;
-          margin-bottom: 35px;
+          margin-bottom: -5px;
           width:100%;
           overflow: hidden;
         }
 
         #team div.logos{
-          text-align: left;
+          text-align: right;
           position:absolute;
           bottom:100px;
           width:40%;
@@ -463,7 +578,11 @@ hr{
           #team div.logos img{
             display: inline-block;
             vertical-align: bottom;
-            margin-right:10px;
+            margin-right:15px;
+          }
+
+          #team div.logos a:last-child img{
+            margin-right:0;
           }
 
 
@@ -477,6 +596,61 @@ hr{
       height:100%;
       position:fixed;
     }
+
+      #mapPage div.controls{
+        padding: 35px 1.4% 1.4% 1.4%;
+        width:5.52%;
+        height:auto;
+        position:absolute;
+        right:0;
+        top:0;
+      }
+
+        #mapPage div.button{
+          margin-bottom:17.5px;
+          width:26px;
+          min-height:26px;
+        }
+
+          #mapPage div.controls div.control-playback{
+            margin-left:auto;
+            margin-right:auto;
+            background-color: white;
+            border-radius: 3px;
+            background-image: url("../img/iconPause.svg");
+            cursor:pointer;
+          }
+        
+          #mapPage div.controls div.control-zoom{
+            margin-left:auto;
+            margin-right:auto;
+          }
+
+            #mapPage div.controls div.control-zoom a{
+              background-color: white;
+              display: block;
+              width:26px;
+              height:26px;
+              color:transparent;
+              margin:0;
+            }
+
+              #mapPage div.controls a.control-zoom-in{
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                background-image: url("../img/iconZoomIn.svg");
+                border-bottom:1px solid rgba(4, 0, 26, 0.2);
+              }
+
+              #mapPage div.controls a.control-zoom-out{
+                border-bottom-left-radius: 3px;
+                border-bottom-right-radius: 3px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                background-image: url("../img/iconZoomOut.svg");
+              }
 
       #mapPage div.pane{
         display:inline-block;
@@ -532,8 +706,23 @@ hr{
         #mapPage div.pane svg#timeline{
           height:80%;
           width:100%;
-          margin-top:35px;
+          margin-top:30px;
         }
+
+          #mapPage div.pane svg#timeline text{
+            width:50%;
+          }
+
+            #mapPage div.pane svg#timeline text tspan{
+              fill:white;
+              font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+              font-weight: 700;
+              font-style: normal;
+              font-size: 10px;
+              text-transform: uppercase;
+              alignment-baseline: middle;
+              text-anchor:end;
+            }
 
         #mapPage div.pane div#feed{
           padding:35px 19.4%;
@@ -787,16 +976,10 @@ svg.wanderer{
     min-width:540px;
   }
 
-  #header{
-    padding-bottom: 80px !important;
-    width:80% !important;
-  }
-
   #navigation{
     float:none;
     position:absolute;
     top:80px;
-    width:80% !important;
   }
 
     #navigation li.teaser{
@@ -822,6 +1005,47 @@ svg.wanderer{
 
   #aboutPage div.column:not(:first-child){
     margin-top: 70px;
+  }
+
+  #team div.logos{
+    text-align: left;
+    width:100%;
+  }
+
+  #header{
+    padding: 70px 0 120px 0 !important;
+  }
+
+  #header #title{
+    width:100%;
+  }
+
+  #header #title{
+    text-align: center;
+  }
+
+  #header #navigation{
+    text-align: center;
+    width:93% !important;
+    padding:0 !important;
+    margin:auto;
+    margin-top:35px;
+  }
+
+  #cta{
+    margin-top:16px;
+  }
+
+  #team div.background{
+    display:none;
+  }
+
+  #team div.content{
+    padding-top:0;
+  }
+
+  #team div.logos{
+    bottom:75px;
   }
 
 }

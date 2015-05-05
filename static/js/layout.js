@@ -34,6 +34,7 @@ function Page(i){
 	var id = i;
 	var button = d3.select('#navigation li.' + i);
 	var node = d3.select('#'+ id + 'Page');
+	var header = d3.select('#header');
 
 	var show = function(){
 		node.classed('hidden',false);
@@ -41,6 +42,7 @@ function Page(i){
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
 		map.setZoom(id == 'journal' ? 15 : 17);
+		header.classed('dark',false);
 	}
 
 
@@ -51,7 +53,7 @@ function Page(i){
 
 
 	var offsetHeader = function(isPageRelative){
-		var header = d3.select('#header');
+		
 		if(!isPageRelative){
 			header.style('width','97.2%')
 				.style('padding-right','1.4%');
@@ -75,7 +77,8 @@ function Page(i){
 		show: show,
 		hide: hide,
 		offsetHeader: offsetHeader,
-		node: node
+		node: node,
+		header: header
 	};
 }
 
@@ -100,6 +103,7 @@ function MapPage(){
 		}
 		if(timeline) timeline.togglePause('resume');
 		map.setZoom(page.id == 'journal' ? 15 : 17);
+		page.header.classed('dark',true);
 	}
 
 
@@ -134,6 +138,7 @@ function JournalPage(){
 		if(timeline) timeline.togglePause('pause');
 		map.setZoom(page.id == 'journal' ? 15 : 17);
 		feed.jump(timeline.getTimeCursor());
+		page.header.classed('dark',false);
 	}
 
 

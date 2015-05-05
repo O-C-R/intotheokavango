@@ -22,6 +22,7 @@ var exec        = require('child_process').exec;
 var execFile    = require('child_process').execFile;
 var gm          = require('gm').subClass({imageMagick: true});
 var Twit        = require('twit');
+var rest        = require('restler');
 var colors      = require('colors');
 
 var portNum = 3000;
@@ -32,6 +33,9 @@ var upFreq = 5 * 60 * 1000;
 
 var picInterval = 10 * 60 * 1000; 
 var upTweet = false;
+
+var mothership = "http://intotheokavango.org/"
+//var mothership = "http://granu.local:7777/";
 
 //Make the Express app
 var app = express();
@@ -59,7 +63,7 @@ totalsOut['mp3'] = 0
 
 var connectedW1 = false;
 var connectedB1 = false;
-var connectedB2 = false;
+var connectedW2 = false;
 
 // connect to iridium network
 var checking_connection = false;
@@ -108,7 +112,7 @@ app.get('/takePic', function(req, res){
    });
 });
 
-app.get('/resetNetwtork', function(req, res){
+app.get('/resetNetwork', function(req, res){
    exec('sudo /home/pi/okavango/gopro/./setRoutes.sh', function(error, stdout, stderr) {
        res.json({output: stdout, error: stderr});
        if (stderr == ""){
@@ -139,13 +143,13 @@ testConnect = function(callback){
         logger.error("Connected to w1");
         connectedW1 = true;
     }
-    exec('ping -I wlan2 -c 2 wlan1 10.5.5.10', function(error, stdout, stderr) {
+    exec('ping -I wlan2 -c 2 10.5.5.9', function(error, stdout, stderr) {
       if (error != null){
-        logger.error("Can't connect to b2");
-        connectedB2 = false;
+        logger.error("Can't connect to w2");
+        connectedW2 = false;
       } else {
-        logger.error("Connected to b2")
-        connectedB2 = true;
+        logger.error("Connected to w2")
+        connectedW2 = true;
       }
       exec('ping -I wlan3 -c 2 10.5.5.8', function(error, stdout, stderr) {
       if (error != null){
@@ -173,12 +177,10 @@ resetNetwork = function(){
 
 //Queue & File Upload
 doQueue = function() {
-    if (!sending && active_connection) {
+
+    if (!sending) {
     	var jsonList = fs.readdirSync(filePath + "json");
-    	//var imageList = fs.readdirSync(filePath + "jpg");
-        var goProLeftList = fs.readdirSync(filePath + "jpg/left");
-        var goProCenterList = fs.readdirSync(filePath + "jpg/center");
-        var goProRightList = fs.readdirSync(filePath + "jpg/right");
+    	var goproList = fs.readdirSync(filePath + "jpg/gopro");
     	var mp3List = fs.readdirSync(filePath + "mp3");
         var tweetList = fs.readdirSync(filePath + "tweet");
         var chk = false;
@@ -187,7 +189,7 @@ doQueue = function() {
     		for (var i = 0; i < jsonList.length; i++) {
     			if (jsonList[i].indexOf('json') != '-1') {
     				logger.log('info', "Found JSON to upload.");
-    				attemptUploadSighting(filePath + "json/" + jsonList[i]);
+    				attemptUploadJSON(filePath + "json/" + jsonList[i]);
                     chk = true;
     				break;
     			}	
@@ -224,68 +226,48 @@ doQueue = function() {
                 }
             }
         }
-    	/*if (imageList.length > 0 && !chk) {
-    		//If not, try an image
-    		for (var i = 0; i < imageList.length; i++) {
-    			if (imageList[i].indexOf('jpg') != '-1') {
-    				logger.log('info', "Found JPG to upload.");
+        if (goproList.length > 0 && !chk) {
 
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/" + imageList[i]);
-                    chk = true;
-    				break;
-    			}	
-    		}
-        } */
-        if (goProLeftList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProLeftList.length; i++) {
-                if (goProLeftList[i].indexOf('jpg') != '-1') {
+            for (var i = 0; i < goproList.length; i++) {
+                if (goproList[i].indexOf('jpg') != '-1') {
                     logger.log('info', "Found JPG to upload.");
 
+                    var url = "gopro/" + goproList[i];
+
+                    var outputFilename = './public/uploads/json/gopro_' + goproList[i] + '.json';
+
+                    var obj = {
+                        TeamMember:"null",
+                        ImageType:"GoPro",
+                        ResourceURL:url
+
+                    }
+
+                    fs.writeFile(outputFilename, JSON.stringify(obj, null, 4), function(err) {
+                        if(err) {
+                          logger.error(err);
+                          //res.send('Did not get it. :(')
+                        } else {
+                          logger.info("JSON saved to " + outputFilename);
+                          //res.send('Got it!')
+                        }
+                    }); 
+
                     // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/left/" + imageList[i], "NULL", "left", "NULL");
                     chk = true;
                     break;
                 }   
             }
-        }
-        if (goProCenterList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProCenterList.length; i++) {
-                if (goProCenterList[i].indexOf('jpg') != '-1') {
-                    logger.log('info', "Found JPG to upload.");
 
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/center/" + imageList[i], "NULL", "center", "NULL");
-                    chk = true;
-                    break;
-                }   
-            }
-        }
-        if (goProRightList.length > 0 && !chk) {
-            //If not, try an image
-            for (var i = 0; i < goProRightList.length; i++) {
-                if (goProRightList[i].indexOf('jpg') != '-1') {
-                    logger.log('info', "Found JPG to upload.");
 
-                    // *** NEED TO RESIZE 
-                    // resizeAndUpload(filePath + "jpg/" , imageList[i]);
-                    attemptUploadImage(filePath + "jpg/right/" + imageList[i], "NULL", "right", "NULL");
-                    chk = true;
-                    break;
-                }   
-            }
+
+            
         }
     	if (mp3List.length > 0 && !chk) {
     		//Or at last resort, a sound file!
     		for (var i = 0; i < mp3List.length; i++) {
     			if (mp3List[i].indexOf('mp3') != '-1') {
     				//console.log("Found mp3 to upload.");
-    				attemptUploadSound(filePath + "mp3/" + mp3List[i]);
     				break;
     			}	
     		}
@@ -369,154 +351,97 @@ var __fileName;
 var __newName;
 var toArchive = null;
 
-resizeAndUpload = function(dirPath, fileName) {
+resize = function(dirPath, fileName, callback) {
     __dirPath = dirPath;
     __fileName = fileName;
     fileFront = fileName.split('.')[0];
     fileExt = fileName.split('.')[1];
     __newName = dirPath + fileFront + "_small." + fileExt;
     __newName = __newName.replace('uploads', 'temp')
+    console.log("resize name " + __newName);
     logger.info("filename: " + dirPath + fileName);
-    sending= true;
-    gm(dirPath + fileName).resize(50).write(__newName, function(err) {
+    gm(dirPath + fileName).resize(1024).write(__newName, function(err) {
         if (err) {
             logger.error(err);
+            console.log(err);
         } else {
-            attemptUpload(__newName);
-            //This needs to only happen at the end.
-            toArchive = __dirPath + __fileName;
-            //archive(__dirPath + __fileName)
-        }
-    });
-    
-}
-
-attemptUpload = function(filePath, endpoint) {
-	console.log("Attempting an upload on " + filePath);
-    sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/upload', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            //Delete small file
-            if (filePath.indexOf('small') != -1) fs.unlinkSync(filePath);
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
-            sending = false;
-        }
-	});
-
-    var form = r.form();
-    form.append('filearg', fs.createReadStream(filePath));
-}
-
-attemptUploadSensor = function(filePath) {
-    console.log("Attempting an upload on " + filePath);
-    sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sensor', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
-            sending = false;
-        }
-    });
-    var form = r.form();
-    form.append('filearg', fs.createReadStream(filePath));
-}
-
-attemptUploadImage = function(filePath, memberName, cameraName, tags) {
-    console.log("Attempting an upload on " + filePath);
-    var formData = {
-        custom_file: {
-            value:  fs.createReadStream(filePath),
-            options: {
-                contentType: 'image/jpg',
-                memberName: memberName,
-                cameraName: cameraName,
-                photoType: photoType,
-                tags: tags
-            }
-        }
-    };
-    sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/image', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
-            sending = false;
+            callback(__newName);
         }
     });
 
-    //var form = r.form();
-    //form.append('filemeta', fs.createReadStream(filePath));
-    //form.append('filearg', fs.createReadStream(filePath));
 }
 
-attemptUploadSighting = function(filePath) {
-    console.log("Attempting an upload on " + filePath);
+attemptUploadJSON = function(url) {
+    console.log("Attempting a JSON upload on " + url);
     sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sighting', 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+
+    var file = fs.createReadStream(url);
+    var json = JSON.parse(fs.readFileSync(url, "utf8"));
+
+    var ingestType = '';
+    var ingestPath = 'jpg';
+
+    var rPath = null;
+    var origPic = null;
+    //Sighting
+    console.log(json);
+    if (json.Count != null) {
+        ingestType = "sighting";
+    } else if (json.ImageType != null) {
+        ingestType = "image";
+        ingestPath = "jpg";
+    } else if (json.SoundType != null) {
+        ingestType = "audio";
+        ingestPath = "mp3"
+    } else if (json.data != null) {
+        ingestType = "databoat"
+    }
+
+    if (ingestType != "image"){
+	var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
         if (err) {
             sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
             return logger.error('upload failed:', err);
         } else {
             logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
+            console.log("ARCHIVING " + url);
+            archive(url);
+            if (rPath) archive(rPath);
             sending = false;
         }
-    });
-
-    var form = r.form();
-    form.append('filearg', fs.createReadStream(filePath));
-}
-
-attemptUploadSound = function(filePath) {
-    console.log("Attempting an upload on " + filePath);
-    var formData = {
-        custom_file: {
-            value:  fs.createReadStream(filePath),
-            options: {
-                memberName: memberName,
-                tags: tags
-            }
-        }
-    };
-    sending = true;
-    var r = request.post({'uri': 'http://intotheokavango.org/ingest/sound', 'auth': {'user': username, 'pass': password}, formData: formData, 'timeout': 120000}, function optionalCallback (err, httpResponse, body) {
+       });
+       var form = r.form();
+       form.append('json', fs.createReadStream(url));
+       if (json.ResourceURL != null) {
+          rPath = filePath + ingestPath + "/" + json.ResourceURL;
+          console.log("ADDING RESOURCE:" + rPath);
+          form.append('resource', fs.createReadStream(rPath));
+       }
+    } else {
+      resize(filePath + ingestPath + "/", json.ResourceURL, function(newName){
+       var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
         if (err) {
             sending = false;
-            //Delete small file
-            fs.unlinkSync(filePath);
             return logger.error('upload failed:', err);
         } else {
             logger.info('Upload successful!  Server responded with:', body);
-            archive(filePath)
-            if(toArchive) archive(toArchive)
-            toArchive = null;
+            console.log("ARCHIVING " + url);
+            archive(url);
+            if (rPath) archive(rPath);
+            if (origPic) archive(origPic);
             sending = false;
         }
+       });
+       var form = r.form();
+       form.append('json', fs.createReadStream(url));
+       if (json.ResourceURL != null) {
+             rPath = newName;
+             origPic = filePath + ingestPath + "/" + json.ResourceURL;
+             console.log("ADDING RESOURCE:" + rPath);
+             form.append('resource', fs.createReadStream(rPath));
+       }
     });
+   }	     
 }
 
 archive = function(filePath) {
@@ -528,9 +453,7 @@ archive = function(filePath) {
 	mkdirSync("./public/archive/" + dt + "/json");
 	mkdirSync("./public/archive/" + dt + "/mp3");
 	mkdirSync("./public/archive/" + dt + "/jpg");
-    mkdirSync("./public/archive/" + dt + "/jpg/left");
-    mkdirSync("./public/archive/" + dt + "/jpg/center");
-    mkdirSync("./public/archive/" + dt + "/jpg/right");
+  mkdirSync("./public/archive/" + dt + "/jpg/gopro");
 	mkdirSync("./public/archive/" + dt + "/tweet");
 
 	var archPath = filePath.replace('uploads', 'archive/' + dt);
@@ -661,35 +584,6 @@ app.post('/upload', function(req, res) {
         	res.send("FAIL. Unsupported extension.")
         }
     } else {
-        // JSON post - species report & sensor data
-        /*
-            SPECIES
-            { name: 'Open Billed Stork',
-              activity: 'R',
-              count: '2',
-              heading: '359.02390476',
-              lat: '42.749587235',
-              lon: '-73.39846097',
-              accuracy: '10.2',
-              accelX: '2.4',
-              accelY: '10.7',
-              accelZ: '5.2',
-              datetime: '298356893465' }
-            
-            ETHNO
-            { exhaustion: '5',
-              mood: 'excited',
-              lastSpoken: 'GB',
-              heading: '359.02390476',
-              lat: '42.749587235',
-              lon: '-73.39846097',
-              accuracy: '10.2',
-              accelX: '2.4',
-              accelY: '10.7',
-              accelZ: '5.2',
-              datetime: '298356893465' }
-
-        */
         //Just save JSON - upload to server will be handled by the queue
 
         if (!req.body.t_utc) {
@@ -716,7 +610,7 @@ app.post('/upload', function(req, res) {
 //Status report!
 app.get('/status', function(req, res){
   testConnect(function(){
-     res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to B2 (right):' + connectedB2 + '</h3></body></html>');
+     res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
   });
 });
 
