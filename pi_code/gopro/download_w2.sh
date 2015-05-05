@@ -17,8 +17,8 @@ if [ $? -eq 0 ]; then
         #take a picture
 	curl -s --interface wlan2 "http://10.5.5.9/bacpac/SH?t=hudsuckerw2&p=%01"
 	sleep 8
-	curl -s --interface wlan2 http://10.5.5.9:8080/videos/DCIM/100GOPRO/ > temp1.html
-	files=( $(python /home/pi/okavango/gopro/html_parse.py temp1.html | grep JPG) )
+	curl -s --interface wlan2 http://10.5.5.9:8080/videos/DCIM/100GOPRO/ > temp3.html
+	files=( $(python /home/pi/okavango/gopro/html_parse.py temp3.html | grep JPG) )
 	for i in "${files[@]}"
 	do
 		:
@@ -43,7 +43,7 @@ if [ $? -eq 0 ]; then
                    fi
                fi
 	done
-	rm temp1.html
+	rm temp3.html
 	#turn it off 
 	curl -s --interface wlan2 "http://10.5.5.9/bacpac/PW?t=hudsuckerw2&p=%00"
 else 

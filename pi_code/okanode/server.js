@@ -151,7 +151,7 @@ testConnect = function(callback){
         logger.error("Connected to w2")
         connectedW2 = true;
       }
-      exec('ping -I wlan3 -c 2 10.5.5.8', function(error, stdout, stderr) {
+      exec('ping -I wlan3 -c 2 10.5.5.9', function(error, stdout, stderr) {
       if (error != null){
         logger.error("Can't connect to b1");
         connectedB1 = false;
@@ -364,6 +364,7 @@ resize = function(dirPath, fileName, callback) {
         if (err) {
             logger.error(err);
             console.log(err);
+            callback("Error");
         } else {
             callback(__newName);
         }
@@ -419,27 +420,34 @@ attemptUploadJSON = function(url) {
        }
     } else {
       resize(filePath + ingestPath + "/", json.ResourceURL, function(newName){
-       var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            console.log("ARCHIVING " + url);
-            archive(url);
-            if (rPath) archive(rPath);
-            if (origPic) archive(origPic);
-            sending = false;
-        }
-       });
-       var form = r.form();
-       form.append('json', fs.createReadStream(url));
-       if (json.ResourceURL != null) {
+	if (newName != "Error"){
+       		var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
+       		 if (err) {
+            		sending = false;
+            		return logger.error('upload failed:', err);
+       		 } else {
+           		 logger.info('Upload successful!  Server responded with:', body);
+           		 console.log("ARCHIVING " + url);
+           		 archive(url);
+           		 if (rPath) archive(rPath);
+           		 if (origPic) archive(origPic);
+           		 sending = false;
+       		 }
+      	       });
+      		 var form = r.form();
+     			  form.append('json', fs.createReadStream(url));
+     	  if (json.ResourceURL != null) {
              rPath = newName;
              origPic = filePath + ingestPath + "/" + json.ResourceURL;
              console.log("ADDING RESOURCE:" + rPath);
              form.append('resource', fs.createReadStream(rPath));
        }
+      } else {
+	logger.error("Could not resize file for upload. Archiving instead");
+	archive(url);
+        archive(filePath + ingestPath + "/" + json.ResourceURL);
+	sending = false;
+      }
     });
    }	     
 }
