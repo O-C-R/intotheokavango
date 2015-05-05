@@ -127,7 +127,6 @@ takePic = function(){
     exec('/home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
         logger.error("Error taking pics: " + stderr);
-        logger.error("Error taking pics: " + stderr);
        } else {
         logger.info("Pictures taken");
        }
@@ -140,7 +139,7 @@ testConnect = function(callback){
         logger.error("Can't connect to w1");
         connectedW1 = false;
     } else {
-        logger.error("Connected to w1");
+        logger.info("Connected to w1");
         connectedW1 = true;
     }
     exec('ping -I wlan2 -c 2 10.5.5.9', function(error, stdout, stderr) {
@@ -148,7 +147,7 @@ testConnect = function(callback){
         logger.error("Can't connect to w2");
         connectedW2 = false;
       } else {
-        logger.error("Connected to w2")
+        logger.info("Connected to w2")
         connectedW2 = true;
       }
       exec('ping -I wlan3 -c 2 10.5.5.9', function(error, stdout, stderr) {
@@ -162,6 +161,13 @@ testConnect = function(callback){
       callback();
      });
     });
+  });
+}
+
+checkIP = function(callback){
+  exec("ifconfig wlan1 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'", function(error, stdout, stderr){
+      currentIP = stdout;
+      callback();
   });
 }
 
@@ -618,7 +624,9 @@ app.post('/upload', function(req, res) {
 //Status report!
 app.get('/status', function(req, res){
   testConnect(function(){
-     res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
+    checkIP(function(){
+      res.send('<html><head/><body><h1>Server is up.</h1><h3>Since:' + upDate + '</h3><h3>Total In:' + totalIn + '</h3><h3>Total Out:' + totalOut + '</h3><h3>Current IP:'+ currentIP +' </h3><h3>Connected to B1 (left):' + connectedB1 + '</h3><h3>Connected to W1 (center):' + connectedW1 + '</h3><h3>Connected to W2 (right):' + connectedW2 + '</h3></body></html>');
+    });
   });
 });
 
