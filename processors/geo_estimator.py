@@ -5,7 +5,6 @@ from ingest import estimate_geometry
 from mongo import db
 
 def main():    
-    return # disabled for now
     log.info("geo_estimator...")
     features = db.features.find({'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit'}})
     for feature in features:

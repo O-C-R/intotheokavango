@@ -39,6 +39,8 @@ Alter `/etc/mongo/mongo.conf` to store data at `mnt/data`
     sudo service mongo start
     cat /var/log/mongodb/mongod.log
 
+After setup, run `./mongo.py` to create indexes
+
 ###### Running
 Mongo, nginx, and monit should be configured -- see .smp files. Then: `sudo ./scripts/start.sh`
 
@@ -146,9 +148,6 @@ This code relies on pymongo>=3.0b, which has more concise collection queries
 mongo 3.2.0 will support altitude in the geojson fields. We want this, but have to temporarily store altitude in the properties until this is released.
 
 
-### Monitor
-
-disk usage
 
 
 #### Copyright/License
