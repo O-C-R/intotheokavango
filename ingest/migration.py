@@ -34,8 +34,8 @@ def parse(request):
 
     dt = datetime.datetime.utcfromtimestamp(t_utc)
     if dt.year == 2013:
-        data['properties']['expedition'] = "okavango_14"    
-    elif dt.year == 2014:
         data['properties']['expedition'] = "okavango_13"    
+    elif dt.year == 2014:
+        data['properties']['expedition'] = "okavango_14"    
 
     return data
