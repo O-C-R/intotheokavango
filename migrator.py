@@ -19,7 +19,7 @@ def fetch_features(db, kinds):
     kindq = []
     for kind in kinds:
         kindq.append(" OR kind='%s'" % kind)
-    query = "SELECT rowid, data FROM features WHERE rowid %% ? = 0 AND (1=0%s) ORDER BY t" % ''.join(kindq)
+    query = "SELECT rowid, data FROM features WHERE (1=0%s) ORDER BY t" % ''.join(kindq)
     log.debug(query)
     db.execute(query)
     features = []
