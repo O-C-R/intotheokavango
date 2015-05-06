@@ -35,6 +35,8 @@ class Ingest(server.Handler):
             feature_type = self.get_argument("FeatureType", "") # if we didn't use an endpoint, check if it's in the variables
         feature_type = feature_type.lower().split('.')[0].strip()
         success, value = ingest_request(feature_type, self.request)
+        # add a header for unrestricted access
+        self.set_header("Access-Control-Allow-Origin", "*")        
         if success:
             return self.text(str(value)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
         else:
