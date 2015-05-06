@@ -126,8 +126,10 @@ def verify_geometry(data):
                 del properties[p]
             data['properties'] = properties    
 
-        ### temporarily ditch altitude prior to mongo 3.1.0
+        ### temporarily ditch altitude prior to mongo 3.2.0
         if 'geometry' in data and data['geometry'] is not None:
+            if len(data['geometry']['coordinates']) == 3:
+                data['properties']['Altitude'] = data['geometry']['coordinates'][2]
             data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
 
     except Exception as e:
