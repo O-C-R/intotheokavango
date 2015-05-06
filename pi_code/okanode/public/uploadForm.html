@@ -8,8 +8,6 @@
 
 $(document).ready(function() {
 
-    console.log("up to date?");
-
     $('#test').on('click', function () {
                 var data = new FormData();
                 var image = $("#Photo").get(0).files;
@@ -21,15 +19,13 @@ $(document).ready(function() {
 
                 var jsonBlob = new Blob([JSON.stringify($('#imageUpload').serializeJSON())], {type : 'text/json'});
 
-                data.append("metadata", jsonBlob);
+                data.append("metadata", jsonBlob, "metadata.json");
 
                 var myReader = new FileReader();
                 myReader.onload = function(event){
                     console.log(myReader.result);
                 };
                 myReader.readAsText(jsonBlob);
-
-                //console.log(jsonBlob);
 
                 // Make Ajax request with the contentType = false, and procesDate = false
                 var ajaxRequest = $.ajax({
@@ -75,6 +71,6 @@ $(document).ready(function() {
     <input type="text" name="Tags" id="Tags" value="">
 
 </form>
-<div id="test">Click Me</div>
+<div id="test">Click to Submit</div>
 </body>
 </html>
