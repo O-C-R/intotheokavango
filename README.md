@@ -64,6 +64,23 @@ http://stackoverflow.com/questions/13890789/convert-dmesg-timestamp-to-custom-da
     sudo du -ah
 
 
+##### Setup EBS Backups
+
+    sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe multiverse"
+    sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe multiverse"
+    sudo apt-get update
+    sudo apt-get install ec2-api-tools
+
+    nano .bashrc
+    export AWS_ACCESS_KEY=XXX
+    export AWS_SECRET_KEY=XXX
+
+    ec2-create-snapshot <volume_id>
+
+    crontab -e
+    0 0 * * * source /home/ubuntu/.bashrc; ec2-create-snapshot <volume_id>
+
+
 #### Usage
 
 ##### Static pages

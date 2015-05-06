@@ -6,12 +6,9 @@
 - okavango 13
 
 ### server
-- migrate to huge instance
 - backups to s3
 - http auth
-- multiple tornado frontends
 - set up crons on server
-- are we returning proper error codes?
 
 ### security
 
