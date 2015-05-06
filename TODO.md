@@ -6,12 +6,11 @@
 - okavango 13
 
 ### server
-- backups to s3
 - http auth
 - set up crons on server
 
 ### security
-
+- this needs to happen now
 
 ### improvments
 - verify_t should be smarter

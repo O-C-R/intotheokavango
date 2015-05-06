@@ -79,7 +79,7 @@ http://stackoverflow.com/questions/13890789/convert-dmesg-timestamp-to-custom-da
 
     crontab -e
     0 0 * * * source /home/ubuntu/.bashrc; ec2-create-snapshot <volume_id>
-
+Note: this should be on the ubuntu crontab, to properly source the bashrc file
 
 #### Usage
 
