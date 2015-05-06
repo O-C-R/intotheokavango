@@ -123,6 +123,10 @@ app.get('/resetNetwork', function(req, res){
    });
 });
 
+app.get('/imageUpload', function(req, res){
+   res.sendfile('public/uploadForm.html');
+});
+
 takePic = function(){
     exec('/home/pi/okavango/gopro/./download_master.sh', function(error, stdout, stderr) {
        if (stderr != ""){
