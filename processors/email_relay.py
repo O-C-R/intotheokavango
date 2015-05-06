@@ -14,7 +14,12 @@ def main():
             continue
         subject = message['subject'].lower().strip()
         log.info("--> subject: %s" % subject)
-        if config['satellite'].lower() in subject:            
+        def check_satellites(subject):
+            for satellite in config['satellites']:
+                if satellite.lower() in subject:            
+                    return True
+            return False
+        if check_satellites(subject):
             # relay a beacon (body post)
             url = "%s/ingest/beacon" % config['url']
             log.info("Sending to %s..." % url)

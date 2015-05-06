@@ -31,7 +31,9 @@ email:
 
 allowed_senders:
 
-satellite: 
+satellites:
+    - TS090180
+    - TS091180
 
 twitter:
     main:
