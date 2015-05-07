@@ -8,7 +8,7 @@ def main():
     log.info("geo_estimator...")
     features = db.features.find({'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}})
     for feature in features:
-        log.info("Updating geometry for %s (currently %s)..." % (feature['_id'], feature['properties.EstimatedGeometry']))
+        log.info("Updating geometry for %s (currently %s)..." % (feature['_id'], feature['properties']['EstimatedGeometry']))
         estimate_geometry(feature, db)
 
 main()
