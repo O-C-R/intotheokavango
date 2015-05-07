@@ -6,9 +6,9 @@ from mongo import db
 
 def main():    
     log.info("geo_estimator...")
-    features = db.features.find({'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit'}})
+    features = db.features.find({'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}})
     for feature in features:
-        log.info("Updating geometry for %s" % feature['_id'])
+        log.info("Updating geometry for %s (currently %s)..." % (feature['_id'], feature['properties.EstimatedGeometry'))
         estimate_geometry(feature, db)
 
 main()

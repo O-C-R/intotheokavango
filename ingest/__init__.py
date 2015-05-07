@@ -161,6 +161,7 @@ def estimate_geometry(data, db):
         data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
         log.debug(data['geometry']['coordinates'])
         data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']
+        log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
     except Exception as e:
         log.error(log.exc(e))
     return data
