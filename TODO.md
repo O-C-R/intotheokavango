@@ -1,4 +1,4 @@
-- verify snapshots are happening on schedule
+- verify snapshots are happening on schedule -- change cron back to 0 0
 - continue with record updating for geo
 - move to resolution
 

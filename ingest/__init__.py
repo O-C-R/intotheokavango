@@ -144,39 +144,59 @@ def estimate_geometry(data, db):
     log.info("--> t is %s" % t)
     try:
 
-        member_closest_before = 0
-        member_closest_after = int("inf")
+        # find geodata from this Member
+        member_closest_before = None
+        member_closest_after = None
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
-            # use anything with the right Member OR a beacon
-            ## this wont work if they arent on the core expedition
             member = data['properties']['Member']
-            member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))
-            member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))
+            log.info("--> member is %s" % member)
+            try:
+                member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))[0]
+                member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))[0]
+            except IndexError:
+                pass
 
-        # use the beacon
+        # find geodata from the nearest beacon
         core_sat = config['satellites'][0] # first satellite is core expedition
-        beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))
-        beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))
+        beacon_closest_before = None
+        beacon_closest_after = None
+        try:
+            beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
+            beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
+        except IndexError:
+            pass
 
-        closest_before = beacon_closest_before if beacon_closest_before > member_closest_before else member_closest_before
-        closest_after = beacon_closest_after if beacon_closest_after < member_closest_after else member_closest_after
+        # pick the best ones
+        if member_closest_before is not None and beacon_closest_before is not None:
+            closest_before = beacon_closest_before if beacon_closest_before['properties']['t_utc'] > member_closest_before['properties']['t_utc'] else member_closest_before
+        elif member_closest_before is not None:
+            closest_before = member_closest_before
+        else:
+            closest_before = beacon_closest_before
 
-        if not len(closest_before) or not len(closest_after):
+        if member_closest_after is not None and beacon_closest_after is not None:
+            closest_after = beacon_closest_after if beacon_closest_after['properties']['t_utc'] < member_closest_after['properties']['t_utc'] else member_closest_after
+        elif member_closest_after is not None:
+            closest_after = member_closest_after
+        else:
+            closest_after = beacon_closest_after
+
+        if closest_before is None or closest_after is None:
             log.warning("--> closest not found")
             return data
-        closest_before = closest_before[0]
-        closest_after = closest_after[0]
-        data['geometry'] = closest_before['geometry']
 
-        # this is naive calculation not taking projection into account
+        # average the times and positions: this is naive calculation not taking projection into account
+        data['geometry'] = closest_before['geometry'] # make sure the fields are there        
         t1 = closest_before['properties']['t_utc']
         t2 = closest_after['properties']['t_utc']
         p = (t - t1) / (t2 - t1)
         data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
         data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
         # log.debug(data['geometry']['coordinates'])
-        data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']
+
+        data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']   # note what we used
         log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
+
     except Exception as e:
         log.error(log.exc(e))
     return data
