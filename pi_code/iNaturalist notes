@@ -1,0 +1,62 @@
+"""
+Callback url:
+
+https://intotheokavango.org
+
+Application Id:
+
+4e10326bd83377287d728a17e792dd3a1d393d32aea338bd66a9378ddfd05d32
+
+Secret:
+
+c9cc84a55fdc2cccb86e1964c5bab99e4e209c6e607ffd3fad3fe79b7dea6709
+
+Auth Code:
+
+9b5b17ad886e701b81e2de112099c2a9e38e7fb7d157c5f2e4d670853daf2c80
+
+
+          observation[species_guess]=Northern+Cardinal&
+         observation[taxon_id]=9083&
+         observation[id_please]=0&
+         observation[observed_on_string]=2013-01-03&
+         observation[time_zone]=Eastern+Time+(US+%26+Canada)&
+         observation[description]=what+a+cardinal&
+         observation[tag_list]=foo,bar&
+         observation[place_guess]=clinton,+ct&
+         observation[latitude]=41.27872259999999&
+         observation[longitude]=-72.5276073
+
+"""
+
+POST /project_observations
+
+Auth required
+Add observations to projects
+
+Formats: json
+
+Params
+
+project_observation[observation_id]
+ID of the observation.
+Allowed values: Valid iNat observation ID
+project_observation[project_id]
+ID of the project that will be receiving this contribution.
+Allowed values: Valid iNat project ID
+
+NatGeo project ID: 800
+
+
+POST /observation_photos
+
+Add photos to observations. This is only for iNat-hosted photos. For adding photos hosted on other services, see POST /observations and PUT /observations/:id.
+
+Params
+
+observation_photo[observation_id]
+ID of the observation receiving this photo.
+Allowed values: Valid iNat observation ID
+file
+The photo data.
+Allowed values: Multipart photo data
