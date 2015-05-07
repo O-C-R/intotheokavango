@@ -1,4 +1,7 @@
 - verify snapshots are happening on schedule
+- continue with record updating for geo
+- move to resolution
+
 
 ### new
 - add SensorType (FeatureSubType) to SMS sensors
@@ -11,24 +14,22 @@
 - access control issues on errors
 
 ### server
-- http auth
+- http auth -- make github private
 - set up crons on server
 
-### security
-- this needs to happen now
-
-### improvments
+### improvements
 - verify_t should be smarter
 - async for soundcloud and twilio
 - resolution filter
-- don't keep querying for ambits if their arent
+- dont keep querying non-ambit wearers
+- geo_estimation broken for non-ambit wearers who arent core
 
 
 ### geo estimating
-- if the data has a Member, it's the ambit_geo of that Member
-- if the data doesnt, it's a beacon estimation from the core beacon
+- if the data has a Member, it's the ambit_geo of that Member, or anything else tagged, or finally the core beacon
+- if the data doesnt, it's just the core beacon
 - sensor sources not on the expedition will all have accompanying geodata, wont get mixed up
-- same with John's data
+- same with John's data?
 
 
 ### thoughts
