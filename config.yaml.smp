@@ -32,7 +32,7 @@ email:
 allowed_senders:
 
 satellites:
-    - TS090180
+    - TS090180  # first satellite is core expedition
     - TS091180
 
 twitter:

@@ -28,7 +28,6 @@ class Ingest(server.Handler):
     def get(self, page=None):
         return self.not_found()        
 
-    @tornado.web.asynchronous
     def post(self, feature_type=None):
         log.info("Ingest.post %s" % feature_type)
         self.set_header("Access-Control-Allow-Origin", "*")                
@@ -65,13 +64,13 @@ def ingest_data(feature_type, feature):
     feature = verify_geojson(feature)
     if not feature:
         return False, "Ingest failed: bad format"
+    feature = verify_expedition(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
         feature = estimate_geometry(feature, db)
     feature = verify_t(feature)
     if not feature:
         return False, "Ingest failed: missing t_utc"
-    feature = verify_expedition(feature)
     feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
     try:
         feature_id = db.features.insert_one(feature).inserted_id
@@ -144,8 +143,21 @@ def estimate_geometry(data, db):
     t = data['properties']['t_utc']
     log.info("--> t is %s" % t)
     try:
-        closest_before = list(db.features.find({'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))
-        closest_after =  list(db.features.find({'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))
+
+        if 'Member' in data['properties'] and data['properties']['Member'] is not None:
+            # use anything with the right Member
+            member = data['properties']['Member']
+            log.info("--> looking for something from %s" % member)
+            closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))
+            closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))
+
+        else:
+            # use the beacon
+            log.info("--> looking for beacons")
+            core_sat = config['satellites'][0] # first satellite is core expedition
+            closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))
+            closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))
+
         if not len(closest_before) or not len(closest_after):
             log.warning("--> closest not found")
             return data
@@ -159,7 +171,7 @@ def estimate_geometry(data, db):
         p = (t - t1) / (t2 - t1)
         data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
         data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
-        log.debug(data['geometry']['coordinates'])
+        # log.debug(data['geometry']['coordinates'])
         data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']
         log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
     except Exception as e:

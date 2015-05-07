@@ -12,6 +12,8 @@ def parse(request):
     for line in lines:
         log.debug("%s" % line)
         try:
+            if "sat4rent" in line.lower():
+                data['Satellite'] = line[-8:].upper()
             if "Position Time:" in line:
                 line = line.replace("Position Time:", "").strip()
                 dt = util.parse_date(line)
@@ -34,5 +36,8 @@ def parse(request):
         except Exception as e:
             log.error(log.exc(e))
             continue
+
+    import json
+    print(json.dumps(data, indent=4))        
 
     return data

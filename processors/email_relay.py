@@ -23,7 +23,7 @@ def main():
             # relay a beacon (body post)
             url = "%s/ingest/beacon" % config['url']
             log.info("Sending to %s..." % url)
-            response = net.read(url, str(message['body']).encode('utf-8'))
+            response = net.read(url, ("%s\n%s" % (str(subject), str(message['body']))).encode('utf-8'))
             log.info("--> %s" % response)
         else:
             # unpack the ambit zip and post each sample (to ambit or to ambit_geo)
