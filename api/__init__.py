@@ -29,6 +29,9 @@ class Api(server.Handler):
 
     def get(self, view_name=None, output=None):
 
+        # add a header for unrestricted access
+        self.set_header("Access-Control-Allow-Origin", "*")
+
         # do the routing and load view module
         if not len(view_name):
             log.info("Listing views...")
@@ -122,9 +125,6 @@ class Api(server.Handler):
 
         # http://localhost:7777/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
         log.info("FILTER %s" % search)
-
-        # add a header for unrestricted access
-        self.set_header("Access-Control-Allow-Origin", "*")
 
         # pass our search to the view module for execution and formatting
         try:         
