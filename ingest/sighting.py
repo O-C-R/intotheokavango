@@ -35,14 +35,17 @@ def parse(request):
         del data['TeamMember']          
 
     # process the image
+    images = []
     for path in paths:
         if path[-4:] != "json":
             image_data = process_image(path, data['Member'] if 'Member' in data else None)
-            data['Image'] = image_data
-            success, value = ingest_request("image", request)   # make a second request for the image featuretype
-            if not success:
-                log.error(value)
-            break
+            if image_data is None:
+                continue            
+            # success, value = ingest_request("image", request)   # make a second request for the image featuretype
+            # if not success:
+            #     log.error(value)
+            images.append(image_data)
+    data['Images'] = images
 
     return data
 

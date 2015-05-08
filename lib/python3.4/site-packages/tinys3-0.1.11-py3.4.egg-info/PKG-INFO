@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: tinys3
+Version: 0.1.11
+Summary: A small library for uploading files to S3,With support of async uploads, worker pools, cache headers etc
+Home-page: https://www.smore.com/labs/tinys3/
+Author: Shlomi Atar
+Author-email: shlomi@smore.com
+License: MIT
+Description: UNKNOWN
+Keywords: amazon,aws,s3,upload
+Platform: Any
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
