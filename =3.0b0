@@ -1,8 +1,0 @@
-The directory '/Users/genevieve/Library/Logs/pip' or its parent directory is not owned by the current user and the debug log has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want the -H flag.
-The directory '/Users/genevieve/Library/Caches/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want the -H flag.
-The directory '/Users/genevieve/Library/Caches/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want the -H flag.
-Collecting pymongo
-  Downloading pymongo-2.8-cp34-cp34m-macosx_10_6_intel.whl (244kB)
-Installing collected packages: pymongo
-
-Successfully installed pymongo-2.8

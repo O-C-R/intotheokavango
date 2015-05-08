@@ -2,7 +2,6 @@
 - continue with record updating for geo
 - move to resolution
 
-- how is ambit getting geo without estimation?
 
 ### new
 - add SensorType (FeatureSubType) to SMS sensors

@@ -186,9 +186,7 @@ def estimate_geometry(data, db):
             return data
 
         # average the times and positions: this is naive calculation not taking projection into account
-        data['geometry'] = closest_before['geometry'] # make sure the fields are there (if theres an error it will default to this assignment)
-        data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']   # note what we used
-
+        data['geometry'] = closest_before['geometry'] # make sure the fields are there        
         t1 = closest_before['properties']['t_utc']
         t2 = closest_after['properties']['t_utc']
         p = (t - t1) / (t2 - t1)
@@ -196,8 +194,7 @@ def estimate_geometry(data, db):
         data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
         # log.debug(data['geometry']['coordinates'])
 
-        ## ignoring altitude
-
+        data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']   # note what we used
         log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
 
     except Exception as e:
@@ -292,36 +289,25 @@ def save_file(request):
     else:
         return None
 
-def process_image(path, member=None, t_utc=None):
+def process_image(path, member=None):
     # try to get EXIF data
-    data = {}
-    if member is not None:
-        data['Member'] = member
-    if t_utc is not None:
-        data['t_utc'] = t_utc
+    data = {'Member': member}
     try:    
         image = Image.open(path)  
         width, height = image.size
         data['Dimensions'] = width, height
-        try:
-            exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
-        except AttributeError:
-            log.error("--> no EXIF data in image")
-        else:
-            # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
-            date_field = exif['DateTime']
-            if date_field[4] == ":" and date_field[7] == ":":
-                date_field = list(date_field)
-                date_field[4] = "-"
-                date_field[7] = "-"
-                date_field = ''.join(date_field)
-            date = util.parse_date(date_field, tz=config['local_tz'])
-            data['t_utc'] = util.timestamp(date)                            ## careful about this overriding
-            data['Make'] = exif['Make'].strip() if 'Make' in exif else None
-            data['Model'] = exif['Model'].strip() if 'Model' in exif else None
-        if data['t_utc'] is None:
-            log.info("--> missing t_utc")
-            return None
+        exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
+        # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
+        date_field = exif['DateTime']
+        if date_field[4] == ":" and date_field[7] == ":":
+            date_field = list(date_field)
+            date_field[4] = "-"
+            date_field[7] = "-"
+            date_field = ''.join(date_field)
+        date = util.parse_date(date_field, tz=config['local_tz'])
+        data['t_utc'] = util.timestamp(date)                            ## careful about this overriding
+        data['Make'] = exif['Make'].strip() if 'Make' in exif else None
+        data['Model'] = exif['Model'].strip() if 'Model' in exif else None
         filename = "%s_%s.jpg" % (data['t_utc'], str(uuid.uuid4()))
         new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
         shutil.copy(path, new_path)
