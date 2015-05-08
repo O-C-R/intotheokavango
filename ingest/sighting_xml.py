@@ -1,5 +1,5 @@
 import json, xmltodict, os, base64
-from ingest import ingest_json_body, save_files, process_image, ingest_request
+from ingest import ingest_json_body, save_files, process_image, ingest_data
 from housepy import config, log, util, strings
 
 def parse(request):
@@ -68,12 +68,16 @@ def parse(request):
     # process the image
     images = []
     for path in paths:
+        log.info("Inserting image... %s" % path.split('/')[-1])
         image_data = process_image(path, feature['Member'] if 'Member' in feature else None, feature['t_utc'] if 't_utc' in feature else None)
         if image_data is None:
+            log.info("--> no image data")
             continue
-        # success, value = ingest_request("image", request)   # make a second request for the image featuretype
-        # if not success:
-        #     log.error(value)
+        success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype        
+        if not success:
+            log.error(value)
+        del image_data['Member']
+        del image_data['t_utc']
         images.append(image_data)
     feature['Images'] = images
 

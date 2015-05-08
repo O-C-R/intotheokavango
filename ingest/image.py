@@ -38,7 +38,7 @@ def parse(request):
     # process the image
     for path in paths:
         if path[-4:] != "json":
-            image_data = process_image(path, data['Member'] if 'Member' in data else None)
+            image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
             data.update(image_data)
             break
 
