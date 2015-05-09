@@ -1,18 +1,16 @@
-- verify snapshots are happening on schedule -- change cron back to 0 0
-- continue with record updating for geo
-- move to resolution
+- iNat
+- DeviceMagic
+- ambits
 
-- how is ambit getting geo without estimation?
+
+- move to resolution
+- audio -- pull created time from file
 
 ### new
 - add SensorType (FeatureSubType) to SMS sensors
 - WordPress RSS -- handles just like tweets
 - resolution should be in the response metadata
 - add totals to species counts
-- okavango 13
-
-### bugs
-- access control issues on errors
 
 ### server
 - http auth -- make github private
@@ -34,27 +32,6 @@
 
 
 ### thoughts
-- send this shit to Ari and co
-- need a backup strategy, ebs snapshots
-- move everything to /mnt/data?
 - api view caching, especially with processing
 - currently no protection on duplicates -- unique second/type keys probably ok except for ambit
-
-### remember
-- will have to clear out and re-migrate old with altitude once Mongo updates to 3.1.0 (hopefully soon!)
-
-
-
-### conceptual
-- ingest defines anything that needs to be parsed differently, a loose correlation to FeatureTypes
-- ingest might end up producing multiple features, via ingest_request, ingest_data
-- whether ingest always happens through http or not is somewhat compromised
-
-
-##### backup
-
-https://aws.amazon.com/cli/
-
-pip install awscli
-
 
