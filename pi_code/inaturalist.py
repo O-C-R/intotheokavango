@@ -38,6 +38,8 @@ def post_inaturalist(feature):
         # log.debug("--> response: %s" % json.dumps(response, indent=4))
         observation_id = response[0]['id']
         log.info("--> observation_id is %s" % observation_id)
+
+        ## update okavango feature with observation_id here
     except Exception as e:
         log.error(log.exc(e))
         return False
@@ -60,7 +62,7 @@ def post_inaturalist(feature):
                 payload = {"observation_photo[observation_id]" : observation_id}
                 files = {'file': open(path, 'rb')}
                 response = oauth.post("%s/observation_photos.json" % site, data=payload, files=files)
-                log.info("--> response: %s" % response)
+                log.info("--> response: %s" % json.dumps(response.json(), indent=4))
             except IndexError as e:
                 log.error(log.exc(e))
                 continue
@@ -69,7 +71,7 @@ def post_inaturalist(feature):
         log.info("Adding observation to project...")
         payload = {"project_observation[observation_id]" : observation_id, "project_observation[project_id]" : project_id}
         response = oauth.post(site  + "/project_observations.json", data=payload)
-        log.info("--> %s" % response)
+        log.info("--> response: %s" % json.dumps(response.json(), indent=4))
     except Exception as e:
         log.error(log.exc(e))
 
