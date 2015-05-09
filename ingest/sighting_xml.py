@@ -20,9 +20,10 @@ def parse(request):
         data = data['inputs']
         dt = util.parse_date(data['Date___Time'])
         del data['Date___Time']
-        feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
-        feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
-        del data['Location']
+        if 'Location' in data:
+            feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
+            feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
+            del data['Location']
         feature['t_utc'] = util.timestamp(dt)
         for key, value in data.items():
             if 'Image' in key:
