@@ -1,27 +1,16 @@
 import json, xmltodict, os, base64
-from ingest import ingest_json_body, save_files, process_image, ingest_data
+from ingest import ingest_json_body, save_files, process_image, ingest_data, ingest_plain_body
 from housepy import config, log, util, strings
 
 def parse(request):
     log.info("sighting.parse")
 
-    paths = save_files(request)
-    if not len(paths):
+    try:
+        content = ingest_plain_body(request)
+        data = xmltodict.parse(content)
+    except Exception as e:
+        log.error(log.exc(e))
         return None
-
-    # process the xml
-    data = None
-    for path in paths:
-        if path[-3:] == "xml":
-            try:
-                with open(path) as f:
-                    data = xmltodict.parse(f.read())
-            except Exception as e:
-                log.error(log.exc(e))
-                return None
-            break
-    if data is None:
-        return None        
 
     try:
         log.info("--> parsing XML")
