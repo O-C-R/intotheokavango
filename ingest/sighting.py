@@ -1,4 +1,4 @@
-import json
+import json, requests
 from ingest import ingest_json_body, save_files, process_image, ingest_data
 from housepy import config, log, util, strings
 
@@ -51,4 +51,18 @@ def parse(request):
             images.append(image_data)
     data['Images'] = images
 
+    data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+
     return data
+
+
+def get_taxonomy(name):
+    try:
+        log.info("Getting taxonomy from GBIF...")
+        response = requests.get("http://api.gbif.org/v1/species/search?q=" + name + "&rank=species")
+        result = response.json()['results'][0]
+        taxonomy = {strings.camelcase(key): value for (key, value) in result.items() if key in ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']}
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return taxonomy
