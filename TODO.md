@@ -1,8 +1,7 @@
+
+
 - iNat photo issues + need NatGeo project membership
-- taxonomy
-
-
-- move to resolution
+- resolution
 - audio -- pull created time from file
 
 ### new
