@@ -17,4 +17,5 @@ def assemble(self, search, limit, order, resolution):
         return self.error(log.exc(e))
     species = results
     total = returned = len(species)        
+    del search['SpeciesName']
     return species, total, returned
