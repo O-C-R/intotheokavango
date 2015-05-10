@@ -53,7 +53,7 @@ def main():
                                     continue
                                 elif os.path.isdir(os.path.join(pd, filename)):
                                     traverse(os.path.join(pd, filename))
-                                elif filename[-3:] == "xml":
+                                elif filename[-3:] == "sml":
                                     try:
                                         log.info("Reading %s..." % os.path.join(pd, filename))
                                         with open(os.path.join(pd, filename)) as f:
