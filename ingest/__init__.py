@@ -323,7 +323,7 @@ def process_image(path, member=None, t_utc=None):
         filename = "%s_%s.jpg" % (data['t_utc'], str(uuid.uuid4()))
         new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
         shutil.copy(path, new_path)
-        data['URL'] = "/static/data/images/%s" % filename
+        data['Url'] = "/static/data/images/%s" % filename
     except Exception as e:
         log.error(log.exc(e))
         return None

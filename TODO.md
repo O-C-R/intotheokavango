@@ -1,7 +1,4 @@
 - iNat photo issues + need NatGeo project membership
-- ambits
-- crons
-- twitters
 - taxonomy
 
 

@@ -53,10 +53,10 @@ def post_inaturalist(feature):
             for image in feature['properties']['Images']:
                 images.append(image)
         for image in images:
-            if 'URL' not in image:
-                log.info("--> missing URL")
+            if 'Url' not in image:
+                log.info("--> missing Url")
                 continue
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", image['URL'].strip("/")))
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", image['Url'].strip("/")))
             log.info("--> %s" % path)
             try:
                 payload = {"observation_photo[observation_id]" : observation_id}
