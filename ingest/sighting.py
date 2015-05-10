@@ -49,6 +49,7 @@ def parse(request):
             del image_data['Member']
             del image_data['t_utc']                
             images.append(image_data)
+            log.info("--> image added")
     data['Images'] = images
 
     data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
