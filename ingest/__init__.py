@@ -227,6 +227,7 @@ def verify_expedition(data):
         data['properties']['Member'] = None
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
+        data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
