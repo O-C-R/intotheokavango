@@ -73,7 +73,7 @@ def parse(request):
         log.info("--> image added")
     feature['Images'] = images
 
-    feature['Taxonomy'] = get_taxonomy(data['SpeciesName']) 
+    feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
 
     return feature
 
