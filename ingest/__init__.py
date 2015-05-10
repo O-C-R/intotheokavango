@@ -216,7 +216,8 @@ def verify_expedition(data):
     """Verify we have an Expedition and Member property"""
     for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member']:
         if wrong in data['properties']:
-            data['properties']['Member'] = data['properties'][wrong]
+            if 'Member' not in data['properties']:
+                data['properties']['Member'] = data['properties'][wrong]
             del data['properties'][wrong]
     for wrong in ['expedition']:
         if wrong in data['properties']:

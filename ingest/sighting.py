@@ -52,7 +52,10 @@ def parse(request):
             log.info("--> image added")
     data['Images'] = images
 
-    data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+    if 'SpeciesName' in data:
+        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+    else:
+        data['Taxonomy'] = None
 
     return data
 
