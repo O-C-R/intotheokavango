@@ -1,7 +1,7 @@
 import json, xmltodict, os, base64
 from ingest import ingest_json_body, save_files, process_image, ingest_data, ingest_plain_body
 from housepy import config, log, util, strings
-from sighting import get_taxonomy
+from ingest.sighting import get_taxonomy
 
 def parse(request):
     log.info("sighting.parse")
