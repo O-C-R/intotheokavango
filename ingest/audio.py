@@ -51,7 +51,6 @@ def parse(request):
     return data
 
 
-"""how do I make this asynchronous?"""
 def post_track(path):
     log.info("Posting %s to soundcloud..." % path)
     # time.sleep(5)

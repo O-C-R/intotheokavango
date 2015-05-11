@@ -19,6 +19,7 @@ from pymongo import ASCENDING, DESCENDING
 
     By default, returns the first 100 results. limit=N for more. 
     Sorted in ascending order by t_utc. To reverse, use order=descending.
+    Returns only one feature for every resolution seconds.
 
 """
 
@@ -28,6 +29,9 @@ class Api(server.Handler):
         return self.not_found()
 
     def get(self, view_name=None, output=None):
+
+        # add a header for unrestricted access
+        self.set_header("Access-Control-Allow-Origin", "*")
 
         # do the routing and load view module
         if not len(view_name):
@@ -123,13 +127,13 @@ class Api(server.Handler):
         # http://localhost:7777/api?geoBounds=20,-17,26,-22&startDate=2014-08-01&endDate=2014-09-01&Member=Jer
         log.info("FILTER %s" % search)
 
-        # add a header for unrestricted access
-        self.set_header("Access-Control-Allow-Origin", "*")
-
         # pass our search to the view module for execution and formatting
         try:         
-            results, total, returned = view.assemble(self, search, limit, order, resolution)   
+            result = view.assemble(self, search, limit, order, resolution)   
+            if result is None:
+                return
+            results, total, returned = result
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}
-            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results})
+            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
         except Exception as e:
             return self.error(log.exc(e))

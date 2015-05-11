@@ -55,8 +55,8 @@ def ingest_request(feature_type, request):
         return False, "Ingest failed"        
     return ingest_data(feature_type, feature)
 
-def ingest_data(feature_type, feature):
-    log.info("ingest_request")    
+def ingest_data(feature_type, feature): # note that this operates on the original datastructure
+    log.info("ingest_data")    
     try:
         db = Application.instance.db
     except AttributeError:
@@ -191,9 +191,10 @@ def estimate_geometry(data, db):
 
         t1 = closest_before['properties']['t_utc']
         t2 = closest_after['properties']['t_utc']
-        p = (t - t1) / (t2 - t1)
-        data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
-        data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
+        if t1 != t2:
+            p = (t - t1) / (t2 - t1)
+            data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
+            data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
         # log.debug(data['geometry']['coordinates'])
 
         ## ignoring altitude
@@ -215,7 +216,8 @@ def verify_expedition(data):
     """Verify we have an Expedition and Member property"""
     for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member']:
         if wrong in data['properties']:
-            data['properties']['Member'] = data['properties'][wrong]
+            if 'Member' not in data['properties']:
+                data['properties']['Member'] = data['properties'][wrong]
             del data['properties'][wrong]
     for wrong in ['expedition']:
         if wrong in data['properties']:
@@ -225,6 +227,7 @@ def verify_expedition(data):
         data['properties']['Member'] = None
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
+        data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
@@ -317,15 +320,12 @@ def process_image(path, member=None, t_utc=None):
                 date_field = ''.join(date_field)
             date = util.parse_date(date_field, tz=config['local_tz'])
             data['t_utc'] = util.timestamp(date)                            ## careful about this overriding
-            data['Make'] = exif['Make'].strip() if 'Make' in exif else None
-            data['Model'] = exif['Model'].strip() if 'Model' in exif else None
-        if data['t_utc'] is None:
-            log.info("--> missing t_utc")
-            return None
+            data['Make'] = exif['Make'].replace("\u0000", '').strip() if 'Make' in exif else None
+            data['Model'] = exif['Model'].replace("\u0000", '').strip() if 'Model' in exif else None
         filename = "%s_%s.jpg" % (data['t_utc'], str(uuid.uuid4()))
         new_path = os.path.join(os.path.dirname(__file__), "..", "static", "data", "images", filename)
         shutil.copy(path, new_path)
-        data['URL'] = "/static/data/images/%s" % filename
+        data['Url'] = "/static/data/images/%s" % filename
     except Exception as e:
         log.error(log.exc(e))
         return None

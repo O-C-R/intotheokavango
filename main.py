@@ -10,6 +10,7 @@ process.secure_pid(os.path.abspath(os.path.join(os.path.dirname(__file__), "run"
 class Home(server.Handler):
 
     def get(self, page=None):
+        self.set_header("Access-Control-Allow-Origin", "*")
         if len(page):
             try:
                 return self.render("%s.html" % page)

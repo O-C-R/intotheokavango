@@ -53,7 +53,7 @@ def main():
                                     continue
                                 elif os.path.isdir(os.path.join(pd, filename)):
                                     traverse(os.path.join(pd, filename))
-                                elif filename[-3:] == "xml":
+                                elif filename[-3:] == "sml":
                                     try:
                                         log.info("Reading %s..." % os.path.join(pd, filename))
                                         with open(os.path.join(pd, filename)) as f:
@@ -63,15 +63,18 @@ def main():
                                     else:
                                         try:
                                             log.info("Parsing...")
-                                            content = content.split("<IBI>")[0]
-                                            parts = content.split("</header>")
-                                            header = parts[0] + "</header>"
-                                            header = xmltodict.parse(header.encode('utf-8'))
-                                            person = header['header']['Activity'].replace("OWBS ", "") 
-                                            content = parts[-1].encode('utf-8')
-                                            samples = xmltodict.parse(content)['Samples']['Sample']
+                                            data = xmltodict.parse(content)
+                                            # log.debug(json.dumps(data, indent=4))
+                                            serial_number = data['sml']['DeviceLog']['Device']['SerialNumber']
+                                            try:
+                                                member = config['ambits'][serial_number]
+                                            except:
+                                                log.warning("Ambit serial number not linked to a Member")
+                                                member = serial_number
+                                            log.info("Member: %s" % member)
+                                            samples = data['sml']['DeviceLog']['Samples']['Sample']
                                             for s, sample in enumerate(samples):            
-                                                sample['Member'] = person
+                                                sample['Member'] = member
                                                 if 'Satellites' in sample:  # ingest satellite location data                    
                                                     try:
                                                         url = "%s/ingest/ambit_geo" % config['url']
@@ -80,9 +83,7 @@ def main():
                                                         log.info("--> %s" % response)                                                        
                                                     except Exception as e:
                                                         log.error(log.exc(e))
-                                                        continue
                                                 elif 'VerticalSpeed' in sample: # ingest energy data sample 
-                                                    continue
                                                     try:
                                                         url = "%s/ingest/ambit" % config['url']
                                                         log.info("Sending to %s..." % url)

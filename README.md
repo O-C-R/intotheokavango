@@ -129,6 +129,7 @@ Can also do expeditionDay=N for the 24 hour period N days after the expedition s
 
 By default, returns the first 100 results. add `limit=N` for more.  
 Sorted in ascending order by t_utc. To reverse, use `order=descending`.  
+Return only one feature for every `resolution` seconds.
 
 ###### Adding a new API endpoint
 Add a python module in the `api` folder with the name of the endpoint. eg, `/api/lion` will load the module `lion.py`. The module should contain a single function, `assemble(tornado.Handler, search)` which receives a server Handler and an assembled Mongo search document, and which returns an HTTP response.

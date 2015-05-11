@@ -1,1 +1,1 @@
-*/5 * * * * /home/ubuntu/okavango/cron.py
+0 * * * * /usr/bin/python3 /home/ubuntu/okavango/cron.py

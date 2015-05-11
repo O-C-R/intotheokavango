@@ -1,60 +1,16 @@
-- verify snapshots are happening on schedule -- change cron back to 0 0
-- continue with record updating for geo
-- move to resolution
-
-- how is ambit getting geo without estimation?
-
 ### new
+- add counts to species api
+- iNat photo issues + need NatGeo project membership
+- audio -- pull created time from file
 - add SensorType (FeatureSubType) to SMS sensors
-- WordPress RSS -- handles just like tweets
-- resolution should be in the response metadata
 - add totals to species counts
-- okavango 13
-
-### bugs
-- access control issues on errors
+- video ingestion
+- 'core' system
 
 ### server
-- http auth -- make github private
-- set up crons on server
+- make github private
 
 ### improvements
-- verify_t should be smarter
+- caching
 - async for soundcloud and twilio
-- resolution filter
-- dont keep querying non-ambit wearers
 - geo_estimation broken for non-ambit wearers who arent core
-
-
-### geo estimating
-- if the data has a Member, it's the ambit_geo of that Member, or anything else tagged, or finally the core beacon
-- if the data doesnt, it's just the core beacon
-- sensor sources not on the expedition will all have accompanying geodata, wont get mixed up
-- same with John's data?
-
-
-### thoughts
-- send this shit to Ari and co
-- need a backup strategy, ebs snapshots
-- move everything to /mnt/data?
-- api view caching, especially with processing
-- currently no protection on duplicates -- unique second/type keys probably ok except for ambit
-
-### remember
-- will have to clear out and re-migrate old with altitude once Mongo updates to 3.1.0 (hopefully soon!)
-
-
-
-### conceptual
-- ingest defines anything that needs to be parsed differently, a loose correlation to FeatureTypes
-- ingest might end up producing multiple features, via ingest_request, ingest_data
-- whether ingest always happens through http or not is somewhat compromised
-
-
-##### backup
-
-https://aws.amazon.com/cli/
-
-pip install awscli
-
-

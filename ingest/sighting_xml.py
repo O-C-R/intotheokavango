@@ -1,27 +1,17 @@
 import json, xmltodict, os, base64
-from ingest import ingest_json_body, save_files, process_image, ingest_request
+from ingest import ingest_json_body, save_files, process_image, ingest_data, ingest_plain_body
 from housepy import config, log, util, strings
+from ingest.sighting import get_taxonomy
 
 def parse(request):
     log.info("sighting.parse")
 
-    paths = save_files(request)
-    if not len(paths):
+    try:
+        content = ingest_plain_body(request)
+        data = xmltodict.parse(content)
+    except Exception as e:
+        log.error(log.exc(e))
         return None
-
-    # process the xml
-    data = None
-    for path in paths:
-        if path[-3:] == "xml":
-            try:
-                with open(path) as f:
-                    data = xmltodict.parse(f.read())
-            except Exception as e:
-                log.error(log.exc(e))
-                return None
-            break
-    if data is None:
-        return None        
 
     try:
         log.info("--> parsing XML")
@@ -31,9 +21,10 @@ def parse(request):
         data = data['inputs']
         dt = util.parse_date(data['Date___Time'])
         del data['Date___Time']
-        feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
-        feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
-        del data['Location']
+        if 'Location' in data:
+            feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
+            feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
+            del data['Location']
         feature['t_utc'] = util.timestamp(dt)
         for key, value in data.items():
             if 'Image' in key:
@@ -68,15 +59,24 @@ def parse(request):
     # process the image
     images = []
     for path in paths:
+        log.info("Inserting image... %s" % path.split('/')[-1])
         image_data = process_image(path, feature['Member'] if 'Member' in feature else None, feature['t_utc'] if 't_utc' in feature else None)
         if image_data is None:
+            log.info("--> no image data")
             continue
-        # success, value = ingest_request("image", request)   # make a second request for the image featuretype
-        # if not success:
-        #     log.error(value)
+        success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype        
+        if not success:
+            log.error(value)
+        del image_data['Member']
+        del image_data['t_utc']
         images.append(image_data)
+        log.info("--> image added")
     feature['Images'] = images
 
+    if 'SpeciesName' in feature:
+        feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
+    else:
+        feature['Taxonomy'] = None        
 
     return feature
 
