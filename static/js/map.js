@@ -38,7 +38,7 @@ function loadData () {
                return L.circleMarker(latlng, geojsonMarkerOptions);
             },
             onEachFeature: function (feature, layer) {
-                layer.bindPopup(feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc']);
+                layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
             }
         }).addTo(map);
     }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });    
