@@ -7,6 +7,7 @@ from mongo import db
 """Produces journal.json"""
 
 def main():    
+    return # disabled for now
     log.info("generate_features")
 
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static", "data", "json", "journal.json"))

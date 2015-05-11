@@ -1,3 +1,6 @@
+var public_path = 'http://dev.intotheokavango.org' + path_to_data;
+console.log(public_path);
+
 var totalsVizDiv, timelineVizDiv;
 var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
 var index = 0;    
@@ -318,9 +321,6 @@ var getFeatureTotalData = function(featureType) {
     });
 }
 
-var public_path = 'http://dev.intotheokavango.org' + path_to_data;
-console.log(public_path);
-
 var loadData = function(url) {
     console.log(url);
     d3.json(url, function(error, data) {
@@ -335,7 +335,7 @@ var loadData = function(url) {
                 //make features viz - totals of all the feature types?
                 //if api call is expeditions or members, get from query string?
 
-                getFeatureTotalData(features[index])
+                //getFeatureTotalData(features[index])
                 console.log("these are the features"); //do we need a viz for members or expeditions?
             }
             if (feature_type === "ambit") {
@@ -357,9 +357,7 @@ var loadData = function(url) {
                         }
                     }
                     timelineVizDiv.fadeIn();
-                    console.log(parsedAmbitHR);
-                    console.log(parsedAmbitEnergy);
-                    console.log(parsedAmbitSpeed);
+
                     makeTimeSeriesViz(parsedAmbitHR);
                     makeTimeSeriesViz(parsedAmbitEnergy);
                     makeTimeSeriesViz(parsedAmbitSpeed);

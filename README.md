@@ -28,6 +28,7 @@ Check it: `sudo ntpq -p`
 ###### nginx
     sudo service nginx start
 Can use this to show syntax errors in /etc/nginx.conf: `sudo nginx -c /etc/nginx/nginx.conf`
+Might have to kill default running instances
 
 ###### mongo
 http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
@@ -37,6 +38,8 @@ Alter `/etc/mongo/mongo.conf` to store data at `mnt/data`
     sudo nano /etc/mongod.conf
     sudo service mongo start
     cat /var/log/mongodb/mongod.log
+
+After setup, run `./mongo.py` to create indexes
 
 ###### Running
 Mongo, nginx, and monit should be configured -- see .smp files. Then: `sudo ./scripts/start.sh`
@@ -62,6 +65,23 @@ http://stackoverflow.com/questions/13890789/convert-dmesg-timestamp-to-custom-da
 ###### Look at file sizes
     sudo du -ah
 
+
+##### Setup EBS Backups
+
+    sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe multiverse"
+    sudo add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe multiverse"
+    sudo apt-get update
+    sudo apt-get install ec2-api-tools
+
+    nano .bashrc
+    export AWS_ACCESS_KEY=XXX
+    export AWS_SECRET_KEY=XXX
+
+    ec2-create-snapshot <volume_id>
+
+    crontab -e
+    0 0 * * * source /home/ubuntu/.bashrc; ec2-create-snapshot <volume_id>
+Note: this should be on the ubuntu crontab, to properly source the bashrc file
 
 #### Usage
 
@@ -109,6 +129,7 @@ Can also do expeditionDay=N for the 24 hour period N days after the expedition s
 
 By default, returns the first 100 results. add `limit=N` for more.  
 Sorted in ascending order by t_utc. To reverse, use `order=descending`.  
+Return only one feature for every `resolution` seconds.
 
 ###### Adding a new API endpoint
 Add a python module in the `api` folder with the name of the endpoint. eg, `/api/lion` will load the module `lion.py`. The module should contain a single function, `assemble(tornado.Handler, search)` which receives a server Handler and an assembled Mongo search document, and which returns an HTTP response.
@@ -123,10 +144,11 @@ If they are bad, they won't crash the system
 
 
 #### Note about recent versions
-This code relies on pymongo 3.0b, which has more concise collection queries  
+This code relies on pymongo>=3.0b, which has more concise collection queries  
 
-mongo 3.1.0 supports altitude in the geojson fields (literally 6 days ago) -- current release version is 3.0.0  
-We want this, so at the moment we are not supporting altitude, but upgrade that before launch so we don't lose that data. (this is not going to happen before launch)
+mongo 3.2.0 will support altitude in the geojson fields. We want this, but have to temporarily store altitude in the properties until this is released.
+
+
 
 
 #### Copyright/License

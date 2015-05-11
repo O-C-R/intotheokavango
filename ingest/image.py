@@ -30,15 +30,10 @@ def parse(request):
         data['Member'] = data['TeamMember']
         del data['TeamMember']                
 
-    # adjust for sightings data making an extra feature (filter the fields we don't want)
-    if 'FeatureType' in data and data['FeatureType'] == "sighting" or 'Bird Name' in data:
-        data = {key: value for (key, value) in data.items() if key in ['Member', 'Expedition', 'Latitude', 'Longitude', 'Altitude', 'ResourceURL']}
-        data['FeatureType'] = "image"
-
     # process the image
     for path in paths:
         if path[-4:] != "json":
-            image_data = process_image(path, data['Member'] if 'Member' in data else None)
+            image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
             data.update(image_data)
             break
 

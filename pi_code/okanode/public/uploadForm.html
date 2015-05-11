@@ -1,20 +1,54 @@
 <html>
 <head>
 
-<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css">
-<link rel="stylesheet" href="css/form.css">
-<script src="js/jquery-2.1.1.min.js"></script>
-<script src="js/jquery.mobile-1.4.3.min.js"></script>
-<script src="js/jquery.form.js"></script> 
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/jquery.serializejson.min.js"></script>
 
 <script>
 
 $(document).ready(function() {
 
-	$('#hydroform').ajaxForm(function() { 
-       alert("Data submitted."); 
-       $('#hydroform')[0].reset();
-    }); 
+    $('#test').on('click', function () {
+                var data = new FormData();
+                var image = $("#Photo").get(0).files;
+
+                // Add the uploaded file content to the form data collection
+                if (image.length > 0) {
+                    data.append("upload", image[0]);
+                }
+
+                var jsonBlob = new Blob([JSON.stringify($('#imageUpload').serializeJSON())], {type : 'text/json'});
+
+                data.append("metadata", jsonBlob, "metadata.json");
+
+                var myReader = new FileReader();
+                myReader.onload = function(event){
+                    console.log(myReader.result);
+                };
+                myReader.readAsText(jsonBlob);
+
+                // Make Ajax request with the contentType = false, and procesDate = false
+                var ajaxRequest = $.ajax({
+                    type: "POST",
+                    url: "http://intotheokavango.org/ingest/image",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                    }
+                });
+
+                ajaxRequest.done(function (xhr, textStatus) {
+                    console.log(textStatus);
+                });
+
+
+            });
 
 })
 
@@ -24,68 +58,19 @@ $(document).ready(function() {
 
 </head>
 <body>
+<h2>Image Upload </h2>
+<form id="imageUpload">
 
-<!--
+    <label for="photo">Photo</label>
+    <input type="file" name="Photo" id="Photo" value="">
 
-Location:
-Logged By:
-Sample Depth:
-Date:
-Time:
-Location
-Latitude:
-Longitude:
-Water Data:
-pH:
-Temperature (deg C):
-Hardness:
-Total Dissolved Solids:
-Alkalinity (ppm):
-Free Clorine (ppm):
-Nitrates (ppm):
-Nitrites (ppm):
-Ammonia (ppm):
-Turbidity (inches):
-Depth (inches):
-Flow Speed (ft/sec):
-Other:
-General notes:
+    <label for="TeamMember">Team Member</label>
+    <input type="text" name="TeamMember" id="TeamMember" value="">
 
--->
+    <label for="Tags">Tags</label>
+    <input type="text" name="Tags" id="Tags" value="">
 
-<h2>Hydro Data</h2>
-<form method="post" enctype="multipart/form-data" class="hydroform" id="hydroform" action="/upload">
-
-	<label for="logged">Logged By</label>
-    <input type="text" name="Logged By" id="logged"> <br/>
-
-    <label for="depth">Sample Depth</label>
-    <input type="text" name="Sample Depth" id="depth"> <br/>
-
-    <label for="date">Date</label>
-	<input type="date" name="Date" id="date" value="">
-
-    <label for="time">Time</label>
-	<input type="time" name="Time" id="time" value="">
-
-	<label for="lon">Longitude</label>
-    <input type="text" name="Longitude" id="lon"> <br/>
-
-    <label for="lon">Latitude</label>
-    <input type="text" name="Latitude" id="lat"> <br/><br/>
-
-    <label for="ph">pH</label>
-    <input type="text" name="pH" id="ph"> <br/>
-
-    <label for="temp">Temperature</label>
-    <input type="text" name="Temperature" id="temp"> <br/>
-
- 
-
-    <label for="notesarea">General Notes:</label>
-	<textarea cols="40" rows="8" name="General Notes" id="notesarea"></textarea>
-
-	<button class="ui-shadow ui-btn ui-corner-all" type="submit" id="submit-2">Submit</button>
 </form>
+<div id="test">Click to Submit</div>
 </body>
 </html>

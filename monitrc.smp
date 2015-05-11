@@ -1,8 +1,8 @@
 ###
 #
-# chmod 0600 monitrc.smp
-# sudo chown root monitrc.smp
 # sudo cp monitrc.smp /etc/monit/monitrc
+# chmod 0600 /etc/monit/monitrc
+# sudo chown root /etc/monit/monitrc
 # then set START=yes here: /etc/default/monit
 # sudo service monit start
 # sudo monit status
@@ -10,6 +10,12 @@
 # will run as root via init.d
 #
 # remember, _everything_ under monit needs absolute paths
+# also, monit doesn't like non-ascii in YAML files
+#
+# can't tell what's wrong? simulate monit's environment
+# $ sudo su
+# $ env -i PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/sh
+# $ <run the process>
 #
 ###
 
@@ -19,8 +25,20 @@ set logfile /home/ubuntu/logs/monit.log
 set daemon 120
 
 set httpd port 2812 and use address localhost   # configure monitoring webservice
-  allow 0.0.0.0/0.0.0.0                        # Allow everything to connect  
+  allow 0.0.0.0/0.0.0.0                         # Allow everything to connect  
 
-check process main with pidfile /mnt/okavango_15/run/main.pid
-  start program = "/usr/bin/python3 /mnt/okavango_15/main.py" 
+check process main6666 with pidfile /home/ubuntu/okavango/run/main6666.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 6666" 
+  stop program = "/bin/pwd"
+
+check process main7777 with pidfile /home/ubuntu/okavango/run/main7777.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 7777" 
+  stop program = "/bin/pwd"
+
+check process main8888 with pidfile /home/ubuntu/okavango/run/main8888.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 8888" 
+  stop program = "/bin/pwd"
+
+check process main9999 with pidfile /home/ubuntu/okavango/run/main9999.pid
+  start program = "/usr/bin/python3 /home/ubuntu/okavango/main.py 9999" 
   stop program = "/bin/pwd"

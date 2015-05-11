@@ -31,7 +31,9 @@ email:
 
 allowed_senders:
 
-satellite: 
+satellites:
+    - TS090180  # first satellite is core expedition
+    - TS091180
 
 twitter:
     main:
@@ -47,6 +49,15 @@ twitter:
     accounts:
     hashtag: okavango15
     
+ambits:
+    B9460B5124000E00: Brian
+
+soundcloud:
+    client_id: 
+    client_secret: 
+    email: 
+    password: 
+
 twilio:
     account_sid: 
     auth_token: 

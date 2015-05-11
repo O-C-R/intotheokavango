@@ -10,9 +10,13 @@ db = client[mongo['database']]
 def make_indexes():
   try:
       db.features.create_index("properties.Expedition")
+      db.features.create_index("properties.FeatureType")
+      db.features.create_index("properties.Member")
       db.features.create_index([("properties.t_utc", ASCENDING)])
       db.features.create_index([("properties.t_utc", DESCENDING)])
-      db.features.create_index("properties.Member")
+      db.features.create_index("properties.EstimatedGeometry")
+      db.features.create_index("properties.Satellite")
+      db.features.create_index("properties.SpeciesName")
       db.features.create_index([("geometry", GEOSPHERE)])
   except Exception as e:
       log.error(log.exc(e))
