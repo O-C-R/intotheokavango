@@ -2,7 +2,6 @@
       width:100%;
       height: auto;
       min-height:800px;
-      padding: 10px;
       background-color: rgba(4, 0, 26, 0.65);
     }
     #dataPage h1{
@@ -179,7 +178,7 @@
       min-height:605px;
       padding: 10px;
       margin-top:8px;
-      background-color: #eff4fb;
+      background-color: rgba(4, 0, 26, 0.62);
     }
 
     #vizContainer {
@@ -192,18 +191,22 @@
 
     #totalsViz text {
         fill: white;
-        font: 10px sans-serif;
+        font: 10px 'Sentinel SSm A', 'Sentinel SSm B';;
         text-anchor: end;
     }
 
     .axis text {
-      font: 10px sans-serif;
-      fill: #333;
+      font: 10px 'Sentinel SSm A', 'Sentinel SSm B';
+      fill: #fff;
     }
 
     .axis .title {
       font-weight: bold;
       text-anchor: end;
+    }
+
+    .axis .label {
+      font: 12px 'Gotham A', 'Gotham B', Helvetica, Arial;
     }
 
     .axis path,
@@ -216,7 +219,7 @@
     .title {
       font-weight: bold;
       font: 12px sans-serif;
-      fill: #333;
+      fill: #fff;
     }
 
     .line {

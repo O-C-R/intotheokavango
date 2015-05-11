@@ -820,7 +820,7 @@ hr{
       width:100%;
       height: auto;
       min-height:800px;
-      background-color: rgba(4, 0, 26, 0.65);
+      background-color: rgba(4, 0, 26, 0.62);
     }
 
     #dataPageContainer {
@@ -870,7 +870,9 @@ hr{
 
     #data-content {
       min-height: 800px;
-      padding: 30px 1.4% 40px 1.4%;
+      /*padding: 30px 1.4% 40px 1.4%;*/
+      width:100%;
+      height: auto;
     }
 
     #data-content #features-area {
@@ -944,6 +946,18 @@ hr{
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+
+    .data-description {
+      /*padding: 30px 1.4% 40px 1.4%;*/
+      padding: 80px 8.6%;
+    }
+
+    .data-description p{
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      line-height: 1.98em;
+      margin-bottom: 50px;
+    }  
 
 svg.wanderer{
   width:300px;
