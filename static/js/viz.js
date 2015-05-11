@@ -1,14 +1,31 @@
-var public_path = 'http://dev.intotheokavango.org' + path_to_data;
-console.log(public_path);
+// path_to_data = "{{ query }}";
+// feature_type = "{{ feature_type }}";
 
-var totalsVizDiv, timelineVizDiv;
-var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
-var index = 0;    
-var featuresCountArray = [];
-var parsedSpeciesSighting = [];
-var parsedAmbitHR = [];
-var parsedAmbitEnergy = [];
-var parsedAmbitSpeed = [];
+var d3Graph = function(timelineVizID, totalsVizID){
+    // if(timelineVizDiv){
+
+    // }
+    console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
+    var totalsVizDiv = $(timelineVizID);
+    var timelineVizDiv = $(totalsVizID);
+    console.log("D3 GRAPH");
+    console.log(totalsVizDiv);
+    totalsVizDiv.hide("slow", function() {
+        console.log("HIDING totalsVizDiv");
+    });
+   // d3.select(totalsVizDiv).style("opacity", 0);
+    // console.log(totalsVizDiv);
+    // var public_path = 'http://dev.intotheokavango.org' + path_to_data;
+    // console.log(public_path);
+
+    var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
+    var index = 0;    
+    var featuresCountArray = [];
+    var parsedSpeciesSighting = [];
+    var parsedAmbitHR = [];
+    var parsedAmbitEnergy = [];
+    var parsedAmbitSpeed = [];
+    // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
 var parseSpeciesSighting = function(item) {
     if(item["properties"].hasOwnProperty("BirdName")) {
@@ -41,17 +58,22 @@ var parseAmbitEnergy = function(item) {
 var parseAmbitSpeed = function(item) {
     //parse for rate (speed?) by dividing Distance by Time
     var ambitData = {};
-    ambitData.speed = item["properties"]["Distance"] / item["properties"]["Time"];
+    if (item["properties"]["Time"] === 0) {
+        ambitData.speed = 0;
+    } else {
+        ambitData.speed = item["properties"]["Distance"] / item["properties"]["Time"];
+    }
+    
     ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-    //console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
+    console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
     return ambitData;
 }
 
-var makeHistogramPlot = function(parsedData) {
+var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
     //HISTOGRAM VIZ
-    var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+    var margin = {top: 100.5, right: 30, bottom: 30, left: 40.5},
     width = 800 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom,
+    height = 605 - margin.top - margin.bottom,
     left_width = 100;
 
     var dateRange = d3.extent(parsedData, function(d) { 
@@ -74,7 +96,7 @@ var makeHistogramPlot = function(parsedData) {
 
     if (feature_type === "sighting") {
         yAxisLabel = "Count";
-        graphTitle = "Sightings";
+        graphTitle = subTitle + " Sightings";
 
         var barWidth = width / parsedData.length;
         
@@ -110,10 +132,12 @@ var makeHistogramPlot = function(parsedData) {
           .attr("class", "y axis")
           .call(yAxis)
         .append("text")
-          .attr("class", "title")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
+          .attr("class", "label")
+          // .attr("transform", "rotate(-90)")
+          .attr("y", -10)
+          .attr("x", -20)
+          // .attr("dy", ".71em")
+          // .attr("text-align", "right")
           .text(yAxisLabel);
 
     svg.append("text")
@@ -126,7 +150,7 @@ var makeHistogramPlot = function(parsedData) {
 
 }
 
-var makeTimeSeriesViz = function(parsedData) {
+var makeTimeSeriesViz = function(parsedData,feature_type) {
     //TIMESERIES VIZ
     var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
     width = 800 - margin.left - margin.right,
@@ -216,7 +240,7 @@ var makeTimeSeriesViz = function(parsedData) {
           .attr("class", "y axis")
           .call(yAxis)
         .append("text")
-          .attr("class", "title")
+          .attr("class", "label")
           .attr("transform", "rotate(-90)")
           .attr("y", 6)
           .attr("dy", ".71em")
@@ -321,27 +345,63 @@ var getFeatureTotalData = function(featureType) {
     });
 }
 
-var loadData = function(url) {
+
+//show the viz div
+function show(){
+    totalsVizDiv.fadeIn();
+    timelineVizDiv.fadeIn();
+}
+
+//hide the viz div
+function hide(){
+    totalsVizDiv.hide();
+    timelineVizDiv.hide();
+}
+
+//load the data again or redraw
+function refresh() {}
+
+function loadData(path_to_data, feature_type) {
+    
+    var url = "http://dev.intotheokavango.org" + path_to_data;
+    
     console.log(url);
+    totalsVizDiv.hide();
+    timelineVizDiv.hide();
+//     this.feature_type = feature_type;
+// console.log(this.feature_type);
     d3.json(url, function(error, data) {
+
+        console.log(feature_type);
         if(error) {
-            console.error("Failed to load " + path_to_data);
+            console.error("Failed to load " + path_to_data   );
+            console.log(error);
             return error;
         } else {
             console.log("Initial Data", data);
 
             //parse item differently based on feature_type
-            if (feature_type === "None" && path_to_data.indexOf("features") != -1) { //if these are top level features
+            if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //if these are top level features
                 //make features viz - totals of all the feature types?
                 //if api call is expeditions or members, get from query string?
+                totalsVizDiv.show();
+                getFeatureTotalData(features[index])
 
-                //getFeatureTotalData(features[index])
                 console.log("these are the features"); //do we need a viz for members or expeditions?
             }
+            
             if (feature_type === "ambit") {
+                console.log("HERE");
                 //make heart rate viz or energy consumption viz - heart rate for now.
                 for (d in data.results.features) {
-                        item = data.results.features[d];
+                    
+                    if(d == "max" || d == "min" ){
+                        continue;
+                    }
+                    var item = data.results.features[d];
+                    //console.log("ITEMS: ");
+                    //console.log(item);
+                        
 
                         if (item["properties"].hasOwnProperty("HR")) {
                             f = parseAmbitHeartRate(item);
@@ -356,24 +416,36 @@ var loadData = function(url) {
                             parsedAmbitSpeed.push(f);
                         }
                     }
-                    timelineVizDiv.fadeIn();
+                        timelineVizDiv.fadeIn();
 
-                    makeTimeSeriesViz(parsedAmbitHR);
-                    makeTimeSeriesViz(parsedAmbitEnergy);
-                    makeTimeSeriesViz(parsedAmbitSpeed);
+                        makeTimeSeriesViz(parsedAmbitHR,feature_type)   ;
+                        makeTimeSeriesViz(parsedAmbitEnergy,feature_type);
+                        makeTimeSeriesViz(parsedAmbitSpeed,feature_type);
             }
             if (feature_type === "sighting") {
                 //make sightings viz - totals of all the SpeciesNames sightings
+                console.log("SIGHTING");
 
                 if(path_to_data.indexOf("BirdName") != -1) { //if query asks for species name
+                    console.log("BirdName: " + path_to_data);
+                    var speciesString = path_to_data.split("BirdName=");
+                    console.log("speciesName: " + speciesString[1]);
+                    var speciesNameClean = speciesString[1].split("&");
+                    console.log("speciesNameClean: " + speciesNameClean[0]);
+                    var speciesName = speciesNameClean[0];
                     //make species sightings timeline viz - SpeciesNames Counts over time
                     for (d in data.results.features) {
+
+                        if(d == "max" || d == "min" ){ //d is max or min sometimes now, to keep it to integers
+                            continue;
+                        }
                         item = data.results.features[d];
                         f = parseSpeciesSighting(item);
                         parsedSpeciesSighting.push(f);
                     }
                     timelineVizDiv.fadeIn();
-                    makeHistogramPlot(parsedSpeciesSighting);
+                    totalsVizDiv.hide();
+                    makeHistogramPlot(parsedSpeciesSighting, feature_type, speciesName);
                 }
             }
             if (feature_type === "tweet") {
@@ -387,15 +459,24 @@ var loadData = function(url) {
     });
     
 }
+    return{
+        loadData: loadData,
+        show: show,
+        hide: hide
+    };
+};
 
 /* executes on load */
-$(document).ready(function() {
-    console.log("READY");
+// $(document).ready(function() {
+//     console.log("READY");
     
-    totalsVizDiv = $("#totalsViz");
-    timelineVizDiv = $("#timelineViz");
-    totalsVizDiv.hide();
-    timelineVizDiv.hide();
+//     var totalsVizDiv = $("#totalsViz");
+//     var timelineVizDiv = $("#timelineViz");
+//     totalsVizDiv.hide();
+//     timelineVizDiv.hide();
     
-    loadData(public_path);
-});
+//     //var d3Page = d3Graph(timelineVizDiv);
+//     // // console.log(Object.keys(d3Page));
+//     //d3Page.loadData("http://dev.intotheokavango.org/api/features/?FeatureType=ambit")
+//     //loadData(public _path);
+// });
