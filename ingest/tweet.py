@@ -6,7 +6,6 @@ from mongo import db
 
 """
     Grab tweets from main timeline and hashtagged tweets from associated accounts
-    Note that this goes through the ingest endpoint in order to take advantage of the checks there.    
 
 """
 
