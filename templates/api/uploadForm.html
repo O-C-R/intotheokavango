@@ -60,17 +60,18 @@ $(document).ready(function() {
 {% endblock head %}
 {% block body %}
 <h2>Image Upload </h2>
+<br />
 <form id="imageUpload">
 
     <label for="photo">Photo</label>
     <input type="file" name="Photo" id="Photo" value="">
-
+    <br /><br />
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
-
+    <br /><br />
     <label for="Tags">Tags</label>
     <input type="text" name="Tags" id="Tags" value="">
 
 </form>
-<div id="test">Click to Submit</div>
+<div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 {% endblock body %}
