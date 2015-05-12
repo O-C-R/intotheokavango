@@ -25,6 +25,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedAmbitHR = [];
     var parsedAmbitEnergy = [];
     var parsedAmbitSpeed = [];
+    var speciesSightingsTotals = [];
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
 var parseSpeciesSighting = function(item) {
@@ -263,11 +264,14 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
 
 var makeTotalsViz = function(data) {
     console.log("MAKE TOTALS VIZ");
+
+    sortArrOfObjectsByParam(data, "total", false);
+
     var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
         width = 800 - margin.left - margin.right,
         barHeight = 20,
         height = barHeight * data.length,
-        left_width = 100;
+        left_width = 300;
 
     var xScale = d3.scale.linear()
         .domain([0, d3.max(data, function(d) { return d.total; })])
@@ -276,8 +280,8 @@ var makeTotalsViz = function(data) {
         
     var yScale = d3.scale.ordinal()
         .domain(data, function(d) { 
-            return d.featureType; 
-            console.log(d.featureType); //hmm it doesn't console anything
+            return d.type; 
+            console.log(d.type); //hmm it doesn't console anything
         })
         .rangeBands([0, height]);
     console.log(yScale.range());
@@ -305,13 +309,27 @@ var makeTotalsViz = function(data) {
         .text(function(d) { return d.total; });
 
     bar.append("text")
-        .attr("x", left_width * 0.85)
+        .attr("x", left_width * 0.92)
         //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
         .attr("y", barHeight / 2)
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
-        .style("fill", "black")
-        .text(function(d) { return d.featureType; });
+        .text(function(d) { return d.type; });
+}
+
+function sortArrOfObjectsByParam(arrToSort, strObjParamToSortBy, sortAscending) {
+    if(sortAscending == undefined) sortAscending = true;  // default to true
+    
+    if(sortAscending) {
+        arrToSort.sort(function (a, b) {
+            return a[strObjParamToSortBy] - b[strObjParamToSortBy];
+        });
+    }
+    else {
+        arrToSort.sort(function (a, b) {
+            return b[strObjParamToSortBy] - a[strObjParamToSortBy];
+        });
+    }
 }
 
 //get the totals for all sightings, or species and counts - then draw a totals bar chart viz
@@ -330,7 +348,7 @@ var getFeatureTotalData = function(featureType) {
     d3.json(url, function(error, data) {
         console.log(featureType + " data");
         var featuresCountObj = {};
-        featuresCountObj.featureType = featureType;
+        featuresCountObj.type = featureType;
         featuresCountObj.total = data.total;
         featuresCountArray.push(featuresCountObj);
         
@@ -381,13 +399,30 @@ function loadData(path_to_data, feature_type) {
             console.log("Initial Data", data);
 
             //parse item differently based on feature_type
-            if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //if these are top level features
+            if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
                 //make features viz - totals of all the feature types?
                 //if api call is expeditions or members, get from query string?
                 totalsVizDiv.show();
                 getFeatureTotalData(features[index])
 
                 console.log("these are the features"); //do we need a viz for members or expeditions?
+            }
+
+            if(feature_type === "None" && path_to_data.indexOf("species") != -1 ) { //list of all species with totals
+                console.log("these are the species");
+                for(species in data.results) {
+                    
+                    var count = data.results[species];
+                    console.log(species + ": " + count);
+
+                    var sightingCount = {};
+                    sightingCount.type = species;
+                    sightingCount.total = count;
+                    speciesSightingsTotals.push(sightingCount);
+                }
+                console.log(speciesSightingsTotals);
+                totalsVizDiv.fadeIn();
+                makeTotalsViz(speciesSightingsTotals);
             }
             
             if (feature_type === "ambit") {
@@ -425,6 +460,7 @@ function loadData(path_to_data, feature_type) {
             if (feature_type === "sighting") {
                 //make sightings viz - totals of all the SpeciesNames sightings
                 console.log("SIGHTING");
+                //if it only asks for sightings and not species??
 
                 if(path_to_data.indexOf("BirdName") != -1) { //if query asks for species name
                     console.log("BirdName: " + path_to_data);

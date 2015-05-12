@@ -12,13 +12,7 @@
       letter-spacing: 0.1em;
     }
 
-    #dataPage h2 {
-      font-family: 'Montserrat';
-      /*font-size: 14px;*/
-      text-transform: uppercase;
-      line-height: 1.0em;
-      letter-spacing: 0.1em;
-    }
+
 
     .api-query-control h2 {
       font-family: 'Montserrat';
@@ -43,7 +37,7 @@
     #totalsViz {
         width: 800px;
         height: 200px;
-        background-color: #eff4fb;
+        background-color: rgba(4, 0, 26, 0.62);
         padding: 9.5px;
         margin-top:8px;
         margin-bottom:20px;
