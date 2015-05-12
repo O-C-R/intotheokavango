@@ -823,6 +823,15 @@ hr{
       background-color: rgba(4, 0, 26, 0.62);
     }
 
+        #dataPage h2 {
+      font-family: 'Montserrat';
+      /*font-size: 14px;*/
+      text-transform: uppercase;
+      line-height: 1.0em;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
     #dataPageContainer {
       width:100%;
       height: auto;
@@ -875,16 +884,24 @@ hr{
       height: auto;
     }
 
+    #widgets-area {
+      background-color: rgba(4, 0, 26, 0.62);
+      width: 100%;
+      height: 600px;
+    }
+
     #data-content #features-area {
       float: left;
-      width: 300px;
+      width: 270px;
       height: 400px;
+      padding: 20px 20px 10px 30px;
     }
 
     #data-content #query-area {
       float: left;
       width: 900px;
       margin-left: 50px;
+      padding: 20px 0px 10px 0px;
     }
 
     #data-content #input-area {
@@ -902,30 +919,31 @@ hr{
       width: 100%;
       height: 200px;
   /*    float: left;*/
-      background-color: #eff4fb;
+      /*background-color: rgba(4, 0, 26, 0.62);*/
       padding:10px;
-      color: #000000;
-      line-height: 24px;
+      color: #fff;
+      line-height: 36px;
     }
 
     #features-totals #features-right {
       float: right;
-      width: 68%;
+      width: 75%;
       text-align: left;
       padding-left: 1%;
     }
 
     #features-totals #features-left {
       float: left;
-      width: 30%;
+      /*width: 30%;*/
       text-align: right;
       padding-right: 1%;
       font-weight: bold;
+      color: #686d9d;
     }
 
     #data-content pre {
         font-size: 12px;
-        /*margin-left: 50px;*/
+        margin-top: 20px;
         width: 800px;
         /*float: left;*/
     }
