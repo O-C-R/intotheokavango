@@ -16,7 +16,7 @@
 <script id='query-template' type='text/ractive'>
     <h2>Query String</h2>
     <pre id="query-endpoint">{{renderedURL}}</pre>
-    <button id="query-button" on-click="runQuery">Run Query</button>
+    
     <Tag queryTags="{{queryTags}}"></Tag>
     <div class="input-section">
         <h2>View</h2>
@@ -37,6 +37,7 @@
         <label>
             <input type='radio' name='{{order}}' value='descending'>descending</label>
     </div>
+    <button id="query-button" on-click="runQuery">Run Query</button>
     <div class="input-section">
         <h2>Filter by</h2>
         <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select the filter" />
@@ -98,11 +99,13 @@
   </div>
 </script>
 
+<!-- d3 component template -->
 <script id="d3-template" type="text/ractive">
     
     <div id="timelineViz"></div>
 </script>
 
+<!-- main data section ractive template -->
 <script id="content-template" type="text/ractive">
   <div id="data-header">
       <ul id="data-navigation">
@@ -122,19 +125,22 @@
 
   {{#if section === "explorer"}}
   <div class="data-description">
-  <p>The API Explorer page contains some user interface tools to help make it easier to understand how to build your database query. By choosing between different buttons, you can decide whether you want your data to return in the raw JSON format, plotted on a map, or visualized on a graph. You can also select how many entries to return, as well as what kind of data you’re interested in seeing. For more information on all possible endpoints (types of queries you can make), please consult the API Documentation section.</p>
-
-    <div id="features-area">
-      <h2>Feature Totals</h2>
-      <div id="features-totals">
-          <!--Ractive template-->
+    <p>The API Explorer page contains some user interface tools to help make it easier to understand how to build your database query. By choosing between different buttons, you can decide whether you want your data to return in the raw JSON format, plotted on a map, or visualized on a graph. You can also select how many entries to return, as well as what kind of data you’re interested in seeing. For more information on all possible endpoints (types of queries you can make), please consult the API Documentation section.</p>
+  
+    <div id="widgets-area">
+      <div id="features-area">
+        <h2>Feature Totals</h2>
+        <div id="features-totals">
+            <!--Ractive template-->
+            <FeaturesWidget />
+        </div>
       </div>
-    </div>
-    <div id="query-area">
-        <!--Ractive template-->
-        <QueryComponent />
-    </div>
-  </div>
+      <div id="query-area">
+          <!--Ractive template-->
+          <QueryComponent />
+      </div>
+     </div>
+   </div>
   {{/if}}
 
   {{#if section === "documentation"}}

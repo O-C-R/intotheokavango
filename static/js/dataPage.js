@@ -103,7 +103,7 @@ console.warn('DATA PAGE', id);
                     isOpened: false,
                     liHeight: 40,
                     padding: 20,
-                    show: 3,
+                    show: 2,
                     limit: 100,
                     selector: 'Nothing',
                     selectedText: 'Select from dropdown',
@@ -782,6 +782,23 @@ console.warn('DATA PAGE', id);
         Template.components.D3View = D3View;
     })(Ractive);
 
+
+   /*
+    ################################
+    ### D3Component ###
+    ################################
+    */
+    (function(Template){
+        var FeaturesWidget = Template.extend({
+            template:"#featuresTemplate",
+            data: function() {
+                return {
+                    featuresArray: featureTotals
+                };
+            }
+        });
+        Template.components.FeaturesWidget = FeaturesWidget
+    })(Ractive);
     
     /*
 
