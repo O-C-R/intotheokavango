@@ -1,0 +1,76 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+<script src="/static/js/jquery-2.1.4.min.js"></script>
+<script src="/static/js/jquery.serializejson.min.js"></script>
+
+<script>
+
+$(document).ready(function() {
+
+    $('#test').on('click', function () {
+                var data = new FormData();
+                var image = $("#Photo").get(0).files;
+
+                // Add the uploaded file content to the form data collection
+                if (image.length > 0) {
+                    data.append("upload", image[0]);
+                }
+
+                var jsonBlob = new Blob([JSON.stringify($('#imageUpload').serializeJSON())], {type : 'text/json'});
+
+                data.append("metadata", jsonBlob, "metadata.json");
+
+                var myReader = new FileReader();
+                myReader.onload = function(event){
+                    console.log(myReader.result);
+                };
+                myReader.readAsText(jsonBlob);
+
+                // Make Ajax request with the contentType = false, and procesDate = false
+                var ajaxRequest = $.ajax({
+                    type: "POST",
+                    url: "http://intotheokavango.org/ingest/image",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                    }
+                });
+
+                ajaxRequest.done(function (xhr, textStatus) {
+                    console.log(textStatus);
+                });
+
+
+            });
+
+})
+
+
+	
+</script>
+
+{% endblock head %}
+{% block body %}
+<h2>Image Upload </h2>
+<form id="imageUpload">
+
+    <label for="photo">Photo</label>
+    <input type="file" name="Photo" id="Photo" value="">
+
+    <label for="TeamMember">Team Member</label>
+    <input type="text" name="TeamMember" id="TeamMember" value="">
+
+    <label for="Tags">Tags</label>
+    <input type="text" name="Tags" id="Tags" value="">
+
+</form>
+<div id="test">Click to Submit</div>
+{% endblock body %}
