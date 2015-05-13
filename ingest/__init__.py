@@ -182,6 +182,7 @@ def estimate_geometry(data, db):
             closest_after = beacon_closest_after
 
         if closest_before is None or closest_after is None:
+            data['properties']['EstimatedGeometry'] = None
             log.warning("--> closest not found")
             return data
 

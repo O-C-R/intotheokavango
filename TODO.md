@@ -1,5 +1,4 @@
 ### new
-- iNat photo issues + need NatGeo project membership
 - audio -- pull created time from file
 - add SensorType (FeatureSubType) to SMS sensors
 - video ingestion
