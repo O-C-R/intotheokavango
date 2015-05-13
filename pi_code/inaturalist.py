@@ -1,24 +1,15 @@
 import json, requests, os
-from housepy import config, log
-# import requests
-
-# import os
-# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import LegacyApplicationClient
+from housepy import config, log
+from mongo import db
 
-site = "https://www.inaturalist.org"
-app_id = "4e10326bd83377287d728a17e792dd3a1d393d32aea338bd66a9378ddfd05d32"
-app_secret = "c9cc84a55fdc2cccb86e1964c5bab99e4e209c6e607ffd3fad3fe79b7dea6709"
-username = "intotheokavango"
-password = "Hipp0potamus"
-project_id = "800"
+SITE = "https://www.inaturalist.org"
+settings = config['iNaturalist']
 
-client = LegacyApplicationClient(app_id)
-oauth = OAuth2Session(app_id, client=client)
-token = oauth.fetch_token(site + '/oauth/token', client_id=app_id, client_secret=app_secret, username=username, password=password)
-
+client = LegacyApplicationClient(settings['app_id'])
+oauth = OAuth2Session(settings['app_id'], client=client)
+token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], client_secret=settings['app_secret'], username=settings['username'], password=settings['password'])
 
 def post_inaturalist(feature):
     log.info("post_inaturalist")
@@ -34,12 +25,11 @@ def post_inaturalist(feature):
 
     try:
         log.info("Sending payload...")
-        response = oauth.post(site + "/observations.json", data=payload).json()
+        response = oauth.post(SITE + "/observations.json", data=payload).json()
         # log.debug("--> response: %s" % json.dumps(response, indent=4))
         observation_id = response[0]['id']
         log.info("--> observation_id is %s" % observation_id)
-
-        ## update okavango feature with observation_id here
+        db.features.update({"_id" : feature['_id']}, {'$set': {'properties.iNaturalistID': observation_id}})
     except Exception as e:
         log.error(log.exc(e))
         return False
@@ -60,8 +50,8 @@ def post_inaturalist(feature):
             log.info("--> %s" % path)
             try:
                 payload = {"observation_photo[observation_id]" : observation_id}
-                files = {'file': open(path, 'rb')}
-                response = oauth.post("%s/observation_photos.json" % site, data=payload, files=files)
+                files = {'file': (os.path.basename(path), open(path, 'rb'), 'image/jpeg')}
+                response = oauth.post("%s/observation_photos.json" % SITE, data=payload, files=files)
                 log.info("--> response: %s" % json.dumps(response.json(), indent=4))
             except IndexError as e:
                 log.error(log.exc(e))
@@ -69,24 +59,16 @@ def post_inaturalist(feature):
 
     try:
         log.info("Adding observation to project...")
-        payload = {"project_observation[observation_id]" : observation_id, "project_observation[project_id]" : project_id}
-        response = oauth.post(site  + "/project_observations.json", data=payload)
+        payload = {"project_observation[observation_id]" : observation_id, "project_observation[project_id]" : settings['project_id']}
+        response = oauth.post(SITE  + "/project_observations.json", data=payload)
         log.info("--> response: %s" % json.dumps(response.json(), indent=4))
     except Exception as e:
         log.error(log.exc(e))
 
 
+def main():
+    features = db.features.find({'properties.FeatureType': "sighting", 'properties.Expedition': config['expedition'], 'properties.iNaturalistID': {'$exists': False}})
+    for feature in features:
+        post_inaturalist(feature)
 
-def test():
-
-    #Get a single feature to use a test
-    r = requests.get("http://localhost:7777/api/features/?FeatureType=sighting&limit=1")
-    jr = r.json()
-    feature = jr['results']['features'][0]
-
-    # print(json.dumps(feature, indent=4))
-
-    post_inaturalist(feature)
-
-
-test()
+main()
