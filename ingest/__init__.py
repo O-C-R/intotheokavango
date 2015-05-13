@@ -313,7 +313,7 @@ def process_image(path, member=None, t_utc=None):
             log.error("--> no EXIF data in image")
         else:
             # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
-            date_field = exif['DateTime']
+            date_field = exif['DateTimeOriginal'] if 'DateTimeOriginal' in exif else exif['DateTime']
             if date_field[4] == ":" and date_field[7] == ":":
                 date_field = list(date_field)
                 date_field[4] = "-"
@@ -321,6 +321,7 @@ def process_image(path, member=None, t_utc=None):
                 date_field = ''.join(date_field)
             date = util.parse_date(date_field, tz=config['local_tz'])
             data['t_utc'] = util.timestamp(date)                            ## careful about this overriding
+            data['DateTime'] = util.datestring(data['t_utc'], tz=config['local_tz'])    
             data['Make'] = exif['Make'].replace("\u0000", '').strip() if 'Make' in exif else None
             data['Model'] = exif['Model'].replace("\u0000", '').strip() if 'Model' in exif else None
         filename = "%s_%s.jpg" % (data['t_utc'], str(uuid.uuid4()))
