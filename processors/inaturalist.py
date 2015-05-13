@@ -15,6 +15,9 @@ token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], c
 
 def post_inaturalist(feature):
     log.info("post_inaturalist")
+    if 'geometry' not in feature or feature['geometry'] is None:
+        log.debug("Skipping sighting %s without geometry..." % feature['_id'])
+        continue
     payload = {
         'observation[species_guess]': feature['properties']['SpeciesName'],
         'observation[observed_on_string]' : feature['properties']['DateTime'],
