@@ -34,7 +34,7 @@ def main(): ## called via tweet_grabber.py
                 entry = {strings.camelcase(key): value for (key, value) in entry.items() if key in ['title', 'link', 'summary', 'published']}
                 entry['Member'] = MEMBERS[a]
                 entry['t_utc'] = util.timestamp(util.parse_date(entry['Published']))
-                if entry['t_utc'] < util.timestamp(util.parse_date(str(config['start_date'][config['expedition']]))):
+                if entry['t_utc'] < (util.timestamp(util.parse_date(str(config['start_date'][config['expedition']])))) - (3 * 24 * 60 * 60): ## hack, minus three days to get jer's post
                     log.info("--> skipping too early blog post")
                     continue
                 del entry['Published']
