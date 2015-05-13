@@ -54,7 +54,6 @@ def parse(request):
             if not success:
                 log.error(value)
             del image_data['Member']
-            del image_data['t_utc']                
             images.append(image_data)
             log.info("--> image added")
     data['Images'] = images

@@ -43,13 +43,6 @@ def parse(request):
         return None
     feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
 
-
-    # Species_Name
-    # Image_1
-    # "Notes": "airport lounge.",
-    #        "Location_Description": "swiss air airport lounge.",
-    #        "Location_Sketch_Image":   
-
     log.info("Saving image file...")
     paths = []
     for key, value in data.items():
@@ -76,7 +69,6 @@ def parse(request):
         if not success:
             log.error(value)
         del image_data['Member']
-        del image_data['t_utc']
         images.append(image_data)
         log.info("--> image added")
     feature['Images'] = images
