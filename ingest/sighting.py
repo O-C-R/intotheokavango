@@ -35,7 +35,7 @@ def parse(request):
         del data['TeamMember']          
 
     # purge blanks
-    data = {key: value for (key, value) in data if len(value.strip())}
+    data = {key: value for (key, value) in data.items() if len(value.strip())}
     if 'SpeciesName' not in data:
         log.error("Missing SpeciesName")
         return None

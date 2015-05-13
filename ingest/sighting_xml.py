@@ -37,7 +37,7 @@ def parse(request):
     log.debug(json.dumps(feature, indent=4))
 
     # purge blanks
-    feature = {key: value for (key, value) in feature if len(value.strip())}
+    feature = {key: value for (key, value) in feature.items() if len(value.strip())}
     if 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
         return None
