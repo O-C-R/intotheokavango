@@ -26,9 +26,9 @@ $(document).ready(function() {
 
 
                 var metadata = $('#sightingUpload').serializeJSON()
-                //metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
+                metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
                 metadata['Notes'] = $('#Notes').val()
-                //metadata['getTimestamp'] = $('#getTimestamp').is(':checked');
+                metadata['getImageTimestamp'] = $('#getImageTimestamp').is(':checked');
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -90,8 +90,8 @@ $(document).ready(function() {
     <label for="Notes">Notes</label>
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
     <br /><br />
-    <label for="getTimestamp">Get timestamp from server (if no image for sighting)</label>
-    <input type="checkbox" name="getTimestamp" id="getTimestamp">
+    <label for="getImageTimestamp">Get timestamp from image</label>
+    <input type="checkbox" name="getImageTimestamp" id="getImageTimestamp">
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 </div>
