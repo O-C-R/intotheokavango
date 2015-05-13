@@ -25,6 +25,7 @@ $(document).ready(function() {
 
                 var metadata = $('#sightingUpload').serializeJSON()
                 metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
+                metadata['Notes'] = $('#Notes').val()
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -71,7 +72,7 @@ $(document).ready(function() {
 <form id="sightingUpload">
 
     <label for="photo">Photo</label>
-    <input type="file" name="Photo" id="Photo" value="">
+    <input type="file" name="Photo" id="Photo" value="" multiple>
     <br /><br />
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
@@ -79,8 +80,11 @@ $(document).ready(function() {
     <label for="SpeciesName">Species Name</label>
     <input type="text" name="SpeciesName" id="SpeciesName" value="">
     <br /><br />
+    <label for="Count">Count</label>
+    <input type="text" name="Count" id="Count" value="">
+    <br /><br />
     <label for="Notes">Notes</label>
-    <input type="text" name="Notes" id="Notes" value="">
+    <textarea type="" name="Notes" id="Notes" value=""></textarea>
 
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
