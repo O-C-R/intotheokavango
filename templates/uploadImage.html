@@ -18,7 +18,10 @@ $(document).ready(function() {
                     data.append("upload", image[0]);
                 }
 
-                var jsonBlob = new Blob([JSON.stringify($('#imageUpload').serializeJSON())], {type : 'text/json'});
+                var metadata = $('#imageUpload').serializeJSON()
+                metadata['Notes'] = $('#Notes').val()
+
+                var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
                 data.append("metadata", jsonBlob, "metadata.json");
 
@@ -45,7 +48,7 @@ $(document).ready(function() {
                 });
 
                 ajaxRequest.done(function (xhr, textStatus) {
-                    console.log(textStatus);
+                    alert(textStatus);
                 });
 
 
@@ -64,14 +67,13 @@ $(document).ready(function() {
 <form id="imageUpload">
 
     <label for="photo">Photo</label>
-    <input type="file" name="Photo" id="Photo" value="">
+    <input type="file" name="Photo" id="Photo" value="" multiple>
     <br /><br />
     <label for="TeamMember">Team Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
     <br /><br />
-    <label for="Tags">Tags</label>
-    <input type="text" name="Tags" id="Tags" value="">
-
+    <label for="Notes">Notes</label>
+    <textarea type="" name="Notes" id="Notes" value=""></textarea>
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 {% endblock body %}
