@@ -34,14 +34,17 @@ def parse(request):
         log.error(log.exc(e))
         return None
 
-    log.debug(json.dumps(feature, indent=4))
-
     # purge blanks
     feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
     if 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
         return None
     feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
+
+    if 'Count' not in feature and 'count' not in feature:
+        feature['Count'] = 1
+    log.debug(json.dumps(feature, indent=4))        
+    feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
 
     log.info("Saving image file...")
     paths = []
@@ -68,12 +71,17 @@ def parse(request):
         success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype        
         if not success:
             log.error(value)
-        del image_data['Member']
+        if 'Member' in image_data:
+            del image_data['Member']            
         images.append(image_data)
         log.info("--> image added")
     feature['Images'] = images
 
-    feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
+    # use image data to assign a timestamp to the sighting
+    if 'getImageTimestamp' in feature and feature['getImageTimestamp'] == True and len(feature['Images']) and 't_utc' in feature['Images'][0]:
+        feature['t_utc'] = feature['Images'][0]['t_utc']
+        log.info("--> replaced sighting t_utc with image data")
+    del feature['getImageTimestamp']
 
     return feature
 

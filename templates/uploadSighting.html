@@ -42,7 +42,7 @@ $(document).ready(function() {
 
                 var ajaxRequest = $.ajax({
                     type: "POST",
-                    url: "http://intotheokavango.org/ingest/sighting",
+                    url: "/ingest/sighting",
                     contentType: false,
                     processData: false,
                     data: data,
@@ -52,11 +52,13 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                        alert(status + " " + error);
                     }
                 });
 
                 ajaxRequest.done(function (xhr, textStatus) {
                     alert(textStatus);
+                    document.location.reload();
                 });
 
 
@@ -91,7 +93,7 @@ $(document).ready(function() {
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
     <br /><br />
     <label for="getImageTimestamp">Get timestamp from image</label>
-    <input type="checkbox" name="getImageTimestamp" id="getImageTimestamp">
+    <input type="checkbox" name="getImageTimestamp" id="getImageTimestamp" checked="checked" />
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 </div>
