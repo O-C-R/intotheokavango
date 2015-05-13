@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json, requests, os
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import LegacyApplicationClient

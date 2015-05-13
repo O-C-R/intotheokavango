@@ -62,3 +62,10 @@ twilio:
     account_sid: 
     auth_token: 
     number: 
+
+iNaturalist:
+    app_id:
+    app_secret:
+    username:
+    password:
+    project_id:
