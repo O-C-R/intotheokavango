@@ -86,7 +86,7 @@ var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
         .range([0, width]);
 
     var yScale = d3.scale.linear()
-        .range([height, 0]);
+        .rangeRound([height, 0]);
 
     var svg = d3.select("#timelineViz").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -99,23 +99,43 @@ var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
         yAxisLabel = "Count";
         graphTitle = subTitle + " Sightings";
 
-        var barWidth = width / parsedData.length;
+        //var barWidth = width / parsedData.length * 0.75;
+        var barWidth = 1;
+
+        xScale.domain(d3.extent(parsedData, function(d) { 
+            return d.time; }));
+
+        var ext = d3.extent(parsedData, function(d) {
+            return d.count;
+        });
+        var max = d3.max(parsedData, function(d) {
+            return d.count;
+        });
+        var min = d3.min(parsedData, function(d) {
+            return d.count;
+        });
+        console.log("ext: " + ext);
+        console.log("max: " + max);
+        console.log("min: " + min);
         
+        yScale.domain([0, max]);
+
         xAxis = d3.svg.axis()
         .scale(xScale)
         .orient("bottom");
 
+        var y_max = yScale.domain().slice(-1)[0];
+        
         yAxis = d3.svg.axis()
             .scale(yScale)
-            .orient("left");
-
-        xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
-        yScale.domain(d3.extent(parsedData, function(d) { return d.count; }));
+            .orient("left")
+            .tickValues(d3.range(y_max +1)) //to get integer y-axis values 
+            .tickFormat(d3.format(",.0f"));
 
         var bar = svg.selectAll("g")
                 .data(parsedData)
             .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+                .attr("transform", function(d) { return "translate(" + xScale(d.time) + ",0)"; });
 
         bar.append("rect")
             .attr("y", function(d) { return yScale(d.count); })
