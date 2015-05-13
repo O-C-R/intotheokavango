@@ -62,9 +62,10 @@ $(document).ready(function() {
 
 {% endblock head %}
 {% block body %}
+<div id="textarea" style="padding:30px">
 <h2>Image Upload </h2>
 <br />
-<form id="imageUpload">
+<form id="imageUpload" style="padding-bottom:20px">
 
     <label for="photo">Photo</label>
     <input type="file" name="Photo" id="Photo" value="" multiple>
@@ -76,4 +77,5 @@ $(document).ready(function() {
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
+<div>
 {% endblock body %}

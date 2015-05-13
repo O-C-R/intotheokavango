@@ -23,9 +23,12 @@ $(document).ready(function() {
                     data.append("upload", image[0]);
                 }
 
+
+
                 var metadata = $('#sightingUpload').serializeJSON()
-                metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
+                //metadata['t_utc'] = Math.floor(today.getTime()/ 1000)
                 metadata['Notes'] = $('#Notes').val()
+                //metadata['getTimestamp'] = $('#getTimestamp').is(':checked');
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -67,9 +70,10 @@ $(document).ready(function() {
 
 {% endblock head %}
 {% block body %}
+<div id="textarea" style="padding:30px">
 <h2>Sighting Upload </h2>
 <br />
-<form id="sightingUpload">
+<form id="sightingUpload" style="padding-bottom:20px">
 
     <label for="photo">Photo</label>
     <input type="file" name="Photo" id="Photo" value="" multiple>
@@ -85,7 +89,10 @@ $(document).ready(function() {
     <br /><br />
     <label for="Notes">Notes</label>
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
-
+    <br /><br />
+    <label for="getTimestamp">Get timestamp from server (if no image for sighting)</label>
+    <input type="checkbox" name="getTimestamp" id="getTimestamp">
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
+</div>
 {% endblock body %}
