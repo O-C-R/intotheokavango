@@ -36,6 +36,14 @@ def parse(request):
 
     log.debug(json.dumps(feature, indent=4))
 
+    # purge blanks
+    feature = {key: value for (key, value) in feature if len(value.strip())}
+    if 'SpeciesName' not in feature:
+        log.error("Missing SpeciesName")
+        return None
+    feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
+
+
     # Species_Name
     # Image_1
     # "Notes": "airport lounge.",
@@ -73,10 +81,7 @@ def parse(request):
         log.info("--> image added")
     feature['Images'] = images
 
-    if 'SpeciesName' in feature:
-        feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
-    else:
-        feature['Taxonomy'] = None        
+    feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
 
     return feature
 

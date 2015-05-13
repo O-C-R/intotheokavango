@@ -34,6 +34,13 @@ def parse(request):
         data['Member'] = data['TeamMember']
         del data['TeamMember']          
 
+    # purge blanks
+    data = {key: value for (key, value) in data if len(value.strip())}
+    if 'SpeciesName' not in data:
+        log.error("Missing SpeciesName")
+        return None
+    data['SpeciesName'] = strings.titlecase(data['SpeciesName'])        
+
     # process the image
     images = []
     for path in paths:
@@ -52,10 +59,7 @@ def parse(request):
             log.info("--> image added")
     data['Images'] = images
 
-    if 'SpeciesName' in data:
-        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
-    else:
-        data['Taxonomy'] = None
+    data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
 
     return data
 
