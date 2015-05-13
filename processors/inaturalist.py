@@ -16,6 +16,8 @@ token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], c
 def post_inaturalist(feature):
     log.info("post_inaturalist")
     if 'geometry' not in feature or feature['geometry'] is None:
+        if 'id' in feature:
+            feature['_id'] = feature['id']
         log.debug("Skipping sighting %s without geometry..." % feature['_id'])
         return
     payload = {
@@ -39,7 +41,7 @@ def post_inaturalist(feature):
         log.error(log.exc(e))
         return False
 
-    if 'Image' in feature['properties']:
+    if 'Image' in feature['properties'] or 'Images' in feature['properties']:
         log.info("Adding photos...")
         images = []
         if 'Image' in feature['properties']:
@@ -47,6 +49,7 @@ def post_inaturalist(feature):
         if 'Images' in feature['properties']:
             for image in feature['properties']['Images']:
                 images.append(image)
+        log.info("%s images" % len(images))
         for image in images:
             if 'Url' not in image:
                 log.info("--> missing Url")
