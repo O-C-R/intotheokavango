@@ -1,8 +1,11 @@
 {% extends "page.html" %}
 {% block head %}
 
+<link rel="stylesheet" type="text/css" href="/static/css/jquery.mobile-1.4.5.min.css" />
 <link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="/static/js/jquery-2.1.4.min.js"></script>
+<script src="/static/js/jquery.mobile-1.4.5.min.js"></script>
 <script src="/static/js/jquery.serializejson.min.js"></script>
 
 <script>
@@ -62,7 +65,7 @@ $(document).ready(function() {
 
 {% endblock head %}
 {% block body %}
-<div id="textarea" style="padding:30px">
+<div id="textarea" style="padding:30px" data-role="page">
 <h2>Image Upload </h2>
 <br />
 <form id="imageUpload" style="padding-bottom:20px">
@@ -78,4 +81,5 @@ $(document).ready(function() {
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 <div>
+</div>
 {% endblock body %}
