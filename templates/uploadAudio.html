@@ -34,6 +34,7 @@ $(document).ready(function() {
     $('#t_utc').val(today);
 
     $('#test').on('click', function () {
+                $('#test').text("Attempting to send....");
                 var data = new FormData();
                 var audio = $("#Audio").get(0).files;
 
