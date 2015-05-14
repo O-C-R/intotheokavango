@@ -28,7 +28,7 @@ class Core(server.Handler):
         self.set_header("Access-Control-Allow-Origin", "*")
         members = []
         for member in config['members']:
-            result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]))
+            result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
             if not len(result) or 'Core' not in result[0]:
                 core = False
             else:

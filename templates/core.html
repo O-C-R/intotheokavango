@@ -1,0 +1,51 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+
+<script>
+    $(document).ready(function() {
+        console.log('ready');
+        $('#setCore').mousedown(function () {
+            console.log("click");
+            var data = {};
+            {% for member in dbmembers %}
+            data['{{ member.Name }}'] = $("#{{ member.Name }}").is(':checked');
+            {% endfor %}
+            var ajaxRequest = $.ajax({
+                type: "POST",
+                url: "/setCore",
+                data: data,
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    console.log(data);
+                    alert(xhr.responseText);
+                }
+            });
+            ajaxRequest.done(function (xhr, textStatus) {
+                alert(textStatus);
+                document.location.reload();
+            });
+        });
+    })
+</script>
+
+{% endblock head %}
+
+{% block body %}
+<div id="textarea" style="padding:30px">
+<h2>Set core members</h2>
+<br />
+<form style="padding-bottom:20px">
+
+    {% for member in dbmembers %}
+    <input type="checkbox" id="{{ member.Name }}" {% if member.Core %}checked="checked"{% endif %} /> {{ member.Name }}<br />
+    {% endfor %}
+
+</form>
+<a id="setCore" href="#">Save</a>
+<div>
+
+{% endblock body %}

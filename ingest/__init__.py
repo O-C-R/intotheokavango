@@ -153,6 +153,7 @@ def estimate_geometry(data, db):
         # find geodata from this Member
         member_closest_before = None
         member_closest_after = None
+        core = False
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)
@@ -162,16 +163,23 @@ def estimate_geometry(data, db):
             except IndexError:
                 pass
 
+            # is/was the member core at this point?
+            try:
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
+            except Exception as e:
+                log.info("No core entry at time %s" % t)
+
         # find geodata from the nearest beacon
         # but only do it if there is no Member, or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        try:
-            beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
-            beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
-        except IndexError:
-            pass
+        if 'Member' not in data['properties'] or core:
+            try:
+                beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
+                beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
+            except IndexError:
+                pass
 
         # pick the best ones
         if member_closest_before is not None and beacon_closest_before is not None:
