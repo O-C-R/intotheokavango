@@ -32,6 +32,9 @@ $(document).ready(function() {
         }
     })(jQuery);
 
+    var today = new Date()
+    $('#t_utc').val(today);
+
     $('#test').on('click', function () {
                 var data = new FormData();
                 var audio = $("#Audio").get(0).files;
@@ -43,6 +46,8 @@ $(document).ready(function() {
 
                 var metadata = $('#imageUpload').serializeJSON()
                 metadata['Notes'] = $('#Notes').val()
+                var timestamp = new Date(metadata['t_utc']);
+                metadata['t_utc'] = Math.floor(timestamp.getTime()/ 1000)
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -98,6 +103,10 @@ $(document).ready(function() {
     <label for="TeamMember">Team Member</label>
     <br />
     <input type="text" name="TeamMember" id="TeamMember" value="">
+    <br /><br />
+    <label for="t_utc">Timestamp</label>
+    <br />
+    <input type="text" name="t_utc" id="t_utc" value="">
     <br /><br />
     <label for="Notes">Notes</label>
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
