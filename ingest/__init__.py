@@ -71,7 +71,8 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
     feature = verify_t(feature)    
     if not feature:
         return False, "Missing t_utc"
-    feature = verify_expedition(feature)        
+    feature = verify_expedition(feature)
+    feature = tag_core(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
         feature = estimate_geometry(feature, db)
@@ -165,9 +166,9 @@ def estimate_geometry(data, db):
 
             # is/was the member core at this point?
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
             except Exception as e:
-                log.info("No core entry at time %s" % t)
+                log.info("--> no core entry at time %s" % t)
 
         # find geodata from the nearest beacon
         # but only do it if there is no Member, or the Member is/was core at that point
@@ -247,6 +248,25 @@ def verify_expedition(data):
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
+
+def tag_core(data):
+    try:
+        db = Application.instance.db
+    except AttributeError:
+        from mongo import db    
+    try:
+        member = data['properties']['Member']   
+        t = data['properties']['t_utc']   
+        try:
+            core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+        except IndexError:
+            log.info("--> no core entry at time %s" % t)
+            core = False
+        data['properties']['CoreExpedition'] = core
+        return data
+    except Exception as e:
+        log.error(log.exc(e))
+        return data
 
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""
