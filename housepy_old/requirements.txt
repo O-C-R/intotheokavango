@@ -1,0 +1,11 @@
+PyYAML>=3.10
+beautifulsoup4>=4.2.1
+python-geohash>=0.8.4
+tornado>=3.1
+Jinja2>=2.7
+pycrypto>=2.6
+python-dateutil>=2.1
+pytz>=2013b
+tinys3>=0.1.8
+numpy>=1.9.1
+Pillow>=2.7.0

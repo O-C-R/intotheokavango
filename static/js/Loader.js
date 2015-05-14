@@ -12,6 +12,7 @@ function Loader(){
 	var photos = [];
 	var members = {};	
 	var dayOffset = 5;
+	var expeditionYear = 14;
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
@@ -35,7 +36,7 @@ function Loader(){
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 			data = data.results;		
@@ -76,7 +77,7 @@ function Loader(){
 
 
 	function loadTweets(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 			data = data.results;	
@@ -95,7 +96,7 @@ function Loader(){
 
 
 	function loadPhotos(day, callback){
-		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_14&expeditionDay='+(day+dayOffset)+'&limit=0'
+		var query = 'http://dev.intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+dayOffset)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + e.statusText);
 			data = data.results;	
