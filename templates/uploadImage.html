@@ -31,7 +31,7 @@ $(document).ready(function() {
     })(jQuery);
 
     $('#test').on('click', function () {
-                $('#test').val("Attempting to send....");
+                $('#test').text("Attempting to send....");
                 var data = new FormData();
                 var image = $("#Photo").get(0).files;
 
