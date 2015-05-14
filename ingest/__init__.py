@@ -48,7 +48,7 @@ def ingest_request(feature_type, request):
         module = importlib.import_module(module_name)
         log.info("--> loaded %s module" % module_name)
         result = module.parse(request)
-        if len(result) == 2:
+        if type(result) == tuple and len(result) == 2:
             feature, error = result
         else:
             feature = result
@@ -61,27 +61,27 @@ def ingest_request(feature_type, request):
     return ingest_data(feature_type, feature)
 
 def ingest_data(feature_type, feature): # note that this operates on the original datastructure
-    log.info("ingest_data")    
+    log.info("ingest_data")  
     try:
         db = Application.instance.db
     except AttributeError:
         from mongo import db
     feature = verify_geojson(feature)
     if not feature:
-        return False, "Ingest failed: bad format"
+        return False, "Could not format as geojson"
+    feature = verify_t(feature)    
+    if not feature:
+        return False, "Missing t_utc"
     feature = verify_expedition(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
         feature = estimate_geometry(feature, db)
-    feature = verify_t(feature)
-    if not feature:
-        return False, "Ingest failed: missing t_utc"
     feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
     try:
         feature_id = db.features.insert_one(feature).inserted_id
     except Exception as e:
         log.error(log.exc(e))
-        return False, "Ingest failed"
+        return False, "Database error"
     log.info("--> success (%s)" % feature_id)
     return True, feature_id
 
