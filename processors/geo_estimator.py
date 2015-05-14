@@ -7,7 +7,7 @@ from mongo import db
 def main():    
     log.info("geo_estimator...")
 
-    # for data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon
+    # for data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon if they are core, otherwise fail
     ## for non-ambit wearers, this will keep querying, unfortunately
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}, 'properties.Member': {'$ne': None}})
     for feature in features:
@@ -21,7 +21,5 @@ def main():
         log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
         feature = estimate_geometry(feature, db)
         db.features.update({"_id" : feature['_id']}, feature)
-
-    ## for members that arent wearing an ambit and arent on the main expedition, this will break
 
 main()

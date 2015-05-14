@@ -2,7 +2,6 @@
       width:100%;
       height: auto;
       min-height:800px;
-      padding: 10px;
       background-color: rgba(4, 0, 26, 0.65);
     }
     #dataPage h1{
@@ -13,13 +12,7 @@
       letter-spacing: 0.1em;
     }
 
-    #dataPage h2 {
-      font-family: 'Montserrat';
-      font-size: 14px;
-      text-transform: uppercase;
-      line-height: 1.0em;
-      letter-spacing: 0.1em;
-    }
+
 
     .api-query-control h2 {
       font-family: 'Montserrat';
@@ -44,7 +37,7 @@
     #totalsViz {
         width: 800px;
         height: 200px;
-        background-color: #eff4fb;
+        background-color: rgba(4, 0, 26, 0.62);
         padding: 9.5px;
         margin-top:8px;
         margin-bottom:20px;
@@ -74,13 +67,14 @@
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-    background-color: steelblue;
+    background-color: #4bff87;
+    color: #686d9d;
     border: 1px solid transparent;
     border-radius: 4px;
   }
 
 /******** QUERY AREA ************/
-
+/*
     pre, code, code span {
         font-family: Monaco, Consolas, "Lucida Console", monospace !important;
         background-color: #eff4fb;
@@ -96,13 +90,13 @@
         color: #333;
         border: 1px solid #ccc;
         border-radius: 4px;
-    }
+    }*/
 
 /* RACTIVE DROP DOWN CSS */
 .ractive-dropdown {
-  color: steelblue;
+  color: #4bff87;
   width: 270px;
-  border: 1px solid steelblue;
+  border: 1px solid #4bff87;
   border-radius: 5px;
   position: relative;
   float: left;
@@ -115,7 +109,7 @@
   padding: 10px;
   outline: none;
   position: relative;
-  background: #fff;
+  background: #686d9d;
   font-size: 1.25em;
 }
 .ractive-dropdown .label:after {
@@ -133,9 +127,9 @@
   position: absolute;
   left: 0;
   z-index: 1;
-  background: #fff;
+  background: #eff4fb;
   width: 100%;
-  border: 1px solid steelblue;
+  border: 1px solid #686d9d;
   overflow-y: auto;
 }
 .ractive-dropdown ul * {
@@ -143,17 +137,18 @@
 }
 .ractive-dropdown ul li {
   padding: 10px 0;
-  color: steelblue;
+  color: #686d9d;
   position: relative;
   font-weight: bold;
 }
 .ractive-dropdown ul li.active {
-  color: #004347;
+  color: #686d9d;
+  background-color: #4bff87;
   padding-left: 10px;
 }
 .ractive-dropdown ul li.active:before {
   position: absolute;
-  color: #ffd100;
+  color: #686d9d;
   left: 0;
   top: 12px;
   content: '\25B8';
@@ -179,7 +174,7 @@
       min-height:605px;
       padding: 10px;
       margin-top:8px;
-      background-color: #eff4fb;
+      background-color: rgba(4, 0, 26, 0.62);
     }
 
     #vizContainer {
@@ -187,23 +182,27 @@
     }
 
     #totalsViz rect {
-        fill: steelblue;
+        fill: #4bff87;
     }
 
     #totalsViz text {
         fill: white;
-        font: 10px sans-serif;
+        font: 10px 'Sentinel SSm A', 'Sentinel SSm B';;
         text-anchor: end;
     }
 
     .axis text {
-      font: 10px sans-serif;
-      fill: #333;
+      font: 10px 'Sentinel SSm A', 'Sentinel SSm B';
+      fill: #fff;
     }
 
     .axis .title {
       font-weight: bold;
       text-anchor: end;
+    }
+
+    .axis .label {
+      font: 12px 'Gotham A', 'Gotham B', Helvetica, Arial;
     }
 
     .axis path,
@@ -216,33 +215,33 @@
     .title {
       font-weight: bold;
       font: 12px sans-serif;
-      fill: #333;
+      fill: #fff;
     }
 
     .line {
       fill: none;
-      stroke: steelblue;
+      stroke: #4bff87;
       stroke-width: 1.5px;
     }
 
     .line {
       fill: none;
-      stroke: steelblue;
+      stroke: #4bff87;
       stroke-width: 1.5px;
     } 
 
     .rect {
-      fill: steelblue;
+      fill: #4bff87;
       stroke: none;
     }
 
     circle {
         fill: none;
-        stroke: steelblue;
+        stroke: #4bff87;
     }
 
     path {
-        stroke: steelblue;
+        stroke: #4bff87;
         stroke-width: 1px;
         fill: none;
     }

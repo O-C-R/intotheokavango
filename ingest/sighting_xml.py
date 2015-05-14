@@ -11,7 +11,7 @@ def parse(request):
         data = xmltodict.parse(content)
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Parsing error"
 
     try:
         log.info("--> parsing XML")
@@ -32,15 +32,23 @@ def parse(request):
             feature[key.replace('_', '')] = value
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Unexpected fields"
 
-    log.debug(json.dumps(feature, indent=4))
+    # purge blanks
+    feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
+    if 'SpeciesNameOther' in feature:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesNameOther'])    
+        del feature['SpeciesNameOther']
+    elif 'SpeciesName' not in feature:
+        log.error("Missing SpeciesName")
+        return None, "Missing SpeciesName"
+    else:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
 
-    # Species_Name
-    # Image_1
-    # "Notes": "airport lounge.",
-    #        "Location_Description": "swiss air airport lounge.",
-    #        "Location_Sketch_Image":   
+    if 'Count' not in feature and 'count' not in feature:
+        feature['Count'] = 1
+    log.debug(json.dumps(feature, indent=4))        
+    feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
 
     log.info("Saving image file...")
     paths = []
@@ -67,16 +75,18 @@ def parse(request):
         success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype        
         if not success:
             log.error(value)
-        del image_data['Member']
-        del image_data['t_utc']
+        if 'Member' in image_data:
+            del image_data['Member']            
         images.append(image_data)
         log.info("--> image added")
     feature['Images'] = images
 
-    if 'SpeciesName' in feature:
-        feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
-    else:
-        feature['Taxonomy'] = None        
+    # use image data to assign a timestamp to the sighting
+    if 'getImageTimestamp' in feature and feature['getImageTimestamp'] == True and len(feature['Images']) and 't_utc' in feature['Images'][0]:
+        feature['t_utc'] = feature['Images'][0]['t_utc']
+        log.info("--> replaced sighting t_utc with image data")
+    if 'getImageTimestamp' in feature:
+        del feature['getImageTimestamp']
 
     return feature
 

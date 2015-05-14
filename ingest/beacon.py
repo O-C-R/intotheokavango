@@ -5,7 +5,7 @@ def parse(request):
     log.info("beacon.parse")
     content = ingest_plain_body(request)
     if content is None:
-        return content
+        return content, "Could not parse"
 
     data = {}
     lines = content.split('\n')
@@ -36,8 +36,5 @@ def parse(request):
         except Exception as e:
             log.error(log.exc(e))
             continue
-
-    import json
-    print(json.dumps(data, indent=4))        
 
     return data

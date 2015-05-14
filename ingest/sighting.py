@@ -7,7 +7,7 @@ def parse(request):
 
     paths = save_files(request)
     if not len(paths):
-        return None
+        return None, "No files"
 
     # process the json
     data = None
@@ -18,10 +18,10 @@ def parse(request):
                     data = json.loads(f.read())
             except Exception as e:
                 log.error(log.exc(e))
-                return None
+                return None, "Could not parse JSON"
             break
     if data is None:
-        return None
+        return None, "No data"
         
     # make corrections
     # Bird Name should be SpeciesName    
@@ -33,6 +33,19 @@ def parse(request):
     if 'TeamMember' in data:
         data['Member'] = data['TeamMember']
         del data['TeamMember']          
+
+    # purge blanks
+    data = {key: value for (key, value) in data.items() if type(value) != str or len(value.strip())}
+    if 'SpeciesName' not in data:
+        log.error("Missing SpeciesName")
+        return None, "Missing SpeciesName"
+    data['SpeciesName'] = strings.titlecase(data['SpeciesName'])       
+
+    if 'Count' not in data and 'count' not in data:
+        data['Count'] = 1
+    log.debug(json.dumps(data, indent=4))
+    data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+
 
     # process the image
     images = []
@@ -46,16 +59,18 @@ def parse(request):
             success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype
             if not success:
                 log.error(value)
-            del image_data['Member']
-            del image_data['t_utc']                
+            if 'Member' in image_data:
+                del image_data['Member']
             images.append(image_data)
             log.info("--> image added")
     data['Images'] = images
 
-    if 'SpeciesName' in data:
-        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
-    else:
-        data['Taxonomy'] = None
+    # use image data to assign a timestamp to the sighting
+    if 'getImageTimestamp' in data and data['getImageTimestamp'] == True and len(data['Images']) and 't_utc' in data['Images'][0]:
+        data['t_utc'] = data['Images'][0]['t_utc']
+        log.info("--> replaced sighting t_utc with image data")
+    if 'getImageTimestamp' in data:
+        del data['getImageTimestamp']
 
     return data
 

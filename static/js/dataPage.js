@@ -9,172 +9,908 @@
 
 
 function DataPage(id){
-
-
+console.warn('DATA PAGE', id);
+    var ractive, page;
 	/* 	Extends Page in layout.js
 		Which among others gives you access to the following methods:
 		- page.getNode()
 		- page.show()
 		- page.hide()	*/
-	var page = Page(id);
-	var ractive;
+    page = Page(id);
+    page._show = page.show.bind(page);
+    page._hide = page.hide.bind(page);
+    
+    page.show = show;
+    page.hide = hide;
 
-	/* add any other variables here */
-	var foo = 'bar';
-	var dataPages = [
-		{ nav_title: 'Overview' , view_title: 'API Overview', pageActive: true, content: "This is where we embed a few interesting endpoint visualizations" },
-		{ nav_title: 'Explorer' , view_title: 'API Explorer', pageActive: false, content: "This is where we have UI elements to explore the API" },
-		{ nav_title: 'Documentation' , view_title: 'API Documentation', pageActive: false, content: "This is where we have information about the API" }
-	];
+    function show(){
+        console.warn('WE ARE SHOWING');
+        page._show();
+    }
 
-	var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
-	var featureTitles = ["Ambit Readings", "Ambit-Geo Readings", "Audio Recordings", "Beacon Readings", "Images", "Sensor Readings", "Sightings", "Tweets"];
-	var index = 0;  
-	var featuresCountArray = [];
+    function hide(){
+        console.warn('WE ARE HIDING');
+        page._hide();
+    }
 
-	var featureTotals = [
-			{ featureType : "ambit", total: 13000, title: "Ambit Readings" }, 
-			{ featureType : "ambit_geo", total: 2111, title: "Ambit-Geo Readings" }, 
-			{ featureType : "audio", total: 57, title: "Audio Recordings" }, 
-			{ featureType : "beacon", total: 141, title: "Beacon Readings" }, 
-			{ featureType : "image", total: 842, title: "Images" }, 
-			{ featureType : "sensor", total: 1931, title: "Sensor Readings" }, 
-			{ featureType : "sighting", total: 413, title: "Sightings" }, 
-			{ featureType : "tweet", total: 264, title: "Tweets" }, 
-		];
 
-	var FeaturesWidget;
 
-	/* add any other methods here */
-	page.myMethod = function(){
-		console.log(ractive);
-	}
+	///////////////////
+    // DATA & VARS
+    ///////////////////
+    var sections = {
+            'documentation': { nav_title: 'Documentation' , view_title: 'API Documentation', pageActive: false, content: "This is where we have information about the API" },
+            'overview': { nav_title: 'Overview' , view_title: 'API Overview', pageActive: true, content: "This is where we embed a few interesting endpoint visualizations" },
+            'explorer': { nav_title: 'Explorer' , view_title: 'API Explorer', pageActive: false, content: "This is where we have UI elements to explore the API" },
+    };
+
+    var index = 0;
+    var featuresCountArray = [];
+    
+    //get features totals
+    //get the totals for all features, recursively draw?
+    var featureTotals = window.FEATURES_DATA;
+    var features = ["ambit", "ambit_geo", "audio", "beacon", "image", "sensor", 'sighting', 'tweet'];
+    var featureTitles = ["Ambit Readings", "Ambit-Geo Readings", "Audio Recordings", "Beacon Readings", "Images", "Sensor Readings", "Sightings", "Tweets"];
+    
+    //how to update query string based on text input
+    var queryString = "";
+    var viewString = "";
+    var apiUrl = "http://dev.intotheokavango.org/api/";
+    ///////////////////
+
+    /*
+    #####################
+    ### Tag Component ###
+    #####################
+    */
+
+    (function(Template){
+        var Tag = Template.extend({
+            isolated: true,
+            template: '#tagTemplate',
+            data: function() {
+                return {
+                    message: 'No message specified, using the default',
+                    queryTag: '',
+                    queryTags: [] //try to pass in as an argument on initializiation 
+                };
+            }
+        });
+
+        Template.components.Tag = Tag;
+    })(Ractive);
+
+
+    /*
+    ################################
+    ### RactiveDropdownComponent ###
+    ################################
+    */
+    (function(Template){
+        var RactiveDropdownComponent = Template.extend({
+
+            isolated: false,
+
+            template: '#RactiveDropdownComponentTemplate',
+
+            // configuration
+            data: function() {
+                return {
+                    selectorClass: 'ractive-dropdown',
+                    keycode: null,
+                    selectedIndex: -1,
+                    isOpened: false,
+                    liHeight: 40,
+                    padding: 20,
+                    show: 2,
+                    limit: 100,
+                    selector: 'Nothing',
+                    selectedText: 'Select from dropdown',
+                    items2: ['apples', 'oranges', 'nada'],
+                    items: [] // should be passed as an argument on object initialization
+                };
+            },
+
+            // the onrender function will be called as soon as the instance has finished rendering
+            oninit: function() {
+
+                var self = this;
+
+                var defaultText = self.get('selectedText');
+
+                self.observe('items', function() {
+                    self.set('selectedText', defaultText);
+                });
+
+                // save the items in a object variable
+                self.items = self.get('items');
+
+                self.selector = self.get('selector');
+
+                // set the active item
+                self.setActiveItem = function(index) {
+
+                    // set the explicit index if it has been passed
+                    if (typeof(index) != 'undefined') {
+                        self.set('selectedIndex', index);
+                    }
+
+                    var currentIndex = self.get('selectedIndex');
+                    var items = self.get('items');
+                    var defaultText = self.get('selectedText');
+
+                    if (currentIndex > -1 && currentIndex <= items.length) {
+                        self.set({
+                            selectedIndex: currentIndex,
+                            selectedText: items[currentIndex]
+                        });
+                    } else {
+                        self.set('selectedText', defaultText);
+                    }
+
+                };
+
+                // open/close the dropdown
+                self.toggleDropdown = function() {
+                    self.toggle('isOpened');
+                };
+
+                // tagging the toggling
+                self.on('toggleDropdown', function() {
+                    self.toggleDropdown();
+                });
+
+                // event to select the item
+                self.on('selectItem', function(event, index) {
+
+                    self.setActiveItem(index);
+
+                    self.toggleDropdown();
+
+                    var items = self.get('items');
+
+                    // fire a onSelect event to the ractive object where the component is being used
+                    // pass the selected item
+                    self.fire('onSelect', items[self.get('selectedIndex')], self.selector);
+
+                });
+
+                // move up/down through the list using the arrow keys
+                self.on('move', function(event, direction) {
+
+                    var currentIndex = self.get('selectedIndex'),
+                        items = self.get('items');
+
+                    if (direction == 'down') {
+                        if (currentIndex < items.length - 1) {
+                            self.set('selectedIndex', currentIndex + 1);
+
+                            // scroll the list upwards
+                            this.ul.scrollTop = this.ul.scrollTop + this.liHeight;
+                        }
+                    } else if (direction == 'up') {
+                        if (currentIndex > 0) {
+                            self.set('selectedIndex', currentIndex - 1);
+
+                            // scroll the list downwards
+                            this.ul.scrollTop = this.ul.scrollTop - this.liHeight;
+                        }
+                    }
+
+                    self.setActiveItem();
+
+                });
+            },
+
+            oncomplete: function() {
+
+                var self = this;
+
+                // calculate item height
+                self.resizeList = function() {
+
+                    var visibleElements = self.get('show'),
+                        selectorClass = self.get('selectorClass'),
+                        ul = self.find('.' + selectorClass + ' ul'),
+                        li = self.find('.' + selectorClass + ' ul li'),
+                        ulHeight,
+                        liHeight;
+
+                    // get the height of the li
+                    ul.style.display = 'block';
+                    ul.style.visibility = 'hidden';
+                    liHeight = li.offsetHeight;
+                    ulHeight = ul.offsetHeight;
+                    ul.style.height = ulHeight - liHeight * visibleElements;
+                    ul.style.display = 'none';
+                    ul.style.visibility = 'visible';
+
+
+                    // save them in object variables to make them accessible for external usage
+                    self.liHeight = liHeight;
+                    self.ulHeight = ulHeight;
+                    self.ul = ul;
+
+                    self.set('liHeight', liHeight);
+                };
+                self.observe('selectedText', function(newValue, oldValue, keypath) {
+                    //console.info('new value:', newValue);
+                    //console.info('key path:', keypath);
+                });
+
+                self.observe('show', function(newValue, oldValue, event) {
+                    console.info('new value:', newValue);
+                    console.info('ul', self.ul);
+                });
+
+            }
+
+        });
+        
+        Template.components.RactiveDropdownComponent = RactiveDropdownComponent;
+    })(Ractive);
+
+    /*
+    ################################
+    ### QueryComponent ###
+    ################################
+    */
+    (function(Template){
+        var QueryComponent = Template.extend({
+            el: "#query-area",
+            template: "#query-template",
+            // components: {
+            //     RactiveDropdownComponent: RactiveDropdownComponent,
+            //     Tag: Tag
+            // },
+
+            oninit: function() {
+                var self = this;
+
+                self.observe('*', this.parseQuery.bind(this));
+
+                self.set('dropDownDisplay', 'none');
+                self.set('dropDownGrandchild', 'none');
+
+                self.on('RactiveDropdownComponent.onSelect', function(item, selector) {
+
+
+
+                    self.set('selectedItem', item);
+                    console.info('callback fired!', selector, item);
+                    //console.log('queryTag: ' + this.get('queryTag'));
+
+                    switch (selector) {
+                        case "items":
+                            var items2 = self.get('itemsKeys.' + item);
+                            self.set('categoriesItems', items2);
+
+                            self.set('dropDownDisplay', 'visible');
+                            self.set('dropDownGrandchild', 'none');
+                            // $("#dropdown-grandchild").hide();
+
+                            this.set('queryObj.filter', item);
+                            //Not updating tags on top filter - uncomment if you want to
+                            // this.set('queryTag', queryObj["filter"]);
+                            // console.log("query filter: " + this.get('queryTag')); 
+                            break
+
+                        case "categories":
+                            var items2 = self.get('categoriesKeys.' + item);
+                            //console.log("items2: " + items2);
+                            self.set('modelsItems', items2);
+                            //console.log('modelsItems: ' + self.get('modelsItems'));
+
+                            //trying to update label, not working yet
+                            //console.log("selectedText: " + self.get('selectedText'));
+                            var state = 'none';
+                            if (items2 && items2.length > 1) state = 'visible';
+
+                            self.set('dropDownGrandchild', state);
+
+                            if (this.get('queryObj.filter') === 'expeditions') {
+                                this.set('queryObj.expedition', 'Expedition=' + item);
+
+                            } else if (this.get('queryObj.filter') === 'members') {
+                                this.set('queryObj.member', 'Member=' + item);
+
+                            } else if (this.get('queryObj.filter') === 'features') {
+                                this.set('queryObj.featureType', 'FeatureType=' + item);
+
+                                console.log('QUERY SENSORTYPE: ' + this.get('queryObj.sensor'));
+                                console.log('QUERY IMAGETYPE: ' + this.get('queryObj.image'));
+                                console.log('QUERY SPECIES: ' + this.get('queryObj.species'));
+                            }
+
+                            break
+
+                        case "models":
+                            //console.log('in models');
+                            //console.log(queryObj);
+                            if (this.get('queryObj.featureType') === 'FeatureType=image') {
+                                this.set('queryObj.image', 'ImageType=' + item);
+
+                            } else if (this.get('queryObj.featureType') === 'FeatureType=sensor') {
+                                this.set('queryObj.sensor', 'SensorType=' + item);
+
+                            } else if (this.get('queryObj.featureType') === 'FeatureType=sighting') {
+
+                                if (item.indexOf(' ') > -1) {
+                                    //TODO: get rid of space?? - not here in parser?
+                                }
+                                this.set('queryObj.species', 'BirdName=' + item); //TODO: change to SpeciesName for OK15
+                            }
+                            break
+                    }
+                });
+                ///
+                //send new query on button press
+                this.on({
+                    runQuery: function() {
+                        console.log(this.get('renderedURL'));
+                        window.open(this.get('renderedURL'), '_blank');
+                    }
+                });
+
+                this.observe('view', function(newValue, oldValue) {
+                    //console.log('view: ' + newValue);
+                    if (newValue != undefined) {
+                        this.set('queryObj.view', 'view=' + newValue);
+                    }
+
+                    //TODO: take view/url parsing out of view, so that if you delete tag, the URL updates too
+                    //console.log('view: ' + newValue);
+                    var updatedUrl = '';
+                    if (newValue === 'map' || newValue === 'viz') {
+                        updatedUrl = "http://dev.intotheokavango.org/api/features/" + newValue;
+                        //this.set('queryObj.view', "features/" + newValue);
+                    } else {
+                        updatedUrl = "http://dev.intotheokavango.org/api/features/";
+                    }
+                    //console.log(updatedUrl);
+                    this.set('apiUrl', updatedUrl);
+                });
+
+                this.observe('limit', function(newValue, oldValue) {
+                    //console.log('limit newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    if (oldValue != undefined && newValue != undefined) {
+                        this.set('queryObj.limit', 'limit=' + newValue);
+                        //console.log(this.get('query')); //try and make query string
+                    }
+                });
+
+                this.observe('order', function(newValue, oldValue) {
+                    //console.log('order: ' + newValue);
+                    if (newValue != undefined) {
+                        var val;
+                        if (newValue === 'ascending') {
+                            val = 1;
+                        } else {
+                            val = -1;
+                        }
+                        this.set('queryObj.order', 'order=' + val);
+                        //this.set('query', this.get('queryTag')); 
+                    }
+                });
+
+                this.observe('queryTags.length', function(n, o, k) {
+                    console.log('array length', k, 'changed from', o, 'to', n);
+
+                    if (n === 0) {
+                        console.log("array is empty, so reset apiUrl");
+                        this.set('apiUrl', "http://dev.intotheokavango.org/api/features/");
+                        this.set('dropDownDisplay', 'none');
+                        this.set('dropDownGrandchild', 'none');
+                    }
+                });
+
+                this.observe('queryTags.*', function(newValue, oldValue, event) {
+                    console.log(this.get('queryTags'));
+                    console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
+
+                });
+
+                this.observe('queryObj.*', function(newValue, oldValue, keypath) {
+                    console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
+
+                    var tagArrayLength = this.get('queryTags.length');
+
+                    if (newValue) { //if the value is not undefined or an empty string
+
+                        var splitNew = newValue.split('=');
+
+                        switch (keypath) {
+                            case 'queryObj.limit':
+                                //iterate through array, either splice or push new limit
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.order':
+                                //iterate through array, either splice or push new order
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.view':
+                                //iterate through array, either splice or push new view
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.filter':
+
+                                //don't add tag for first dropdown filter
+
+                                break
+
+                            case 'queryObj.expedition':
+
+                                //iterate through array, either splice or push new expedition
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.member':
+                                //iterate through array, either splice or push new member
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.featureType':
+
+                                //iterate through array, either splice or push new featureType
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    //this.addElement(tagArrayLength, splitNew[0], newValue);
+
+                                    console.log("ARRAY HAS ELEMENTS");
+                                    //splice if old and new are the same
+                                    for (var i = 0; i < tagArrayLength; i++) {
+                                        var item = this.get('queryTags[' + i + ']');
+                                        console.log("ITEM: " + item);
+
+                                        //if array item is a FeatureType
+                                        if (item.indexOf(splitNew[0]) > -1) {
+
+                                            //before you splice remove the other element???
+                                            for (var j = 0; j < tagArrayLength; j++) {
+                                                var item2 = this.get('queryTags[' + j + ']');
+                                                console.log("ITEM2: " + item2);
+
+                                                if (item2 != undefined) {
+                                                    if (item2.indexOf('BirdName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
+                                                        console.log('item: ' + item2 + ' is a subcategory');
+                                                        this.splice('queryTags', j, 1);
+                                                        console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
+                                                        var arrayState = this.get('queryTags');
+                                                        //this.set('queryTags', arrayState);
+                                                    }
+                                                }
+
+                                            }
+
+                                            console.log("SPLICE THE NEW VALUE AT: " + item);
+                                            this.splice('queryTags', i, 1, newValue);
+
+                                            break
+                                        }
+                                        if (i === tagArrayLength - 1) { //only push it if checked against whole array
+                                            console.log("PUSH " + newValue);
+                                            this.push('queryTags', newValue);
+                                        }
+                                    }
+
+                                    if (this.get('queryObj.sensor').indexOf('SensorType') > -1) {
+
+                                    }
+                                }
+
+                                break
+
+                            case 'queryObj.sensor':
+                                //iterate through array, either splice or push new sensor
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.image':
+
+                                //iterate through array, either splice or push new sensor
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.species':
+
+                                //iterate through array, either splice or push new sensor
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+                        }
+                    }
+                });
+                ///
+            },
+            addElement: function (arrayLength, splitValue, newVal) {
+                console.log("ARRAY HAS ELEMENTS");
+                //splice if old and new are the same
+                for (var i = 0; i < arrayLength; i++) {
+                    var item = this.get('queryTags[' + i + ']');
+                    console.log("ITEM: " + item);
+
+                    if (item.indexOf(splitValue) > -1) {
+                        console.log("SPLICE THE NEW VALUE AT: " + item);
+                        this.splice('queryTags', i, 1, newVal);
+                        return
+                    }
+                    if (i === arrayLength - 1) { //only push it if checked against whole array
+                        console.log("PUSH " + newVal);
+                        this.push('queryTags', newVal);
+                    }
+                }
+            },
+            parseQuery: function() {
+                var serializeTags = function(obj) {
+                    if (!obj) return ''; //reset URL here? to account for deleting view?
+                    var str = [];
+                    for (var p in obj)
+                        if (obj.hasOwnProperty(p)) {
+                            //console.log('serialize obj[p]: '+ obj[p]);
+                            if (obj[p].indexOf('view') > -1) {
+                                //console.log('dont add view to query as tag');
+                            } else {
+                                str.push(obj[p]);
+                            }
+                        }
+                    if (!str.length) return '';
+                    return '?' + str.join("&");
+                };
+                var url = this.get('apiUrl');
+                var path = this.get('query');
+                var query = serializeTags(this.get('queryTags'));
+                if (path) url += path;
+                if (query) url += query;
+
+                this.set('renderedURL', url);
+                //console.log(this.get('queryTags.*'));
+                //console.log(this.get('queryTags.length'));
+            },
+            data: function() {
+                return {
+                    apiUrl: "http://dev.intotheokavango.org/api/features",
+
+                    queryObj: {
+                        filter: "",
+                        featureType: "",
+                        member: "",
+                        expedition: "",
+                        species: "",
+                        image: "",
+                        sensor: "",
+                        view: "",
+                        order: "",
+                        limit: ""
+                    },
+                    queryTags: [],
+                    items: ['expeditions', 'members', 'features'],
+                    categoriesItems: [],
+                    modelsItems: [],
+
+                    itemsKeys: {
+                        expeditions: ['okavango_14', 'okavango_15'],
+                        members: ["Steve", "GB", "Giles", "Chris", "Jer", "Tom", "null"],
+                        features: ["ambit", "ambit_geo", "audio", "beacon", "image", "sensor", 'sighting', 'tweet'],
+                    },
+                    categoriesKeys: {
+                        ambit: [],
+                        ambit_geo: [],
+                        audio: [],
+                        beacon: [],
+                        image: ['habitat', 'documentary', 'specimen'],
+                        sensor: ['databoat1', 'sensor2', 'databoat'],
+                        sighting: [
+                            "African Crake",
+                            "African Darter",
+                            "African Fish Eagle",
+                            "African Jacana",
+                            "African Marsh Harrier",
+                            "African Openbill Stork",
+                            "African Pygmy Goose",
+                            "African Skimmer",
+                            "African Spoonbill",
+                            "Baillon's Crake",
+                            "Black Crake",
+                            "Black-crowned Night-Heron",
+                            "Black-winged Stilt",
+                            "Blacksmith Lapwing",
+                            "Boat",
+                            "Cattle Egret",
+                            "Collared Pratincole",
+                            "Comb Duck",
+                            "Common Moorhen",
+                            "Common Whimbrel",
+                            "Coppery-tailed Coucal",
+                            "Crocodile",
+                            "Egyptian Goose",
+                            "Elephant",
+                            "Fishing",
+                            "Glossy Ibis",
+                            "Glossy IbisWestern Marsh Harrier",
+                            "Glossy IbisWestern Marsh HarrierGlossy Ibis",
+                            "Goliath Heron",
+                            "Great Egret",
+                            "Great White Pelican",
+                            "Greater Reed Warbler",
+                            "Green-backed Heron",
+                            "Grey Heron",
+                            "Grey-headed Gull",
+                            "Hadeda Ibis",
+                            "Hamerkop",
+                            "Hippo",
+                            "Lesser Jacana",
+                            "Lesser Swamp Warbler",
+                            "Little Egret",
+                            "Little Grebe",
+                            "Little Rush-Warbler",
+                            "Little Stint",
+                            "Long-toed Lapwing",
+                            "Malachite Kingfisher",
+                            "Marabou Stork",
+                            "Mokoro",
+                            "People",
+                            "Pied Avocet",
+                            "Pied Kingfisher",
+                            "Purple Heron",
+                            "Red Lechwe",
+                            "Reed Cormorant",
+                            "RuffGlossy Ibis",
+                            "Rufous-bellied Heron",
+                            "Sacred Ibis",
+                            "Saddle-billed Stork",
+                            "Slaty Egret",
+                            "Spur-winged Goose",
+                            "Squacco Heron",
+                            "Swamp Boubou",
+                            "Test",
+                            "Thick-billed Weaver",
+                            "Three-banded Plover",
+                            "Water Thick-knee",
+                            "Wattled Crane",
+                            "Whiskered Tern",
+                            "White Otelia",
+                            "White-backed Duck",
+                            "White-browed Coucal",
+                            "White-faced Duck",
+                            "Yellow-billed Stork",
+                            "banded bluber ",
+                            "black egret",
+                            "glossy ibis",
+                            "glossy ibisGlossy Ibis",
+                            "grey headed gull",
+                            "openbill",
+                            "openbill ",
+                            "water dikop "
+                        ],
+                        tweet: []
+                    },
+                    selectedItem: '',
+                    show: 4,
+                    limit: 100
+                }
+            }
+        });
+        Template.components.QueryComponent = QueryComponent;
+    })(Ractive);
+    
+    /*
+    ################################
+    ### D3Component ###
+    ################################
+    */
+    (function(Template){
+        var d3Page = d3Graph("#totalsViz", "#timelineViz");
+        var D3View = Template.extend({
+            template:"#d3-template",
+            oninit:function(){
+                // d3Graph("#d3-content")
+                console.log("d3 ractive");
+                d3Page.show();
+                d3Page.loadData("/api/features/?FeatureType=sighting&BirdName=African Jacana&limit=40", "sighting");
+            },
+            onteardown:function(){
+                d3Page.hide();
+            }
+        });
+
+        Template.components.D3View = D3View;
+    })(Ractive);
+
+
+   /*
+    ################################
+    ### FeaturesComponent ###
+    ################################
+    */
+    (function(Template){
+        var FeaturesWidget = Template.extend({
+            template:"#featuresTemplate",
+            data: function() {
+                return {
+                    featuresArray: featureTotals
+                };
+            }
+        });
+        Template.components.FeaturesWidget = FeaturesWidget;
+    })(Ractive);
+    
+    /*
+
+    #############
+    ### USAGE ###/*
+    #############
+    ### USAGE ###
+    #############
+    */
+
+    //need this ractive to update data from server (won't go to widget)
+    var ractive_features = new Ractive({
+        el: "#features-totals",
+        template: "#featuresTemplate",
+        data: {
+            featuresArray: featureTotals
+        }
+    });
+
+    ////////////////////
+
 
 	page.getFeatureTotalData = function(featureType) {
         var url = "http://dev.intotheokavango.org/api/features?FeatureType=" + featureType + "";
-       
         d3.json(url, function(error, data) {
-            console.log(featureType + " data");
-            
+            //console.log(featureType + " data");
+
             var featuresCountObj = {};
             featuresCountObj.featureType = featureType;
             featuresCountObj.total = data.total;
-            featuresCountObj.title = featureTitles[index];
             featuresCountArray.push(featuresCountObj);
 
-            console.log("index: " + index);
-            console.log(ractive.get("featuresArray[" + index + "].total"));
-            console.log(ractive.findComponent('features'));
-            ractive.set("featuresArray[" + index + "].total", featuresCountObj.total);
-            
-            if(index < features.length -1){
+            // console.log("index: " + index);
+            // console.log(ractive_features.get("featuresArray[" + index + "].total"));
+            ractive_features.set("featuresArray[" + index + "].total", featuresCountObj.total);
+
+            if (index < features.length - 1) {
                 index++;
-                setTimeout(page.getFeatureTotalData(features[index], ractive, 100));
-            }
-            else {
-                console.log("featuresCountArray");
-                console.log(featuresCountArray);
-                console.log("featuresArray at index: " + index);
-                console.log(ractive.get("featuresArray"));
-                return featuresCountArray;
+                setTimeout(page.getFeatureTotalData(features[index], 100));
+            } else {
+                // console.log("featuresCountArray");
+                // console.log(featuresCountArray);
+                // console.log("featuresArray at index: " + index);
+                // console.log(ractive_features.get("featuresArray"));
+
+                // totalsVizDiv.fadeIn();
+                // makeTotalsViz(featuresCountArray);
             }
         });
-	}
+	};
 
-	var pageTemplate;// = "<H1>{{view_title}}</H1>";
-	var featuresTemplate;
-
-	page.getDataPageTemplate = function() {
-		$.ajax( 'static/templates/dataPageTemplate.hbs' ).then( function ( template ) { 
-			pageTemplate = template;
-			console.log(pageTemplate);
-			//load main Ractive template
-			page.loadRactive(template);
-			//load other templates
-			getFeaturesTemplate();
-	    });
-    }
-
-    getFeaturesTemplate = function() {
-    	$.ajax( 'static/templates/featuresTemplate.hbs' ).then( function (template) {
-	    	featuresTemplate = template;
-	    	console.log(featuresTemplate);
-	    	return featuresTemplate;
-	    	/* this works but creates a new Ractive instance
-	    	var ractive_features = new Ractive({
-	    		el: "#features-totals",
-				template: featuresTemplate,
-				//oninit: getFeatureTotalData(features[index]),
-				data: { featuresArray : featureTotals }
-			});
-
-			page.getFeatureTotalData(features[index], ractive_features);
-			*/
-
-        });
-	}
-
-    var FeaturesWidget = Ractive.extend({
-    	template: '<div id="features-left">{{ >totals}}</div><div id="features-right">{{ >featureTypes}}</div>{{#partial featureTypes}}{{#each featuresArray}}<ul><li>{{ title }}</li></ul>{{/each}}{{/partial}}{{#partial totals}}{{#each featuresArray}}<ul><li>{{ total }}</li></ul>{{/each}}{{message}}{{/partial}}',
-    	// data: function() {
-    	// 	return { featuresArray : featureTotals }
-    	oninit: page.getFeatureTotalData(features[index]), //isn't able to update the data yet
-    	data: function() {
-    		return {
-    		featuresArray : featureTotals
-    		};
-    	}
-    });
-
-	Ractive.components.features = FeaturesWidget;
-
-	page.loadRactive = function(template) {
-		console.log("loading ractive");
+	page.loadRactive = function() {
+		console.warn("loading ractive!!!");
 		ractive = new Ractive({
-	      	el: '#dataPageContainer',
+	      	el: '#data-content',
 	      	// We could pass in a string, but for the sake of convenience
 	      	// we're passing the ID of the <script> tag above.
 	      	// template: '#navTemplate',
-	      	template: template,
-	      	// delimiters: [ '{[{', '}]}' ], //dont' need delimiters if using {% raw %} and {% endraw %}
+	      	template: '#content-template',
+            oninit:function(){
+                console.warn('ON INIT')
+                this.setActive('overview');
+
+            },
+            setActive: function(id){
+                console.warn('ID', id);
+                this.set('section', id);
+                d3.select('#data-navigation li.documentation').classed('active', false);
+                d3.select('#data-navigation li.overview').classed('active', false);
+                d3.select('#data-navigation li.explorer').classed('active', false);
+                
+                var button = d3.select('#data-navigation li.' + id);
+                button.classed('active', true);
+                var activeSection = this.get('sections.'+id);
+                this.set('activeSection', activeSection);
+            },	     	
+            // delimiters: [ '{[{', '}]}' ], //dont' need delimiters if using {% raw %} and {% endraw %}
 	      	// Here, we're passing in some initial data
 	      	data: { 
-				pages : dataPages 	
+                'section': 'overview',
+                'sections': {
+                    'documentation': {  nav_title: 'Documentation' , view_title: 'API Documentation', pageActive: false, content: "This is where we have information about the API" },
+                    'overview': {  nav_title: 'Overview' , view_title: 'API Overview', pageActive: true, content: "This is where we embed a few interesting endpoint visualizations" },
+                    'explorer': {  nav_title: 'Explorer' , view_title: 'API Explorer', pageActive: false, content: "This is where we have UI elements to explore the API" },
+                }
 			}
 		});
-
-		ractive.on('activateDoc', function() {
-			ractive.set('pages[2].pageActive', true);
-			ractive.set('pages[1].pageActive', false);
-			ractive.set('pages[0].pageActive', false);
-			$('#features-area').hide();
-			console.log('Activate Documentation Page');
-		});
-
-		ractive.on('activateExp', function() {
-			ractive.set('pages[1].pageActive', true);
-			ractive.set('pages[2].pageActive', false);
-			ractive.set('pages[0].pageActive', false);
-			$('#features-area').show();
-			console.log('Activate Explorer Page');
-		});
-		
-		ractive.on('activateOver', function() {
-			ractive.set('pages[0].pageActive', true);
-			ractive.set('pages[2].pageActive', false);
-			ractive.set('pages[1].pageActive', false);
-			$('#features-area').hide();
-			console.log('Activate Overview Page');
-		});
-
 		
 		window.ra = ractive;
-
 	}
 
-	page.getDataPageTemplate();
-	//page.getFeaturesTemplate();
 
+
+	page.loadRactive();
+    page.getFeatureTotalData(features[index]);
+    
+    
+    // var D3View = Ractive.extend({
+    //     el:'#d3-content',
+    //     template:"#d3-template",
+    //     oninit:function(){
+    //         // d3Graph("#d3-content")
+    //         console.log("d3 ractive");
+    //         d3Page.show();
+    //         d3Page.loadData("api/features/?FeatureType=ambit", "ambit");
+    //     },
+    //     onteardown:function(){
+    //         d3Page.hide();
+    //     }
+    // });
+    //console.log(Object.keys(d3Page));
+    
 	return page;
 }
 
