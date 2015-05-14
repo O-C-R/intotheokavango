@@ -81,7 +81,8 @@ def parse(request):
     if 'getImageTimestamp' in feature and feature['getImageTimestamp'] == True and len(feature['Images']) and 't_utc' in feature['Images'][0]:
         feature['t_utc'] = feature['Images'][0]['t_utc']
         log.info("--> replaced sighting t_utc with image data")
-    del feature['getImageTimestamp']
+    if 'getImageTimestamp' in feature:
+        del feature['getImageTimestamp']
 
     return feature
 

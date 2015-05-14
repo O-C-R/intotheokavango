@@ -69,7 +69,8 @@ def parse(request):
     if 'getImageTimestamp' in data and data['getImageTimestamp'] == True and len(data['Images']) and 't_utc' in data['Images'][0]:
         data['t_utc'] = data['Images'][0]['t_utc']
         log.info("--> replaced sighting t_utc with image data")
-    del data['getImageTimestamp']
+    if 'getImageTimestamp' in data:
+        del data['getImageTimestamp']
 
     return data
 

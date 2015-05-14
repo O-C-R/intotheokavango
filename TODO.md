@@ -1,8 +1,8 @@
 ### new
+- 'core' system
 - audio -- pull created time from file
 - add SensorType (FeatureSubType) to SMS sensors
 - video ingestion
-- 'core' system
 
 ### server
 - make github private
