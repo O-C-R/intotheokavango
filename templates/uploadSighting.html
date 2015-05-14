@@ -1,15 +1,36 @@
 {% extends "page.html" %}
 {% block head %}
 
-<link rel="stylesheet" type="text/css" href="/static/css/jquery.mobile-1.4.5.min.css" />
 <link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="/static/js/jquery-2.1.4.min.js"></script>
-<script src="/static/js/jquery.mobile-1.4.5.min.js"></script>
 <script src="/static/js/jquery.serializejson.min.js"></script>
 
 <script>
 
 $(document).ready(function() {
+
+    //stolen from Stack Overflow
+    (function ($) {
+
+        //check if the browser width is less than or equal to the large dimension of an iPad
+        if ($(window).width() <= 1024) {
+
+            //create an AJAX request for the CSS file
+            $.ajax({
+                url     : '/static/css/jquery.mobile-1.4.5.min.css',
+                success : function (response) {
+                    $('head').append('<style>' + response + '</style>');
+                }
+            });
+
+            //create an AJAX request for the JS file, setting the dataType to 'script' will have jQuery automatically evaluate the JS code in the global scope
+            $.ajax({
+                url      : 'jquery.mobile-1.4.5.min.js',
+                dataType : 'script'
+            });
+        }
+    })(jQuery);
 
     var today = new Date()
     console.log();
@@ -83,9 +104,11 @@ $(document).ready(function() {
     <input type="file" name="Photo" id="Photo" value="" multiple>
     <br /><br />
     <label for="TeamMember">Team Member</label>
+    <br />
     <input type="text" name="TeamMember" id="TeamMember" value="">
     <br /><br />
     <label for="SpeciesName">Species Name</label>
+    <br />
     <input type="text" name="SpeciesName" id="SpeciesName" value="">
     <br /><br />
     <label for="Count">Count</label>
