@@ -36,10 +36,13 @@ def parse(request):
 
     # purge blanks
     feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
-    if 'SpeciesName' not in feature:
+    if 'SpeciesNameOther' in feature:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])    
+    elif 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
         return None, "Missing SpeciesName"
-    feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
+    else:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
 
     if 'Count' not in feature and 'count' not in feature:
         feature['Count'] = 1
