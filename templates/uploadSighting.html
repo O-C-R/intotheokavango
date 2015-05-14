@@ -1,8 +1,10 @@
 {% extends "page.html" %}
 {% block head %}
 
+<link rel="stylesheet" type="text/css" href="/static/css/jquery.mobile-1.4.5.min.css" />
 <link rel="stylesheet" type="text/css" href="/static/css/api.css" />
 <script src="/static/js/jquery-2.1.4.min.js"></script>
+<script src="/static/js/jquery.mobile-1.4.5.min.js"></script>
 <script src="/static/js/jquery.serializejson.min.js"></script>
 
 <script>
@@ -72,7 +74,7 @@ $(document).ready(function() {
 
 {% endblock head %}
 {% block body %}
-<div id="textarea" style="padding:30px">
+<div id="textarea" style="padding:30px" data-role="page">
 <h2>Sighting Upload </h2>
 <br />
 <form id="sightingUpload" style="padding-bottom:20px">
