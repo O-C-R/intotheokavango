@@ -35,9 +35,8 @@ class Ingest(server.Handler):
             feature_type = self.get_argument("FeatureType", "") # if we didn't use an endpoint, check if it's in the variables
         feature_type = feature_type.lower().split('.')[0].strip()
         success, value = ingest_request(feature_type, self.request)
-        # add a header for unrestricted access
         if success:
-            return self.text(str(value)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
+            return self.text("SUCCESS") if feature_type != "sensor" else self.finish() ## supressing output for twilio
         else:
             return self.error(value)
 
@@ -144,6 +143,8 @@ def verify_geometry(data):
 
 def estimate_geometry(data, db):
     """Estimate the location of a geotagged object for a new feature that's missing it"""
+    """For data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon if they are core, otherwise fail"""
+    """For non-member data, just tag it to the beacon"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     log.info("--> t is %s" % t)
@@ -162,6 +163,7 @@ def estimate_geometry(data, db):
                 pass
 
         # find geodata from the nearest beacon
+        # but only do it if there is no Member, or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
