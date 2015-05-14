@@ -11,7 +11,7 @@ def parse(request):
         data = xmltodict.parse(content)
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Parsing error"
 
     try:
         log.info("--> parsing XML")
@@ -32,13 +32,13 @@ def parse(request):
             feature[key.replace('_', '')] = value
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Unexpected fields"
 
     # purge blanks
     feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
     if 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
-        return None
+        return None, "Missing SpeciesName"
     feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
 
     if 'Count' not in feature and 'count' not in feature:

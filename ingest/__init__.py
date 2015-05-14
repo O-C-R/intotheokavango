@@ -47,12 +47,17 @@ def ingest_request(feature_type, request):
     try:
         module = importlib.import_module(module_name)
         log.info("--> loaded %s module" % module_name)
-        feature = module.parse(request)
+        result = module.parse(request)
+        if len(result) == 2:
+            feature, error = result
+        else:
+            feature = result
+            error = "Ingest failed"
     except ImportError as e:
         log.error(log.exc(e))
         return False, "FeatureType \"%s\" not recognized" % feature_type
     if not feature:
-        return False, "Ingest failed"        
+        return False, error
     return ingest_data(feature_type, feature)
 
 def ingest_data(feature_type, feature): # note that this operates on the original datastructure

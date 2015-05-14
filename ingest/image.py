@@ -9,7 +9,7 @@ def parse(request):
 
     paths = save_files(request) ## ends up being redundant if called through sighting
     if not len(paths):
-        return None
+        return None, "No files"
 
     # process the json
     data = None
@@ -20,10 +20,10 @@ def parse(request):
                     data = json.loads(f.read())
             except Exception as e:
                 log.error(log.exc(e))
-                return None
+                return None, "Could not parse"
             break
     if data is None:
-        return None
+        return None, "Missing data"
 
     # fix things
     if 'TeamMember' in data:

@@ -14,7 +14,7 @@ def parse(request):
         data['t_utc'] = util.delocalize_timestamp(t_local, tz=config['local_tz'])
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))
-        return None        
+        return None, "Unexpected format"   
     return data
 
 
