@@ -629,8 +629,8 @@ console.warn('DATA PAGE', id);
                 if (query) url += query;
 
                 this.set('renderedURL', url);
-                console.log(this.get('queryTags.*'));
-                console.log(this.get('queryTags.length'));
+                //console.log(this.get('queryTags.*'));
+                //console.log(this.get('queryTags.length'));
             },
             data: function() {
                 return {
@@ -785,7 +785,7 @@ console.warn('DATA PAGE', id);
 
    /*
     ################################
-    ### D3Component ###
+    ### FeaturesComponent ###
     ################################
     */
     (function(Template){
@@ -797,7 +797,7 @@ console.warn('DATA PAGE', id);
                 };
             }
         });
-        Template.components.FeaturesWidget = FeaturesWidget
+        Template.components.FeaturesWidget = FeaturesWidget;
     })(Ractive);
     
     /*
@@ -809,6 +809,7 @@ console.warn('DATA PAGE', id);
     #############
     */
 
+    //need this ractive to update data from server (won't go to widget)
     var ractive_features = new Ractive({
         el: "#features-totals",
         template: "#featuresTemplate",
@@ -860,11 +861,17 @@ console.warn('DATA PAGE', id);
             oninit:function(){
                 console.warn('ON INIT')
                 this.setActive('overview');
+
             },
             setActive: function(id){
                 console.warn('ID', id);
                 this.set('section', id);
-
+                d3.select('#data-navigation li.documentation').classed('active', false);
+                d3.select('#data-navigation li.overview').classed('active', false);
+                d3.select('#data-navigation li.explorer').classed('active', false);
+                
+                var button = d3.select('#data-navigation li.' + id);
+                button.classed('active', true);
                 var activeSection = this.get('sections.'+id);
                 this.set('activeSection', activeSection);
             },	     	

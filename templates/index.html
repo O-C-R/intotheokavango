@@ -109,9 +109,9 @@
 <script id="content-template" type="text/ractive">
   <div id="data-header">
       <ul id="data-navigation">
-          <li on-click='setActive("documentation")'>Documentation</li>
-          <li on-click='setActive("explorer")'>Explorer</li>
-          <li on-click='setActive("overview")'>Overview</li>
+          <li class="documentation" on-click='setActive("documentation")'>Documentation</li>
+          <li class="explorer" on-click='setActive("explorer")'>Explorer</li>
+          <li class="overview" on-click='setActive("overview")'>Overview</li>
       </ul>
       <div class="title" id="api-view-title">{{activeSection.nav_title}}</div>
     </div>
