@@ -1,0 +1,29 @@
+{% extends "page.html" %}
+
+{% block head %}
+    <script type="text/javascript">
+        path_to_data = "{{ query }}";
+        feature_type = "{{ feature_type }}";
+    </script>
+    <script src="/static/js/images.js"></script>
+    <style type="text/css">
+        body, html {
+            margin: 20px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+            font: 18px verdana;
+        }
+        #images {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }         
+    </style>
+{% endblock head %}
+
+{% block body %}
+    {{ search }}
+    <div id="images"></div>
+{% endblock body %}
