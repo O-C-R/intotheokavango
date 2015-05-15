@@ -72,16 +72,17 @@ var parseAmbitSpeed = function(item) {
 
 var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
     //HISTOGRAM VIZ
-    var margin = {top: 100.5, right: 30, bottom: 30, left: 40.5},
-    width = 800 - margin.left - margin.right,
-    height = 605 - margin.top - margin.bottom,
+    var margin = {top: 70.5, right: 30, bottom: 40, left: 60.5},
+    width = ($('body').width())*0.82 - margin.left - margin.right,
+    height = 525 - margin.top - margin.bottom,
     left_width = 100;
+    console.log("WIDTH: " + width);
 
     var dateRange = d3.extent(parsedData, function(d) { 
         return d.time; 
     });
     var parseDate = d3.time.format("%m %d").parse;
-
+    var  date_format = d3.time.format("%d %b");
     var xScale = d3.time.scale()
         .range([0, width]);
 
@@ -105,18 +106,9 @@ var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
         xScale.domain(d3.extent(parsedData, function(d) { 
             return d.time; }));
 
-        var ext = d3.extent(parsedData, function(d) {
-            return d.count;
-        });
         var max = d3.max(parsedData, function(d) {
             return d.count;
         });
-        var min = d3.min(parsedData, function(d) {
-            return d.count;
-        });
-        console.log("ext: " + ext);
-        console.log("max: " + max);
-        console.log("min: " + min);
         
         yScale.domain([0, max]);
 
