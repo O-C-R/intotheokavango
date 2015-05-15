@@ -61,6 +61,8 @@ table {
 
 a{
   text-decoration: none;
+/*  color: #686d9d; 
+*/  color: #D29C49;
 }
 
 
@@ -892,7 +894,7 @@ hr{
 
     #data-content #features-area {
       float: left;
-      /*width: 20%;*/
+      width: 25%;
       min-width: 260px;
       height: 400px;
       padding: 20px 20px 10px 30px;
@@ -900,7 +902,7 @@ hr{
 
     #data-content #query-area {
       float: left;
-      width: 70%;
+      width: 65%;
       /*margin-left: 50px;*/
       padding: 20px 0px 10px 0px;
     }
@@ -958,6 +960,12 @@ hr{
       float: right;
     }
 
+    .data-description code {
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 0.8em;
+      color: #fff;
+    }
+
     pre, code, code span {
         font-family: Monaco, Consolas, "Lucida Console", monospace !important;
         background-color: #eff4fb;
@@ -987,7 +995,7 @@ hr{
       margin-bottom: 50px;
     }  
 
-    .data-description ul {
+    #api-documentation ul {
       font-size: 18px;
       letter-spacing: 0.12em;
       line-height: 1.98em;
@@ -995,13 +1003,21 @@ hr{
       margin-left: 20px;
     }
 
-    .data-description li {
+    #api-documentation li {
       list-style: disc outside none;
     }
 
     #features-totals li {
       list-style: none;
     }
+
+/*    #features-totals ul {
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      line-height: 1.98em;
+      margin-bottom: 0px;
+      margin-left: 0px;
+    }*/
 
 svg.wanderer{
   width:300px;
