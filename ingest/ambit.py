@@ -6,7 +6,7 @@ def parse(request):
     log.info("ambit.parse")
     sample = ingest_json_body(request)
     if sample is None:
-        return sample
+        return sample, "Could not parse"
  
     data = {}
     for key, value in sample.items():
