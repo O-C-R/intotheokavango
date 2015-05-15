@@ -7,7 +7,7 @@ def parse(request):
 
     paths = save_files(request)
     if not len(paths):
-        return None
+        return None, "No files"
 
     # process the json
     data = None
@@ -18,10 +18,10 @@ def parse(request):
                     data = json.loads(f.read())
             except Exception as e:
                 log.error(log.exc(e))
-                return None
+                return None, "Could not parse JSON"
             break
     if data is None:
-        return None
+        return None, "No data"
         
     # make corrections
     # Bird Name should be SpeciesName    
@@ -38,7 +38,7 @@ def parse(request):
     data = {key: value for (key, value) in data.items() if type(value) != str or len(value.strip())}
     if 'SpeciesName' not in data:
         log.error("Missing SpeciesName")
-        return None
+        return None, "Missing SpeciesName"
     data['SpeciesName'] = strings.titlecase(data['SpeciesName'])       
 
     if 'Count' not in data and 'count' not in data:
@@ -69,7 +69,8 @@ def parse(request):
     if 'getImageTimestamp' in data and data['getImageTimestamp'] == True and len(data['Images']) and 't_utc' in data['Images'][0]:
         data['t_utc'] = data['Images'][0]['t_utc']
         log.info("--> replaced sighting t_utc with image data")
-    del data['getImageTimestamp']
+    if 'getImageTimestamp' in data:
+        del data['getImageTimestamp']
 
     return data
 

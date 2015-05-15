@@ -30,18 +30,23 @@ $(document).ready(function() {
         }
     })(jQuery);
 
+    var today = new Date()
+    $('#t_utc').val(today);
+
     $('#test').on('click', function () {
                 $('#test').text("Attempting to send....");
                 var data = new FormData();
-                var image = $("#Photo").get(0).files;
+                var audio = $("#Audio").get(0).files;
 
                 // Add the uploaded file content to the form data collection
-                if (image.length > 0) {
-                    data.append("upload", image[0]);
+                if (audio.length > 0) {
+                    data.append("upload", audio[0]);
                 }
 
                 var metadata = $('#imageUpload').serializeJSON()
                 metadata['Notes'] = $('#Notes').val()
+                var timestamp = new Date(metadata['t_utc']);
+                metadata['t_utc'] = Math.floor(timestamp.getTime()/ 1000)
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -56,7 +61,7 @@ $(document).ready(function() {
                 // Make Ajax request with the contentType = false, and procesDate = false
                 var ajaxRequest = $.ajax({
                     type: "POST",
-                    url: "/ingest/image",
+                    url: "http://intotheokavango.org/ingest/audio",
                     contentType: false,
                     processData: false,
                     data: data,
@@ -91,12 +96,16 @@ $(document).ready(function() {
 <br />
 <form id="imageUpload" style="padding-bottom:20px">
 
-    <label for="photo">Photo</label>
-    <input type="file" name="Photo" id="Photo" value="" multiple>
+    <label for="audio">Audio</label>
+    <input type="file" name="Audio" id="Audio" value="" multiple>
     <br /><br />
     <label for="TeamMember">Team Member</label>
     <br />
     <input type="text" name="TeamMember" id="TeamMember" value="">
+    <br /><br />
+    <label for="t_utc">Timestamp</label>
+    <br />
+    <input type="text" name="t_utc" id="t_utc" value="">
     <br /><br />
     <label for="Notes">Notes</label>
     <br />

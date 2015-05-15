@@ -11,7 +11,7 @@ def parse(request):
         data = xmltodict.parse(content)
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Parsing error"
 
     try:
         log.info("--> parsing XML")
@@ -32,14 +32,18 @@ def parse(request):
             feature[key.replace('_', '')] = value
     except Exception as e:
         log.error(log.exc(e))
-        return None
+        return None, "Unexpected fields"
 
     # purge blanks
     feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
-    if 'SpeciesName' not in feature:
+    if 'SpeciesNameOther' in feature:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesNameOther'])    
+        del feature['SpeciesNameOther']
+    elif 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
-        return None
-    feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
+        return None, "Missing SpeciesName"
+    else:
+        feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
 
     if 'Count' not in feature and 'count' not in feature:
         feature['Count'] = 1
@@ -81,7 +85,8 @@ def parse(request):
     if 'getImageTimestamp' in feature and feature['getImageTimestamp'] == True and len(feature['Images']) and 't_utc' in feature['Images'][0]:
         feature['t_utc'] = feature['Images'][0]['t_utc']
         log.info("--> replaced sighting t_utc with image data")
-    del feature['getImageTimestamp']
+    if 'getImageTimestamp' in feature:
+        del feature['getImageTimestamp']
 
     return feature
 

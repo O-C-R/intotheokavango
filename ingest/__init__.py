@@ -35,9 +35,8 @@ class Ingest(server.Handler):
             feature_type = self.get_argument("FeatureType", "") # if we didn't use an endpoint, check if it's in the variables
         feature_type = feature_type.lower().split('.')[0].strip()
         success, value = ingest_request(feature_type, self.request)
-        # add a header for unrestricted access
         if success:
-            return self.text(str(value)) if feature_type != "sensor" else self.finish() ## supressing output for twilio
+            return self.text("SUCCESS") if feature_type != "sensor" else self.finish() ## supressing output for twilio
         else:
             return self.error(value)
 
@@ -47,36 +46,42 @@ def ingest_request(feature_type, request):
     try:
         module = importlib.import_module(module_name)
         log.info("--> loaded %s module" % module_name)
-        feature = module.parse(request)
+        result = module.parse(request)
+        if type(result) == tuple and len(result) == 2:
+            feature, error = result
+        else:
+            feature = result
+            error = "Ingest failed"
     except ImportError as e:
         log.error(log.exc(e))
         return False, "FeatureType \"%s\" not recognized" % feature_type
     if not feature:
-        return False, "Ingest failed"        
+        return False, error
     return ingest_data(feature_type, feature)
 
 def ingest_data(feature_type, feature): # note that this operates on the original datastructure
-    log.info("ingest_data")    
+    log.info("ingest_data")  
     try:
         db = Application.instance.db
     except AttributeError:
         from mongo import db
     feature = verify_geojson(feature)
     if not feature:
-        return False, "Ingest failed: bad format"
-    feature = verify_expedition(feature)        
+        return False, "Could not format as geojson"
+    feature = verify_t(feature)    
+    if not feature:
+        return False, "Missing t_utc"
+    feature = verify_expedition(feature)
+    feature = tag_core(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
         feature = estimate_geometry(feature, db)
-    feature = verify_t(feature)
-    if not feature:
-        return False, "Ingest failed: missing t_utc"
     feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
     try:
         feature_id = db.features.insert_one(feature).inserted_id
     except Exception as e:
         log.error(log.exc(e))
-        return False, "Ingest failed"
+        return False, "Database error"
     log.info("--> success (%s)" % feature_id)
     return True, feature_id
 
@@ -139,6 +144,8 @@ def verify_geometry(data):
 
 def estimate_geometry(data, db):
     """Estimate the location of a geotagged object for a new feature that's missing it"""
+    """For data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon if they are core, otherwise fail"""
+    """For non-member data, just tag it to the beacon"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     log.info("--> t is %s" % t)
@@ -147,6 +154,7 @@ def estimate_geometry(data, db):
         # find geodata from this Member
         member_closest_before = None
         member_closest_after = None
+        core = False
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)
@@ -156,15 +164,23 @@ def estimate_geometry(data, db):
             except IndexError:
                 pass
 
+            # is/was the member core at this point?
+            try:
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+            except Exception as e:
+                log.info("--> no core entry at time %s" % t)
+
         # find geodata from the nearest beacon
+        # but only do it if there is no Member, or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        try:
-            beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
-            beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
-        except IndexError:
-            pass
+        if 'Member' not in data['properties'] or core:
+            try:
+                beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
+                beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
+            except IndexError:
+                pass
 
         # pick the best ones
         if member_closest_before is not None and beacon_closest_before is not None:
@@ -232,6 +248,25 @@ def verify_expedition(data):
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
+
+def tag_core(data):
+    try:
+        db = Application.instance.db
+    except AttributeError:
+        from mongo import db    
+    try:
+        member = data['properties']['Member']   
+        t = data['properties']['t_utc']   
+        try:
+            core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+        except IndexError:
+            log.info("--> no core entry at time %s" % t)
+            core = False
+        data['properties']['CoreExpedition'] = core
+        return data
+    except Exception as e:
+        log.error(log.exc(e))
+        return data
 
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""

@@ -21,7 +21,7 @@ def parse(request):
 
     paths = save_files(request)
     if not len(paths):
-        return None
+        return None, "No files"
 
     # process the json
     data = None
@@ -32,10 +32,10 @@ def parse(request):
                     data = json.loads(f.read())
             except Exception as e:
                 log.error(log.exc(e))
-                return None
+                return None, "Could not parse"
             break
     if data is None:
-        return None            
+        return None, "No data"          
 
     # process the audio
     for path in paths:
@@ -46,7 +46,7 @@ def parse(request):
     soundcloud_url = post_track(path)#yield gen.Task(post_track, path)
     log.debug("yielded")
     if soundcloud_url is None:
-        return None
+        return None, "Could not post to Soundcloud"
     data['SoundCloudURL'] = soundcloud_url
     return data
 

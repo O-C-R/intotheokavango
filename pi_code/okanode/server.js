@@ -124,7 +124,11 @@ app.get('/resetNetwork', function(req, res){
 });
 
 app.get('/imageUpload', function(req, res){
-   res.sendfile('public/uploadForm.html');
+   res.sendfile('public/uploadFormImage.html');
+});
+
+app.get('/soundUpload', function(req, res){
+   res.sendfile('public/uploadFormSound.html');
 });
 
 takePic = function(){
@@ -387,79 +391,97 @@ attemptUploadJSON = function(url) {
     sending = true;
 
     var file = fs.createReadStream(url);
-    var json = JSON.parse(fs.readFileSync(url, "utf8"));
-
-    var ingestType = '';
-    var ingestPath = 'jpg';
-
-    var rPath = null;
-    var origPic = null;
-    //Sighting
-    console.log(json);
-    if (json.Count != null) {
-        ingestType = "sighting";
-    } else if (json.ImageType != null) {
-        ingestType = "image";
-        ingestPath = "jpg";
-    } else if (json.SoundType != null) {
-        ingestType = "audio";
-        ingestPath = "mp3"
-    } else if (json.data != null) {
-        ingestType = "databoat"
+    var json;
+    try {
+      json = JSON.parse(fs.readFileSync(url, "utf8"));
+    } catch(err) {
+      logger.error("Error parsing JSON.");
     }
 
-    if (ingestType != "image"){
-	var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
-        if (err) {
-            sending = false;
-            return logger.error('upload failed:', err);
-        } else {
-            logger.info('Upload successful!  Server responded with:', body);
-            console.log("ARCHIVING " + url);
-            archive(url);
-            if (rPath) archive(rPath);
-            sending = false;
-        }
-       });
-       var form = r.form();
-       form.append('json', fs.createReadStream(url));
-       if (json.ResourceURL != null) {
-          rPath = filePath + ingestPath + "/" + json.ResourceURL;
-          console.log("ADDING RESOURCE:" + rPath);
-          form.append('resource', fs.createReadStream(rPath));
-       }
-    } else {
-      resize(filePath + ingestPath + "/", json.ResourceURL, function(newName){
-	if (newName != "Error"){
-       		var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
-       		 if (err) {
-            		sending = false;
-            		return logger.error('upload failed:', err);
-       		 } else {
-           		 logger.info('Upload successful!  Server responded with:', body);
-           		 console.log("ARCHIVING " + url);
-           		 archive(url);
-           		 if (rPath) archive(rPath);
-           		 if (origPic) archive(origPic);
-           		 sending = false;
-       		 }
-      	       });
-      		 var form = r.form();
-     			  form.append('json', fs.createReadStream(url));
-     	  if (json.ResourceURL != null) {
-             rPath = newName;
-             origPic = filePath + ingestPath + "/" + json.ResourceURL;
-             console.log("ADDING RESOURCE:" + rPath);
-             form.append('resource', fs.createReadStream(rPath));
-       }
-      } else {
-	logger.error("Could not resize file for upload. Archiving instead");
-	archive(url);
-        archive(filePath + ingestPath + "/" + json.ResourceURL);
-	sending = false;
+    if (json) {
+      var ingestType = '';
+      var ingestPath = 'jpg';
+
+      var rPath = null;
+      var origPic = null;
+      //Sighting
+      console.log(json);
+      if (json.Count != null) {
+          ingestType = "sighting";
+      } else if (json.ImageType != null) {
+          ingestType = "image";
+          ingestPath = "jpg";
+      } else if (json.SoundType != null) {
+          ingestType = "audio";
+          ingestPath = "mp3"
+      } else if (json.data != null) {
+          ingestType = "databoat"
       }
-    });
-   }	     
+
+      if (ingestType != "image"){
+
+  	 var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
+          if (err) {
+              sending = false;
+              return logger.error('upload failed:', err);
+          } else {
+              logger.info('Upload successful!  Server responded with:', body);
+              console.log("ARCHIVING " + url);
+              archive(url);
+              if (rPath) archive(rPath);
+              sending = false;
+          }
+         });
+         var form = r.form();
+         form.append('json', fs.createReadStream(url));
+         if (json.ResourceURL != null) {
+            rPath = filePath + ingestPath + "/" + json.ResourceURL;
+            console.log("ADDING RESOURCE 1:" + rPath);
+            try {
+              form.append('resource', fs.createReadStream(rPath));
+            } catch (err) {
+              console.log("COULDN'T ADD RESOURCE URL.");
+            }
+         }
+      } else {
+        console.log("Attempt resize." + ingestPath + ":" + json.ResourceURL);
+        resize(filePath + ingestPath + "/", json.ResourceURL, function(newName){
+  	       if (newName != "Error"){
+         		var r = request.post(mothership + 'ingest/' + ingestType, function optionalCallback(err, httpResponse, body) {
+         		 if (err) {
+              		sending = false;
+              		return logger.error('upload failed:', err);
+         		 } else {
+             		 logger.info('Upload successful!  Server responded with:', body);
+             		 console.log("ARCHIVING " + url);
+             		 archive(url);
+             		 if (rPath) archive(rPath);
+             		 if (origPic) archive(origPic);
+             		 sending = false;
+         		 }
+        	  });
+        		var form = r.form();
+       			form.append('json', fs.createReadStream(url));
+       	    if (json.ResourceURL != null) {
+
+               rPath = newName;
+               origPic = filePath + ingestPath + "/" + json.ResourceURL;
+               ///log.error("ADDING RESOURCE 2:" + rPath);
+               try {
+                form.append('resource', fs.createReadStream(rPath));
+               } catch (err) {
+                log.error("COULDN'T ADD RESOURCE URL");
+               }
+            }
+          } else {
+  	             logger.error("Could not resize file for upload. Archiving instead");
+  	             archive(url);
+                 archive(filePath + ingestPath + "/" + json.ResourceURL);
+  	             sending = false;
+          }
+      });
+     }
+   }    
 }
 
 archive = function(filePath) {
@@ -570,60 +592,88 @@ app.get('/form', function(req, res){
 app.post('/upload', function(req, res) {
     // get the temporary location of the file
     logger.info("UPLOAD ATTEMPT.")
-    if (req.files.file) {
-        var tmp_path = req.files.file.path;
+    logger.info(req.params  )
+    logger.info("IMAGE COUNT:" + req.param('ImageCount', null))
+    logger.info("hasJSON:" + req.param('json', null))
+
+    
+
+    //Save the images
+    if (req.param('ImageCount', null) > 0) {
+      var ic = req.param('ImageCount', null);
+      for (var i = 0; i < ic; i++) {
+        console.log("SAVE IMAGE")
+        saveAttachment(req.files['image-' + i], req.param('image-' + i + '-ResourceURL'), res);
+      }
+    }
+
+    if (req.param('hasJSON', null)) {
+      console.log("SAVE JSON")
+      saveAttachment(req.files['json'], req.param('TeamMember') + "_" + Math.floor((new Date()).getTime() / 1000) + ".json", res);
+    } else {
+
+      //Save the files
+      if (req.files.file) {
+          //tm + "_" + ds + "." + ext;
+          var ds = dateFormat(new Date(), 'ddmmyyHHMMss')
+          saveAttachment(req.files.file, req.param('TeamMember') + "_" + ds + "." + req.files.file.extension, res);
+      } else if (Object.keys(req.body).length > 0) {
+          logger.info("Saving JSON - no file. " + outputFilename);
+          //Just save JSON - upload to server will be handled by the queue
+
+          if (!req.body.t_utc) {
+              req.body.t_utc = Math.floor((new Date()).getTime() / 1000);
+          }
+
+          var outputFilename = './public/uploads/json/app_' + req.body.t_utc + '.json';
+
+          fs.writeFile(outputFilename, JSON.stringify(req.body, null, 4), function(err) {
+              if(err) {
+                logger.error(err);
+                res.send('Did not get it. :(')
+              } else {
+                logger.info("JSON saved to " + outputFilename);
+                res.send('Got it!')
+              }
+          }); 
+
+
+          console.log(req.body);
+      } else {
+        logger.error("BAD UPLOAD ATTEMPT. BAD.");
+      }
+    }
+
+
+});
+
+function saveAttachment(file, name, res) {
+        var tmp_path = file.path;
         logger.info(tmp_path);
-        var ext = req.files.file.extension;
+        var ext = file.extension.toLowerCase();
 
-        var ds = dateFormat(new Date(), 'ddmmyyHHMMss')
-
-        var tm = req.param('TeamMember', null)
-        logger.info("TEAM MEMBER: " + tm)
+        
 
         // *** NEED TO CHANGE DATE, RENAME .JPGs
-
-
         if (ext == 'jpg' || ext == 'mp3' || ext == 'json') {
         // set where the file should actually exists - this is dependant on the extension
-        var target_path = './public/uploads/' + ext + "/" + tm + "_" + ds + "." + ext; 
+        var target_path = './public/uploads/' + ext + "/" + name; 
         // move the file from the temporary location to the intended location
         fs.rename(tmp_path, target_path, function(err) {
             if (err) throw err;
             // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
             fs.unlink(tmp_path, function() {
                 if (err) throw err;
-                res.send('SUCCESS! File uploaded to: ' + target_path + ' - ' + req.files.file.size + ' bytes');
+                res.send('SUCCESS! File uploaded to: ' + target_path + ' - ' + file.size + ' bytes');
                 totalIn ++;
                 totalsIn[ext] ++;
             });
         });
         } else {
-        	logger.info("Unsupported extension.")
-        	res.send("FAIL. Unsupported extension.")
+          logger.info("Unsupported extension.")
+          res.send("FAIL. Unsupported extension.")
         }
-    } else {
-        //Just save JSON - upload to server will be handled by the queue
-
-        if (!req.body.t_utc) {
-            req.body.t_utc = Math.floor((new Date()).getTime() / 1000);
-        }
-
-        var outputFilename = './public/uploads/json/app_' + req.body.t_utc + '.json';
-
-        fs.writeFile(outputFilename, JSON.stringify(req.body, null, 4), function(err) {
-            if(err) {
-              logger.error(err);
-              res.send('Did not get it. :(')
-            } else {
-              logger.info("JSON saved to " + outputFilename);
-              res.send('Got it!')
-            }
-        }); 
-
-
-        console.log(req.body);
-    }
-});
+}
 
 //Status report!
 app.get('/status', function(req, res){
