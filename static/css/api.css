@@ -169,9 +169,9 @@
 /******** D3 STYLES ******/    
 
     #timelineViz {
-      width:800px;
+      width:100%;
       height: auto;
-      min-height:605px;
+      min-height:525px;
       padding: 10px;
       margin-top:8px;
       background-color: rgba(4, 0, 26, 0.62);
