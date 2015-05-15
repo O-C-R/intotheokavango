@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>RiverFi Image Upload 1.1</title>
+
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/jquery.serializejson.min.js"></script>
+<script src="js/jquery.mobile-1.4.3.min.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css">
+
+
+<script>
+
+$(document).ready(function() {
+
+    $('#add-button').on('click', function () {
+                var data = new FormData();
+                var image = $("#Photo").get(0).files;
+
+                // Add the uploaded file content to the form data collection
+                data.append('ImageCount', image.length);
+                for (var i = 0; i < image.length; i++) {
+                    console.log("ADDING IMAGE " + image[i])
+                    data.append("image-" + i, image[i]);
+                    data.append("image-" + i + "-ResourceURL", image[i].name);
+                }
+
+                var j = $('#imageUpload').serializeJSON();
+                j.ResourceURL = image[0].name;
+                j.ImageType = 'Documentary';
+
+                var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
+                console.log(jsonBlob);
+
+                data.append("hasJSON", true);
+                data.append("json", jsonBlob, "metadata.json");
+                data.append("TeamMember", $("#TeamMember").val());
+
+
+                var myReader = new FileReader();
+                myReader.onload = function(event){
+                    console.log(myReader.result);
+                };
+                myReader.readAsText(jsonBlob);
+
+                // Make Ajax request with the contentType = false, and processDate = false
+                var ajaxRequest = $.ajax({
+                    type: "POST",
+                    url: "/upload",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                    }
+                });
+
+                ajaxRequest.done(function (xhr, textStatus) {
+                    console.log(textStatus);
+                });
+
+
+            });
+
+})
+
+
+	
+</script>
+
+</head>
+<body>
+<h2>Image Upload </h2>
+<form id="imageUpload">
+
+    <label for="photo">Photo</label>
+    <input type="file" name="Photo" id="Photo" value="">
+
+    <label for="TeamMember">Team Member</label>
+    <input type="text" name="TeamMember" id="TeamMember" value="">
+
+    <label for="Notes">Notes</label>
+    <input type="text" name="Notes" id="Notes" value="">
+
+</form>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Record Observation</button>
+</body>
+</html>
