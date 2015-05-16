@@ -243,9 +243,10 @@ def verify_expedition(data):
             del data['properties'][wrong]
     if 'Member' not in data['properties']:
         data['properties']['Member'] = None
-    if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
-        data['properties']['Member'] = None
-    data['properties']['Member'] = data['properties']['Member'].strip()
+    if data['properties']['Member'] is not None:
+        if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
+            data['properties']['Member'] = None
+        data['properties']['Member'] = data['properties']['Member'].strip()
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
