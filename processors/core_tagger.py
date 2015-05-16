@@ -15,8 +15,8 @@ def main():
         member = feature['properties']['Member']
         if member is None:
             core_sat = config['satellites'][0]
-            if 'Satellite' in data['properties']:
-                core = data['properties']['Satellite'] == core_sat
+            if 'Satellite' in feature['properties']:
+                core = feature['properties']['Satellite'] == core_sat
                 log.info("--> satellite, core is %s" % core)
             else:
                 log.info("--> null Member, core is True")
