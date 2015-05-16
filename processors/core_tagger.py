@@ -13,12 +13,21 @@ def main():
             log.warning("--> no member, feature_type is %s" % feature['properties']['FeatureType'])
             continue
         member = feature['properties']['Member']
-        t = feature['properties']['t_utc']
-        try:
-            core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
-        except Exception as e:
-            log.info("--> no core entry at time %s" % t)
-            continue
+        if member is None:
+            core_sat = config['satellites'][0]
+            if 'Satellite' in data['properties']:
+                core = data['properties']['Satellite'] == core_sat
+                log.info("--> satellite, core is %s" % core)
+            else:
+                log.info("--> null Member, core is True")
+                core = True
+        else:
+            t = feature['properties']['t_utc']
+            try:
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+            except Exception as e:
+                log.info("--> no core entry at time %s" % t)
+                continue
         db.features.update({'_id': feature['_id']}, {'$set': {'properties.CoreExpedition': core}})
         log.info("--> updated feature, CoreExpedition: %s" % core)
 

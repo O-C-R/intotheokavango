@@ -259,13 +259,23 @@ def tag_core(data):
     except AttributeError:
         from mongo import db    
     try:
-        member = data['properties']['Member']   
-        t = data['properties']['t_utc']   
-        try:
-            core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
-        except IndexError:
-            log.info("--> no core entry at time %s" % t)
-            core = False
+        member = data['properties']['Member']
+        if member is None:
+            core_sat = config['satellites'][0]
+            if 'Satellite' in data['properties']:
+                core = data['properties']['Satellite'] == core_sat
+                log.info("--> satellite, core is %s" % core)
+            else:
+                log.info("--> null Member, core is True")
+                core = True
+        else:
+            t = data['properties']['t_utc']   
+            try:
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                log.info("--> core is %s" % core)
+            except IndexError:
+                log.info("--> no core entry at time %s" % t)
+                core = False
         data['properties']['CoreExpedition'] = core
         return data
     except Exception as e:
