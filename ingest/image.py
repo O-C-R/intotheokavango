@@ -28,7 +28,7 @@ def parse(request):
     # fix things
     if 'TeamMember' in data:
         data['Member'] = data['TeamMember']
-        del data['TeamMember']                
+        del data['TeamMember']            
 
     # process the image
     for path in paths:

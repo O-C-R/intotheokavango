@@ -15,11 +15,30 @@ token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], c
 
 def post_inaturalist(feature):
     log.info("post_inaturalist")
+
+    # skip features without geometry
     if 'geometry' not in feature or feature['geometry'] is None:
         if 'id' in feature:
             feature['_id'] = feature['id']
-        log.debug("Skipping sighting %s without geometry..." % feature['_id'])
+        log.info("--> skipping sighting %s without geometry" % feature['_id'])
         return
+
+    # skip features without images
+    image_count = 0
+    if 'Image' in feature['properties'] and feature['properties']['Image'] is not None:
+        image_count += 1
+    if 'Images' in feature['properties']:
+        for image in feature['properties']['Images']:
+            image_count += 1
+    log.info("--> image_count %s" % image_count)
+    if not image_count:
+        log.info("--> skipping sighting %s without photos" % feature['_id'])
+        return 
+
+    # skip test features
+    if 'Member' in feature['properties'] and feature['properties']['Member'] == "Chaps":
+        log.info("--> skipping sighting %s from Chaps" % feature['_id'])
+
     payload = {
         'observation[species_guess]': feature['properties']['SpeciesName'],
         'observation[observed_on_string]' : feature['properties']['DateTime'],
