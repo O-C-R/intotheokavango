@@ -68,6 +68,7 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
     feature = verify_geojson(feature)
     if not feature:
         return False, "Could not format as geojson"
+    feature['properties'].update({'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType']})        
     feature = verify_t(feature)    
     if not feature:
         return False, "Missing t_utc"
@@ -75,8 +76,8 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
     feature = tag_core(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
-        feature = estimate_geometry(feature, db)
-    feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
+        feature = estimate_geometry(feature, db)         
+    feature['properties'].update({'t_created': util.timestamp(ms=True)})
     try:
         feature_id = db.features.insert_one(feature).inserted_id
     except Exception as e:
