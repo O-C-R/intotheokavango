@@ -148,6 +148,7 @@ def estimate_geometry(data, db):
     """For non-member data, just tag it to the beacon"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
+    feature_type = data['properties']['FeatureType']
     log.info("--> t is %s" % t)
     try:
 
@@ -176,7 +177,7 @@ def estimate_geometry(data, db):
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        if 'Member' not in data['properties'] or core:
+        if 'Member' not in data['properties'] or (core and not feature_type == "ambit"):  ## for some reason, ambit points are snapping to beacons (which may in fact be more often?) but that's bad form with individual gps data, right? and we'll plot that via ambit_geo
             try:
                 beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
                 beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
