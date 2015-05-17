@@ -43,7 +43,12 @@ def parse(request):
             break
 
     """Would be nice to have Member with this"""
-    soundcloud_url = post_track(path)#yield gen.Task(post_track, path)
+    member = "%s: " % data['Member'] if 'Member' in data else ""
+    notes = data['Notes'] if 'Notes' in data else ""
+    title = "%s%s" % (member, notes)
+    if not len(title.strip()):
+        title = util.datestring(data['t_utc'], tz=config['local_tz'])
+    soundcloud_url = post_track(path, title)#yield gen.Task(post_track, path)
     log.debug("yielded")
     if soundcloud_url is None:
         return None, "Could not post to Soundcloud"
@@ -51,13 +56,13 @@ def parse(request):
     return data
 
 
-def post_track(path):
+def post_track(path, title):
     log.info("Posting %s to soundcloud..." % path)
     # time.sleep(5)
     # return "http://soundcloud.com/brianhouse/test"
     try:
         with open(path, 'rb') as f:
-            track = {'asset_data': f, 'sharing': "public", 'title': "test"}
+            track = {'asset_data': f, 'sharing': "public", 'title': title}
             track = client.post('/tracks', track=track)
             soundcloud_url = track.permalink_url
     except Exception as e:
