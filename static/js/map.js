@@ -5,7 +5,7 @@ var map;                     // the map object
 function initMap () {
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
-        center: new L.LatLng(-19.003049, 22.414856),
+        center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
         zoomControl: true,
         attributionControl: false,
         doubleClickZoom: true,
@@ -14,10 +14,13 @@ function initMap () {
         touchZoom: false,
         dragging: true,
         keyboard: true,
-        zoom: 10,
+        zoom: 7,
         minZoom: 1,                    
         maxZoom: 20
-    });     
+    });    
+
+    zoomLevel = map.getZoom();
+    console.log("zoom level: " + zoomLevel); 
 }
 
 var geojsonMarkerOptions = {

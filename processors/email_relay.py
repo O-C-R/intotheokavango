@@ -23,8 +23,12 @@ def main():
             # relay a beacon (body post)
             url = "%s/ingest/beacon" % config['url']
             log.info("Sending to %s..." % url)
-            response = net.read(url, ("%s\n%s" % (str(subject), str(message['body']))).encode('utf-8'))
-            log.info("--> %s" % response)
+            try:
+                response = net.read(url, ("%s\n%s" % (str(subject), str(message['body']))).encode('utf-8'))
+                log.info("--> %s" % response)
+            except Exception as e:
+                log.error("--> main server error: %s" % log.exc(e))
+                continue
         else:
             # unpack the ambit zip and post each sample (to ambit or to ambit_geo)
             log.info("--> %s attachments" % len(message['attachments']))

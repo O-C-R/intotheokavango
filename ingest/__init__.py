@@ -68,14 +68,16 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
     feature = verify_geojson(feature)
     if not feature:
         return False, "Could not format as geojson"
+    feature['properties'].update({'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType']})        
     feature = verify_t(feature)    
     if not feature:
         return False, "Missing t_utc"
-    feature = verify_expedition(feature)        
+    feature = verify_expedition(feature)
+    feature = tag_core(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
-        feature = estimate_geometry(feature, db)
-    feature['properties'].update({'Expedition': config['expedition'] if 'Expedition' not in feature['properties'] else feature['properties']['Expedition'], 'FeatureType': feature_type if 'FeatureType' not in feature['properties'] else feature['properties']['FeatureType'], 't_created': util.timestamp(ms=True)})
+        feature = estimate_geometry(feature, db)         
+    feature['properties'].update({'t_created': util.timestamp(ms=True)})
     try:
         feature_id = db.features.insert_one(feature).inserted_id
     except Exception as e:
@@ -147,6 +149,7 @@ def estimate_geometry(data, db):
     """For non-member data, just tag it to the beacon"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
+    feature_type = data['properties']['FeatureType']
     log.info("--> t is %s" % t)
     try:
 
@@ -165,16 +168,17 @@ def estimate_geometry(data, db):
 
             # is/was the member core at this point?
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                log.info("--> core is %s" % core)
             except Exception as e:
-                log.info("No core entry at time %s" % t)
+                log.info("--> no core entry at time %s" % t)
 
         # find geodata from the nearest beacon
         # but only do it if there is no Member, or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        if 'Member' not in data['properties'] or core:
+        if 'Member' not in data['properties'] or data['properties']['Member'] is None or (core and not feature_type == "ambit"):  ## for some reason, ambit points are snapping to beacons (which may in fact be more often?) but that's bad form with individual gps data, right? and we'll plot that via ambit_geo
             try:
                 beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
                 beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
@@ -242,11 +246,44 @@ def verify_expedition(data):
     if 'Member' not in data['properties']:
         data['properties']['Member'] = None
     if data['properties']['Member'] is not None:
+        if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
+            data['properties']['Member'] = None
+        data['properties']['Member'] = data['properties']['Member'].strip()
+    if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
+
+def tag_core(data):
+    try:
+        db = Application.instance.db
+    except AttributeError:
+        from mongo import db    
+    try:
+        member = data['properties']['Member']
+        if member is None:
+            core_sat = config['satellites'][0]
+            if 'Satellite' in data['properties']:
+                core = data['properties']['Satellite'] == core_sat
+                log.info("--> satellite, core is %s" % core)
+            else:
+                log.info("--> null Member, core is True")
+                core = True
+        else:
+            t = data['properties']['t_utc']   
+            try:
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                log.info("--> core is %s" % core)
+            except IndexError:
+                log.info("--> no core entry at time %s" % t)
+                core = False
+        data['properties']['CoreExpedition'] = core
+        return data
+    except Exception as e:
+        log.error(log.exc(e))
+        return data
 
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""

@@ -9,6 +9,7 @@ def main():
 
     # for data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon if they are core, otherwise fail
     ## for non-ambit wearers, this will keep querying, unfortunately
+    log.info("Updating features with a Member...")
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}, 'properties.Member': {'$ne': None}})
     for feature in features:
         log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
@@ -16,6 +17,7 @@ def main():
         db.features.update({"_id" : feature['_id']}, feature)
 
     # for non-member data, just tag it to the beacons
+    log.info("Updating features without a Member...")
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'beacon'}, 'properties.Member': {'$eq': None}})
     for feature in features:
         log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))

@@ -41,9 +41,11 @@ class Core(server.Handler):
         try:
             for member, status in self.request.arguments.items():
                 status = True if status[0].decode('utf-8') == "true" else False
-                log.debug("%s %s" % (member, status))
-                self.db.members.insert({'Name': member, 'Core': status, 't_utc': util.timestamp()})
-        except Exception:
+                t = util.timestamp()
+                log.debug("%s %s %s" % (member, status, t))
+                self.db.members.insert({'Name': member, 'Core': status, 't_utc': t})
+        except Exception as e:
+            self.error(log.exc(e))
             return self.error("Bad format")
         return self.text("OK")
 

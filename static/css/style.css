@@ -61,6 +61,8 @@ table {
 
 a{
   text-decoration: none;
+/*  color: #686d9d; 
+*/  color: #D29C49;
 }
 
 
@@ -881,7 +883,7 @@ hr{
       background-color: rgba(4, 0, 26, 0.62);
     }
 
-        #dataPage h2 {
+    #dataPage h2 {
       font-family: 'Montserrat';
       /*font-size: 14px;*/
       text-transform: uppercase;
@@ -950,16 +952,22 @@ hr{
 
     #data-content #features-area {
       float: left;
-      width: 270px;
+      width: 25%;
+      min-width: 260px;
       height: 400px;
       padding: 20px 20px 10px 30px;
     }
 
     #data-content #query-area {
       float: left;
-      width: 900px;
-      margin-left: 50px;
+      width: 65%;
+      /*margin-left: 50px;*/
       padding: 20px 0px 10px 0px;
+    }
+
+    #data-content #tag-area {
+      height: 100px;
+      width: 90%;
     }
 
     #data-content #input-area {
@@ -975,26 +983,26 @@ hr{
 
     #data-content #features-totals {
       width: 100%;
-      height: 200px;
+      height: 100%;
   /*    float: left;*/
       /*background-color: rgba(4, 0, 26, 0.62);*/
-      padding:10px;
+ /*     padding:10px;*/
       color: #fff;
       line-height: 36px;
     }
 
     #features-totals #features-right {
-      float: right;
-      width: 75%;
+      float: left;
+      /*width: 75%;*/
       text-align: left;
-      padding-left: 1%;
     }
 
     #features-totals #features-left {
       float: left;
       /*width: 30%;*/
+      height: 100%;
       text-align: right;
-      padding-right: 1%;
+      padding-right: 8%;
       font-weight: bold;
       color: #686d9d;
     }
@@ -1002,8 +1010,18 @@ hr{
     #data-content pre {
         font-size: 12px;
         margin-top: 20px;
-        width: 800px;
+        /*width: 100%;*/
         /*float: left;*/
+    }
+
+    #query-button {
+      float: right;
+    }
+
+    .data-description code {
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 0.8em;
+      color: #fff;
     }
 
     pre, code, code span {
@@ -1025,7 +1043,7 @@ hr{
 
     .data-description {
       /*padding: 30px 1.4% 40px 1.4%;*/
-      padding: 80px 8.6%;
+      padding: 80px 8%;
     }
 
     .data-description p{
@@ -1034,6 +1052,30 @@ hr{
       line-height: 1.98em;
       margin-bottom: 50px;
     }  
+
+    #api-documentation ul {
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      line-height: 1.98em;
+      margin-bottom: 50px;
+      margin-left: 20px;
+    }
+
+    #api-documentation li {
+      list-style: disc outside none;
+    }
+
+    #features-totals li {
+      list-style: none;
+    }
+
+/*    #features-totals ul {
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      line-height: 1.98em;
+      margin-bottom: 0px;
+      margin-left: 0px;
+    }*/
 
 svg.wanderer{
   width:300px;
