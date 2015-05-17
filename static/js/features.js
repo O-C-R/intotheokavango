@@ -43,6 +43,42 @@ function Sighting(feature, m){
 }
 
 
+function Beacon(feature, m){
+
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	var visible = true;
+	var marker = m;
+
+	function getData(){
+		return {
+			type: 'beacon',
+			date: date,
+			latLng: latLng
+		}
+	}
+
+	function getLatLng(){
+		return latLng;
+	}
+
+	function setVisible(v){
+		if(v != visible){
+			if(v) sightingLayer.addLayer(marker);
+			else sightingLayer.removeLayer(marker);
+			visible = v;
+		}
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng,
+		marker: marker,
+		setVisible: setVisible
+	};
+}
+
+
 function PhotoPost(feature, m){
 
 	var feedPos = 0;

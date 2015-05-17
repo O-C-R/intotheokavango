@@ -30,6 +30,7 @@
 	KNOWN BUGS
 	- jumping + loading not finished
 	- links are removed from the end of the tweets
+	- scroll map when hovering a marker
 
 	TODOS
 	- beacon
@@ -45,7 +46,7 @@
 	- update teaser
 	- cross-browser compatibility
 	- sightings taxonomy color
-	- replce share with twitter icon
+	- replace share with twitter icon
 	- 'click to pause, scroll to navigate'
 
 	NICE TO HAVE
@@ -79,6 +80,8 @@ var map;
 var tweetLayer;
 var photoLayer;
 var sightingLayer;
+var beaconLayer;
+var beaconPathLayer;
 var timeline;
 var feed;
 var wanderer;
@@ -178,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function(){
     tweetLayer = new L.layerGroup().addTo(map);
     photoLayer = new L.layerGroup().addTo(map);
     sightingLayer = new L.layerGroup().addTo(map);
+    beaconLayer = new L.layerGroup().addTo(map);
+    beaconPathLayer = new L.layerGroup().addTo(map);
 
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();

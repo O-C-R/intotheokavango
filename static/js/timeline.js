@@ -242,9 +242,9 @@ function Timeline(){
 	}
 
 	function cullMarkersByDay(){
-		var features = ['sightings', 'tweets', 'photos'];
+		var features = ['sightings', 'tweets', 'photos', 'beacons'];
 		for(var k=0; k<features.length; k++){
-			var f = loader.getFeatures()[features[k]]
+			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){
 				if(f[i]){
 					var len = f[i].length;
