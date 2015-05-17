@@ -207,21 +207,24 @@ function Timeline(){
 	}
 
 	function updateCursor(hover){
-		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+
+		if(!cursorHovered) cursorTY = margin + Math.map(offsetTimezone(new Date(timeCursor*1000).getTime())/1000,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+
 		cursorY = Math.lerp(cursorY,cursorTY,0.2);
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
-			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+			cursorDate = new Date(Math.constrain(Math.map(hover,margin+dayRad,height-dayRad,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000-timeOffsets.timezone*3600000);
 		}
+		var d = new Date(offsetTimezone(cursorDate.getTime()));
 		var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		var mo = monthNames[cursorDate.getMonth()];
-		var da = cursorDate.getDate();
+		var mo = monthNames[d.getMonth()];
+		var da = d.getDate();
 		if(da < 10) da = '0' + da;
 		cursor.select('text tspan:first-child').text(mo + ' ' + da);
-		var ho = cursorDate.getHours();
+		var ho = d.getHours();
 		if(ho < 10) ho = '0'+ho;
-		var mi = cursorDate.getMinutes();
+		var mi = d.getMinutes();
 		if(mi < 10) mi = '0'+mi;
 		cursor.select('text tspan:last-child').text(ho + ':' + mi);
 	}

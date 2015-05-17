@@ -7,7 +7,7 @@
 	Please note I have been using the following javascript pattern: 
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
 
-	API NEEDS :
+	API:
 	- Should we use Jer's or Brian's mapbox credentials? Should they be hidden?
 
 	TODO IAN: 
@@ -33,11 +33,10 @@
 	- scroll map when hovering a marker
 
 	TODOS
-	- beacon
 	- timezone
 	- marker labels and popups
-	- linkable features
 	- transition to 2015
+	- linkable features
 	- loading screen
 	- sound and video features
 	- logos
@@ -48,6 +47,9 @@
 	- sightings taxonomy color
 	- replace share with twitter icon
 	- 'click to pause, scroll to navigate'
+	- proper teleport
+	- remove global functions/variables
+	- pause on blur
 
 	NICE TO HAVE
 	- margin journal alignment with timeline
@@ -90,7 +92,8 @@ var timeOffsets = {
 	'timeAmbit': 0,
 	'dateAmbit': 2*24*3600,
 	'tweet': 172760,
-	'photo': 24*3600
+	'photo': 24*3600,
+	'timezone': 4
 }
 
 // var timeOffset = 8*3600;
@@ -227,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(!paused){
 			var frameTime = new Date().getTime();
 			var frameRate = 1000/(frameTime - lastFrameTime);
+			if(frameRate < 0.5) frameRate = 60;
 		    frameCount ++;
 		    if(!blurred && !jumping){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
@@ -342,14 +346,26 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(timeline) timeline.resize();
 	}
 
-
-	function getBodyHeight(){
-		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
-		var headerHeight = d3.select('#header').node().clientHeight;
-		return containerHeight - headerHeight;
-	}
-
 });
+
+
+function getBodyHeight(){
+	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
+	var headerHeight = d3.select('#header').node().clientHeight;
+	return containerHeight - headerHeight;
+}
+
+
+// kind of buggy, only takes full 13 digit long timestamps for now
+function offsetTimezone(t){
+	var shorthand = Math.floor(t).length == 10;
+	if(shorthand) t*=1000;
+	var date = new Date(t);
+	var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+	var newDate = new Date(utc + (3600000 * timeOffsets.timezone)).getTime();
+	if(shorthand) newDate /= 1000;
+	return newDate;
+}
 
 
 

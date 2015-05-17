@@ -53,7 +53,7 @@ function Feed(){
 	        .each(function(d,i){
 	        	d = d.getData();
 	        	
-	        	var t = d.date;
+	        	var t = new Date(offsetTimezone(d.date.getTime()));
 	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
 	        	d3.select(this).select('div.meta div.timestamp')
 	        		.html(t);
