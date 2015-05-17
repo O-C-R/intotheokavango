@@ -3,7 +3,7 @@
 import json, requests, os
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import LegacyApplicationClient
-from housepy import config, log
+from housepy import config, log, util
 from mongo import db
 
 SITE = "https://www.inaturalist.org"
@@ -15,6 +15,12 @@ token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], c
 
 def post_inaturalist(feature):
     log.info("post_inaturalist")
+
+    # 12 hour delay on inat uploads to allow time for ambit ingestion
+    t_now = util.timestamp()
+    if t_now - feature['properties']['t_utc'] < 60 * 60 * 12: 
+        log.info("--> skipping too recent feature")
+        return
 
     # skip features without geometry
     if 'geometry' not in feature or feature['geometry'] is None:
