@@ -5,15 +5,55 @@
 */
 
 
+function Sighting(feature, m){
 
-function PhotoPost(feature){
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	var name = feature.properties.SpeciesName;
+	var visible = true;
+	var marker = m;
+
+	function getData(){
+		return {
+			type: 'sighting',
+			date: date,
+			latLng: latLng,
+			name: name
+		}
+	}
+
+	function getLatLng(){
+		return latLng;
+	}
+
+	function setVisible(v){
+		if(v != visible){
+			if(v) sightingLayer.addLayer(marker);
+			else sightingLayer.removeLayer(marker);
+			visible = v;
+		}
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng,
+		marker: marker,
+		setVisible: setVisible
+	};
+}
+
+
+function PhotoPost(feature, m){
 
 	var feedPos = 0;
 	var height = 0;
-	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
+	// var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var photoUrl = feature.properties.Url;
 	var size = feature.properties.Size;
+	var visible = true;
+	var marker = m;
 
 
 	function getData(){
@@ -25,7 +65,7 @@ function PhotoPost(feature){
 			feedPos: feedPos,
 			size: size,
 			setFeedPos: setFeedPos,
-			height: height
+			height: height,
 		}
 	}
 
@@ -44,32 +84,42 @@ function PhotoPost(feature){
 	function getFeedPos(){
 		return{
 			feedPos: feedPos,
-			height: height
+			height: height,
+			index: i
 		};
 	}
 
+	function setVisible(v){
+		if(v != visible){
+			if(v) photoLayer.addLayer(marker);
+			else photoLayer.removeLayer(marker);
+			visible = v;
+		}
+	}
 
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
-		setFeedPos: setFeedPos
+		setFeedPos: setFeedPos,
+		marker: marker,
+		setVisible: setVisible
 	};
 }
 
 
 
 
-function TweetPost(feature){
+function TweetPost(feature, m){
 
 	var feedPos = 0;
 	var height = 0;
 	var username = feature.properties.Tweet.user.name;
 	var message = feature.properties.Tweet.text;
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
-	var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
-
-	// console.log(new Date(feature.properties.t_utc*1000), t.message);
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.tweet)*1000)));
+	var visible = true;
+	var marker = m;
 
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
@@ -119,12 +169,21 @@ function TweetPost(feature){
 		};
 	}
 
+	function setVisible(v){
+		if(v != visible){
+			if(v) tweetLayer.addLayer(marker);
+			else tweetLayer.removeLayer(marker);
+			visible = v;
+		}
+	}
 
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
-		setFeedPos: setFeedPos
+		setFeedPos: setFeedPos,
+		marker: marker,
+		setVisible: setVisible
 	};
 }
 

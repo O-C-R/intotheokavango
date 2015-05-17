@@ -7,7 +7,7 @@
 
 function Timeline(){
 
-	var timeFrame = [0,new Date().getTime()];
+	var timeFrame = [100000000000000,0];
 	var totalTimeFrame = [0,new Date().getTime()];
 	var node = d3.select('#timeline');
 	var height;
@@ -31,6 +31,10 @@ function Timeline(){
 	var dayRad = 2.5;
 	var margin = 10;
 	var cursor;
+	var cursorY = 0;
+	var cursorTY = 0;
+	var cursorHovered = false;
+	var cursorDate = new Date();
 
 
 	node.append('line')
@@ -38,86 +42,99 @@ function Timeline(){
 		.attr('y1',margin)
 		.attr('x2','80%')
 		.attr('y2','100%')
-		.attr('stroke','#FFFFFF');
+		.attr('stroke','#FFFFFF')
+		.style('pointer-events','none');
 
 	var nightNode = d3.select('#map').append('div').attr('id','night');
 
-	function init(day){
+	function setDates(count,start){
+		dates = [];
+		dayCount = count;
+		var t = new Date(start).getTime()/1000;
+		totalTimeFrame[0] = t;
+		for(var i=0; i<=dayCount; i++){
+			var d = new Date((t+(24*3600*(i)))*1000);
+			dates.push(d);
+			totalTimeFrame[1] = t+(24*3600*(i));
+		}
+	}
+
+	function init(day, lastDay){
 		for(var i=day-1; i<day+2; i+=2){
 			if(i >= 0 && !loader.getLoading()[i]){
-				loader.loadDay(i,function(day){
-					// day = day that was just loaded
-					feed.init(day);
-					setTimeFrame();
-				});
+				if(i>=0 && i<dayCount){
+					loader.loadDay(i,function(day){
+						// day = day that was just loaded
+						feed.init(day);
+						setTimeFrame();
+					});
+				}
 			}
 		}
-		initGraphics();
 	}	
 
 	function initGraphics(){
 
-		if(!graphicsInitialized){
-			dates = [];
-			var t = loader.members['Steve'].getPathQueue()[0].time*1000;
-			totalTimeFrame[0] = t;
-			for(var i=0; i<=dayCount; i++){
-				// WHY +1 ?
-				var d = new Date(t+(24*3600*1000*(i+1)));
-				// d.setHours(0);
-				// d.setMinutes(0);
-				// d.setSeconds(0);
-				// d.setMilliseconds(0);
-				dates.push(d);
-				totalTimeFrame[1] = t+(24*3600*1000*(i+1));
+		node.selectAll('circle.day')
+			.data(dates)
+			.enter()
+			.append('circle')
+			.attr('class','day')
+			.attr('cx','80%')
+			.attr('r',dayRad)
+			.attr('fill','rgb(255,255,255)')
+			.style('pointer-events','none');
+
+		cursor = node.append('g')
+			.style('pointer-events','none')
+			.attr('class','cursor')
+			.each(function(){
+				d3.select(this)
+					.append('text')
+					.each(function(){
+						d3.select(this)
+							.append('tspan')
+							.attr('x','66%')
+							.attr('dy','-0.8em')
+							.text('jun 05');
+						d3.select(this)
+							.append('tspan')
+							.attr('x','66%')
+							.attr('dy','1.6em')
+							.text('05:05');
+					})
+
+				d3.select(this)
+					.append('line')
+					.attr('x1','90%')
+					.attr('x2','100%')
+					.attr('stroke','#FFFFFF');
+
+				d3.select(this)
+					.append('line')
+					.attr('x1','0%')
+					.attr('x2','10%')
+					.attr('stroke','#FFFFFF');
+			})
+
+		node.on('mousemove',function(){
+			if(!jumping){
+				cursorHovered = true;
+				cursorTY = d3.event.layerY-30;
+				updateCursor(d3.event.layerY-30);
 			}
+		}).on('mouseout',function(){
+			cursorHovered = false;
+		}).on('click',function(){
+			cursorHovered = false;
+			if(!jumping){
+				d3.event.stopPropagation();
+				var d = Math.round(Math.constrain(Math.map(d3.event.layerY-30,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1]));
+				jumpTo(d);
+			}
+		});
 
-			console.log(dates);
-
-			node.selectAll('circle.day')
-				.data(dates)
-				.enter()
-				.append('circle')
-				.attr('class','day')
-				.attr('cx','80%')
-				.attr('r',dayRad)
-				.attr('fill','rgb(255,255,255)')
-
-			cursor = node.append('g')
-				.attr('class','cursor')
-				.each(function(){
-					d3.select(this)
-						.append('text')
-						.each(function(){
-							d3.select(this)
-								.append('tspan')
-								.attr('x','66%')
-								.attr('dy','-0.8em')
-								.text('jun 05');
-							d3.select(this)
-								.append('tspan')
-								.attr('x','66%')
-								.attr('dy','1.6em')
-								.text('05:05');
-						})
-
-					d3.select(this)
-						.append('line')
-						.attr('x1','90%')
-						.attr('x2','100%')
-						.attr('stroke','#FFFFFF');
-
-					d3.select(this)
-						.append('line')
-						.attr('x1','0%')
-						.attr('x2','10%')
-						.attr('stroke','#FFFFFF');
-				})
-
-			resize();
-		}
-
-		graphicsInitialized = true;
+		resize();
 
 	}
 
@@ -135,24 +152,32 @@ function Timeline(){
 			});
 	}
 
-	function setTimeFrame(){
+	function initTimeCursor(){
 		var timestamps = [];
 		for(m in loader.members){
 			var member = loader.members[m];
 			timestamps.push(member.getPathQueue()[0].time);
 		}
-		timeFrame[0] = Math.min(timeFrame[0]>0?timeFrame[0]:100000000000000,timestamps.min());
-		timestamps = [];
-		for(m in loader.members){
-			var member = loader.members[m];
-			timestamps.push(member.getPathQueue()[member.getPathQueue().length-1].time);
+		timeCursor = timestamps.min();
+		prevTimeCursor = timeFrame[0]-1;
+		isNightTime = timeCursor >= nightTime[dayCursor][0] || prevTimeCursor < nightTime[dayCursor][1];
+	}
+
+	function setTimeFrame(aga){
+
+		var loaded = loader.getLoadedDays();
+		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
+		timeFrame = [dates[dayCursor].getTime()/1000,dates[dayCursor+1].getTime()/1000-1];
+		for(var i=dayCursor-1; i>=0; i--){
+			if(loaded[i]) {
+				timeFrame[0] = dates[i].getTime()/1000;
+			} else break;
 		}
-		timeFrame[1] = Math.max(timeFrame[1],timestamps.max());
-		if(timeCursor == -1){
-			timeCursor = timeFrame[0];
-			prevTimeCursor = timeFrame[0]-1;
-			isNightTime = timeCursor >= nightTime[dayCursor][0] || prevTimeCursor < nightTime[dayCursor][1];
-		}	
+		for(var i=dayCursor; i<dates.length-1; i++){
+			if(loaded[i]) {
+				timeFrame[1] = dates[i+1].getTime()/1000-1;
+			} else break;
+		}
 	}
 
 
@@ -164,31 +189,39 @@ function Timeline(){
 		prevTimeCursor = timeCursor;
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
-		
-		// console.log(new Date(timeCursor*1000), dates[0], dates[dates.length-1]);
-		
-		wheelDelta = 0;
-		if(new Date(timeCursor*1000).getDate() != new Date(prevTimeCursor*1000).getDate()) newDay();
-		for(var i=0; i<2; i++){
-			if(timeCursor < nightTime[dayCursor][i] && prevTimeCursor >= nightTime[dayCursor][i]) toggleNightTime(i,false); 
-			if(timeCursor >= nightTime[dayCursor][i] && prevTimeCursor < nightTime[dayCursor][i]) toggleNightTime(i,true); 
-		}
 
+		wheelDelta = 0;
+
+		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
+		var lastDay = Math.constrain(Math.floor(Math.map(prevTimeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
+				
+		if(day != lastDay) {
+			newDay();
+		} else{
+			for(var i=0; i<2; i++){
+				if(timeCursor < nightTime[dayCursor][i] && prevTimeCursor >= nightTime[dayCursor][i]) toggleNightTime(i,false); 
+				if(timeCursor >= nightTime[dayCursor][i] && prevTimeCursor < nightTime[dayCursor][i]) toggleNightTime(i,true); 
+			}
+		}
 		updateCursor();
 	}
 
-	function updateCursor(){
-		var y = Math.map(timeCursor*1000,totalTimeFrame[0],totalTimeFrame[1],margin,height-margin);
-		cursor.attr('transform','translate(0,'+y+')');
-		var d = new Date(timeCursor*1000);
+	function updateCursor(hover){
+		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+		cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		cursor.attr('transform','translate(0,'+cursorY+')');
+		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
+		else if(hover){
+			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+		}
 		var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-		var mo = monthNames[d.getMonth()];
-		var da = d.getDate();
+		var mo = monthNames[cursorDate.getMonth()];
+		var da = cursorDate.getDate();
 		if(da < 10) da = '0' + da;
 		cursor.select('text tspan:first-child').text(mo + ' ' + da);
-		var ho = d.getHours();
+		var ho = cursorDate.getHours();
 		if(ho < 10) ho = '0'+ho;
-		var mi = d.getMinutes();
+		var mi = cursorDate.getMinutes();
 		if(mi < 10) mi = '0'+mi;
 		cursor.select('text tspan:last-child').text(ho + ':' + mi);
 	}
@@ -201,11 +234,32 @@ function Timeline(){
 
 
 	function newDay(){
-		dayCursor += timeCursor > prevTimeCursor ? 1 : -1;
+		var forward = timeCursor > prevTimeCursor;
+		dayCursor += forward ? 1 : -1;
 		console.log('new day: ' + dayCursor);
-		timeline.init(dayCursor);
+		init(dayCursor);
+		cullMarkersByDay();
 	}
 
+	function cullMarkersByDay(){
+		var features = ['sightings', 'tweets', 'photos'];
+		for(var k=0; k<features.length; k++){
+			var f = loader.getFeatures()[features[k]]
+			for(var i=0; i<f.length; i++){
+				if(f[i]){
+					var len = f[i].length;
+					for(var j=0; j<len; j++){
+						var sighting = f[i][j];
+						if(Math.abs(dayCursor-i)<=1){
+							sighting.setVisible(true);
+						} else {
+							sighting.setVisible(false);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	function navigateMap(delta){
 		tSpeed = 0;
@@ -216,7 +270,7 @@ function Timeline(){
 		wheelDelta = -delta/4;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
-			d3.select('#feed').node().parentNode.scrollTop += delta;
+			d3.select('#map div.scrollPane').node().scrollTop = 2000;
 		}
 	}
 
@@ -225,6 +279,55 @@ function Timeline(){
 		tSpeed = 0;
 		speed = 0;
 		wheelDelta = t-timeCursor;
+	}
+
+
+	function jumpTo(d){
+
+		function updatePos(){
+			var coord = [0,0];
+			for(m in loader.members){
+				var member = loader.members[m];
+				member.teleport(timeCursor);
+			}
+		}
+
+		function checkNightTime(){
+			isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
+			nightNode.classed('night',isNightTime);
+		}
+
+		function resume(){
+			feed.init(day);
+			init(day);
+			setTimeFrame(true);
+			checkNightTime();
+			jumping = false;
+			updatePos();
+			if(pages.active.id == 'journal') feed.jump(getTimeCursor());
+			if(!paused){
+				togglePause('pause');
+				setTimeout(function(){
+					togglePause('play')
+				},2000)
+			}
+			speed = 0;
+			wheelDelta = 0;
+			cullMarkersByDay();
+		}
+
+		var day = Math.constrain(Math.floor(Math.map(d-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
+		timeCursor = d;
+		prevTimeCursor = timeCursor-1;
+		console.log('Jumping to day: ' + day);
+		if(!loader.getLoading()[day]){
+			jumping = true;
+			loader.loadDay(day,function(day){
+				resume();
+			});
+		} else {
+			resume();
+		}
 	}
 
 
@@ -241,7 +344,6 @@ function Timeline(){
 	}
 
 	function updateControl(state){
-		// console.log(state);
 		if(lastControlState != state) controlNode.style('background-image','url("static/img/icon'+state+'.svg")');
 		lastControlState = state;
 	}
@@ -258,6 +360,8 @@ function Timeline(){
 
 	return {
 		init: init,
+		initGraphics: initGraphics,
+		initTimeCursor: initTimeCursor,
 		getTimeCursor: getTimeCursor,
 		navigateMap: navigateMap,
 		navigateJournal: navigateJournal,
@@ -266,7 +370,9 @@ function Timeline(){
 		setTimeFrame: setTimeFrame,
 		setNightTime: setNightTime,
 		update: update,
-		updateControl: updateControl
+		updateControl: updateControl,
+		setDates: setDates,
+		jumpTo: jumpTo
 	};
 }
 
