@@ -42,7 +42,9 @@ def parse(request):
         if path[-4:] != "json":
             break
 
-    """Would be nice to have Member with this"""
+    if 'TeamMember' in data:
+        data['Member'] = data['TeamMember']
+        del data['TeamMember']              
     member = "%s: " % data['Member'] if 'Member' in data else ""
     notes = data['Notes'] if 'Notes' in data else ""
     title = "%s%s" % (member, notes)
