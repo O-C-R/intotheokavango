@@ -42,9 +42,10 @@ function loadData () {
         
         for (d in featureCollection.features) {
             var item = featureCollection.features[d];
-            if(item.geometry === "null") {
+            if(item.geometry === null) {
                 console.log("sighting has no geometry");
             } else {
+                console.log("sighting with geometry");
                 sightingsWithGeoLoc.push(item);
             }
         }
