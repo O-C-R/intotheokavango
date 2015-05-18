@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="../static/js/MarkerCluster.css" />
   <link rel="stylesheet" href="../static/js/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="../static/js/MarkerCluster.Default.ie.css" />
-      <link rel="stylesheet" type="text/css" href="../static/css/api.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/api.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
   
 {% raw %}
 <script id='query-template' type='text/ractive'>
@@ -224,7 +224,7 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
         <li class="journal">Journal</li>
         <li class="data">Data</li>
         <li class="about">About</li>
-        <li class="share"><img src="static/img/twitterIcon.svg"/></li>
+        <li class="share"><a href="http://twitter.com/intotheokavango" target="_blank"><img src="static/img/twitterIcon.svg"/></a></li>
       </ul>
       <div id="title">
         <h1>Into the Okavango 2015</h1>
@@ -234,17 +234,39 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
 
     <div id="pageContainer">
       <div id="aboutPage" class="page hidden">
+        
         <div id="video">
           <div class="vimeoContainer">
             <iframe src="https://player.vimeo.com/video/124421450" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
           </div>
         </div>
         <div id="introduction">
-          <div class="row">
+          <div class="row" id="intro">
             <div class="column">
+              
+
+              <div id="cta">
+                <a href="#"><p>The expedition has started, join us!</p></a>
+              </div>
+
+
+              <p>90 days, 1,000 miles, 3 countries, 2 rivers, 31 adventurers, 100% open data.<br> Join us in real-time as we explore</p>
               <h1>The beating heart of our planet</h1>
             </div>
             <div class="column">
+
+              <div class="logos">
+                <a href="http://www.nationalgeographic.com/">
+                  <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+                </a>
+                <a href="http://www.o-c-r.org/">
+                  <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+                </a>
+                <a href="http://www.wildbirdtrust.com/">
+                  <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+                </a>
+              </div>
+
               <p>
                 The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unexplored. Starting in May a team of Ba’Yei, scientists, engineers and adventurers will journey a 1000 miles down the Cuito River, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
               <br>
@@ -364,6 +386,22 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
               </div>
             </div>
 
+            <div class="post blog">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/mediumIcon.svg"/>
+                <div class="text">
+                  <h3 class="title">
+                  </h3>
+                  <p class="message">
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div class="post photo">
               <div class="content">
               <div class="meta">
@@ -383,6 +421,17 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
             <a class="control-zoom-out" href="#" title="Zoom out">-</a>
           </div>
           <div class="button control-playback"></div>
+        </div>
+        <div class="logos">
+          <a href="http://www.nationalgeographic.com/">
+            <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+          </a>
+          <a href="http://www.o-c-r.org/">
+            <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+          </a>
+          <a href="http://www.wildbirdtrust.com/">
+            <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+          </a>
         </div>
       </div>
 

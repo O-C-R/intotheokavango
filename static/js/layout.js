@@ -43,6 +43,7 @@ function Page(i){
 		offsetHeader(id=='about' || id=='data');
 		map.setZoom(id == 'journal' ? 15 : 17);
 		header.classed('dark',false);
+		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 	}
 
 
@@ -92,6 +93,7 @@ function MapPage(){
 
 
 	page.show = function(){
+		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
@@ -101,10 +103,15 @@ function MapPage(){
 				pages.journal.panes[i].hide();
 			}
 		}
-		if(timeline) setTimeout(function(){timeline.togglePause('resume');},1000);
+		if(timeline) {
+			if(lastActive.id != 'journal') timeline.togglePause('pause');
+			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
+		}
 		map.setZoom(page.id == 'journal' ? 15 : 17);
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
+		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
+		d3.select('#mapPage div.logos').classed('hidden',false);
 	}
 
 	page.hide = function(){
@@ -148,6 +155,8 @@ function JournalPage(){
 		page.header.classed('dark',false);
 
 		page.node.select('.controls').classed('hidden',true);
+		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
+		d3.select('#mapPage div.logos').classed('hidden',true);
 	}
 
 

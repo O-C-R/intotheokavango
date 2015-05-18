@@ -12,6 +12,8 @@ function Loader(){
 	var photos = [];
 	var sightings = [];
 	var beacons = [];
+	var blogs = [];
+	var sounds = [];
 	var members = {};	
 	var loadedDays = [];
 
@@ -49,16 +51,16 @@ function Loader(){
 		photos[day] = [];
 		sightings[day] = [];
 		beacons[day] = [];
+		blogs[day] = [];
+		sounds[day] = [];
 
 		loadPath(day, checkForCompletion);
 		loadTweets(day, checkForCompletion);
 		loadPhotos(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
+		loadBlogPosts(day, checkForCompletion);
+		// loadSoundPosts(day, checkForCompletion);
 		// loadBeacons(day, checkForCompletion);
-		checkForCompletion();
-		// checkForCompletion();
-		// checkForCompletion();
-		// checkForCompletion();
 	}
 
 
@@ -84,23 +86,28 @@ function Loader(){
 			    	var time = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
 			    	var core = feature.properties.CoreExpedition;
 			        if(!members[name]) {
+			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.0005, 18.175099+((Math.random()*2)-1)*0.0005);
 			        	members[name] = Member(name, latLng, day);
 			        }
-			        console.log(feature);
+			        // members[name].addAmbitGeo(day, latLng, time, core, time < new Date('2015-05-19'));
 			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
-			for(m in members) members[m].initPathQueue();
 			var activityInterval = [0, 10000000000];
 			for(m in members){
 				var member = members[m];
 				var pathQueue = member.getPathQueueByDay(day);
-				if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
-				if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				if(!pathQueue){
+					// member.fillEmptyPathQueue(day);
+				} else {
+					if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
+					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				}
 			}
 			activityInterval[0]+(10*60);
 			activityInterval[1]-(10*60);
-			// console.log(day, activityInterval);
+			// console.log(day, new Date(activityInterval[0]*1000),new Date(activityInterval[1]*1000));
+			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
@@ -130,7 +137,6 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	console.log(feature.properties);
 		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
 		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
 		        },
@@ -139,6 +145,86 @@ function Loader(){
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
 		        	if(tweet) tweets[day].push(tweet);
+                    return marker;
+                }
+		    });
+		    callback();
+		});
+	}
+
+	
+	function loadBlogPosts(day, callback){
+
+		var markerIcon = L.icon({
+	        iconUrl: '../static/img/quote.png',
+	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconSize:     [40,40],
+	        shadowSize:   [40,40],
+	        iconAnchor:   [15,35],
+	        shadowAnchor: [15,35],
+	        popupAnchor:  [10,-40]
+	    });
+
+	    var markerOptions = {
+	        icon:markerIcon,
+	        iconSize:[20,20]
+	    };
+
+		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
+		d3.json(query, function(error, data) {
+			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+			data = data.results;	
+		    L.geoJson(data.features, {
+		        filter: function(feature, layer) {
+		        	if(feature.geometry == null){
+			            var blog = BlogPost(feature);
+		        		if(blog) blogs[day].push(blog);
+				        return false;
+		            } else return true;
+		        },
+		        pointToLayer: function (feature, latlng) {
+                    var marker = L.marker(latlng, markerOptions);
+                    blogLayer.addLayer(marker);
+                    var blog = BlogPost(feature, marker);
+		        	if(blog) blogs[day].push(blog);
+                    return marker;
+                }
+		    });
+		    callback();
+		});
+	}
+
+
+	function loadSoundPosts(day, callback){
+
+		var markerIcon = L.icon({
+	        iconUrl: '../static/img/quote.png',
+	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconSize:     [40,40],
+	        shadowSize:   [40,40],
+	        iconAnchor:   [15,35],
+	        shadowAnchor: [15,35],
+	        popupAnchor:  [10,-40]
+	    });
+
+	    var markerOptions = {
+	        icon:markerIcon,
+	        iconSize:[20,20]
+	    };
+
+		var query = 'http://intotheokavango.org/api/features?FeatureType=audio&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
+		d3.json(query, function(error, data) {
+			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+			data = data.results;	
+		    L.geoJson(data.features, {
+		        filter: function(feature, layer) {
+		        	return feature.geometry != null;
+		        },
+		        pointToLayer: function (feature, latlng) {
+                    var marker = L.marker(latlng, markerOptions);
+                    soundLayer.addLayer(marker);
+                    var sound = SoundPost(feature, marker);
+		        	if(sound) sounds[day].push(sound);
                     return marker;
                 }
 		    });
@@ -170,15 +256,18 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		            return (feature.properties.Url.indexOf('james') > -1);
-		            // return true;
+		            if(feature.properties.Member == null){
+			            var photo = PhotoPost(feature);
+				        if(photo) photos[day].push(photo);
+				        return false;
+		            } else return true;
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
-                    tweetLayer.addLayer(marker);
-                    var photo = PhotoPost(feature, marker);
-		            if(photo) photos[day].push(photo);
-                    return marker;
+	                    var marker = L.marker(latlng, markerOptions);
+	                    tweetLayer.addLayer(marker);
+	                    var photo = PhotoPost(feature, marker);
+				        if(photo) photos[day].push(photo);
+	                    return marker;
                 }
 		    });
 		    callback();
@@ -355,13 +444,19 @@ function Loader(){
 			sightings: sightings,
 			tweets: tweets,
 			photos: photos,
-			beacons: beacons
+			beacons: beacons,
+			blogs: blogs
 		}
+	}
+
+	function getBlogs(){
+		return blogs;
 	}
 
 	return {
 		loadDay: loadDay,
 		members: members,
+		getBlogs: getBlogs,
 		getTweets: getTweets,
 		getPhotos: getPhotos,
 		getLoading: getLoading,

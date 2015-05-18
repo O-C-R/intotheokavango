@@ -50,12 +50,12 @@ function Timeline(){
 	function setDates(count,start){
 		dates = [];
 		dayCount = count;
-		var t = new Date(start).getTime()/1000;
-		totalTimeFrame[0] = t;
+		var t = new Date(start).getTime()/1000-3600*24;
+		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){
 			var d = new Date((t+(24*3600*(i)))*1000);
 			dates.push(d);
-			totalTimeFrame[1] = t+(24*3600*(i));
+			totalTimeFrame[1] = t+(24*3600*(i)-1) -4*3600;
 		}
 	}
 
@@ -120,7 +120,7 @@ function Timeline(){
 		node.on('mousemove',function(){
 			if(!jumping){
 				cursorHovered = true;
-				cursorTY = d3.event.layerY-30;
+				cursorTY = Math.constrain(d3.event.layerY-30,margin+dayRad,height-dayRad);
 				updateCursor(d3.event.layerY-30);
 			}
 		}).on('mouseout',function(){
@@ -160,22 +160,26 @@ function Timeline(){
 		}
 		timeCursor = timestamps.min();
 		prevTimeCursor = timeFrame[0]-1;
-		isNightTime = timeCursor >= nightTime[dayCursor][0] || prevTimeCursor < nightTime[dayCursor][1];
+		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
+		// console.log(new Date(timeCursor*1000), new Date(nightTime[dayCursor][0]*1000), new Date(nightTime[dayCursor][1]*1000));
+		// console.log('NIGHT1',isNightTime);
 	}
 
-	function setTimeFrame(aga){
+	function setTimeFrame(){
 
 		var loaded = loader.getLoadedDays();
 		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
-		timeFrame = [dates[dayCursor].getTime()/1000,dates[dayCursor+1].getTime()/1000-1];
+		timeFrame = [dates[dayCursor].getTime()/1000 -4*3600,dates[dayCursor+1].getTime()/1000-1 -4*3600];
+		// console.log('LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 		for(var i=dayCursor-1; i>=0; i--){
 			if(loaded[i]) {
-				timeFrame[0] = dates[i].getTime()/1000;
+				timeFrame[0] = dates[i].getTime()/1000 -4*3600;
 			} else break;
 		}
+		// console.log('Aasdsaddssa', dates.slice());
 		for(var i=dayCursor; i<dates.length-1; i++){
 			if(loaded[i]) {
-				timeFrame[1] = dates[i+1].getTime()/1000-1;
+				timeFrame[1] = dates[i+1].getTime()/1000-1 -4*3600;
 			} else break;
 		}
 	}
@@ -189,6 +193,7 @@ function Timeline(){
 		prevTimeCursor = timeCursor;
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
+		// console.log(new Date(timeCursor*1000), 'LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),'LOL',new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 
 		wheelDelta = 0;
 
@@ -202,19 +207,20 @@ function Timeline(){
 				if(timeCursor < nightTime[dayCursor][i] && prevTimeCursor >= nightTime[dayCursor][i]) toggleNightTime(i,false); 
 				if(timeCursor >= nightTime[dayCursor][i] && prevTimeCursor < nightTime[dayCursor][i]) toggleNightTime(i,true); 
 			}
+			// console.log(new Date(timeCursor*1000), new Date(nightTime[dayCursor][0]*1000), new Date(nightTime[dayCursor][1]*1000));
 		}
 		updateCursor();
 	}
 
 	function updateCursor(hover){
 
-		if(!cursorHovered) cursorTY = margin + Math.map(offsetTimezone(new Date(timeCursor*1000).getTime())/1000,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
 
 		cursorY = Math.lerp(cursorY,cursorTY,0.2);
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
-			cursorDate = new Date(Math.constrain(Math.map(hover,margin+dayRad,height-dayRad,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000-timeOffsets[expeditionYear].timezone*3600000);
+			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
 		}
 		var d = new Date(offsetTimezone(cursorDate.getTime()));
 		var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -239,13 +245,12 @@ function Timeline(){
 	function newDay(){
 		var forward = timeCursor > prevTimeCursor;
 		dayCursor += forward ? 1 : -1;
-		console.log('new day: ' + dayCursor);
 		init(dayCursor);
 		cullMarkersByDay();
 	}
 
 	function cullMarkersByDay(){
-		var features = ['sightings', 'tweets', 'photos', 'beacons'];
+		var features = ['sightings', 'tweets', 'photos', 'beacons', 'blogs'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){
@@ -265,6 +270,7 @@ function Timeline(){
 	}
 
 	function navigateMap(delta){
+		// console.log(new Date(timeCursor*1000));
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
@@ -303,7 +309,7 @@ function Timeline(){
 		function resume(){
 			feed.init(day);
 			init(day);
-			setTimeFrame(true);
+			setTimeFrame();
 			checkNightTime();
 			jumping = false;
 			updatePos();

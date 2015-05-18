@@ -63,6 +63,11 @@ a{
   text-decoration: none;
 /*  color: #686d9d; 
 */  color: #D29C49;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color:#fff;
 }
 
 
@@ -89,6 +94,19 @@ body{
 hr{
   opacity: 0.5;
 }
+
+
+h3{
+  font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 18px;
+  text-transform: uppercase;
+  line-height: 1.5em;
+  letter-spacing: 0.2em;
+  color: #fff;
+}
+
 
 #mapContainer{
   width:100%;
@@ -246,7 +264,7 @@ hr{
             ul#navigation li.share img{
               display: block;
               margin:auto;
-              margin-top:-5px;
+              margin-top:-6px;
             }
 
 
@@ -274,12 +292,57 @@ hr{
       display:none;
     }
 
+    #cta{
+      /*position:absolute;
+      bottom:-22px;*/
+      width:100%;
+      left:0;
+      text-align: center;
+      margin-top:-35px;
+      margin-bottom:70px;
+    }
+
+      #cta p{
+        position:relative;
+        margin:auto;
+        display:inline-block;
+        border-radius: 3px;
+        padding:14px 26px;
+        border: 2px solid white;
+        text-transform: uppercase;
+        font-size: 11px !important;
+        color: #4BFF87;
+        transition: color 0.15s;
+        text-decoration: none;
+      }
+
+      #cta p span{
+        text-transform: lowercase;
+      }
+
+      #cta a:hover p{
+        color: white;
+      }
+
     #aboutPage{
       background-color: rgba(4, 0, 26, 0.65);
     }
 
-      #aboutPage div.row{
-        
+      #aboutPage div.logos{
+        height:auto;
+        width:100%;
+        padding-top:10px;
+        padding-bottom:45px;
+        text-align: left;
+      }
+
+      #aboutPage div.logos a{
+        margin-right: 20px;
+      }
+
+      #aboutPage #cta{
+        margin:0;
+        margin-bottom:75px;
       }
 
       #aboutPage div.column{
@@ -365,10 +428,14 @@ hr{
     #aboutPage #introduction{
       width:82.8%;
       height:auto;
-      padding:105px 8.6%;
+      padding:100px 8.6%;
       overflow-x:hidden; 
       position:relative;
     }
+
+      #aboutPage #introduction #cta{
+        text-align: right;
+      }
 
       #aboutPage h1{
         font-size: 56px;
@@ -405,44 +472,13 @@ hr{
           margin-top:35px;
         }
 
-        #introduction #intro div.column:first-child p{
+        #introduction #intro div.column:first-child p:nth-child(2){
           text-align: right;
-          padding-left:20%;
+          padding-left:15%;
           margin-bottom:15px;
+          margin-top:0;
         }
 
-
-      #cta{
-        /*position:absolute;
-        bottom:-22px;*/
-        width:100%;
-        left:0;
-        text-align: center;
-        margin-top:-35px;
-        margin-bottom:70px;
-      }
-
-        #cta p{
-          position:relative;
-          margin:auto;
-          display:inline-block;
-          border-radius: 3px;
-          padding:14px 26px;
-          border: 2px solid white;
-          text-transform: uppercase;
-          font-size: 11px;
-          color: #4BFF87;
-          transition: color 0.15s;
-          text-decoration: none;
-        }
-
-        #cta p span{
-          text-transform: lowercase;
-        }
-
-        #cta a:hover p{
-          color: white;
-        }
 
       #aboutPage #beaconContainer{
         position: absolute;
@@ -627,7 +663,7 @@ hr{
         #team div.logos{
           text-align: right;
           position:absolute;
-          bottom:100px;
+          bottom:50px;
           width:40%;
         }
 
@@ -652,6 +688,26 @@ hr{
       height:100%;
       position:fixed;
     }
+
+    #mapPage div.logos{
+      position:absolute;
+      bottom:35px;
+      right:3%;
+      transition: opacity 0.2s;
+    }
+
+      #mapPage div.logos.hidden{
+        opacity: 0;
+      }
+
+      #mapPage div.logos a{
+        pointer-events:auto;
+        margin-left:20px;
+      }
+
+      #mapPage div.logos.hidden a{
+        pointer-events:none;
+      }
 
       #mapPage div.controls{
         padding: 35px 1.4% 1.4% 1.4%;
@@ -828,6 +884,34 @@ hr{
               line-height: 1.85em;
               margin-top:-7px;
             }
+
+
+              #mapPage div#feed div.post.blog div.content div.text {
+                display:inline-block;
+                vertical-align: middle;
+                margin:0 0 0 5%;
+                width:85%;
+                /*font-style: italic;*/
+                font-size: 20px;
+                line-height: 1.85em;
+                margin-top:-7px;
+              }
+
+                #mapPage div#feed div.post.blog div.content div.text p.message{
+                  display:block;
+                  margin:0;
+                  width:100%;
+                }
+
+                #mapPage div#feed div.post.blog div.content div.text p.message a{
+                  font-size:13px;
+                  font-style: italic;
+                }
+
+                #mapPage div#feed div.post.blog div.content div.text h3{
+                  margin-top: 5px;
+                  margin-bottom:15px;
+                }
 
               #mapPage.data div#feed div.post div.content p.message{
                 margin:0 0 0 3.8%;

@@ -33,6 +33,19 @@
 	- scroll map when hovering a marker
 
 	TODOS
+	- teleport map once in a while
+	- unzoom at car speed
+	- sound
+	- linkable features
+	- fix trail in about page
+	- core features?
+	- add link to tweets and blogposts
+	- -4h in setDates(x2) and setTimeFrame(x2)
+
+
+	- EstimatedGeometry?
+
+
 	- marker labels and popups
 	- transition to 2015
 	- linkable features
@@ -82,6 +95,8 @@ var photoLayer;
 var sightingLayer;
 var beaconLayer;
 var beaconPathLayer;
+var blogLayer;
+var soundLayer;
 var timeline;
 var feed;
 var wanderer;
@@ -95,7 +110,9 @@ var timeOffsets = {
 		'tweet': 172760,
 		'photo': 24*3600,
 		'timezone': 4,
-		'query': -1
+		'query': -1,
+		'departure': 3,
+		'startDate':0
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -103,15 +120,17 @@ var timeOffsets = {
 		'tweet': 0,
 		'photo': 0,
 		'timezone': 4,
-		'query': 0
+		'query': 0,
+		'departure': 3,
+		'startDate':-1
 	}
 }
 
-// var timeOffset = 8*3600;
-// var dayOffset = 2*24*3600;
 var paused = false;
 var blurred = false;
 var jumping = false;
+
+var carCounter = 0;
 
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -119,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function(){
     map = new L.map('map', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        center:new L.LatLng(-19.003049,22.414856),
+        center:new L.LatLng(-12.811059,18.175099),
         attributionControl: false,
         doubleClickZoom: false,
         scrollWheelZoom: true,
@@ -133,70 +152,13 @@ document.addEventListener('DOMContentLoaded', function(){
         scrollWheelZoom:false
     });
 
- //    //Extend to add labels on circle markers
-	// L.CircleMarker.include({
-
-	//     bindLabel: function (content, options) {
-
-	//         if (!this._label || this._label.options !== options) {
-	//         	console.log(L.Label)
-	//             this._label = new L.Label(options, this);
-	//         }
-
-	//         if (!this.label || this.label.options !== options) {
-	//             this.label = new L.Label(options, this);
-	//         }
-
-	//         this._map = map;
-	//         this.label.setContent(content);
-	//         this._labelNoHide = options && options.noHide;
-
-	//         if (!this._showLabelAdded) {
-	//             if (this._labelNoHide) {
-	//                 this
-	//                     .on('remove', this.hideLabel, this)
-	//                     .on('move', this._moveLabel, this);
-	//                 this._showLabel({latlng: this.getLatLng()});
-	//             } else {
-	//                 this
-	//                     .on('mouseover', this._showLabel, this)
-	//                     .on('mousemove', this._moveLabel, this)
-	//                     .on('mouseout remove', this._hideLabel, this);
-	//                 if (L.Browser.touch) {
-	//                     this.on('click', this._showLabel, this);
-	//                 }
-	//             }
-	//             this._showLabelAdded = true;
-	//         }
-
-	//         return this;
-	//     },
-
-	//     unbindLabel: function () {
-	//         if (this._label) {
-	//             this._hideLabel();
-	//             this._label = null;
-	//             this._showLabelAdded = false;
-	//             if (this._labelNoHide) {
-	//                 this
-	//                     .off('remove', this._hideLabel, this)
-	//                     .off('move', this._moveLabel, this);
-	//             } else {
-	//                 this
-	//                     .off('mouseover', this._showLabel, this)
-	//                     .off('mousemove', this._moveLabel, this)
-	//                     .off('mouseout remove', this._hideLabel, this);
-	//             }
-	//         }
-	//         return this;
-	//     }
-	// });
-
     tweetLayer = new L.layerGroup().addTo(map);
     photoLayer = new L.layerGroup().addTo(map);
     sightingLayer = new L.layerGroup().addTo(map);
     beaconLayer = new L.layerGroup().addTo(map);
     beaconPathLayer = new L.layerGroup().addTo(map);
+    blogLayer = new L.layerGroup().addTo(map);
+    soundLayer = new L.layerGroup().addTo(map);
 
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
@@ -215,7 +177,8 @@ document.addEventListener('DOMContentLoaded', function(){
     wanderer = Wanderer(map.getCenter());
 
     if(d3.selectAll('#navigation li')[0].length > 3){
-		pages.map.show();
+		// pages.map.show();
+		pages.about.show();
 		setLayoutInteractions();
 		loader.getDayCount(function(dayCount,startDate){
 			timeline.setDates(dayCount,startDate);
@@ -247,16 +210,29 @@ document.addEventListener('DOMContentLoaded', function(){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
 				    timeline.update(frameRate);
 				    var coord = [0,0];
+				    var i = 0;
+					
 					for(m in loader.members){
 						var member = loader.members[m];
-						member.move(timeline.getTimeCursor());
-						var c = member.getLatLng();
-						coord[0] += c.lat;
-						coord[1] += c.lng;
+						var isCore = member.move(timeline.getTimeCursor());
+						// if(isCore){
+						// 	var c = member.getLatLng();
+						// 	coord[0] += c.lat;
+						// 	coord[1] += c.lng;
+						// 	i++;
+						// }
 					}
-					coord[0] /= Object.keys(loader.members).length;
-					coord[1] /= Object.keys(loader.members).length;
-					map.panTo(new L.LatLng(coord[0],coord[1]), {animate:false});
+					// coord[0] /= i;
+					// coord[1] /= i;
+
+					// var latLng = new L.LatLng(coord[0],coord[1]);
+					// if(loader.members['Steve'].getLatLng().distanceTo(latLng) > 500) latLng = loader.members['Steve'].getLatLng();
+					// var previousCenter = map.getCenter();
+					map.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+
+					// carCounter = Math.constrain(carCounter + (previousCenter.distanceTo(map.getCenter()) > 100?1:-1),0,30);
+					// if(carCounter == 30 && map.getZoom() == 17) map.setZoom(13);
+					// if(carCounter == 0 && map.getZoom() == 13) map.setZoom(17);
 
 					var matrix = d3.select('#map div.leaflet-map-pane').style('transform').split(', ');
 					matrix = matrix[0]+', '+matrix[1]+', '+matrix[2]+', '+matrix[3]+', '+(-1*parseFloat(matrix[4]))+', '+(-1*parseFloat(matrix[5]))+')';
@@ -277,13 +253,24 @@ document.addEventListener('DOMContentLoaded', function(){
 	function setLayoutInteractions(){			
 
 		d3.selectAll('#navigation li')
-	    	.on('click',function(){
-	    		var btn = d3.select(this);
-	    		var t = btn.text().toLowerCase();
-	    		pages.active.hide();
-	    		pages[t].show();
-	    		resize();
+	    	.on('click',function(d,i){
+	    		if(i<4){
+		    		var btn = d3.select(this);
+		    		var t = btn.text().toLowerCase();
+		    		pages.active.hide();
+		    		pages[t].show();
+		    		resize();
+		    	}
 	    	});
+
+	    if(d3.selectAll('#navigation li')[0].length > 3){
+			d3.selectAll('#cta')
+		    	.on('click',function(d,i){
+		    		pages.active.hide();
+		    		pages['map'].show();
+		    		resize();
+		    	});
+	    }
 
 	    d3.select('#map div.leaflet-layer')
 	    	.append('div')
@@ -296,6 +283,11 @@ document.addEventListener('DOMContentLoaded', function(){
 	    	});
 
 	    d3.select('#map div.scrollPane div')
+	    	.on('click',function(){
+	    		if(pages.active.id == 'map') timeline.togglePause();
+	    	});
+
+	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){
 	    		if(pages.active.id == 'map') timeline.togglePause();
 	    	});

@@ -11,7 +11,8 @@ function Feed(){
 	node.on('mousewheel', scroll);
 	var templates = {
 		tweet: node.select('div.post.tweet').remove().html(),
-		photo: node.select('div.post.photo').remove().html()
+		photo: node.select('div.post.photo').remove().html(),
+		blog: node.select('div.post.blog').remove().html()
 	}
 	var postsByDay = [];
 	var allPosts = [];
@@ -26,7 +27,11 @@ function Feed(){
 		// Definitely not optimized
 		var newPosts = [];
 		newPosts = newPosts.concat(loader.getTweets()[day]);
-		newPosts = newPosts.concat(loader.getPhotos()[day]);
+		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		var photos = loader.getPhotos()[day];
+		for(var i=0; i<photos.length; i++){
+			if(photos[i].getMember() != null) newPosts.push(photos[i]);
+		}
 		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
@@ -35,10 +40,6 @@ function Feed(){
 		allPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
-
-		// for(var i=0; i<allPosts.length; i++){
-		// 	console.log(allPosts[i].getData().date);
-		// }
 
 		var posts = node.selectAll('div.post')
 	        .data(allPosts, function(d){ 
@@ -52,7 +53,6 @@ function Feed(){
 	        .html(function(d){ return templates[d.getData().type] })
 	        .each(function(d,i){
 	        	d = d.getData();
-	        	
 	        	var t = new Date(offsetTimezone(d.date.getTime()));
 	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
 	        	d3.select(this).select('div.meta div.timestamp')
@@ -61,7 +61,19 @@ function Feed(){
 	        	if(d.type == 'tweet'){
 		        	d3.select(this).select('p.message')
 		        		.html(function(){
-		        			return '“'+d.message.replace(/http[^\s]*/,'')+'”';
+		        			var urls = d.message.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.message = d.message.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        			}
+			        		}
+			        		var handles = d.message.match(/@[^\s]*/gi);
+		        			if(handles){
+			        			for(var i=0; i<handles.length; i++){
+			        				d.message = d.message.replace(handles[i],'<a href="http://twitter.com/'+handles[i].slice(1,handles[i].length-1)+'" target="_blank">'+handles[i]+'</a>');
+			        			}
+			        		}
+		        			return d.message
 		        		});
 		        	if(d.photoUrl){
 			        	d3.select(this).select('div.photo')
@@ -78,6 +90,13 @@ function Feed(){
 		        		.attr('alt','Photo taken on ' + t)
 		        		.attr('width', w)
 		        		.attr('height', d.size[1]*w/d.size[0]);
+	        	} else if(d.type == 'blog'){
+		        	d3.select(this).select('h3.title')
+		        		.html(d.title);
+	        		d3.select(this).select('p.message')
+		        		.html(function(){
+		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full on Medium</a>'
+		        		});
 	        	}
 	        });
 
