@@ -7,7 +7,7 @@
 
 function Sighting(feature, m){
 
-	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var name = feature.properties.SpeciesName;
 	var visible = true;
@@ -45,7 +45,7 @@ function Sighting(feature, m){
 
 function Beacon(feature, m){
 
-	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var visible = true;
 	var marker = m;
@@ -84,7 +84,7 @@ function PhotoPost(feature, m){
 	var feedPos = 0;
 	var height = 0;
 	// var date = new Date(Math.round(parseFloat(feature.properties.t_utc*1000)));
-	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.photo)*1000)));
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var photoUrl = feature.properties.Url;
 	var size = feature.properties.Size;
@@ -148,12 +148,13 @@ function PhotoPost(feature, m){
 
 function TweetPost(feature, m){
 
+	var tweetProperties = expeditionYear == '15' ? feature.properties : feature.properties.Tweet;
+
 	var feedPos = 0;
 	var height = 0;
-	var username = feature.properties.Tweet.user.name;
-	var message = feature.properties.Tweet.text;
+	var message = expeditionYear == '15' ? tweetProperties.Text : tweetProperties.text;
 	if(message.substring(0,2).toLowerCase() == 'rt') return null;
-	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets.tweet)*1000)));
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
 
@@ -162,10 +163,10 @@ function TweetPost(feature, m){
 	var photoUrl;
 	var size = [];
 	try{
-		if(feature.properties.Tweet.extended_entities.media[0].type == 'photo'){
-			photoUrl = feature.properties.Tweet.extended_entities.media[0].media_url;
-			size[0] = feature.properties.Tweet.extended_entities.media[0].sizes.large.w;
-			size[1] = feature.properties.Tweet.extended_entities.media[0].sizes.large.h;
+		if(tweetProperties.extended_entities.media[0].type == 'photo'){
+			photoUrl = tweetProperties.extended_entities.media[0].media_url;
+			size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
+			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
 		}
 	} catch(e){}
 
@@ -173,7 +174,6 @@ function TweetPost(feature, m){
 	function getData(){
 		return {
 			type: 'tweet',
-			username: username,
 			message: message,
 			date: date,
 			latLng: latLng,

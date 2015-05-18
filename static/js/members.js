@@ -20,9 +20,9 @@ function Member(n, l, d){
 		iconSize:['50px','40px']});
 	var marker = L.marker(latLng, {icon: icon}).addTo(map);
 
-	function addAmbitGeo(d, l, t){
+	function addAmbitGeo(d, l, t, c){
 		if(!pathQueueByDay[d]) pathQueueByDay[d] = [];
-	    pathQueueByDay[d].push({latLng:l, time:t});
+	    pathQueueByDay[d].push({latLng:l, time:t, core:c});
 	}
 
 	function teleport(time){

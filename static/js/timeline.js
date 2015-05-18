@@ -214,7 +214,7 @@ function Timeline(){
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
-			cursorDate = new Date(Math.constrain(Math.map(hover,margin+dayRad,height-dayRad,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000-timeOffsets.timezone*3600000);
+			cursorDate = new Date(Math.constrain(Math.map(hover,margin+dayRad,height-dayRad,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000-timeOffsets[expeditionYear].timezone*3600000);
 		}
 		var d = new Date(offsetTimezone(cursorDate.getTime()));
 		var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

@@ -243,13 +243,19 @@ hr{
               text-decoration: none;
             }
 
+            ul#navigation li.share img{
+              display: block;
+              margin:auto;
+              margin-top:-5px;
+            }
 
-            ul#navigation li.share span:hover{
+
+            /*ul#navigation li.share span:hover{
               color: #ffffff;
               border-color: #ffffff;
               border-radius: 3px;
               padding: 7px 12px;
-            }
+            }*/
 
           ul#navigation li:first-child{
             padding-left:0;

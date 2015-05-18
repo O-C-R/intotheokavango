@@ -33,7 +33,6 @@
 	- scroll map when hovering a marker
 
 	TODOS
-	- timezone
 	- marker labels and popups
 	- transition to 2015
 	- linkable features
@@ -41,15 +40,14 @@
 	- sound and video features
 	- logos
 	- medium posts
+	- replace share with twitter icon
+	
 	- core expedition members
-	- update teaser
 	- cross-browser compatibility
 	- sightings taxonomy color
-	- replace share with twitter icon
 	- 'click to pause, scroll to navigate'
 	- proper teleport
 	- remove global functions/variables
-	- pause on blur
 
 	NICE TO HAVE
 	- margin journal alignment with timeline
@@ -88,12 +86,25 @@ var timeline;
 var feed;
 var wanderer;
 
+var expeditionYear = '15';
+
 var timeOffsets = {
-	'timeAmbit': 0,
-	'dateAmbit': 2*24*3600,
-	'tweet': 172760,
-	'photo': 24*3600,
-	'timezone': 4
+	'14':{
+		'timeAmbit': 0,
+		'dateAmbit': 2*24*3600,
+		'tweet': 172760,
+		'photo': 24*3600,
+		'timezone': 4,
+		'query': -1
+	},
+	'15':{
+		'timeAmbit': 0,
+		'dateAmbit': 0,
+		'tweet': 0,
+		'photo': 0,
+		'timezone': 4,
+		'query': 0
+	}
 }
 
 // var timeOffset = 8*3600;
@@ -362,7 +373,7 @@ function offsetTimezone(t){
 	if(shorthand) t*=1000;
 	var date = new Date(t);
 	var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-	var newDate = new Date(utc + (3600000 * timeOffsets.timezone)).getTime();
+	var newDate = new Date(utc + (3600000 * timeOffsets[expeditionYear].timezone)).getTime();
 	if(shorthand) newDate /= 1000;
 	return newDate;
 }

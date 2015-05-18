@@ -13,8 +13,6 @@ function Loader(){
 	var sightings = [];
 	var beacons = [];
 	var members = {};	
-	var queryOffset = -1;
-	var expeditionYear = 14;
 	var loadedDays = [];
 
 
@@ -24,7 +22,7 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_14&startDate='+d+'&endDate=2014-09-17&limit=0&resolution=86400';
+			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2016-09-17&limit=0&resolution=86400';
 			d3.json(query, function(error, data){
 				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 				data = data.results;
@@ -56,8 +54,8 @@ function Loader(){
 		loadTweets(day, checkForCompletion);
 		loadPhotos(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
-		loadBeacons(day, checkForCompletion);
-		// checkForCompletion();
+		// loadBeacons(day, checkForCompletion);
+		checkForCompletion();
 		// checkForCompletion();
 		// checkForCompletion();
 		// checkForCompletion();
@@ -66,7 +64,7 @@ function Loader(){
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+queryOffset)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -83,11 +81,13 @@ function Loader(){
 			    onEachFeature: function(feature){
 			    	var name = feature.properties.Member;
 			    	var latLng = L.latLng(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
-			    	var time = feature.properties.t_utc + timeOffsets.timeAmbit + timeOffsets.dateAmbit;
+			    	var time = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
+			    	var core = feature.properties.CoreExpedition;
 			        if(!members[name]) {
 			        	members[name] = Member(name, latLng, day);
 			        }
-			        members[name].addAmbitGeo(day, latLng, time);
+			        console.log(feature);
+			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
 			for(m in members) members[m].initPathQueue();
@@ -124,13 +124,15 @@ function Loader(){
 	        iconSize:[20,20]
 	    };
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+queryOffset)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		            return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+		        	console.log(feature.properties);
+		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
+		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
 		        },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
@@ -162,7 +164,7 @@ function Loader(){
 	        iconSize:[20,20]
 	    };
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+queryOffset)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -207,7 +209,7 @@ function Loader(){
 		    fillOpacity: 0.7,
 		};
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+queryOffset)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -271,7 +273,7 @@ function Loader(){
 
 		var beaconCoords = [];
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+queryOffset)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -365,7 +367,8 @@ function Loader(){
 		getLoading: getLoading,
 		getDayCount: getDayCount,
 		getLoadedDays: getLoadedDays,
-		getFeatures: getFeatures		
+		getFeatures: getFeatures,
+		expeditionYear: expeditionYear	
 	};
 }
 
