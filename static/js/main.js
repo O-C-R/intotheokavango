@@ -132,8 +132,8 @@ var jumping = false;
 
 var carCounter = 0;
 
-
-document.addEventListener('DOMContentLoaded', function(){
+$(document).ready(){
+// document.addEventListener('DOMContentLoaded', function(){
 
     map = new L.map('map', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
