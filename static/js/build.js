@@ -3496,35 +3496,13 @@ Array.prototype.min = function() {
 
 	Okavango 2015 front-end.
 	Please note I have been using the following javascript pattern: 
-	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
-
-	API:
-	- Should we use Jer's or Brian's mapbox credentials? Should they be hidden?
-
-	TODO IAN: 
-	- add location to post meta + link
-	- make all post type to inherit from super class
-	- test without smooth scroll
-	- localstorage for caching data?
-	- API error handling
-	- replace data loading with promises
-	- filter crazy path points
-	- remove feed elements that happened before of after the expedition
-	- handle scrollbar event for feed navigation?
-	- there are 2 getBodyHeight functions
-
-	- some photos are not being displayed on the map?
-	- disable click pause on timeline
-
-
-
-	KNOWN BUGS
-	- jumping + loading not finished
-	- links are removed from the end of the tweets
-	- scroll map when hovering a marker
+	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
+	- starts on last day
 	- teleport map once in a while
+	- screen for mobile and tablets
+	- pause video when hiding about page
 	- unzoom at car speed
 	- sound
 	- linkable features
@@ -3532,45 +3510,34 @@ Array.prototype.min = function() {
 	- core features?
 	- add link to tweets and blogposts
 	- -4h in setDates(x2) and setTimeFrame(x2)
-
-
-	- EstimatedGeometry?
-
-
+	- scroll map while hovering a marker
+	- add location to post meta + link
+	- test without smooth scroll and with touch scroll
+	- How to cache data?
+	- API error handling
+	- filter crazy path points
+	- scrollbar event for feed navigation?
+	- there are 2 getBodyHeight functions
 	- marker labels and popups
-	- transition to 2015
-	- linkable features
 	- loading screen
-	- sound and video features
-	- logos
-	- medium posts
-	- replace share with twitter icon
-	
-	- core expedition members
-	- cross-browser compatibility
+	- video features	
 	- sightings taxonomy color
 	- 'click to pause, scroll to navigate'
 	- proper teleport
 	- remove global functions/variables
-
-	NICE TO HAVE
 	- margin journal alignment with timeline
 	- label for day transition
 	- finer grained culling
 	- heartrate peak feature
 	- live mode
 	- togglePause highlight on map
-	- handle unzoom
+	- more unzoom
 	- dim out night sections of timeline
-	- highligh journal in nav on new contents
-	- add scrolling behavior to markers
-
-
+	- highlight journal in nav on new contents
+	- transitions between pages
 
 */
 
-
-// These should eventually be moved into the closure.
 
 var debug = false;
 var frameCount = 0;
@@ -3802,22 +3769,22 @@ $(document).ready(function(){
 	}
 
 	function setPause(){
-		d3.select('body, iframe')
-			.on('blur',function(){
-				blurred = true;
-			})
-		d3.select('body, iframe')
-			.on('focus',function(){
-				blurred = false;
-			})
-		d3.select(window)
-			.on('blur',function(){
-				blurred = true;
-			})
-		d3.select(window)
-			.on('focus',function(){
-				blurred = false;
-			})
+		// d3.select('body, iframe')
+		// 	.on('blur',function(){
+		// 		blurred = true;
+		// 	})
+		// d3.select('body, iframe')
+		// 	.on('focus',function(){
+		// 		blurred = false;
+		// 	})
+		// d3.select(window)
+		// 	.on('blur',function(){
+		// 		blurred = true;
+		// 	})
+		// d3.select(window)
+		// 	.on('focus',function(){
+		// 		blurred = false;
+		// 	})
 	}
 
 

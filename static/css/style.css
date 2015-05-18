@@ -115,7 +115,7 @@ h3{
   /*height: auto;*/
   display: inline-block;
   /*position: absolute;*/
-  overflow: scroll;
+  overflow: hidden;
 }
 
   #map{
@@ -155,9 +155,10 @@ h3{
     }
 
     #map div.scrollPane{
-      width:100%;
+      width:150%;
       height:150%;
-      overflow: scroll;
+      overflow-y: scroll;
+      overflow-x: hidden;
       position:relative;
       z-index:10;
     }
@@ -474,7 +475,7 @@ h3{
 
         #introduction #intro div.column:first-child p:nth-child(2){
           text-align: right;
-          padding-left:15%;
+          padding-left:18%;
           margin-bottom:15px;
           margin-top:0;
         }
