@@ -16,6 +16,10 @@ window.FEATURES_DATA = [{
     total: 141,
     title: "Beacon Readings"
 }, {
+    featureType: "blog",
+    total: 4,
+    title: "Blog Posts"
+},{
     featureType: "image",
     total: 842,
     title: "Images"

@@ -34,8 +34,10 @@ var geojsonMarkerOptions = {
 
 /* load data file */
 function loadData () {
-    $.getJSON(path_to_data, function(data) {
+    var url = "http://intotheokavango.org" + path_to_data;
+    $.getJSON(url, function(data) {
         var featureCollection = data['results'];
+        //console.log(featureCollection);
         L.geoJson(featureCollection, {
             pointToLayer: function (feature, latlng) {
                return L.circleMarker(latlng, geojsonMarkerOptions);
@@ -44,7 +46,7 @@ function loadData () {
                 layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
             }
         }).addTo(map);
-    }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });    
+    }).error(function(e) { console.log("Failed to load " + url + ": " + e.statusText); });    
 }
 
 
