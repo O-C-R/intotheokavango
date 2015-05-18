@@ -36,21 +36,19 @@ var geojsonMarkerOptions = {
 function loadData () {
     $.getJSON(path_to_data, function(data) {
         var featureCollection = data['results'];
-        console.log(featureCollection);
-
+        //console.log(featureCollection);
         var sightingsWithGeoLoc = [];
         
         for (d in featureCollection.features) {
             var item = featureCollection.features[d];
             if(item.geometry === null) {
-                console.log("sighting has no geometry");
+                //console.log("sighting has no geometry");
             } else {
-                console.log("sighting with geometry");
+                //console.log("sighting with geometry");
                 sightingsWithGeoLoc.push(item);
             }
         }
-
-        console.log(sightingsWithGeoLoc);
+        //console.log(sightingsWithGeoLoc);
         filteredFeatureCollection = {};
         filteredFeatureCollection.features = sightingsWithGeoLoc;
         filteredFeatureCollection.type = "FeatureCollection";
