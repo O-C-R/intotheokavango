@@ -235,12 +235,13 @@
       stroke: none;
     }
 
-    circle {
+    /* just added this pseudo selector because it was messing up with my timeline. ian*/
+    #dataPage circle {
         fill: none;
         stroke: #4bff87;
     }
 
-    path {
+    #dataPage path {
         stroke: #4bff87;
         stroke-width: 1px;
         fill: none;

@@ -94,6 +94,10 @@ hr{
   width:100%;
   height:100%;
   position:fixed;
+  /*height: auto;*/
+  display: inline-block;
+  /*position: absolute;*/
+  overflow: scroll;
 }
 
   #map{
@@ -109,12 +113,51 @@ hr{
       height:100%;
       position:absolute;
       opacity: 0;
+      pointer-events:none;
       transition: opacity 1s;
     }
 
     #map div#night.night{
       opacity: 1;
     }
+
+    #map div.leaflet-map-pane{
+      width:100%;
+      height:100%;
+    }
+
+    #map div.leaflet-tile-pane{
+      width:100%;
+      height:100%;
+    }
+
+    #map div.leaflet-layer{
+      width:100%;
+      height:100%;
+    }
+
+    #map div.scrollPane{
+      width:100%;
+      height:150%;
+      overflow: scroll;
+      position:relative;
+      z-index:10;
+    }
+
+    #map div.scrollPane div{
+      position:relative;
+      background-color: transparent;
+      width:100%;
+      height:4000px;
+    }
+
+    #map div.leaflet-overlay-pane svg{
+      pointer-events:none;
+    }
+
+      #map div.leaflet-overlay-pane svg *{
+        pointer-events:auto;
+      }
 
 #contentContainer{
   width:100%;
@@ -123,11 +166,16 @@ hr{
   height:100%;
 }
 
+  #contentContainer.map{
+    pointer-events:none;
+  }
+
   #contentContainer #header{
     width:97.2%;
     height:auto;
     padding:35px 1.4% 30px 1.4%;
     transition: background-color 0.4s;
+    pointer-events:auto;
   }
 
     #header.dark{
@@ -195,13 +243,19 @@ hr{
               text-decoration: none;
             }
 
+            ul#navigation li.share img{
+              display: block;
+              margin:auto;
+              margin-top:-5px;
+            }
 
-            ul#navigation li.share span:hover{
+
+            /*ul#navigation li.share span:hover{
               color: #ffffff;
               border-color: #ffffff;
               border-radius: 3px;
               padding: 7px 12px;
-            }
+            }*/
 
           ul#navigation li:first-child{
             padding-left:0;
@@ -606,6 +660,14 @@ hr{
         position:absolute;
         right:0;
         top:0;
+        pointer-events:auto;
+        opacity: 1;
+        transition: opacity 0.2s;
+      }
+
+      #mapPage div.controls.hidden{
+        pointer-events:none;
+        opacity: 0;
       }
 
         #mapPage div.button{
@@ -709,6 +771,8 @@ hr{
           height:80%;
           width:100%;
           margin-top:30px;
+          cursor:pointer;
+          pointer-events:auto;
         }
 
           #mapPage div.pane svg#timeline text{
@@ -1052,19 +1116,62 @@ svg.wanderer{
 }
 
 .memberMarker {
-  border-left: 2px solid #FFB637;
-  background-color:rgba(255,255,255,0.7);
-  border-radius:2px;
-  /*font-family: "Montserrat";*/
   font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
   font-weight: 700;
   font-style: normal;
-  color:rgba(4,0,26,0.9);;
+  color:#4BFF87;
   font-size:14px;
-  width:auto;
-  padding:4px;
-  height:14px !important;
-}
+  width:30px;
+  height:38px;
+  left:-15px;
+  top:-38px;
+  transition: width 0.2s, height 0.2s, left 0.2s, top 0.2s;
+
+  /*
+  transition: width 0.2s;
+  transition: height 0.2s;*/
+  /*transition: left 0.2s;
+  transition: top 0.2s;
+*/}
+
+  .memberMarker:hover {
+    width:48px;
+    height:60px;
+    left:-24px;
+    top:-60px;
+    /*transition: width 0.2s;
+    transition: height 0.2s;
+    transition: left 0.2s;
+    transition: top 0.2s;*/
+  }
+
+  .memberMarker img{
+    display: block;
+    position: absolute;
+    width:100%;
+    height:100%;
+  }
+
+  .memberMarker p{
+    text-align: center;
+    width:100%;
+    position:relative;
+    text-transform: uppercase;
+    top:25%;
+    transition: font-size 0.1s; 
+  }
+
+  .memberMarker:hover p{
+    font-size: 9px; 
+  }
+
+    .memberMarker span{
+      display:none;
+    }
+
+    .memberMarker:hover span{
+      display:inline;
+    }
 
 
 

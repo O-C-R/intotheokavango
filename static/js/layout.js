@@ -101,9 +101,16 @@ function MapPage(){
 				pages.journal.panes[i].hide();
 			}
 		}
-		if(timeline) timeline.togglePause('resume');
+		if(timeline) setTimeout(function(){timeline.togglePause('resume');},1000);
 		map.setZoom(page.id == 'journal' ? 15 : 17);
 		page.header.classed('dark',true);
+		d3.select('#contentContainer').classed('map',true);
+	}
+
+	page.hide = function(){
+		page.getNode().classed('hidden',true);
+		page.button.classed('active',false);
+		d3.select('#contentContainer').classed('map',false);
 	}
 
 
@@ -139,12 +146,15 @@ function JournalPage(){
 		map.setZoom(page.id == 'journal' ? 15 : 17);
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
+
+		page.node.select('.controls').classed('hidden',true);
 	}
 
 
 	page.hide = function(){
 		page.getNode().classed('hidden',true);
 		page.button.classed('active',false);
+		page.node.select('.controls').classed('hidden',false);
 	}
 
 	return page;
