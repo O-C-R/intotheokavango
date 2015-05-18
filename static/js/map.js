@@ -20,7 +20,7 @@ function initMap () {
     });    
 
     zoomLevel = map.getZoom();
-    console.log("zoom level: " + zoomLevel); 
+    //console.log("zoom level: " + zoomLevel); 
 }
 
 var geojsonMarkerOptions = {
@@ -35,7 +35,7 @@ var geojsonMarkerOptions = {
 /* load data file */
 function loadData () {
     var url = "http://intotheokavango.org" + path_to_data;
-    $.getJSON(url, function(data) {
+    $.getJSON(path_to_data, function(data) {
         var featureCollection = data['results'];
         //console.log(featureCollection);
         L.geoJson(featureCollection, {
