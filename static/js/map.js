@@ -37,6 +37,20 @@ function loadData () {
     $.getJSON(path_to_data, function(data) {
         var featureCollection = data['results'];
         console.log(featureCollection);
+
+        var sightingsWithGeoLoc = [];
+        
+        for (d in featureCollection.features) {
+            var item = featureCollection.features[d];
+            if(item.geometry === "null") {
+                console.log("sighting has no geometry");
+            } else {
+                sightingsWithGeoLoc.push(item);
+            }
+        }
+
+        console.log(sightingsWithGeoLoc);
+
         L.geoJson(featureCollection, {
             pointToLayer: function (feature, latlng) {
                return L.circleMarker(latlng, geojsonMarkerOptions);
