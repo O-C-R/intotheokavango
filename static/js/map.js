@@ -51,8 +51,11 @@ function loadData () {
         }
 
         console.log(sightingsWithGeoLoc);
+        filteredFeatureCollection = {};
+        filteredFeatureCollection.features = sightingsWithGeoLoc;
+        filteredFeatureCollection.type = "FeatureCollection";
 
-        L.geoJson(featureCollection, {
+        L.geoJson(filteredFeatureCollection, {
             pointToLayer: function (feature, latlng) {
                return L.circleMarker(latlng, geojsonMarkerOptions);
             },
