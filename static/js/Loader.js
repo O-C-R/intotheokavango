@@ -4,7 +4,7 @@
 	Loads all features day by day and stores them .
 */
 
-
+console.log('test');
 function Loader(){
 
 	var loading = [];
