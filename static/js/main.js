@@ -132,7 +132,7 @@ var jumping = false;
 
 var carCounter = 0;
 
-$(document).ready(){
+$(document).ready(function(){
 // document.addEventListener('DOMContentLoaded', function(){
 
     map = new L.map('map', {
