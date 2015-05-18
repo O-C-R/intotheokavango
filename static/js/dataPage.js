@@ -46,17 +46,18 @@ console.warn('DATA PAGE', id);
 
     var index = 0;
     var featuresCountArray = [];
+    var speciesList = [];
     
     //get features totals
     //get the totals for all features, recursively draw?
     var featureTotals = window.FEATURES_DATA;
-    var features = ["ambit", "ambit_geo", "audio", "beacon", "image", "sensor", 'sighting', 'tweet'];
-    var featureTitles = ["Ambit Readings", "Ambit-Geo Readings", "Audio Recordings", "Beacon Readings", "Images", "Sensor Readings", "Sightings", "Tweets"];
+    var features = ["ambit", "ambit_geo", "audio", "beacon", "blog", "image", "sensor", 'sighting', 'tweet'];
+    var featureTitles = ["Ambit Readings", "Ambit-Geo Readings", "Audio Recordings", "Beacon Readings", "Blog Entries", "Images", "Sensor Readings", "Sightings", "Tweets"];
     
     //how to update query string based on text input
     var queryString = "";
     var viewString = "";
-    var apiUrl = "http://dev.intotheokavango.org/api/";
+    var apiUrl = "http://intotheokavango.org/api/";
     ///////////////////
 
     /*
@@ -332,14 +333,14 @@ console.warn('DATA PAGE', id);
                                 this.set('queryObj.image', 'ImageType=' + item);
 
                             } else if (this.get('queryObj.featureType') === 'FeatureType=sensor') {
-                                this.set('queryObj.sensor', 'SensorType=' + item);
+                                this.set('queryObj.sensor', 'SensorName=' + item);
 
                             } else if (this.get('queryObj.featureType') === 'FeatureType=sighting') {
 
                                 if (item.indexOf(' ') > -1) {
                                     //TODO: get rid of space?? - not here in parser?
                                 }
-                                this.set('queryObj.species', 'BirdName=' + item); //TODO: change to SpeciesName for OK15
+                                this.set('queryObj.species', 'SpeciesName=' + item); //TODO: change to SpeciesName for OK15
                             }
                             break
                     }
@@ -353,20 +354,50 @@ console.warn('DATA PAGE', id);
                     }
                 });
 
-                this.observe('view', function(newValue, oldValue) {
-                    //console.log('view: ' + newValue);
+                this.on({
+                    heartRateQuery: function() {
+                        this.set('queryObj.filter', 'features');
+                        this.set('queryObj.featureType', 'FeatureType=ambit');
+                        this.set('queryObj.output', 'output=viz');
+                        this.set('mapChecked', false);
+                        this.set('vizChecked', true);
+                        this.set('jsonChecked', false);
+                        
+                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                            //this.set('queryObj.output', "features/" + newValue);
+                        this.set('apiUrl', updatedUrl);
+
+                    }
+                });
+
+                this.on({
+                    hippoSighting: function() {
+                        this.set('queryObj.filter', 'features');
+                        this.set('queryObj.featureType', 'FeatureType=sighting');
+                        this.set('queryObj.species', 'SpeciesName=Hippo');
+                        this.set('queryObj.output', 'output=map');
+                        this.set('mapChecked', true);
+                        this.set('vizChecked', false);
+                        this.set('jsonChecked', false);
+                        var updatedUrl = "http://intotheokavango.org/api/features/map";
+                        this.set('apiUrl', updatedUrl);
+                    }
+                })
+
+                this.observe('output', function(newValue, oldValue) {
+                    //console.log('output: ' + newValue);
                     if (newValue != undefined) {
-                        this.set('queryObj.view', 'view=' + newValue);
+                        this.set('queryObj.output', 'output=' + newValue);
                     }
 
-                    //TODO: take view/url parsing out of view, so that if you delete tag, the URL updates too
-                    //console.log('view: ' + newValue);
+                    //TODO: take output/url parsing out of output, so that if you delete tag, the URL updates too
+                    //console.log('output: ' + newValue);
                     var updatedUrl = '';
                     if (newValue === 'map' || newValue === 'viz') {
-                        updatedUrl = "http://dev.intotheokavango.org/api/features/" + newValue;
-                        //this.set('queryObj.view', "features/" + newValue);
+                        updatedUrl = "http://intotheokavango.org/api/features/" + newValue;
+                        //this.set('queryObj.output', "features/" + newValue);
                     } else {
-                        updatedUrl = "http://dev.intotheokavango.org/api/features/";
+                        updatedUrl = "http://intotheokavango.org/api/features/";
                     }
                     //console.log(updatedUrl);
                     this.set('apiUrl', updatedUrl);
@@ -394,12 +425,36 @@ console.warn('DATA PAGE', id);
                     }
                 });
 
+                this.observe('expeditionDay', function(newValue, oldValue) {
+                    console.log('expeditionDay newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    if (oldValue != undefined && newValue != undefined) {
+                        this.set('queryObj.expeditionDay', 'expeditionDay=' + newValue);
+                        //console.log(this.get('query')); //try and make query string
+                    }
+                });
+
+                this.observe('startDate', function(newValue, oldValue) {
+                    console.log('startDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    if (oldValue != undefined && newValue != undefined) {
+                        this.set('queryObj.startDate', 'startDate=' + newValue);
+                        //console.log(this.get('query')); //try and make query string
+                    }
+                });
+
+                this.observe('endDate', function(newValue, oldValue) {
+                    console.log('endDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    if (oldValue != undefined && newValue != undefined) {
+                        this.set('queryObj.endDate', 'endDate=' + newValue);
+                        //console.log(this.get('query')); //try and make query string
+                    }
+                });
+
                 this.observe('queryTags.length', function(n, o, k) {
                     console.log('array length', k, 'changed from', o, 'to', n);
 
                     if (n === 0) {
                         console.log("array is empty, so reset apiUrl");
-                        this.set('apiUrl', "http://dev.intotheokavango.org/api/features/");
+                        this.set('apiUrl', "http://intotheokavango.org/api/features/");
                         this.set('dropDownDisplay', 'none');
                         this.set('dropDownGrandchild', 'none');
                     }
@@ -447,8 +502,44 @@ console.warn('DATA PAGE', id);
 
                                 break
 
-                            case 'queryObj.view':
-                                //iterate through array, either splice or push new view
+                            case 'queryObj.output':
+                                //iterate through array, either splice or push new output
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.startDate':
+
+                                if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.endDate':
+
+                            if (this.get('queryTags.length') === 0) {
+                                    this.push('queryTags', newValue);
+                                    console.log("PUSH : " + newValue);
+                                } else {
+
+                                    this.addElement(tagArrayLength, splitNew[0], newValue);
+                                }
+
+                                break
+
+                            case 'queryObj.expeditionDay':
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
@@ -517,7 +608,7 @@ console.warn('DATA PAGE', id);
                                                 console.log("ITEM2: " + item2);
 
                                                 if (item2 != undefined) {
-                                                    if (item2.indexOf('BirdName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
+                                                    if (item2.indexOf('SpeciesName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
                                                         console.log('item: ' + item2 + ' is a subcategory');
                                                         this.splice('queryTags', j, 1);
                                                         console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
@@ -539,7 +630,7 @@ console.warn('DATA PAGE', id);
                                         }
                                     }
 
-                                    if (this.get('queryObj.sensor').indexOf('SensorType') > -1) {
+                                    if (this.get('queryObj.sensor').indexOf('SensorName') > -1) {
 
                                     }
                                 }
@@ -608,13 +699,13 @@ console.warn('DATA PAGE', id);
             },
             parseQuery: function() {
                 var serializeTags = function(obj) {
-                    if (!obj) return ''; //reset URL here? to account for deleting view?
+                    if (!obj) return ''; //reset URL here? to account for deleting output?
                     var str = [];
                     for (var p in obj)
                         if (obj.hasOwnProperty(p)) {
                             //console.log('serialize obj[p]: '+ obj[p]);
-                            if (obj[p].indexOf('view') > -1) {
-                                //console.log('dont add view to query as tag');
+                            if (obj[p].indexOf('output') > -1) {
+                                //console.log('dont add output to query as tag');
                             } else {
                                 str.push(obj[p]);
                             }
@@ -634,8 +725,10 @@ console.warn('DATA PAGE', id);
             },
             data: function() {
                 return {
-                    apiUrl: "http://dev.intotheokavango.org/api/features",
-
+                    apiUrl: "http://intotheokavango.org/api/features",
+                    mapChecked: false,
+                    vizChecked: false,
+                    jsonChecked: true,
                     queryObj: {
                         filter: "",
                         featureType: "",
@@ -644,9 +737,12 @@ console.warn('DATA PAGE', id);
                         species: "",
                         image: "",
                         sensor: "",
-                        view: "",
+                        output: "",
                         order: "",
-                        limit: ""
+                        limit: "",
+                        startDate: "",
+                        endDate: "",
+                        expeditionDay: ""
                     },
                     queryTags: [],
                     items: ['expeditions', 'members', 'features'],
@@ -654,105 +750,26 @@ console.warn('DATA PAGE', id);
                     modelsItems: [],
 
                     itemsKeys: {
-                        expeditions: ['okavango_14', 'okavango_15'],
-                        members: ["Steve", "GB", "Giles", "Chris", "Jer", "Tom", "null"],
-                        features: ["ambit", "ambit_geo", "audio", "beacon", "image", "sensor", 'sighting', 'tweet'],
+                        expeditions: ['okavango_13', 'okavango_14', 'okavango_15'],
+                        members: ["Alex", "Asher", "Brian", "Chaps", "Chris", "GB", "Giles", "Gotz", "Greg", "James", "Jer", "John", "KG", "Maans", "Markymarl", "Shah", "Tom", "null"],
+                        features: ["ambit", "ambit_geo", "audio", "beacon", "blog", "image", "sensor", 'sighting', 'tweet'],
                     },
                     categoriesKeys: {
                         ambit: [],
                         ambit_geo: [],
                         audio: [],
                         beacon: [],
-                        image: ['habitat', 'documentary', 'specimen'],
+                        blog:[],
+                        image: ['GoPro', 'documentary', 'specimen'],
                         sensor: ['databoat1', 'sensor2', 'databoat'],
-                        sighting: [
-                            "African Crake",
-                            "African Darter",
-                            "African Fish Eagle",
-                            "African Jacana",
-                            "African Marsh Harrier",
-                            "African Openbill Stork",
-                            "African Pygmy Goose",
-                            "African Skimmer",
-                            "African Spoonbill",
-                            "Baillon's Crake",
-                            "Black Crake",
-                            "Black-crowned Night-Heron",
-                            "Black-winged Stilt",
-                            "Blacksmith Lapwing",
-                            "Boat",
-                            "Cattle Egret",
-                            "Collared Pratincole",
-                            "Comb Duck",
-                            "Common Moorhen",
-                            "Common Whimbrel",
-                            "Coppery-tailed Coucal",
-                            "Crocodile",
-                            "Egyptian Goose",
-                            "Elephant",
-                            "Fishing",
-                            "Glossy Ibis",
-                            "Glossy IbisWestern Marsh Harrier",
-                            "Glossy IbisWestern Marsh HarrierGlossy Ibis",
-                            "Goliath Heron",
-                            "Great Egret",
-                            "Great White Pelican",
-                            "Greater Reed Warbler",
-                            "Green-backed Heron",
-                            "Grey Heron",
-                            "Grey-headed Gull",
-                            "Hadeda Ibis",
-                            "Hamerkop",
-                            "Hippo",
-                            "Lesser Jacana",
-                            "Lesser Swamp Warbler",
-                            "Little Egret",
-                            "Little Grebe",
-                            "Little Rush-Warbler",
-                            "Little Stint",
-                            "Long-toed Lapwing",
-                            "Malachite Kingfisher",
-                            "Marabou Stork",
-                            "Mokoro",
-                            "People",
-                            "Pied Avocet",
-                            "Pied Kingfisher",
-                            "Purple Heron",
-                            "Red Lechwe",
-                            "Reed Cormorant",
-                            "RuffGlossy Ibis",
-                            "Rufous-bellied Heron",
-                            "Sacred Ibis",
-                            "Saddle-billed Stork",
-                            "Slaty Egret",
-                            "Spur-winged Goose",
-                            "Squacco Heron",
-                            "Swamp Boubou",
-                            "Test",
-                            "Thick-billed Weaver",
-                            "Three-banded Plover",
-                            "Water Thick-knee",
-                            "Wattled Crane",
-                            "Whiskered Tern",
-                            "White Otelia",
-                            "White-backed Duck",
-                            "White-browed Coucal",
-                            "White-faced Duck",
-                            "Yellow-billed Stork",
-                            "banded bluber ",
-                            "black egret",
-                            "glossy ibis",
-                            "glossy ibisGlossy Ibis",
-                            "grey headed gull",
-                            "openbill",
-                            "openbill ",
-                            "water dikop "
-                        ],
+                        sighting: speciesList,
+                        
                         tweet: []
                     },
                     selectedItem: '',
-                    show: 4,
-                    limit: 100
+                    show: 3,
+                    limit: 100,
+                    expeditionDay: 1
                 }
             }
         });
@@ -772,7 +789,7 @@ console.warn('DATA PAGE', id);
                 // d3Graph("#d3-content")
                 console.log("d3 ractive");
                 d3Page.show();
-                d3Page.loadData("/api/features/?FeatureType=sighting&BirdName=African Jacana&limit=40", "sighting");
+                d3Page.loadData("/api/features/?FeatureType=sighting&SpeciesName=African Jacana&limit=40", "sighting");
             },
             onteardown:function(){
                 d3Page.hide();
@@ -820,9 +837,32 @@ console.warn('DATA PAGE', id);
 
     ////////////////////
 
+    page.getSpeciesList = function() {
+        d3.json("http://intotheokavango.org/api/species", function(error, data) {
+            if(error) {
+                console.error("Failed to load " + url);
+                console.log(error);
+                return error;
+            } else {
+                for (species in data.results) {
+                    var count = data.results[species];
+                    //console.log(species + ": " + count);
+                    if(species.indexOf("quote") != -1 || species.indexOf("test") != -1 || species.indexOf("Test") != -1) {
+                        console.log("not a species");
+                    } else {
+                        speciesList.push(species);
+                    }
+                }
+                speciesList.sort();
+                console.log(speciesList);
+            }
+        });
+        return speciesList;
+    }
+
 
 	page.getFeatureTotalData = function(featureType) {
-        var url = "http://dev.intotheokavango.org/api/features?FeatureType=" + featureType + "";
+        var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
             //console.log(featureType + " data");
 
@@ -861,7 +901,6 @@ console.warn('DATA PAGE', id);
             oninit:function(){
                 console.warn('ON INIT')
                 this.setActive('overview');
-
             },
             setActive: function(id){
                 console.warn('ID', id);
@@ -894,6 +933,7 @@ console.warn('DATA PAGE', id);
 
 	page.loadRactive();
     page.getFeatureTotalData(features[index]);
+    page.getSpeciesList();
     
     
     // var D3View = Ractive.extend({

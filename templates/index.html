@@ -24,9 +24,11 @@
     <div id="tag-area"> 
       <Tag queryTags="{{queryTags}}"></Tag>
     </div> 
+    <button id="heartrate-button" on-click="heartRateQuery">Show Me a HeartRate Graph</button>
+    <button id="hippoSightings-button" on-click="hippoSighting">Show Me Hippo Sightings on a Map</button>
     <div class="input-section">
-        <h2>Filter by</h2>
-        <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select the filter" />
+        <h2>Select the type of Feature you want to explore</h2>
+        <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select the view" />
         <div id="dropdown-child" style="display:{{dropDownDisplay}}">
             <RactiveDropdownComponent items="{{categoriesItems}}" selector="categories" show="{{show}}" selectedText="select {{selector}}" />
         </div>
@@ -36,23 +38,32 @@
         <br><br><br>
     </div>
     <div class="input-section">
-        <h2>View</h2>
-        <label><input type='radio' name='{{view}}' value='viz'>VIZ</label>
-        <label><input type='radio' name='{{view}}' value='map'>MAP</label>
-        <label><input type='radio' name='{{view}}' value='json'>JSON</label>
+        <h2>Get the data output as</h2>
+        <label><input type='radio' name='{{output}}' value='viz' checked={{vizChecked}}>VIZ</label>
+        <label><input type='radio' name='{{output}}' value='map' checked={{mapChecked}}>MAP</label>
+        <label><input type='radio' name='{{output}}' value='json' checked={{jsonChecked}}>JSON</label>
     </div>
     <div class="input-section">
-        <h2>Limit to <input type='number' value='{{limit}}' show="{{limit}}" min='1' max="2000" /></h2>
+        <h2>Limit the number of results to <input type='number' value='{{limit}}' show="{{limit}}" min='1' max="2000" /></h2>
     </div>
     <div class="input-section">
-        <h2>Order by</h2>
+        <h2>Which order do you want the results?</h2>
         <label><input type='radio' name='{{order}}' value='ascending'>ascending</label>
         <label><input type='radio' name='{{order}}' value='descending'>descending</label>
     </div>
     <div class="input-section">
-        <h2>Date Range</h2>
-        <label>Start Date <input type="date" name="startDate" value=''></label>
-        <label> and/or End Date <input type="date" name="endDate" value=''></label>
+      <h2>Which day of the expedition do you want to see?</h2>
+      <label>Expedition Day <input type='number' value='{{expeditionDay}}' show="{{expeditionDay}}" min='1' max="90" /></label>
+    </div>
+    <div class="input-section">
+        <h2>Specify a Date Range</h2>
+        <label>Start Date <input type="date" name="{{startDate}}" value='{{startDate}}'></label>
+        <label> and/or 
+        <br><br>End Date <input type="date" name="{{endDate}}" value='{{endDate}}' min="{{startDate}}"></label>
+    </div>
+    <div class="input-section">
+    <h2>Specify a Geographical Area</h2>
+        <label>NW Corner Lon, Lat, SE Corner Lon, Lat <input type="text" name="{{geoBound}}" value=''></label>
     </div>
 </script>
 
@@ -151,32 +162,35 @@
 
   {{#if section === "documentation"}}
   <div class="data-description" id="api-documentation">
-    <h2>What is an API?</h2>
-    <p>API stands for application programming interface, which usually involves a set of processes and commands that make it convenient for people to access computer code or information that someone has already produced. For instance, if you want to make your own app post a message to Facebook, you would probably use Facebook’s API to integrate your app with theirs.</p>
-    <h2>What is a Database?</h2>
-    <p>A database is an organized collection of data. For the Okavango Wildlife Database, each type of data &#8212; a wildlife sighting, image, sensor reading or audio recording, to name a few &#8212; is uploaded to an online server via satellite. As the expedition unfolds, the database will grow, holding more and more records of what the explorers and scientists have witnessed on the trip.</p>
-    <h2>What is a Database API?</h2>
-    <p>The Okavango Database API is the interface that allows you to ask the database to show you what’s inside. Usually, API’s are software-to-software interfaces that aren’t that easy for humans to understand. To ask the database to give you data back, you make a specific query in the form of a URL. The database is able to parse and recognize this request, and returns the data to you in some kind of structured way, like an XML or JSON file. In our case, the Okavango Database returns information in JSON (Javascript Object Notation).</p>
-    <h2>Calling the API</h2>
-    <ul>
-      <li>Basically, it&#39;s like this: <code>/api/&lt;view&gt;/&lt;output&gt;?&lt;query&gt;</code></li>
-      <li>The view is what kind of thing you want back. The core of the API lies in the features view, but you can also view expeditions, members and species as general lists.</li>
-      <li>The output returns the data as JSON if nothing is specified, otherwise you can specify <code>map</code> to see the data plotted spatially or <code>viz</code> for a graph.</li>
-      <li>The query defines the filter (ex: <code>FeatureType=sighting</code>). Multiple filters are appended with <code>&</code> in between.</li>
-    </ul>
-    <h2>API Endpoints</h2>
-    <ul>
-      <li>The following list outlines all possible methods for accessing features in the Okavango Database. These methods are also known as endpoints, and are requested with a URL. For example, to load all of the elephant sightings (limited to the first 100 by default), you would request: <code><a href="http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant" target="_blank">
-http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant</a></code></li>
-    <li>The Elephant sightings could be filtered further, by the expedition member who saw them, geographic region, or day of expedition, for example.</li>
-    <br>Each API endpoint call contains the following general information:
-      <li><code>limit:</code> the amount of entries returned. The default limit is 100, but this can be changed (ex: <code>limit=30</code>). Larger limits tax the database, so it is recommended to keep your limit request as small as possible.</li>
-      <li><code>resolution:</code> returns a feature for every <code>resolution</code> seconds. This might be useful if you want a larger sample set or time period, but don’t want to overload a graph with every single data point. <code>full</code> returns all features.</li>
-      <li><code>filter:</code> feature endpoints can be filtered by member, expedition, as well as general filters like <code>limit, resolution,</code> and <code>order.</code></li>
-      <li><code>returned:</code> the amount of entries returned (this usually correlates to limit, but may be less than the limit indicated if there are fewer results in the database).</li>
-      <li><code>order:</code> results are returned by default in ascending order (indicated by setting <code>order</code> to <code>ascending</code> or <code>1</code>), or descending order (indicated by setting <code>order</code> to <code>descending</code> or <code>-1<code>).</li>
-      <li><code>total:</code> indicates the total amount of matching results for the query in the database, even if the amount returned is limited.</li>
-      <br>Additional Filters:
+    <div class="column">
+      <h2>What is an API?</h2>
+      <p>API stands for application programming interface, which usually involves a set of processes and commands that make it convenient for people to access computer code or information that someone has already produced. For instance, if you want to make your own app post a message to Facebook, you would probably use Facebook’s API to integrate your app with theirs.</p>
+      <h2>What is a Database?</h2>
+      <p>A database is an organized collection of data. For the Okavango Wildlife Database, each type of data &#8212; a wildlife sighting, image, sensor reading or audio recording, to name a few &#8212; is uploaded to an online server via satellite. As the expedition unfolds, the database will grow, holding more and more records of what the explorers and scientists have witnessed on the trip.</p>
+      <h2>What is a Database API?</h2>
+      <p>The Okavango Database API is the interface that allows you to ask the database to show you what’s inside. Usually, API’s are software-to-software interfaces that aren’t that easy for humans to understand. To ask the database to give you data back, you make a specific query in the form of a URL. The database is able to parse and recognize this request, and returns the data to you in some kind of structured way, like an XML or JSON file. In our case, the Okavango Database returns information in JSON (Javascript Object Notation).</p>
+      <h2>Calling the API</h2>
+      <ul>
+        <li>Basically, it&#39;s like this: <code>/api/&lt;view&gt;/&lt;output&gt;?&lt;query&gt;</code></li>
+        <li>The view is what kind of thing you want back. The core of the API lies in the features view, but you can also view expeditions, members and species as general lists.</li>
+        <li>The output returns the data as JSON if nothing is specified, otherwise you can specify <code>map</code> to see the data plotted spatially or <code>viz</code> for a graph.</li>
+        <li>The query defines the filter (ex: <code>FeatureType=sighting</code>). Multiple filters are appended with <code>&</code> in between.</li>
+      </ul>
+      </div>
+      <div class="column right">
+      <h2>API Endpoints</h2>
+      <ul>
+        <li>The following list outlines all possible methods for accessing features in the Okavango Database. These methods are also known as endpoints, and are requested with a URL. For example, to load all of the elephant sightings (limited to the first 100 by default), you would request: <code><a href="http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant" target="_blank">
+  http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant</a></code></li>
+      <li>The Elephant sightings could be filtered further, by the expedition member who saw them, geographic region, or day of expedition, for example.</li>
+      <br>Each API endpoint call contains the following general information:
+        <li><code>limit:</code> the amount of entries returned. The default limit is 100, but this can be changed (ex: <code>limit=30</code>). Larger limits tax the database, so it is recommended to keep your limit request as small as possible.</li>
+        <li><code>resolution:</code> returns a feature for every <code>resolution</code> seconds. This might be useful if you want a larger sample set or time period, but don’t want to overload a graph with every single data point. <code>full</code> returns all features.</li>
+        <li><code>filter:</code> feature endpoints can be filtered by member, expedition, as well as general filters like <code>limit, resolution,</code> and <code>order.</code></li>
+        <li><code>returned:</code> the amount of entries returned (this usually correlates to limit, but may be less than the limit indicated if there are fewer results in the database).</li>
+        <li><code>order:</code> results are returned by default in ascending order (indicated by setting <code>order</code> to <code>ascending</code> or <code>1</code>), or descending order (indicated by setting <code>order</code> to <code>descending</code> or <code>-1<code>).</li>
+        <li><code>total:</code> indicates the total amount of matching results for the query in the database, even if the amount returned is limited.</li>
+        <br>Additional Filters:
         <li><code>startDate:</code> specifies the starting date of the features to be returned. May be combined with <code>endDate.</code> Format is <code>yyyy-mm-dd</code> (ex: <code>startDate=2015-06-03</code>).</li>
         <li><code>endDate:</code> specifies the ending date of the features to be returned. May be combined with <code>startDate.</code> Format is <code>yyyy-mm-dd</code> (ex: <code>endDate=2015-06-03</code>).</li>
         <li><code>geoBounds:</code> upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So the Okavango Delta is something like <code>geoBounds=20,-17,26,-22</code></li>
@@ -199,7 +213,8 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
         <li><code>sighting:</code> all species sightings on the expedition. You can further filter by <code>SpeciesName</code> (ex: <code>SpeciesName=Elephant</code>). The results return a timestamped geolocated point, with a <code>Count</code> of how many species were sighted, as well as images if they were taken. A <code>Taxonomy</code> object returns the scientific name, and a <code>Notes</code> field records a description uploaded with the sighting.</li>
           <li><code>tweet:</code> a list of all tweets with the hashtag #okavango15.</li>
           <li><code>longform:</code> returns longform blog entries posted to the okavango collection on <a href="https://medium.com/tag/okavango15" target="_blank">Medium.</a></li>
-    </ul>
+        </ul>
+      </div>
   </div>
   {{/if}}
 </script>

@@ -6,13 +6,15 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     // }
     console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
-    var totalsVizDiv = $(timelineVizID);
-    var timelineVizDiv = $(totalsVizID);
+    var timelineVizDiv = d3.select("timelineVizID");
+    var totalsVizDiv = d3.select("totalsVizID");
     console.log("D3 GRAPH");
     console.log(totalsVizDiv);
-    totalsVizDiv.hide("slow", function() {
+
+    $("totalsViz").hide("slow", function() {
         console.log("HIDING totalsVizDiv");
     });
+    totalsVizDiv.style("opacity", 0);
    // d3.select(totalsVizDiv).style("opacity", 0);
     // console.log(totalsVizDiv);
     // var public_path = 'http://dev.intotheokavango.org' + path_to_data;
@@ -29,7 +31,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
 var parseSpeciesSighting = function(item) {
-    if(item["properties"].hasOwnProperty("BirdName")) {
+    if(item["properties"].hasOwnProperty("SpeciesName")) {
         var speciesSighting = {};
         speciesSighting.count = item["properties"]["Count"];
         speciesSighting.time = new Date(+item["properties"]["t_utc"] * 1000);
@@ -165,23 +167,21 @@ var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
 
 var makeTimeSeriesViz = function(parsedData,feature_type) {
     //TIMESERIES VIZ
-    var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
+    var margin = {top: 70.5, right: 30, bottom: 60, left: 40.5},
     width = 800 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     left_width = 100;
 
     var yAxisLabel = "";
+    var xAxisLabel = "";
     var graphTitle = "";
 
-    var dateRange = d3.extent(parsedData, function(d) { 
-        return d.time; 
-    });
-    console.log(dateRange);
     console.log(feature_type);
 
     var parseDate = d3.time.format("%m %d").parse;
 
-    var xScale = d3.time.scale()
+    var xScale = d3.time.scale.utc()
+        //.nice(d3.time.week)
         .range([0, width]);
 
     var yScale = d3.scale.linear()
@@ -209,18 +209,34 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.heartRate); });
 
-                    xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
-                    yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
+               var dateRange = d3.extent(parsedData, function(d) { 
+                    return d.time; 
+                });
+                console.log("dateRange: " + dateRange);
+
+                xScale.domain(dateRange);
+                yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
+                var dateFormat = d3.time.format.utc("%B %d %Y");
+                var timeFormat = d3.time.format.utc("%I:%M:%S");
+                xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
 
             } else if (parsedData[i].hasOwnProperty("energy")) {
-                yAxisLabel = "Calories?";
+                yAxisLabel = "Average Calories Burned";
                 graphTitle = "Energy Consumption";
                 var line = d3.svg.line()
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.energy); });
 
-                    xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
-                    yScale.domain(d3.extent(parsedData, function(d) { return d.energy; }));
+                var dateRange = d3.extent(parsedData, function(d) { 
+                    return d.time; 
+                });
+                console.log("dateRange: " + dateRange);
+
+                xScale.domain(dateRange);
+                yScale.domain(d3.extent(parsedData, function(d) { return d.energy; }));
+                var dateFormat = d3.time.format.utc("%B %d %Y");
+                var timeFormat = d3.time.format.utc("%I:%M:%S");
+                xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
 
             } else if (parsedData[i].hasOwnProperty("speed")) {
                 console.log("data has speed key");
@@ -230,8 +246,16 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
                     .x(function(d) { return xScale(d.time); })
                     .y(function(d) { return yScale(d.speed); });
 
-                    xScale.domain(d3.extent(parsedData, function(d) { return d.time; }));
-                    yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
+                var dateRange = d3.extent(parsedData, function(d) { 
+                    return d.time; 
+                });
+                console.log("dateRange: " + dateRange);
+
+                xScale.domain(dateRange);
+                yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
+                var dateFormat = d3.time.format.utc("%B %d %Y");
+                var timeFormat = d3.time.format.utc("%I:%M:%S");
+                xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
             }
         }
 
@@ -247,16 +271,25 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
     svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+          .call(xAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("y", 40)
+          .attr("x", width/2)
+          .attr("text-anchor", "middle") 
+          .text(xAxisLabel);
 
     svg.append("g")
           .attr("class", "y axis")
           .call(yAxis)
         .append("text")
           .attr("class", "label")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
+          // .attr("transform", "rotate(-90)")
+          .attr("y", -10)
+          .attr("x", -20)
+          // .attr("text-align", "right")
+          // .attr("y", 6)
+          // .attr("dy", ".71em")
           .text(yAxisLabel);
 
     svg.append("path")
@@ -313,11 +346,11 @@ var makeTotalsViz = function(data) {
         .attr("height", barHeight - 1);
 
     bar.append("text")
-        .attr("x", function(d) { return xScale(d.total) - 3 + left_width; })
+        .attr("x", function(d) { return xScale(d.total) - 5 + left_width; })
         //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
         .attr("y", barHeight / 2)
         .attr("dy", "0.35em")
-        .attr("text-anchor", "end")
+        .attr("text-anchor", "beginning")
         .text(function(d) { return d.total; });
 
     bar.append("text")
@@ -348,7 +381,7 @@ function sortArrOfObjectsByParam(arrToSort, strObjParamToSortBy, sortAscending) 
 //first get the array of species names from the api
 var species = [];
 var getSpeciesSightingsTotals = function() {
-    var speciesUrl = "http://dev.intotheokavango.org/api/species";
+    var speciesUrl = "http://intotheokavango.org/api/species";
     d3.json(speciesUrl, function(error, data) {
         
     })
@@ -356,7 +389,7 @@ var getSpeciesSightingsTotals = function() {
 
 //get the totals for all features, recursively - then draw a totals bar chart viz
 var getFeatureTotalData = function(featureType) {
-    var url = "http://dev.intotheokavango.org/api/features?FeatureType=" + featureType + "";
+    var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
     d3.json(url, function(error, data) {
         console.log(featureType + " data");
         var featuresCountObj = {};
@@ -369,7 +402,7 @@ var getFeatureTotalData = function(featureType) {
             setTimeout(getFeatureTotalData(features[index], 100));
         }
         else{
-            totalsVizDiv.fadeIn();
+            //totalsVizDiv.fadeIn();
             makeTotalsViz(featuresCountArray);
         }
     });
@@ -378,14 +411,14 @@ var getFeatureTotalData = function(featureType) {
 
 //show the viz div
 function show(){
-    totalsVizDiv.fadeIn();
-    timelineVizDiv.fadeIn();
+    //totalsVizDiv.fadeIn();
+    //timelineVizDiv.fadeIn();
 }
 
 //hide the viz div
 function hide(){
-    totalsVizDiv.hide();
-    timelineVizDiv.hide();
+    //totalsVizDiv.hide();
+    //timelineVizDiv.hide();
 }
 
 //load the data again or redraw
@@ -393,11 +426,11 @@ function refresh() {}
 
 function loadData(path_to_data, feature_type) {
     
-    var url = "http://dev.intotheokavango.org" + path_to_data;
+    var url = "http://intotheokavango.org" + path_to_data;
     
     console.log(url);
-    totalsVizDiv.hide();
-    timelineVizDiv.hide();
+    //totalsVizDiv.hide();
+    //timelineVizDiv.hide();
 //     this.feature_type = feature_type;
 // console.log(this.feature_type);
     d3.json(url, function(error, data) {
@@ -414,7 +447,7 @@ function loadData(path_to_data, feature_type) {
             if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
                 //make features viz - totals of all the feature types?
                 //if api call is expeditions or members, get from query string?
-                totalsVizDiv.show();
+                //totalsVizDiv.show();
                 getFeatureTotalData(features[index])
 
                 console.log("these are the features"); //do we need a viz for members or expeditions?
@@ -433,7 +466,7 @@ function loadData(path_to_data, feature_type) {
                     speciesSightingsTotals.push(sightingCount);
                 }
                 console.log(speciesSightingsTotals);
-                totalsVizDiv.fadeIn();
+                //totalsVizDiv.fadeIn();
                 makeTotalsViz(speciesSightingsTotals);
             }
             
@@ -463,8 +496,8 @@ function loadData(path_to_data, feature_type) {
                             parsedAmbitSpeed.push(f);
                         }
                     }
-                        timelineVizDiv.fadeIn();
-
+                        //timelineVizDiv.fadeIn();
+                        //totalsVizDiv.hide();
                         makeTimeSeriesViz(parsedAmbitHR,feature_type)   ;
                         makeTimeSeriesViz(parsedAmbitEnergy,feature_type);
                         makeTimeSeriesViz(parsedAmbitSpeed,feature_type);
@@ -474,12 +507,12 @@ function loadData(path_to_data, feature_type) {
                 console.log("SIGHTING");
                 //if it only asks for sightings and not species??
 
-                if(path_to_data.indexOf("BirdName") != -1) { //if query asks for species name
-                    console.log("BirdName: " + path_to_data);
-                    var speciesString = path_to_data.split("BirdName=");
-                    console.log("speciesName: " + speciesString[1]);
+                if(path_to_data.indexOf("SpeciesName") != -1) { //if query asks for species name
+                    //console.log("SpeciesName: " + path_to_data);
+                    var speciesString = path_to_data.split("SpeciesName=");
+                    //console.log("speciesName: " + speciesString[1]);
                     var speciesNameClean = speciesString[1].split("&");
-                    console.log("speciesNameClean: " + speciesNameClean[0]);
+                    //console.log("speciesNameClean: " + speciesNameClean[0]);
                     var speciesName = speciesNameClean[0];
                     //make species sightings timeline viz - SpeciesNames Counts over time
                     for (d in data.results.features) {
@@ -491,8 +524,8 @@ function loadData(path_to_data, feature_type) {
                         f = parseSpeciesSighting(item);
                         parsedSpeciesSighting.push(f);
                     }
-                    timelineVizDiv.fadeIn();
-                    totalsVizDiv.hide();
+                    //timelineVizDiv.fadeIn();
+                    //totalsVizDiv.hide();
                     makeHistogramPlot(parsedSpeciesSighting, feature_type, speciesName);
                 }
             }

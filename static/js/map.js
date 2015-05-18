@@ -20,7 +20,7 @@ function initMap () {
     });    
 
     zoomLevel = map.getZoom();
-    console.log("zoom level: " + zoomLevel); 
+    //console.log("zoom level: " + zoomLevel); 
 }
 
 var geojsonMarkerOptions = {
@@ -36,7 +36,24 @@ var geojsonMarkerOptions = {
 function loadData () {
     $.getJSON(path_to_data, function(data) {
         var featureCollection = data['results'];
-        L.geoJson(featureCollection, {
+        //console.log(featureCollection);
+        var sightingsWithGeoLoc = [];
+        
+        for (d in featureCollection.features) {
+            var item = featureCollection.features[d];
+            if(item.geometry === null) {
+                //console.log("sighting has no geometry");
+            } else {
+                //console.log("sighting with geometry");
+                sightingsWithGeoLoc.push(item);
+            }
+        }
+        //console.log(sightingsWithGeoLoc);
+        filteredFeatureCollection = {};
+        filteredFeatureCollection.features = sightingsWithGeoLoc;
+        filteredFeatureCollection.type = "FeatureCollection";
+
+        L.geoJson(filteredFeatureCollection, {
             pointToLayer: function (feature, latlng) {
                return L.circleMarker(latlng, geojsonMarkerOptions);
             },
