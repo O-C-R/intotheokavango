@@ -23,6 +23,12 @@ function AboutPage(){
 		setTimeout(switchBackground,10000);
 	})();	
 
+	page.hide = function(){
+		page.node.classed('hidden',true);
+		page.button.classed('active',false);
+		pauseVimeoPlayer();
+	}
+
 	return page;
 }
 

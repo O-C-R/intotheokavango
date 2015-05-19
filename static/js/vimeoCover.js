@@ -1,4 +1,5 @@
 var playerOrigin = '*';
+var vimeoPlayer;
 
 window.addEventListener('message', onMessageReceived, false);
 function onMessageReceived(event) {
@@ -19,8 +20,8 @@ function onReady() {
       value: 'play'
     };
     var message = JSON.stringify(data);
-    var player = d3.select('iframe').node();
-    player.contentWindow.postMessage(data, playerOrigin);
+    vimeoPlayer = d3.select('iframe').node();
+    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }
 
 function onPlay(){
@@ -28,4 +29,12 @@ function onPlay(){
 		.transition()
 		.style('opacity',0)
 		.remove();
+}
+
+function pauseVimeoPlayer(){
+    var data = {
+      method: 'addEventListener',
+      value: 'pause'
+    };
+    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }

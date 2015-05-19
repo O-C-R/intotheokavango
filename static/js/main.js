@@ -8,18 +8,22 @@
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- starts on last day
-	- teleport map once in a while
-	- screen for mobile and tablets
 	- pause video when hiding about page
+	- screen for mobile and tablets
+	- loading screen
+	- teleport map once in a while
 	- unzoom at car speed
+	- starts on last day
+	
+	- free camera mode
+	- scroll map while hovering a marker
+	- dim out zoom buttons when max is reached
 	- sound
 	- linkable features
 	- fix trail in about page
 	- core features?
 	- add link to tweets and blogposts
 	- -4h in setDates(x2) and setTimeFrame(x2)
-	- scroll map while hovering a marker
 	- add location to post meta + link
 	- test without smooth scroll and with touch scroll
 	- How to cache data?
@@ -28,7 +32,6 @@
 	- scrollbar event for feed navigation?
 	- there are 2 getBodyHeight functions
 	- marker labels and popups
-	- loading screen
 	- video features	
 	- sightings taxonomy color
 	- 'click to pause, scroll to navigate'
@@ -40,10 +43,10 @@
 	- heartrate peak feature
 	- live mode
 	- togglePause highlight on map
-	- more unzoom
 	- dim out night sections of timeline
-	- highlight journal in nav on new contents
+	- highlight journal in header nav on new contents
 	- transitions between pages
+	- no night on journal
 
 */
 
@@ -113,7 +116,7 @@ $(document).ready(function(){
         touchZoom: false,
         dragging: false,
         keyboard: false,
-        minZoom: 1,                    
+        minZoom: 0,                    
         maxZoom: 20,
         zoom:17,
         scrollWheelZoom:false

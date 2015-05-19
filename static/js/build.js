@@ -2166,6 +2166,12 @@ function AboutPage(){
 		setTimeout(switchBackground,10000);
 	})();	
 
+	page.hide = function(){
+		page.node.classed('hidden',true);
+		page.button.classed('active',false);
+		pauseVimeoPlayer();
+	}
+
 	return page;
 }
 
@@ -3489,7 +3495,46 @@ Array.prototype.max = function() {
 
 Array.prototype.min = function() {
   return Math.min.apply(null, this);
-};;
+};;var playerOrigin = '*';
+var vimeoPlayer;
+
+window.addEventListener('message', onMessageReceived, false);
+function onMessageReceived(event) {
+    if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
+        return false;
+    }	        
+    if (playerOrigin === '*') {
+        playerOrigin = event.origin;
+    }
+    var data = JSON.parse(event.data);
+    if(data.event == 'ready') onReady();
+    if(data.event == 'play') onPlay();
+}
+
+function onReady() {
+    var data = {
+      method: 'addEventListener',
+      value: 'play'
+    };
+    var message = JSON.stringify(data);
+    vimeoPlayer = d3.select('iframe').node();
+    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
+}
+
+function onPlay(){
+	d3.select('#aboutPage #video div.cover')
+		.transition()
+		.style('opacity',0)
+		.remove();
+}
+
+function pauseVimeoPlayer(){
+    var data = {
+      method: 'addEventListener',
+      value: 'pause'
+    };
+    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
+};
 
 /*
 
@@ -3499,18 +3544,22 @@ Array.prototype.min = function() {
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- starts on last day
-	- teleport map once in a while
-	- screen for mobile and tablets
 	- pause video when hiding about page
+	- screen for mobile and tablets
+	- loading screen
+	- teleport map once in a while
 	- unzoom at car speed
+	- starts on last day
+	
+	- free camera mode
+	- scroll map while hovering a marker
+	- dim out zoom buttons when max is reached
 	- sound
 	- linkable features
 	- fix trail in about page
 	- core features?
 	- add link to tweets and blogposts
 	- -4h in setDates(x2) and setTimeFrame(x2)
-	- scroll map while hovering a marker
 	- add location to post meta + link
 	- test without smooth scroll and with touch scroll
 	- How to cache data?
@@ -3519,7 +3568,6 @@ Array.prototype.min = function() {
 	- scrollbar event for feed navigation?
 	- there are 2 getBodyHeight functions
 	- marker labels and popups
-	- loading screen
 	- video features	
 	- sightings taxonomy color
 	- 'click to pause, scroll to navigate'
@@ -3531,10 +3579,10 @@ Array.prototype.min = function() {
 	- heartrate peak feature
 	- live mode
 	- togglePause highlight on map
-	- more unzoom
 	- dim out night sections of timeline
-	- highlight journal in nav on new contents
+	- highlight journal in header nav on new contents
 	- transitions between pages
+	- no night on journal
 
 */
 
@@ -3604,7 +3652,7 @@ $(document).ready(function(){
         touchZoom: false,
         dragging: false,
         keyboard: false,
-        minZoom: 1,                    
+        minZoom: 0,                    
         maxZoom: 20,
         zoom:17,
         scrollWheelZoom:false
