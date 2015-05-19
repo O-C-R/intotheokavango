@@ -95,14 +95,14 @@ h3, h3.title{
   overflow: hidden;
 }
 
-  #map{
+  #mapWorld{
     position: absolute;
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
 
-    #map div#night{
+    #mapWorld div#night{
       background-color: rgba(4, 0, 26, 0.6);
       width:100%;
       height:100%;
@@ -112,26 +112,26 @@ h3, h3.title{
       transition: opacity 1s;
     }
 
-    #map div#night.night{
+    #mapWorld div#night.night{
       opacity: 1;
     }
 
-    #map div.leaflet-map-pane{
+    #mapWorld div.leaflet-map-pane{
       width:100%;
       height:100%;
     }
 
-    #map div.leaflet-tile-pane{
+    #mapWorld div.leaflet-tile-pane{
       width:100%;
       height:100%;
     }
 
-    #map div.leaflet-layer{
+    #mapWorld div.leaflet-layer{
       width:100%;
       height:100%;
     }
 
-    #map div.scrollPane{
+    #mapWorld div.scrollPane{
       width:150%;
       height:150%;
       overflow-y: scroll;
@@ -140,18 +140,18 @@ h3, h3.title{
       z-index:10;
     }
 
-    #map div.scrollPane div{
+    #mapWorld div.scrollPane div{
       position:relative;
       background-color: transparent;
       width:100%;
       height:4000px;
     }
 
-    #map div.leaflet-overlay-pane svg{
+    #mapWorld div.leaflet-overlay-pane svg{
       pointer-events:none;
     }
 
-      #map div.leaflet-overlay-pane svg *{
+      #mapWorld div.leaflet-overlay-pane svg *{
         pointer-events:auto;
       }
 

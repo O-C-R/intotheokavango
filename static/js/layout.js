@@ -49,7 +49,7 @@ function Page(i){
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		map.setZoom(id == 'journal' ? 15 : 17);
+		mapWorld.setZoom(id == 'journal' ? 15 : 17, {animate:false});
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		if(isMobile) d3.select('#statusScreen').classed('hidden',true);
@@ -117,7 +117,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		map.setZoom(page.id == 'journal' ? 15 : 17);
+		mapWorld.setZoom(page.id == 'journal' ? 15 : 17, {animate:false});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -162,7 +162,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		map.setZoom(page.id == 'journal' ? 15 : 17);
+		mapWorld.setZoom(page.id == 'journal' ? 15 : 17, {animate:false});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 
