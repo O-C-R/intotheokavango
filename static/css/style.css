@@ -75,7 +75,7 @@ hr{
 }
 
 
-h3{
+h3, h3.title{
   font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
   font-weight: 700;
   font-style: normal;

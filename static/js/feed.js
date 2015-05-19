@@ -97,7 +97,7 @@ function Feed(){
 		        		.html(d.title);
 	        		d3.select(this).select('p.message')
 		        		.html(function(){
-		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full on Medium</a>'
+		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
 		        		});
 	        	}
 	        });

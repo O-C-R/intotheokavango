@@ -1652,7 +1652,7 @@ function Feed(){
 		        		.html(d.title);
 	        		d3.select(this).select('p.message')
 		        		.html(function(){
-		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full on Medium</a>'
+		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
 		        		});
 	        	}
 	        });
@@ -3556,8 +3556,6 @@ function pauseVimeoPlayer(){
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- fonts firefox
-	- scroll firefox
 	- teleport map once in a while
 	- loading screen
 	- unzoom at car speed
@@ -3803,14 +3801,15 @@ $(document).ready(function(){
 	    	.append('div');
 
 		d3.select('#map div.scrollPane div')
-	    	.on('mousewheel',function(){
-	    		if(pages.active.id == 'map') timeline.navigateMap(d3.event.wheelDeltaY);
-	    	});
-
+	    	
 	    d3.select('#map div.scrollPane div')
 	    	.on('click',function(){
+	    		console.log(d3.event);
 	    		if(pages.active.id == 'map') timeline.togglePause();
-	    	});
+	    	})
+	    	.on('wheel',function(){
+	    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+	    	})
 
 	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){
