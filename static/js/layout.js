@@ -23,6 +23,7 @@ function AboutPage(){
 		setTimeout(switchBackground,10000);
 	})();	
 
+
 	page.hide = function(){
 		page.node.classed('hidden',true);
 		page.button.classed('active',false);
@@ -50,6 +51,7 @@ function Page(i){
 		map.setZoom(id == 'journal' ? 15 : 17);
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
+		if(isMobile) d3.select('#statusScreen').classed('hidden',true);
 	}
 
 
@@ -118,6 +120,7 @@ function MapPage(){
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',false);
+		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 	}
 
 	page.hide = function(){
@@ -163,6 +166,7 @@ function JournalPage(){
 		page.node.select('.controls').classed('hidden',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
+		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 	}
 
 

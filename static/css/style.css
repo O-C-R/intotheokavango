@@ -185,6 +185,62 @@ h3{
   height:100%;
 }
 
+  #contentContainer #statusScreen{
+    position:fixed;
+    background-color: rgba(4, 0, 26, 0.95);
+    width:100%;
+    height:100%;
+    z-index:20;
+    display:block;
+    text-align: center;
+    pointer-events:auto;
+  }
+
+
+    #contentContainer #statusScreen.hidden{
+      display:none;
+    }
+
+    #contentContainer #statusScreen p{
+      position:relative;
+      padding: 0 39%;
+      width:22%;
+      margin-top: 140px;
+      margin-bottom: 35px;
+      line-height: 1.75em;
+    }
+
+    #contentContainer #statusScreen div.cta{
+      position:relative;
+      margin:auto;
+      display:inline-block;
+      border-radius: 3px;
+      padding:14px 26px;
+      border: 2px solid white;
+      text-transform: uppercase;
+      font-size: 11px !important;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+
+    #contentContainer #statusScreen div.cta a {
+      color: #4BFF87;
+    }
+
+    #contentContainer #statusScreen img{
+      top:45%;
+      position:absolute;
+      opacity:0.6;
+      margin-top:-17.5px;
+      margin-left:-17.5px;
+    }
+
+    #contentContainer #statusScreen img:hidden{
+      display:none;
+    }
+
+
+
   #contentContainer.map{
     pointer-events:none;
   }
