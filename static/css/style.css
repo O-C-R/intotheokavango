@@ -978,8 +978,10 @@ hr{
     }
 
     #data-content #tag-area {
-      height: 100px;
+      min-height: 100px;
       width: 90%;
+      height: auto;
+      margin-bottom: 5px;
     }
 
     #data-content #input-area {
@@ -1022,12 +1024,15 @@ hr{
     #data-content pre {
         font-size: 12px;
         margin-top: 20px;
-        /*width: 100%;*/
-        /*float: left;*/
+        width: 82%;
+        float: left;
     }
 
     #query-button {
-      float: right;
+      /*float: right;*/  
+      width: 12%;
+      margin-top: 23px;
+      margin-left: 5px;
     }
 
     .data-description code {

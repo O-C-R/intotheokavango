@@ -242,7 +242,7 @@
     }
 
     #dataPage path {
-        stroke: #4bff87;
+        /*stroke: #4bff87;*/
         stroke-width: 1px;
         fill: none;
     }
