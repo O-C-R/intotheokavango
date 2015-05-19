@@ -17,10 +17,13 @@ def parse(request):
         log.info("--> parsing XML")
         data = data['instance']
         feature = {'FeatureType': "sighting"}
+        log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         feature['Member'] = data['@dm:submitting_user'].split(' ')[0]
+        dt = util.parse_date(data['@dm:submit_time'])
         data = data['inputs']
-        dt = util.parse_date(data['Date___Time'])
-        del data['Date___Time']
+        if 'Date___Time' in data:
+            dt = util.parse_date(data['Date___Time'])
+            del data['Date___Time']
         if 'Location' in data:
             feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
             feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
