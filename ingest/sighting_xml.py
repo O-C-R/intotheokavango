@@ -17,6 +17,7 @@ def parse(request):
         log.info("--> parsing XML")
         data = data['instance']
         feature = {'FeatureType': "sighting"}
+        log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         feature['Member'] = data['@dm:submitting_user'].split(' ')[0]
         data = data['inputs']
         dt = util.parse_date(data['Date___Time'])
