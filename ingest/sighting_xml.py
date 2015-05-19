@@ -19,7 +19,7 @@ def parse(request):
         feature = {'FeatureType': "sighting"}
         log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         feature['Member'] = data['@dm:submitting_user'].split(' ')[0]
-        dt = util.parse_date(data['@dm:submit_time'])
+        dt = util.parse_date(data['@writeTime'])
         data = data['inputs']
         if 'Date___Time' in data:
             dt = util.parse_date(data['Date___Time'])
