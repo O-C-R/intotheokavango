@@ -1573,6 +1573,8 @@ function Feed(){
 	var allPosts = [];
 	var postCursor = 0;
 
+	var initialized = false;
+
 
 	function init(day){
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -1665,6 +1667,8 @@ function Feed(){
 				jump(timeline.getTimeCursor());
 			}
 		});
+
+		initialized = false;
 
 	}
 
@@ -2171,6 +2175,7 @@ function AboutPage(){
 		page.node.classed('hidden',true);
 		page.button.classed('active',false);
 		pauseVimeoPlayer();
+		d3.select('#aboutPage #video div.cover').remove();
 	}
 
 	return page;
@@ -2195,6 +2200,7 @@ function Page(i){
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		if(isMobile) d3.select('#statusScreen').classed('hidden',true);
+		pauseVimeoPlayer();
 	}
 
 
@@ -2264,6 +2270,7 @@ function MapPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
+		pauseVimeoPlayer();
 	}
 
 	page.hide = function(){
@@ -2310,6 +2317,7 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
+		pauseVimeoPlayer();
 	}
 
 
@@ -3537,7 +3545,7 @@ function pauseVimeoPlayer(){
       method: 'pause'
     };
     vimeoPlayer = d3.select('iframe').node();
-    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
+    if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 };
 
 /*

@@ -36,5 +36,5 @@ function pauseVimeoPlayer(){
       method: 'pause'
     };
     vimeoPlayer = d3.select('iframe').node();
-    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
+    if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }

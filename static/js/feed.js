@@ -18,6 +18,8 @@ function Feed(){
 	var allPosts = [];
 	var postCursor = 0;
 
+	var initialized = false;
+
 
 	function init(day){
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -110,6 +112,8 @@ function Feed(){
 				jump(timeline.getTimeCursor());
 			}
 		});
+
+		initialized = false;
 
 	}
 
