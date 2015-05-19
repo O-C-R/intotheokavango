@@ -38,3 +38,7 @@ function pauseVimeoPlayer(){
     vimeoPlayer = d3.select('iframe').node();
     if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }
+
+if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+    d3.select('#aboutPage #video div.cover').remove();
+}

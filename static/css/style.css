@@ -1,19 +1,4 @@
 
-
-   /*
-  Fonts
-*/
-
-
-@import url(http://fonts.googleapis.com/css?family=Montserrat);
-@import url(http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
-
-
-   /*
-  Reset CSS
-*/
-
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -41,7 +26,6 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
   width:100%;
-  /*overflow-x:hidden; */
 }
 ol, ul {
   list-style: none;
@@ -61,19 +45,13 @@ table {
 
 a{
   text-decoration: none;
-/*  color: #686d9d; 
-*/  color: #D29C49;
+  color: #D29C49;
   transition: color 0.15s;
 }
 
 a:hover {
   color:#fff;
 }
-
-
-   /*
-  Reset CSS
-*/
 
 html{
   height:100%;
@@ -82,8 +60,9 @@ html{
 body{
   background-color:#04001A;
   color:#ffffff;
-  /*font-family: 'Lora', Georgia, serif;*/
-  font-family: 'Sentinel SSm A', 'Sentinel SSm B'; font-weight: 300; font-style: normal;
+  font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif; 
+  font-weight: 300; 
+  font-style: normal;
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
@@ -96,7 +75,7 @@ hr{
 }
 
 
-h3{
+h3, h3.title{
   font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
   font-weight: 700;
   font-style: normal;
@@ -112,20 +91,18 @@ h3{
   width:100%;
   height:100%;
   position:fixed;
-  /*height: auto;*/
   display: inline-block;
-  /*position: absolute;*/
   overflow: hidden;
 }
 
-  #map{
+  #mapWorld{
     position: absolute;
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
 
-    #map div#night{
+    #mapWorld div#night{
       background-color: rgba(4, 0, 26, 0.6);
       width:100%;
       height:100%;
@@ -135,26 +112,26 @@ h3{
       transition: opacity 1s;
     }
 
-    #map div#night.night{
+    #mapWorld div#night.night{
       opacity: 1;
     }
 
-    #map div.leaflet-map-pane{
+    #mapWorld div.leaflet-map-pane{
       width:100%;
       height:100%;
     }
 
-    #map div.leaflet-tile-pane{
+    #mapWorld div.leaflet-objects-pane{
       width:100%;
       height:100%;
     }
 
-    #map div.leaflet-layer{
+    #mapWorld div.leaflet-layer{
       width:100%;
       height:100%;
     }
 
-    #map div.scrollPane{
+    #mapWorld div.scrollPane{
       width:150%;
       height:150%;
       overflow-y: scroll;
@@ -163,18 +140,18 @@ h3{
       z-index:10;
     }
 
-    #map div.scrollPane div{
-      position:relative;
-      background-color: transparent;
-      width:100%;
-      height:4000px;
-    }
+      #mapWorld div.scrollPane div{
+        position:relative;
+        background-color: transparent;
+        width:100%;
+        height:4000px;
+      }
 
-    #map div.leaflet-overlay-pane svg{
+    #mapWorld div.leaflet-overlay-pane svg{
       pointer-events:none;
     }
 
-      #map div.leaflet-overlay-pane svg *{
+      #mapWorld div.leaflet-overlay-pane svg *{
         pointer-events:auto;
       }
 
@@ -184,6 +161,10 @@ h3{
   position:relative;
   height:100%;
 }
+
+  #contentContainer.fixed{
+    position:fixed;
+  }
 
   #contentContainer #statusScreen{
     position:fixed;
@@ -204,11 +185,10 @@ h3{
 
     #contentContainer #statusScreen p{
       position:relative;
-      padding: 0 39%;
+      padding: 0;
       width:22%;
       min-width: 300px;
-      margin-top: 140px;
-      margin-bottom: 35px;
+      margin:100px auto 35px auto;
       line-height: 1.75em;
     }
 
@@ -511,17 +491,6 @@ h3{
         font-style: normal;
       }
 
-      /*#aboutPage h1{
-        font-family: "Montserrat", Helvetica, Arial;
-        font-size: 56px;
-        color:#ffffff;
-        text-transform: uppercase;
-        text-align: right;
-        letter-spacing: 0.15em;
-        line-height: 1.32em; 
-        margin-top:-5px;
-      }*/
-
       #introduction p{
         font-size: 18px;
         letter-spacing: 0.12em;
@@ -561,7 +530,6 @@ h3{
       }
 
       #aboutPage h2{
-        /*font-family: 'Montserrat', arial, sans-serif;*/
         font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
         font-weight: 700;
         font-style: normal;
@@ -660,7 +628,6 @@ h3{
           }
 
             #team h2 span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -685,7 +652,6 @@ h3{
           }
 
             #team p span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -1012,7 +978,6 @@ h3{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                /*font-family: 'Montserrat', arial, sans-serif;*/
                 font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
                 font-weight: 700;
                 font-style: normal;
@@ -1034,8 +999,7 @@ h3{
     }
 
     #dataPage h2 {
-      font-family: 'Montserrat';
-      /*font-size: 14px;*/
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       text-transform: uppercase;
       line-height: 1.0em;
       letter-spacing: 0.1em;
@@ -1043,7 +1007,7 @@ h3{
     }
 
     #dataPage label {
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 0.9em;
       letter-spacing: 0.1em;
       margin-bottom: 8px;
@@ -1122,8 +1086,10 @@ h3{
     }
 
     #data-content #tag-area {
-      height: 100px;
+      min-height: 100px;
       width: 90%;
+      height: auto;
+      margin-bottom: 5px;
     }
 
     #data-content #input-area {
@@ -1166,12 +1132,15 @@ h3{
     #data-content pre {
         font-size: 12px;
         margin-top: 20px;
-        /*width: 100%;*/
-        /*float: left;*/
+        width: 82%;
+        float: left;
     }
 
     #query-button {
-      float: right;
+      /*float: right;*/  
+      width: 12%;
+      margin-top: 23px;
+      margin-left: 5px;
     }
 
     .data-description code {
@@ -1223,7 +1192,7 @@ h3{
 
     #features-totals li {
       list-style: none;
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 14px;
     }
 

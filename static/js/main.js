@@ -8,13 +8,14 @@
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- fonts firefox
-	- scroll firefox
-	- teleport map once in a while
+	- mouse scroll too slow
+	- labels timeline
+	- layout mobile
+
 	- loading screen
 	- unzoom at car speed
 	- starts on last day
-	
+	- add note field to documentary images
 	- free camera mode
 	- scroll map while hovering a marker
 	- dim out zoom buttons when max is reached
@@ -59,7 +60,7 @@ var mapbox_map_id = "oxn5wd2a"; //"vsat7sho";
 
 var loader;
 var pages = {};
-var map;
+var mapWorld;
 var tweetLayer;
 var photoLayer;
 var sightingLayer;
@@ -103,8 +104,7 @@ var jumping = false;
 var carCounter = 0;
 var isMobile = false;
 
-$(document).ready(function(){
-// document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function(){
 
 	(function() {
 	  var check = false;
@@ -112,7 +112,7 @@ $(document).ready(function(){
 	  isMobile = check;
 	})();
 
-    map = new L.map('map', {
+    mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
         center:new L.LatLng(-12.811059,18.175099),
@@ -129,13 +129,13 @@ $(document).ready(function(){
         scrollWheelZoom:false
     });
 
-    tweetLayer = new L.layerGroup().addTo(map);
-    photoLayer = new L.layerGroup().addTo(map);
-    sightingLayer = new L.layerGroup().addTo(map);
-    beaconLayer = new L.layerGroup().addTo(map);
-    beaconPathLayer = new L.layerGroup().addTo(map);
-    blogLayer = new L.layerGroup().addTo(map);
-    soundLayer = new L.layerGroup().addTo(map);
+    tweetLayer = new L.layerGroup().addTo(mapWorld);
+    photoLayer = new L.layerGroup().addTo(mapWorld);
+    sightingLayer = new L.layerGroup().addTo(mapWorld);
+    beaconLayer = new L.layerGroup().addTo(mapWorld);
+    beaconPathLayer = new L.layerGroup().addTo(mapWorld);
+    blogLayer = new L.layerGroup().addTo(mapWorld);
+    soundLayer = new L.layerGroup().addTo(mapWorld);
 
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
@@ -151,10 +151,10 @@ $(document).ready(function(){
 		pages.about = AboutPage('about');
 		pages.about.show();
 	}
-    wanderer = Wanderer(map.getCenter());
+    wanderer = Wanderer(mapWorld.getCenter());
 
     if(d3.selectAll('#navigation li')[0].length > 3){
-		// pages.map.show();
+		// pages.mapWorld.show();
 		pages.about.show();
 		setLayoutInteractions();
 		loader.getDayCount(function(dayCount,startDate){
@@ -172,7 +172,6 @@ $(document).ready(function(){
 	} else {
 		window.addEventListener('resize',resize);
 		resize();	
-		setPause();
 		animate(new Date().getTime()-16);
 	}
 
@@ -204,22 +203,25 @@ $(document).ready(function(){
 
 					// var latLng = new L.LatLng(coord[0],coord[1]);
 					// if(loader.members['Steve'].getLatLng().distanceTo(latLng) > 500) latLng = loader.members['Steve'].getLatLng();
-					// var previousCenter = map.getCenter();
-					map.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+					// var previousCenter = mapWorld.getCenter();
+					
+					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
-					// carCounter = Math.constrain(carCounter + (previousCenter.distanceTo(map.getCenter()) > 100?1:-1),0,30);
-					// if(carCounter == 30 && map.getZoom() == 17) map.setZoom(13);
-					// if(carCounter == 0 && map.getZoom() == 13) map.setZoom(17);
-
-					var matrix = d3.select('#map div.leaflet-map-pane').style('transform').split(', ');
+					var matrix;
+					try{
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('transform').split(', ');
+					}catch(e){
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('-webkit-transform').split(', ');
+					}
 					matrix = matrix[0]+', '+matrix[1]+', '+matrix[2]+', '+matrix[3]+', '+(-1*parseFloat(matrix[4]))+', '+(-1*parseFloat(matrix[5]))+')';
-					d3.select('#map div.scrollPane').style('transform',matrix);
-					d3.select('#map div.scrollPane').node().scrollTop = 2000;
+					d3.select('#mapWorld div.scrollPane').style('transform',matrix);
+					d3.select('#mapWorld div.scrollPane').style('-webkit-transform',matrix);
+					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 				
 				} else {
 					wanderer.wander();
 			    	var target = wanderer.update();
-			    	map.panTo(new L.LatLng(target.y,target.x), {animate:false});
+			    	mapWorld.panTo(new L.LatLng(target.y,target.x), {animate:false});
 				}
 			}
 		}
@@ -249,20 +251,16 @@ $(document).ready(function(){
 		    	});
 	    }
 
-	    d3.select('#map div.leaflet-layer')
+	    d3.select('#mapWorld div.leaflet-objects-pane')
 	    	.append('div')
-	    	.attr('class','scrollPane')
-	    	.append('div');
-
-		d3.select('#map div.scrollPane div')
-	    	.on('mousewheel',function(){
-	    		if(pages.active.id == 'map') timeline.navigateMap(d3.event.wheelDeltaY);
-	    	});
-
-	    d3.select('#map div.scrollPane div')
-	    	.on('click',function(){
-	    		if(pages.active.id == 'map') timeline.togglePause();
-	    	});
+		    	.attr('class','scrollPane')
+		    	.append('div')
+			    	.on('click',function(){
+			    		if(pages.active.id == 'map') timeline.togglePause();
+			    	})
+			    	.on('wheel',function(){
+			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+			    	})
 
 	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){
@@ -271,39 +269,19 @@ $(document).ready(function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		map.setZoom(Math.constrain(map.getZoom()-1,9,17));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)),{animate:false});
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		map.setZoom(Math.constrain(map.getZoom()+1,9,17));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)),{animate:false});
 	    		d3.event.stopPropagation();
 	    	});
 		
 		window.addEventListener('resize',resize);
 		resize();
 
-		setPause();	
-	}
-
-	function setPause(){
-		// d3.select('body, iframe')
-		// 	.on('blur',function(){
-		// 		blurred = true;
-		// 	})
-		// d3.select('body, iframe')
-		// 	.on('focus',function(){
-		// 		blurred = false;
-		// 	})
-		// d3.select(window)
-		// 	.on('blur',function(){
-		// 		blurred = true;
-		// 	})
-		// d3.select(window)
-		// 	.on('focus',function(){
-		// 		blurred = false;
-		// 	})
 	}
 
 

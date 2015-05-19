@@ -279,7 +279,7 @@ function Timeline(){
 		wheelDelta = -delta/4;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
-			d3.select('#map div.scrollPane').node().scrollTop = 2000;
+			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 		}
 	}
 

@@ -18,7 +18,7 @@ function Member(n, l, d){
 		className: 'memberMarker', 
 		html: '<img src="static/img/beacon.svg"/><p>' + name.charAt(0) + '<span>'+ name.slice(1,name.length) +'</span></p>', 
 		iconSize:['50px','40px']});
-	var marker = L.marker(latLng, {icon: icon}).addTo(map);
+	var marker = L.marker(latLng, {icon: icon}).addTo(mapWorld);
 
 
 	// (function init(){
