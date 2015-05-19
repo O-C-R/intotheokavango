@@ -5,7 +5,7 @@ window.addEventListener('message', onMessageReceived, false);
 function onMessageReceived(event) {
     if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
         return false;
-    }	        
+    }           
     if (playerOrigin === '*') {
         playerOrigin = event.origin;
     }
@@ -25,16 +25,16 @@ function onReady() {
 }
 
 function onPlay(){
-	d3.select('#aboutPage #video div.cover')
-		.transition()
-		.style('opacity',0)
-		.remove();
+    d3.select('#aboutPage #video div.cover')
+        .transition()
+        .style('opacity',0)
+        .remove();
 }
 
 function pauseVimeoPlayer(){
     var data = {
-      method: 'addEventListener',
-      value: 'pause'
+      method: 'pause'
     };
+    vimeoPlayer = d3.select('iframe').node();
     vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }
