@@ -20,8 +20,18 @@ function Member(n, l, d){
 		iconSize:['50px','40px']});
 	var marker = L.marker(latLng, {icon: icon}).addTo(map);
 
-	function addAmbitGeo(d, l, t, c){
+
+	// (function init(){
+	// 	var l = L.latLng(-12.811059,18.175099);
+	// 	var t = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
+	// 	var c = true;
+	// 	pathQueueByDay[0].push({latLng:l, time:t, core:c})
+	// })();
+
+
+	function addAmbitGeo(d, l, t, c, origin){
 		if(!pathQueueByDay[d]) pathQueueByDay[d] = [];
+	    // pathQueueByDay[d].push({latLng:origin? l:latLng, time:t, core:c});
 	    pathQueueByDay[d].push({latLng:l, time:t, core:c});
 	}
 
@@ -93,6 +103,9 @@ function Member(n, l, d){
 		// }
 		marker.setLatLng(latLng);
 
+		if(interval.length==2) return interval[0].core;
+		else return true;
+
 	}
 
 
@@ -121,6 +134,10 @@ function Member(n, l, d){
 	    timeCursor = -1;
 	}
 
+	function fillEmptyPathQueue(d){
+		// pathQueueByDay[d].push({latLng:l, time:t, core:c});
+	}
+
 
 	return{
 		addAmbitGeo: addAmbitGeo,
@@ -132,7 +149,8 @@ function Member(n, l, d){
 		getPathQueueByDay: getPathQueueByDay,
 		timeCursor: timeCursor,
 		initPathQueue: initPathQueue,
-		teleport: teleport
+		teleport: teleport,
+		fillEmptyPathQueue: fillEmptyPathQueue
 	}
 }
 

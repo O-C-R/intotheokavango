@@ -1,19 +1,4 @@
 
-
-   /*
-  Fonts
-*/
-
-
-@import url(http://fonts.googleapis.com/css?family=Montserrat);
-@import url(http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
-
-
-   /*
-  Reset CSS
-*/
-
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -41,7 +26,6 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
   width:100%;
-  /*overflow-x:hidden; */
 }
 ol, ul {
   list-style: none;
@@ -61,14 +45,13 @@ table {
 
 a{
   text-decoration: none;
-/*  color: #686d9d; 
-*/  color: #D29C49;
+  color: #D29C49;
+  transition: color 0.15s;
 }
 
-
-   /*
-  Reset CSS
-*/
+a:hover {
+  color:#fff;
+}
 
 html{
   height:100%;
@@ -77,8 +60,9 @@ html{
 body{
   background-color:#04001A;
   color:#ffffff;
-  /*font-family: 'Lora', Georgia, serif;*/
-  font-family: 'Sentinel SSm A', 'Sentinel SSm B'; font-weight: 300; font-style: normal;
+  font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif; 
+  font-weight: 300; 
+  font-style: normal;
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
@@ -90,14 +74,25 @@ hr{
   opacity: 0.5;
 }
 
+
+h3, h3.title{
+  font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 18px;
+  text-transform: uppercase;
+  line-height: 1.5em;
+  letter-spacing: 0.2em;
+  color: #fff;
+}
+
+
 #mapContainer{
   width:100%;
   height:100%;
   position:fixed;
-  /*height: auto;*/
   display: inline-block;
-  /*position: absolute;*/
-  overflow: scroll;
+  overflow: hidden;
 }
 
   #map{
@@ -137,9 +132,10 @@ hr{
     }
 
     #map div.scrollPane{
-      width:100%;
+      width:150%;
       height:150%;
-      overflow: scroll;
+      overflow-y: scroll;
+      overflow-x: hidden;
       position:relative;
       z-index:10;
     }
@@ -165,6 +161,64 @@ hr{
   position:relative;
   height:100%;
 }
+
+  #contentContainer #statusScreen{
+    position:fixed;
+    background-color: rgba(4, 0, 26, 0.95);
+    width:100%;
+    height:100%;
+    z-index:20;
+    display:block;
+    text-align: center;
+    pointer-events:auto;
+    overflow: visible;
+  }
+
+
+    #contentContainer #statusScreen.hidden{
+      display:none;
+    }
+
+    #contentContainer #statusScreen p{
+      position:relative;
+      padding: 0 39%;
+      width:22%;
+      min-width: 300px;
+      margin-top: 140px;
+      margin-bottom: 35px;
+      line-height: 1.75em;
+    }
+
+    #contentContainer #statusScreen div.cta{
+      position:relative;
+      margin:auto;
+      display:inline-block;
+      border-radius: 3px;
+      padding:14px 26px;
+      border: 2px solid white;
+      text-transform: uppercase;
+      font-size: 11px !important;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+
+    #contentContainer #statusScreen div.cta a {
+      color: #4BFF87;
+    }
+
+    #contentContainer #statusScreen img{
+      top:45%;
+      position:absolute;
+      opacity:0.6;
+      margin-top:-17.5px;
+      margin-left:-17.5px;
+    }
+
+    #contentContainer #statusScreen img:hidden{
+      display:none;
+    }
+
+
 
   #contentContainer.map{
     pointer-events:none;
@@ -246,7 +300,7 @@ hr{
             ul#navigation li.share img{
               display: block;
               margin:auto;
-              margin-top:-5px;
+              margin-top:-6px;
             }
 
 
@@ -274,12 +328,57 @@ hr{
       display:none;
     }
 
+    #cta{
+      /*position:absolute;
+      bottom:-22px;*/
+      width:100%;
+      left:0;
+      text-align: center;
+      margin-top:-35px;
+      margin-bottom:70px;
+    }
+
+      #cta p{
+        position:relative;
+        margin:auto;
+        display:inline-block;
+        border-radius: 3px;
+        padding:14px 26px;
+        border: 2px solid white;
+        text-transform: uppercase;
+        font-size: 11px !important;
+        color: #4BFF87;
+        transition: color 0.15s;
+        text-decoration: none;
+      }
+
+      #cta p span{
+        text-transform: lowercase;
+      }
+
+      #cta a:hover p{
+        color: white;
+      }
+
     #aboutPage{
       background-color: rgba(4, 0, 26, 0.65);
     }
 
-      #aboutPage div.row{
-        
+      #aboutPage div.logos{
+        height:auto;
+        width:100%;
+        padding-top:10px;
+        padding-bottom:45px;
+        text-align: left;
+      }
+
+      #aboutPage div.logos a{
+        margin-right: 20px;
+      }
+
+      #aboutPage #cta{
+        margin:0;
+        margin-bottom:75px;
       }
 
       #aboutPage div.column{
@@ -310,6 +409,7 @@ hr{
         height:100%;
         width:100%;
         background-image: url("../img/vimeoCover.jpg");
+        background-size: cover;
       }
 
         #aboutPage #video div.cover img{
@@ -365,10 +465,14 @@ hr{
     #aboutPage #introduction{
       width:82.8%;
       height:auto;
-      padding:105px 8.6%;
+      padding:100px 8.6%;
       overflow-x:hidden; 
       position:relative;
     }
+
+      #aboutPage #introduction #cta{
+        text-align: right;
+      }
 
       #aboutPage h1{
         font-size: 56px;
@@ -384,17 +488,6 @@ hr{
         font-style: normal;
       }
 
-      /*#aboutPage h1{
-        font-family: "Montserrat", Helvetica, Arial;
-        font-size: 56px;
-        color:#ffffff;
-        text-transform: uppercase;
-        text-align: right;
-        letter-spacing: 0.15em;
-        line-height: 1.32em; 
-        margin-top:-5px;
-      }*/
-
       #introduction p{
         font-size: 18px;
         letter-spacing: 0.12em;
@@ -405,44 +498,13 @@ hr{
           margin-top:35px;
         }
 
-        #introduction #intro div.column:first-child p{
+        #introduction #intro div.column:first-child p:nth-child(2){
           text-align: right;
-          padding-left:20%;
+          padding-left:18%;
           margin-bottom:15px;
+          margin-top:0;
         }
 
-
-      #cta{
-        /*position:absolute;
-        bottom:-22px;*/
-        width:100%;
-        left:0;
-        text-align: center;
-        margin-top:-35px;
-        margin-bottom:70px;
-      }
-
-        #cta p{
-          position:relative;
-          margin:auto;
-          display:inline-block;
-          border-radius: 3px;
-          padding:14px 26px;
-          border: 2px solid white;
-          text-transform: uppercase;
-          font-size: 11px;
-          color: #4BFF87;
-          transition: color 0.15s;
-          text-decoration: none;
-        }
-
-        #cta p span{
-          text-transform: lowercase;
-        }
-
-        #cta a:hover p{
-          color: white;
-        }
 
       #aboutPage #beaconContainer{
         position: absolute;
@@ -465,7 +527,6 @@ hr{
       }
 
       #aboutPage h2{
-        /*font-family: 'Montserrat', arial, sans-serif;*/
         font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
         font-weight: 700;
         font-style: normal;
@@ -564,7 +625,6 @@ hr{
           }
 
             #team h2 span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -589,7 +649,6 @@ hr{
           }
 
             #team p span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -627,7 +686,7 @@ hr{
         #team div.logos{
           text-align: right;
           position:absolute;
-          bottom:100px;
+          bottom:50px;
           width:40%;
         }
 
@@ -652,6 +711,26 @@ hr{
       height:100%;
       position:fixed;
     }
+
+    #mapPage div.logos{
+      position:absolute;
+      bottom:35px;
+      right:3%;
+      transition: opacity 0.2s;
+    }
+
+      #mapPage div.logos.hidden{
+        opacity: 0;
+      }
+
+      #mapPage div.logos a{
+        pointer-events:auto;
+        margin-left:20px;
+      }
+
+      #mapPage div.logos.hidden a{
+        pointer-events:none;
+      }
 
       #mapPage div.controls{
         padding: 35px 1.4% 1.4% 1.4%;
@@ -829,6 +908,34 @@ hr{
               margin-top:-7px;
             }
 
+
+              #mapPage div#feed div.post.blog div.content div.text {
+                display:inline-block;
+                vertical-align: middle;
+                margin:0 0 0 5%;
+                width:85%;
+                /*font-style: italic;*/
+                font-size: 20px;
+                line-height: 1.85em;
+                margin-top:-7px;
+              }
+
+                #mapPage div#feed div.post.blog div.content div.text p.message{
+                  display:block;
+                  margin:0;
+                  width:100%;
+                }
+
+                #mapPage div#feed div.post.blog div.content div.text p.message a{
+                  font-size:13px;
+                  font-style: italic;
+                }
+
+                #mapPage div#feed div.post.blog div.content div.text h3{
+                  margin-top: 5px;
+                  margin-bottom:15px;
+                }
+
               #mapPage.data div#feed div.post div.content p.message{
                 margin:0 0 0 3.8%;
                 width:65.4%;
@@ -868,7 +975,6 @@ hr{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                /*font-family: 'Montserrat', arial, sans-serif;*/
                 font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
                 font-weight: 700;
                 font-style: normal;
@@ -890,8 +996,7 @@ hr{
     }
 
     #dataPage h2 {
-      font-family: 'Montserrat';
-      /*font-size: 14px;*/
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       text-transform: uppercase;
       line-height: 1.0em;
       letter-spacing: 0.1em;
@@ -899,7 +1004,7 @@ hr{
     }
 
     #dataPage label {
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 0.9em;
       letter-spacing: 0.1em;
       margin-bottom: 8px;
@@ -1084,7 +1189,7 @@ hr{
 
     #features-totals li {
       list-style: none;
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 14px;
     }
 

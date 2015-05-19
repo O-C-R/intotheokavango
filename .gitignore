@@ -15,3 +15,4 @@ tests
 passwords.txt
 pi_code/okanode/server.log
 pi_code/okanode/error.log
+node_modules/**
