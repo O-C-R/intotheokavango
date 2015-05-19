@@ -8,9 +8,10 @@
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- screen for mobile and tablets
-	- loading screen
+	- fonts firefox
+	- scroll firefox
 	- teleport map once in a while
+	- loading screen
 	- unzoom at car speed
 	- starts on last day
 	

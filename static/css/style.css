@@ -194,6 +194,7 @@ h3{
     display:block;
     text-align: center;
     pointer-events:auto;
+    overflow: visible;
   }
 
 
@@ -205,6 +206,7 @@ h3{
       position:relative;
       padding: 0 39%;
       width:22%;
+      min-width: 300px;
       margin-top: 140px;
       margin-bottom: 35px;
       line-height: 1.75em;
