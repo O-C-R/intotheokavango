@@ -18,7 +18,7 @@ class Home(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.not_found()        
-        return self.render("indexTeaser.html")
+        return self.render("index.html")
 
 
 class Core(server.Handler):
