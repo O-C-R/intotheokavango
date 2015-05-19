@@ -181,11 +181,10 @@ h3, h3.title{
 
     #contentContainer #statusScreen p{
       position:relative;
-      padding: 0 39%;
+      padding: 0;
       width:22%;
       min-width: 300px;
-      margin-top: 140px;
-      margin-bottom: 35px;
+      margin:100px auto 35px auto;
       line-height: 1.75em;
     }
 
