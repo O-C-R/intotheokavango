@@ -1563,7 +1563,7 @@ console.warn('DATA PAGE', id);
 function Feed(){
 
 	var node = d3.select('#feed');
-	node.on('mousewheel', scroll);
+	node.on('wheel', scroll);
 	var templates = {
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html(),
@@ -3557,7 +3557,6 @@ function pauseVimeoPlayer(){
 
 	TODOS
 	- scroll is now too slow
-	- map doesn't refresh in firefox
 	- journal nav doesn't update timeline in firefox
 	- labels timeline
 	- layout mobile

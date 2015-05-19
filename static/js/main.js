@@ -9,7 +9,6 @@
 
 	TODOS
 	- scroll is now too slow
-	- map doesn't refresh in firefox
 	- journal nav doesn't update timeline in firefox
 	- labels timeline
 	- layout mobile
