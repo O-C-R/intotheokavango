@@ -1,19 +1,4 @@
 
-
-   /*
-  Fonts
-*/
-
-
-@import url(http://fonts.googleapis.com/css?family=Montserrat);
-@import url(http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
-
-
-   /*
-  Reset CSS
-*/
-
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -41,7 +26,6 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
   width:100%;
-  /*overflow-x:hidden; */
 }
 ol, ul {
   list-style: none;
@@ -61,19 +45,13 @@ table {
 
 a{
   text-decoration: none;
-/*  color: #686d9d; 
-*/  color: #D29C49;
+  color: #D29C49;
   transition: color 0.15s;
 }
 
 a:hover {
   color:#fff;
 }
-
-
-   /*
-  Reset CSS
-*/
 
 html{
   height:100%;
@@ -82,8 +60,9 @@ html{
 body{
   background-color:#04001A;
   color:#ffffff;
-  /*font-family: 'Lora', Georgia, serif;*/
-  font-family: 'Sentinel SSm A', 'Sentinel SSm B'; font-weight: 300; font-style: normal;
+  font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif; 
+  font-weight: 300; 
+  font-style: normal;
   font-size: 16px;
   letter-spacing: 0.12em;
   width:100%;
@@ -112,9 +91,7 @@ h3{
   width:100%;
   height:100%;
   position:fixed;
-  /*height: auto;*/
   display: inline-block;
-  /*position: absolute;*/
   overflow: hidden;
 }
 
@@ -511,17 +488,6 @@ h3{
         font-style: normal;
       }
 
-      /*#aboutPage h1{
-        font-family: "Montserrat", Helvetica, Arial;
-        font-size: 56px;
-        color:#ffffff;
-        text-transform: uppercase;
-        text-align: right;
-        letter-spacing: 0.15em;
-        line-height: 1.32em; 
-        margin-top:-5px;
-      }*/
-
       #introduction p{
         font-size: 18px;
         letter-spacing: 0.12em;
@@ -561,7 +527,6 @@ h3{
       }
 
       #aboutPage h2{
-        /*font-family: 'Montserrat', arial, sans-serif;*/
         font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
         font-weight: 700;
         font-style: normal;
@@ -660,7 +625,6 @@ h3{
           }
 
             #team h2 span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -685,7 +649,6 @@ h3{
           }
 
             #team p span.title{
-              /*font-family: 'Montserrat', arial, sans-serif;*/
               font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
               font-weight: 700;
               font-style: normal;
@@ -1012,7 +975,6 @@ h3{
                 margin:0 0 0 5%;
                 width:85%;
                 color: rgba(173,176,255,0.65);
-                /*font-family: 'Montserrat', arial, sans-serif;*/
                 font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
                 font-weight: 700;
                 font-style: normal;
@@ -1034,8 +996,7 @@ h3{
     }
 
     #dataPage h2 {
-      font-family: 'Montserrat';
-      /*font-size: 14px;*/
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       text-transform: uppercase;
       line-height: 1.0em;
       letter-spacing: 0.1em;
@@ -1043,7 +1004,7 @@ h3{
     }
 
     #dataPage label {
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 0.9em;
       letter-spacing: 0.1em;
       margin-bottom: 8px;
@@ -1223,7 +1184,7 @@ h3{
 
     #features-totals li {
       list-style: none;
-      font-family: 'Montserrat';
+      font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
       font-size: 14px;
     }
 
