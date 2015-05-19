@@ -2269,6 +2269,7 @@ function MapPage(){
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',false);
+		d3.select('#contentContainer').classed('fixed',true);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 		pauseVimeoPlayer();
 	}
@@ -2277,6 +2278,7 @@ function MapPage(){
 		page.getNode().classed('hidden',true);
 		page.button.classed('active',false);
 		d3.select('#contentContainer').classed('map',false);
+		d3.select('#contentContainer').classed('fixed',false);
 	}
 
 
@@ -3546,7 +3548,11 @@ function pauseVimeoPlayer(){
     };
     vimeoPlayer = d3.select('iframe').node();
     if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-};
+}
+
+// if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+    // d3.select('#aboutPage #video div.cover').remove();
+// };
 
 /*
 
@@ -3755,9 +3761,15 @@ document.addEventListener('DOMContentLoaded', function(){
 					
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
-					var matrix = d3.select('#mapWorld div.leaflet-map-pane').style('transform').split(', ');
+					var matrix;
+					try{
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('transform').split(', ');
+					}catch(e){
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('-webkit-transform').split(', ');
+					}
 					matrix = matrix[0]+', '+matrix[1]+', '+matrix[2]+', '+matrix[3]+', '+(-1*parseFloat(matrix[4]))+', '+(-1*parseFloat(matrix[5]))+')';
 					d3.select('#mapWorld div.scrollPane').style('transform',matrix);
+					d3.select('#mapWorld div.scrollPane').style('-webkit-transform',matrix);
 					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 				
 				} else {

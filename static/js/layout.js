@@ -122,6 +122,7 @@ function MapPage(){
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',false);
+		d3.select('#contentContainer').classed('fixed',true);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 		pauseVimeoPlayer();
 	}
@@ -130,6 +131,7 @@ function MapPage(){
 		page.getNode().classed('hidden',true);
 		page.button.classed('active',false);
 		d3.select('#contentContainer').classed('map',false);
+		d3.select('#contentContainer').classed('fixed',false);
 	}
 
 

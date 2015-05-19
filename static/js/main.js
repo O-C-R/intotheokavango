@@ -207,9 +207,15 @@ document.addEventListener('DOMContentLoaded', function(){
 					
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
-					var matrix = d3.select('#mapWorld div.leaflet-map-pane').style('transform').split(', ');
+					var matrix;
+					try{
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('transform').split(', ');
+					}catch(e){
+						matrix = d3.select('#mapWorld div.leaflet-map-pane').style('-webkit-transform').split(', ');
+					}
 					matrix = matrix[0]+', '+matrix[1]+', '+matrix[2]+', '+matrix[3]+', '+(-1*parseFloat(matrix[4]))+', '+(-1*parseFloat(matrix[5]))+')';
 					d3.select('#mapWorld div.scrollPane').style('transform',matrix);
+					d3.select('#mapWorld div.scrollPane').style('-webkit-transform',matrix);
 					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 				
 				} else {
