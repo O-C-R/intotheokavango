@@ -1149,9 +1149,9 @@ h3, h3.title{
 
     #query-button {
       /*float: right;*/  
-     /* width: 19%;*/
-      margin-top: 20px;
-      margin-left: 5px;
+      /*width: 106px;*/
+      margin-top: 16px;
+      margin-left: 8px;
     }
 
     .data-description code {
