@@ -96,7 +96,7 @@
 .ractive-dropdown {
   color: #4bff87;
   /*width: 33%;*/
-  min-width: 200px;
+  min-width: 160px;
   border: 1px solid #4bff87;
   border-radius: 5px;
   position: relative;
@@ -114,9 +114,9 @@
   font-size: 1.1em;
 }
 .ractive-dropdown .label:after {
-  position: absolute;
-  right: 10px;
-  /*margin-left: 10px;*/
+  position: relative;
+  float: right;
+  margin-left: 10px;
   content: '\29BF';
   font-size: 1em;
 }
