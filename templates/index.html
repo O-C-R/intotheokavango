@@ -44,17 +44,17 @@
     </div>
     <div class="input-section">
         <h2>Get the data output as</h2>
-        <label><input type='radio' name='{{output}}' value='viz' checked={{vizChecked}}>VIZ</label>
-        <label><input type='radio' name='{{output}}' value='map' checked={{mapChecked}}>MAP</label>
-        <label><input type='radio' name='{{output}}' value='json' checked={{jsonChecked}}>JSON</label>
+        <label><input type='radio' name='{{output}}' value='viz' checked={{vizChecked}}> VIZ</label>
+        <label><input type='radio' name='{{output}}' value='map' checked={{mapChecked}}> MAP</label>
+        <label><input type='radio' name='{{output}}' value='json' checked={{jsonChecked}}> JSON</label>
     </div>
     <div class="input-section">
         <h2>Limit the number of results to <input type='number' value='{{limit}}' show="{{limit}}" min='1' max="2000" /></h2>
     </div>
     <div class="input-section">
         <h2>Which order do you want the results?</h2>
-        <label><input type='radio' name='{{order}}' value='ascending'>ascending</label>
-        <label><input type='radio' name='{{order}}' value='descending'>descending</label>
+        <label><input type='radio' name='{{order}}' value='ascending'> ascending</label>
+        <label><input type='radio' name='{{order}}' value='descending'> descending</label>
     </div>
     <div class="input-section">
       <h2>Which day of the expedition do you want to see?</h2>
@@ -65,10 +65,6 @@
         <label>Start Date <input type="date" name="{{startDate}}" value='{{startDate}}'></label>
         <label> and/or 
         <br><br>End Date <input type="date" name="{{endDate}}" value='{{endDate}}' min="{{startDate}}"></label>
-    </div>
-    <div class="input-section">
-    <h2>Specify a Geographical Area</h2>
-        <label>NW Corner Lon, Lat, SE Corner Lon, Lat <input type="text" name="{{geoBound}}" value=''></label>
     </div>
 </script>
 
