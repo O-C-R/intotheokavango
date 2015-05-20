@@ -760,7 +760,7 @@ console.warn('DATA PAGE', id);
                         audio: [],
                         beacon: [],
                         blog:[],
-                        image: ['GoPro', 'documentary', 'specimen'],
+                        image: ['documentary', 'habitat', 'specimen'],
                         sensor: ['databoat1', 'sensor2', 'databoat'],
                         sighting: speciesList,
                         

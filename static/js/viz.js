@@ -74,11 +74,14 @@ var parseAmbitSpeed = function(item) {
 
 var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
     //HISTOGRAM VIZ
-    var margin = {top: 70.5, right: 30, bottom: 40, left: 60.5},
-    width = ($('body').width())*0.82 - margin.left - margin.right,
+    var margin = {top: 70.5, right: 30, bottom: 40, left: 50.5},
+   // width = ($('body').width()*0.9) - margin.left - margin.right,
     height = 525 - margin.top - margin.bottom,
     left_width = 100;
+    var bodywidth = $('body').width();
+    console.log("BODY WIDTH:" + bodywidth );
     console.log("WIDTH: " + width);
+    console.log("TEST");
 
     var dateRange = d3.extent(parsedData, function(d) { 
         return d.time; 
