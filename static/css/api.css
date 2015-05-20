@@ -95,7 +95,8 @@
 /* RACTIVE DROP DOWN CSS */
 .ractive-dropdown {
   color: #4bff87;
-  width: 33%;
+  /*width: 33%;*/
+  width: 200px;
   border: 1px solid #4bff87;
   border-radius: 5px;
   position: relative;
