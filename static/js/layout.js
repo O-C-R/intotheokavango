@@ -125,6 +125,7 @@ function MapPage(){
 		d3.select('#contentContainer').classed('fixed',true);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 		pauseVimeoPlayer();
+		timeline.checkNightTime();
 	}
 
 	page.hide = function(){

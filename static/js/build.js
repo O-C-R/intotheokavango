@@ -1567,7 +1567,8 @@ function Feed(){
 	var templates = {
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html(),
-		blog: node.select('div.post.blog').remove().html()
+		blog: node.select('div.post.blog').remove().html(),
+		sound: node.select('div.post.sound').remove().html()
 	}
 	var postsByDay = [];
 	var allPosts = [];
@@ -1585,6 +1586,7 @@ function Feed(){
 		var newPosts = [];
 		newPosts = newPosts.concat(loader.getTweets()[day]);
 		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		newPosts = newPosts.concat(loader.getSounds()[day]);
 		var photos = loader.getPhotos()[day];
 		for(var i=0; i<photos.length; i++){
 			if(photos[i].getMember() != null) newPosts.push(photos[i]);
@@ -1646,7 +1648,20 @@ function Feed(){
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
 		        		.attr('width', w)
-		        		.attr('height', d.size[1]*w/d.size[0]);
+
+		        	if(d.notes){
+		        	d3.select(this).select('p.notes')
+		        		.html(function(){
+		        			var urls = d.notes.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        			}
+			        		}
+		        			return d.notes
+		        		})
+		        	}
+		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
 		        	d3.select(this).select('h3.title')
 		        		.html(d.title);
@@ -1654,6 +1669,11 @@ function Feed(){
 		        		.html(function(){
 		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
 		        		});
+	        	} else if(d.type == 'sound'){
+	        		d3.select(this).select('p.notes')
+		        		.html(d.notes);
+		        	d3.select(this).select('div.text iframe')
+		        		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
 	        	}
 	        });
 
@@ -1828,6 +1848,7 @@ function PhotoPost(feature, m){
 	var visible = true;
 	var marker = m;
 	var member = feature.properties.Member;
+	var notes = feature.properties.Notes;
 	// console.log(member);
 
 	function getData(){
@@ -1840,6 +1861,7 @@ function PhotoPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
+			notes: notes
 		}
 	}
 
@@ -2048,38 +2070,9 @@ function BlogPost(feature, m){
 
 function SoundPost(feature, m){
 
-	// "properties": {
- //        "t_utc": 1431839602,
- //        "Expedition": "okavango_15",
- //        "FeatureType": "audio",
- //        "Time": "12:00",
- //        "t_created": 1431840040.998817,
- //        "Date": "2015-05-16",
- //        "Notes": "Field recording from the bustling covered market in Menongue, Angola.",
- //        "DateTime": "2015-05-17T07:13:22+0200",
- //        "SoundCloudURL": "http://soundcloud.com/intotheokavango/jer-field-recording-from-the",
- //        "CoreExpedition": true,
- //        "EstimatedGeometry": "beacon",
- //        "SoundType": "Field Recording",
- //        "Member": "Jer",
- //        "ResourceURLs": [
- //            "MenongueMarket_0516.wav"
- //        ]
- //    },
- //    "type": "Feature",
- //    "geometry": {
- //        "coordinates": [
- //            17.665418389490604,
- //            -14.66285528680308
- //        ],
- //        "type": "Point"
- //    },
- //    "id": "55582528b9a21411ed7ddf69"
-
 	var feedPos = 0;
 	var height = 0;
-	var title = feature.properties.Title;
-	var message = feature.properties.Summary;
+	var notes = feature.properties.Notes;
 	var member = feature.properties.Member;
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
@@ -2088,13 +2081,13 @@ function SoundPost(feature, m){
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
-	var url = feature.properties.Url
+	var url = feature.properties.SoundCloudURL;
 
 
 	function getData(){
 		return {
-			type: 'blog',
-			message: message,
+			type: 'sound',
+			notes: notes,
 			title: title,
 			date: date,
 			latLng: latLng,
@@ -2272,6 +2265,7 @@ function MapPage(){
 		d3.select('#contentContainer').classed('fixed',true);
 		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
 		pauseVimeoPlayer();
+		timeline.checkNightTime();
 	}
 
 	page.hide = function(){
@@ -2399,7 +2393,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 5;
+		var toBeCompleted = 6;
 		function checkForCompletion(){
 			// console.log(toBeCompleted);
 			toBeCompleted --;
@@ -2422,7 +2416,7 @@ function Loader(){
 		loadPhotos(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
-		// loadSoundPosts(day, checkForCompletion);
+		loadSoundPosts(day, checkForCompletion);
 		// loadBeacons(day, checkForCompletion);
 	}
 
@@ -2619,6 +2613,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.Dimensions) return false;
 		            if(feature.properties.Member == null){
 			            var photo = PhotoPost(feature);
 				        if(photo) photos[day].push(photo);
@@ -2794,6 +2789,10 @@ function Loader(){
 		return photos;
 	}
 
+	function getSounds(){
+		return sounds;
+	}
+
 	function getLoading(){
 		return loading;
 	}
@@ -2820,6 +2819,7 @@ function Loader(){
 		loadDay: loadDay,
 		members: members,
 		getBlogs: getBlogs,
+		getSounds: getSounds,
 		getTweets: getTweets,
 		getPhotos: getPhotos,
 		getLoading: getLoading,
@@ -3033,7 +3033,7 @@ function Timeline(){
 		.attr('stroke','#FFFFFF')
 		.style('pointer-events','none');
 
-	var nightNode = d3.select('#map').append('div').attr('id','night');
+	var nightNode = d3.select('#mapWorld').append('div').attr('id','night');
 
 	function setDates(count,start){
 		dates = [];
@@ -3226,6 +3226,11 @@ function Timeline(){
 	function toggleNightTime(i,forward){
 		isNightTime = (i==0 && !forward) || (i==1 && forward);
 		timeCursor = nightTime[dayCursor][i] + (forward?1:-1);
+		if(pages.active.id !='journal' || !isNightTime) nightNode.classed('night',isNightTime);
+	}
+
+	function checkNightTime(){
+		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
 		nightNode.classed('night',isNightTime);
 	}
 
@@ -3289,10 +3294,6 @@ function Timeline(){
 			}
 		}
 
-		function checkNightTime(){
-			isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
-			nightNode.classed('night',isNightTime);
-		}
 
 		function resume(){
 			feed.init(day);
@@ -3349,13 +3350,8 @@ function Timeline(){
 		nightTime[day] = interval;
 	}
 
-	function getBodyHeight(){
-		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
-		var headerHeight = d3.select('#header').node().clientHeight;
-		return containerHeight - headerHeight;
-	}
-
 	return {
+		checkNightTime: checkNightTime,
 		init: init,
 		initGraphics: initGraphics,
 		initTimeCursor: initTimeCursor,
@@ -3550,9 +3546,9 @@ function pauseVimeoPlayer(){
     if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
 }
 
-// if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-    // d3.select('#aboutPage #video div.cover').remove();
-// };
+if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+    d3.select('#aboutPage #video div.cover').remove();
+};
 
 /*
 
@@ -3562,46 +3558,42 @@ function pauseVimeoPlayer(){
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- mouse scroll too slow
-	- labels timeline
-	- layout mobile
 
+	- crash loading feed
+	- add note field to documentary images + vertical photos
+	- marker labels and popups
+
+	- linkable features and pages
+	- labels timeline
+	- sometimes map doesnt refresh
+	- mouse scroll too slow
 	- loading screen
 	- unzoom at car speed
 	- starts on last day
-	- add note field to documentary images
 	- free camera mode
 	- scroll map while hovering a marker
 	- dim out zoom buttons when max is reached
-	- sound
-	- linkable features
 	- fix trail in about page
-	- core features?
-	- add link to tweets and blogposts
-	- -4h in setDates(x2) and setTimeFrame(x2)
-	- add location to post meta + link
-	- test without smooth scroll and with touch scroll
-	- How to cache data?
-	- API error handling
-	- filter crazy path points
-	- scrollbar event for feed navigation?
-	- there are 2 getBodyHeight functions
-	- marker labels and popups
-	- video features	
-	- sightings taxonomy color
-	- 'click to pause, scroll to navigate'
-	- proper teleport
-	- remove global functions/variables
-	- margin journal alignment with timeline
+	- view labels, 'click to pause, scroll to navigate'
 	- label for day transition
-	- finer grained culling
 	- heartrate peak feature
 	- live mode
 	- togglePause highlight on map
-	- dim out night sections of timeline
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- no night on journal
+
+	- proper teleport
+	- sightings taxonomy color
+	- filter crazy path points (resolution)
+	- core features?
+	- add location to post meta + link
+	- API error handling
+	- scrollbar event for feed navigation?
+	- remove global functions/variables
+	- margin journal alignment with timeline
+	- finer grained culling
+	- dim out night sections of timeline
 
 */
 

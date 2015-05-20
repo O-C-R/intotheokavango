@@ -35,7 +35,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 5;
+		var toBeCompleted = 6;
 		function checkForCompletion(){
 			// console.log(toBeCompleted);
 			toBeCompleted --;
@@ -58,7 +58,7 @@ function Loader(){
 		loadPhotos(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
-		// loadSoundPosts(day, checkForCompletion);
+		loadSoundPosts(day, checkForCompletion);
 		// loadBeacons(day, checkForCompletion);
 	}
 
@@ -255,6 +255,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.Dimensions) return false;
 		            if(feature.properties.Member == null){
 			            var photo = PhotoPost(feature);
 				        if(photo) photos[day].push(photo);
@@ -430,6 +431,10 @@ function Loader(){
 		return photos;
 	}
 
+	function getSounds(){
+		return sounds;
+	}
+
 	function getLoading(){
 		return loading;
 	}
@@ -456,6 +461,7 @@ function Loader(){
 		loadDay: loadDay,
 		members: members,
 		getBlogs: getBlogs,
+		getSounds: getSounds,
 		getTweets: getTweets,
 		getPhotos: getPhotos,
 		getLoading: getLoading,

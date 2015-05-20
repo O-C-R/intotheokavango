@@ -12,7 +12,8 @@ function Feed(){
 	var templates = {
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html(),
-		blog: node.select('div.post.blog').remove().html()
+		blog: node.select('div.post.blog').remove().html(),
+		sound: node.select('div.post.sound').remove().html()
 	}
 	var postsByDay = [];
 	var allPosts = [];
@@ -30,6 +31,7 @@ function Feed(){
 		var newPosts = [];
 		newPosts = newPosts.concat(loader.getTweets()[day]);
 		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		newPosts = newPosts.concat(loader.getSounds()[day]);
 		var photos = loader.getPhotos()[day];
 		for(var i=0; i<photos.length; i++){
 			if(photos[i].getMember() != null) newPosts.push(photos[i]);
@@ -91,7 +93,20 @@ function Feed(){
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
 		        		.attr('width', w)
-		        		.attr('height', d.size[1]*w/d.size[0]);
+
+		        	if(d.notes){
+		        	d3.select(this).select('p.notes')
+		        		.html(function(){
+		        			var urls = d.notes.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        			}
+			        		}
+		        			return d.notes
+		        		})
+		        	}
+		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
 		        	d3.select(this).select('h3.title')
 		        		.html(d.title);
@@ -99,6 +114,11 @@ function Feed(){
 		        		.html(function(){
 		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
 		        		});
+	        	} else if(d.type == 'sound'){
+	        		d3.select(this).select('p.notes')
+		        		.html(d.notes);
+		        	d3.select(this).select('div.text iframe')
+		        		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
 	        	}
 	        });
 

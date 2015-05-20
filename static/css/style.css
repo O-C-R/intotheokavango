@@ -661,6 +661,7 @@ h3, h3.title{
               text-align: right;
               display: block;
               float:right;
+              line-height: 2.8em !important;
             }
 
             span.explorerBox{
@@ -829,7 +830,7 @@ h3, h3.title{
 
         #mapPage div.pane:nth-child(3){
           width:91.5%;
-          background-color: rgba(4, 0, 26, 0.62);
+          background-color: rgba(4, 0, 26, 0.65);
           height:auto;
           min-height:100%;
           overflow-y: scroll;
@@ -912,7 +913,7 @@ h3, h3.title{
             }
 
 
-              #mapPage div#feed div.post.blog div.content div.text {
+              #mapPage div#feed div.content div.text {
                 display:inline-block;
                 vertical-align: middle;
                 margin:0 0 0 5%;
@@ -946,7 +947,20 @@ h3, h3.title{
 
             #mapPage div#feed div.post div.photo{
               width:100%;
-              margin-top:35px;
+              margin-top:7px;
+              display: inline-block;
+            }
+
+            #mapPage div#feed div.post.vertical div.photo{
+              width:64%;
+              margin-right: 5%;
+              vertical-align: top;
+            }
+
+            #mapPage div#feed div.post.vertical p.notes{
+              display: inline-block;
+              vertical-align: top;
+              width:29.5%;
             }
 
               #mapPage div#feed div.post div.photo img{

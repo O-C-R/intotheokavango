@@ -8,46 +8,41 @@
 	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
 
 	TODOS
-	- mouse scroll too slow
-	- labels timeline
-	- layout mobile
 
+	
+	- crash loading feed
+	- marker labels and popups
+
+	- linkable features and pages
+	- sometimes map doesnt refresh
+	- mouse scroll too slow
 	- loading screen
 	- unzoom at car speed
 	- starts on last day
-	- add note field to documentary images
 	- free camera mode
 	- scroll map while hovering a marker
 	- dim out zoom buttons when max is reached
-	- sound
-	- linkable features
 	- fix trail in about page
-	- core features?
-	- add link to tweets and blogposts
-	- -4h in setDates(x2) and setTimeFrame(x2)
-	- add location to post meta + link
-	- test without smooth scroll and with touch scroll
-	- How to cache data?
-	- API error handling
-	- filter crazy path points
-	- scrollbar event for feed navigation?
-	- there are 2 getBodyHeight functions
-	- marker labels and popups
-	- video features	
-	- sightings taxonomy color
-	- 'click to pause, scroll to navigate'
-	- proper teleport
-	- remove global functions/variables
-	- margin journal alignment with timeline
+	- view labels, 'click to pause, scroll to navigate'
 	- label for day transition
-	- finer grained culling
 	- heartrate peak feature
 	- live mode
 	- togglePause highlight on map
-	- dim out night sections of timeline
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- no night on journal
+
+	- proper teleport
+	- sightings taxonomy color
+	- filter crazy path points (resolution)
+	- core features?
+	- add location to post meta + link
+	- API error handling
+	- scrollbar event for feed navigation?
+	- remove global functions/variables
+	- margin journal alignment with timeline
+	- finer grained culling
+	- dim out night sections of timeline
 
 */
 

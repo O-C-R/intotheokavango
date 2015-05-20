@@ -45,7 +45,7 @@ function Timeline(){
 		.attr('stroke','#FFFFFF')
 		.style('pointer-events','none');
 
-	var nightNode = d3.select('#map').append('div').attr('id','night');
+	var nightNode = d3.select('#mapWorld').append('div').attr('id','night');
 
 	function setDates(count,start){
 		dates = [];
@@ -238,6 +238,11 @@ function Timeline(){
 	function toggleNightTime(i,forward){
 		isNightTime = (i==0 && !forward) || (i==1 && forward);
 		timeCursor = nightTime[dayCursor][i] + (forward?1:-1);
+		if(pages.active.id !='journal' || !isNightTime) nightNode.classed('night',isNightTime);
+	}
+
+	function checkNightTime(){
+		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
 		nightNode.classed('night',isNightTime);
 	}
 
@@ -301,10 +306,6 @@ function Timeline(){
 			}
 		}
 
-		function checkNightTime(){
-			isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
-			nightNode.classed('night',isNightTime);
-		}
 
 		function resume(){
 			feed.init(day);
@@ -361,13 +362,8 @@ function Timeline(){
 		nightTime[day] = interval;
 	}
 
-	function getBodyHeight(){
-		var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
-		var headerHeight = d3.select('#header').node().clientHeight;
-		return containerHeight - headerHeight;
-	}
-
 	return {
+		checkNightTime: checkNightTime,
 		init: init,
 		initGraphics: initGraphics,
 		initTimeCursor: initTimeCursor,
