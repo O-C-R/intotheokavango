@@ -36,7 +36,7 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
-	var unzoomedTime = [[1431948652,1432151999]];
+	var unzoomedTime = [[1431948652,1432152000]];
 	var isUnzoomedTime = false;
 
 

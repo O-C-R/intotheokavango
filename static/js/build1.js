@@ -2576,7 +2576,7 @@ function Loader(){
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=60'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -3218,7 +3218,7 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
-	var unzoomedTime = [[1431948652,1432151999]];
+	var unzoomedTime = [[1431948652,1432152000]];
 	var isUnzoomedTime = false;
 
 
@@ -4148,6 +4148,17 @@ document.addEventListener('DOMContentLoaded', function(){
 		    	});
 	    }
 
+	    function dragmove(d) {
+	    	console.log(d3.event);
+			// d3.select(this)
+			//     .attr("cx", d.x = Math.max(radius, Math.min(width - radius, d3.event.x)))
+			//     .attr("cy", d.y = Math.max(radius, Math.min(height - radius, d3.event.y)));
+		}
+
+	    var drag = d3.behavior.drag()
+		    .on("drag", dragmove);
+		    // .origin(function(d) { return d; })
+
 	    d3.select('#mapWorld div.leaflet-objects-pane')
 	    	.append('div')
 		    	.attr('class','scrollPane')
@@ -4158,6 +4169,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    	.on('wheel',function(){
 			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
+			    	.call(drag);
 
 	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){
