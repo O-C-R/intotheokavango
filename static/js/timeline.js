@@ -36,7 +36,7 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
-	var unzoomedTime = [[1431948652,1432151999]];
+	var unzoomedTime = [[1431948652,1432199688]];
 	var isUnzoomedTime = false;
 
 
@@ -246,6 +246,7 @@ function Timeline(){
 		checkNightTime();
 		updateCursor();
 		if(frameCount%60==0 && pages.active.id == 'map') checkUnzoom();
+		// if(frameCount%60==0) console.log(new Date(timeCursor*1000), timeCursor);
 	}
 
 	function updateCursor(hover){

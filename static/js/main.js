@@ -278,6 +278,17 @@ document.addEventListener('DOMContentLoaded', function(){
 		    	});
 	    }
 
+	    function dragmove(d) {
+	    	console.log(d3.event);
+			// d3.select(this)
+			//     .attr("cx", d.x = Math.max(radius, Math.min(width - radius, d3.event.x)))
+			//     .attr("cy", d.y = Math.max(radius, Math.min(height - radius, d3.event.y)));
+		}
+
+	    var drag = d3.behavior.drag()
+		    .on("drag", dragmove);
+		    // .origin(function(d) { return d; })
+
 	    d3.select('#mapWorld div.leaflet-objects-pane')
 	    	.append('div')
 		    	.attr('class','scrollPane')
@@ -288,6 +299,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    	.on('wheel',function(){
 			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
+			    	// .call(drag);
 
 	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){
