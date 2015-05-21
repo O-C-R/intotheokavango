@@ -1083,7 +1083,7 @@ h3, h3.title{
     #data-content #features-area {
       float: left;
       /*width: 25%;*/
-      min-width: 245px;
+      min-width: 260px;
       height: 400px;
       /*padding: 3% 2% 1% 2%;*/
     }
