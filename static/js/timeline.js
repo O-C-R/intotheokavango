@@ -36,6 +36,9 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
+	var unzoomedTime = [[1431948652,1432151999]];
+	var isUnzoomedTime = false;
+
 
 	node.append('line')
 		.attr('x1','80%')
@@ -241,6 +244,7 @@ function Timeline(){
 		if(day != lastDay) newDay();
 		checkNightTime();
 		updateCursor();
+		if(frameCount%60==0) checkUnzoom();
 	}
 
 	function updateCursor(hover){
@@ -284,6 +288,15 @@ function Timeline(){
 			var n = timeCursor < nightTime[dayCursor][0] || timeCursor >= nightTime[dayCursor][1];
 			if(isNightTime != n) nightNode.classed('night',n);
 			isNightTime = n;
+		}
+	}
+
+	function checkUnzoom(){
+		// unzoomedTime
+		for(var i=0; i<unzoomedTime.length; i++){
+			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
+			isUnzoomedTime = u;
 		}
 	}
 

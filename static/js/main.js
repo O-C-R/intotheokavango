@@ -9,8 +9,9 @@
 
 	TODOS
 
-	- change how night is computed
-		- crash loading feed
+	18 1530
+	20 2359
+
 	- unzoom at car speed
 	- loading screen
 	- starts on last day
@@ -18,7 +19,7 @@
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
-	- pas de nuit May 19?
+	- night time May 19?
 		
 	- linkable features and pages
 	- live mode
@@ -292,13 +293,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)),{animate:false});
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)),{animate:false});
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		

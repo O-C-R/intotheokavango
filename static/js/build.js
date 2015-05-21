@@ -3219,6 +3219,9 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
+	var unzoomedTime = [[1431948652,1432151999]];
+	var isUnzoomedTime = false;
+
 
 	node.append('line')
 		.attr('x1','80%')
@@ -3424,6 +3427,7 @@ function Timeline(){
 		if(day != lastDay) newDay();
 		checkNightTime();
 		updateCursor();
+		if(frameCount%60==0) checkUnzoom();
 	}
 
 	function updateCursor(hover){
@@ -3467,6 +3471,15 @@ function Timeline(){
 			var n = timeCursor < nightTime[dayCursor][0] || timeCursor >= nightTime[dayCursor][1];
 			if(isNightTime != n) nightNode.classed('night',n);
 			isNightTime = n;
+		}
+	}
+
+	function checkUnzoom(){
+		// unzoomedTime
+		for(var i=0; i<unzoomedTime.length; i++){
+			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
+			isUnzoomedTime = u;
 		}
 	}
 
@@ -3848,8 +3861,9 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- change how night is computed
-		- crash loading feed
+	18 1530
+	20 2359
+
 	- unzoom at car speed
 	- loading screen
 	- starts on last day
@@ -3857,7 +3871,7 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
-	- pas de nuit May 19?
+	- night time May 19?
 		
 	- linkable features and pages
 	- live mode
@@ -4131,13 +4145,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)),{animate:false});
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)),{animate:false});
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		
