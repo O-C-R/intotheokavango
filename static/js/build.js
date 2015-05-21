@@ -3427,7 +3427,7 @@ function Timeline(){
 		if(day != lastDay) newDay();
 		checkNightTime();
 		updateCursor();
-		if(frameCount%60==0) checkUnzoom();
+		if(frameCount%60==0 && pages.active.id == 'map') checkUnzoom();
 	}
 
 	function updateCursor(hover){
@@ -3467,15 +3467,17 @@ function Timeline(){
 	}
 
 	function checkNightTime(){
-		if(nightTime[dayCursor]){
-			var n = timeCursor < nightTime[dayCursor][0] || timeCursor >= nightTime[dayCursor][1];
-			if(isNightTime != n) nightNode.classed('night',n);
-			isNightTime = n;
+		var len = nightTime.length;
+		for(var i=0; i<nightTime.length; i++){
+			if(nightTime[i]){
+				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(isNightTime != n) nightNode.classed('night',n);
+				isNightTime = n;
+			}
 		}
 	}
 
 	function checkUnzoom(){
-		// unzoomedTime
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
 			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
@@ -3864,17 +3866,17 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	18 1530
 	20 2359
 
-	- unzoom at car speed
 	- loading screen
 	- starts on last day
-	- sometimes map doesnt refresh
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
-	- night time May 19?
+	- ambit May 19?
 		
-	- linkable features and pages
 	- live mode
+	- linkable features and pages
+	- sightings taxonomy color
+	- sometimes map doesnt refresh
 
 	- clicking on popups should open journal on right time
 	- mouse scroll too slow
@@ -3884,11 +3886,9 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	- transitions between pages
 	- fix trail in about page
 	- heartrate peak feature
-	- query resolutions
 
 	- scroll map while hovering a marker
 	- proper teleport
-	- sightings taxonomy color
 	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link

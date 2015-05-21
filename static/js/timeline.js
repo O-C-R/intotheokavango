@@ -244,7 +244,7 @@ function Timeline(){
 		if(day != lastDay) newDay();
 		checkNightTime();
 		updateCursor();
-		if(frameCount%60==0) checkUnzoom();
+		if(frameCount%60==0 && pages.active.id == 'map') checkUnzoom();
 	}
 
 	function updateCursor(hover){
@@ -284,15 +284,17 @@ function Timeline(){
 	}
 
 	function checkNightTime(){
-		if(nightTime[dayCursor]){
-			var n = timeCursor < nightTime[dayCursor][0] || timeCursor >= nightTime[dayCursor][1];
-			if(isNightTime != n) nightNode.classed('night',n);
-			isNightTime = n;
+		var len = nightTime.length;
+		for(var i=0; i<nightTime.length; i++){
+			if(nightTime[i]){
+				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(isNightTime != n) nightNode.classed('night',n);
+				isNightTime = n;
+			}
 		}
 	}
 
 	function checkUnzoom(){
-		// unzoomedTime
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
 			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);

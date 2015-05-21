@@ -12,17 +12,17 @@
 	18 1530
 	20 2359
 
-	- unzoom at car speed
 	- loading screen
 	- starts on last day
-	- sometimes map doesnt refresh
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
-	- night time May 19?
+	- ambit May 19?
 		
-	- linkable features and pages
 	- live mode
+	- linkable features and pages
+	- sightings taxonomy color
+	- sometimes map doesnt refresh
 
 	- clicking on popups should open journal on right time
 	- mouse scroll too slow
@@ -32,11 +32,9 @@
 	- transitions between pages
 	- fix trail in about page
 	- heartrate peak feature
-	- query resolutions
 
 	- scroll map while hovering a marker
 	- proper teleport
-	- sightings taxonomy color
 	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link
