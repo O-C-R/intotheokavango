@@ -853,6 +853,23 @@ h3, h3.title{
         opacity: 0;
       }
 
+      #mapPage div.controls div.scrollLabel{
+        position:absolute;
+        left:-1225%;
+        width:1205%;
+        text-align: right;
+        font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 10px;
+        text-transform: uppercase;
+        alignment-baseline: middle;
+        text-anchor:end;
+        color:white;
+        opacity: 0.4;
+        line-height: 1.8em;
+      }
+
         #mapPage div.button{
           margin-bottom:17.5px;
           width:26px;

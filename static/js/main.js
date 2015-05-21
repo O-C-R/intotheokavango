@@ -10,9 +10,9 @@
 	TODOS
 
 	- cache busting
-	- legit teleport
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
+
 	- accelerate scroll
 	- ambit May 19?
 		
@@ -124,6 +124,10 @@ document.addEventListener('DOMContentLoaded', function(){
         scrollWheelZoom:false
     });
 
+    // mapWorld.addEventListener('drag',function(e){
+    // 	console.log(e);
+    // })
+
     initMapLabels(mapWorld);
 
     tweetLayer = new L.layerGroup().addTo(mapWorld);
@@ -226,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
-					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+					// mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
 					var matrix;
 					try{

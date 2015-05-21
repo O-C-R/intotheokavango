@@ -1729,7 +1729,6 @@ function Feed(){
 			var nextPost = allPosts[i+1];
 			var t1 = post.getData().date.getTime()/1000;
 			var t2 = nextPost.getData().date.getTime()/1000;
-			console.log(new Date(1000*t1),new Date(1000*t2), t.current >= t1 && t.current < t2);
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
 				requestAnimationFrame(function(){
@@ -3863,9 +3862,9 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	TODOS
 
 	- cache busting
-	- legit teleport
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
+
 	- accelerate scroll
 	- ambit May 19?
 		
@@ -3977,6 +3976,10 @@ document.addEventListener('DOMContentLoaded', function(){
         scrollWheelZoom:false
     });
 
+    // mapWorld.addEventListener('drag',function(e){
+    // 	console.log(e);
+    // })
+
     initMapLabels(mapWorld);
 
     tweetLayer = new L.layerGroup().addTo(mapWorld);
@@ -4079,7 +4082,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
-					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+					// mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
 					var matrix;
 					try{
