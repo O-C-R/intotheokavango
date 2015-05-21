@@ -5,13 +5,38 @@
 */
 
 
+function setPopupEvent(m){
+	d3.select('div.leaflet-popup-content-wrapper')
+		.on('click',function(){
+			pages.active.hide();
+			pages['journal'].show();
+			m.closePopup();
+		})
+}
+
+
 function Sighting(feature, m){
 
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
-	var name = feature.properties.SpeciesName;
+	var name = feature.properties.SpeciesName.trim();
+	var count = feature.properties.Count;
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
+	var type = 'sighting';
+
+	// if(marker){
+	// 	marker.addEventListener('popupclose',function(){
+	// 		popupVisible = false;
+	// 		popupDelay = true;
+	// 	})
+	// 	marker.addEventListener('popupopen',function(){
+	// 		popupVisible = true;
+	// 	})
+	// }
+
 
 	function getData(){
 		return {
@@ -36,12 +61,30 @@ function Sighting(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<600 && pages.active.id == 'map'){
+    			if(!popupVisible) {
+    				marker.showLabel();
+    				popupVisible = true;
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.hideLabel();
+    				popupVisible = false;
+    			}
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
+
 }
 
 
@@ -51,6 +94,7 @@ function Beacon(feature, m){
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var visible = true;
 	var marker = m;
+	var type = 'beacon';
 
 	function getData(){
 		return {
@@ -78,7 +122,7 @@ function Beacon(feature, m){
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 
@@ -94,7 +138,20 @@ function PhotoPost(feature, m){
 	var visible = true;
 	var marker = m;
 	var member = feature.properties.Member;
-	// console.log(member);
+	var notes = feature.properties.Notes;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'photo';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 	function getData(){
 		return {
@@ -106,7 +163,26 @@ function PhotoPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
+			notes: notes
 		}
+	}
+
+
+	function animate(t){
+        if(marker){
+
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
 	}
 
 
@@ -150,7 +226,8 @@ function PhotoPost(feature, m){
 		setFeedPos: setFeedPos,
 		marker: marker,
 		setVisible: setVisible,
-		getMember: getMember
+		getMember: getMember,
+		animate: animate
 	};
 }
 
@@ -168,6 +245,9 @@ function TweetPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'tweet';
 
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
@@ -181,6 +261,16 @@ function TweetPost(feature, m){
 			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
 		}
 	} catch(e){}
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -227,13 +317,30 @@ function TweetPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -249,11 +356,24 @@ function BlogPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
 	var url = feature.properties.Url
+	var type = 'blog';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -300,13 +420,30 @@ function BlogPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -314,53 +451,27 @@ function BlogPost(feature, m){
 
 function SoundPost(feature, m){
 
-	// "properties": {
- //        "t_utc": 1431839602,
- //        "Expedition": "okavango_15",
- //        "FeatureType": "audio",
- //        "Time": "12:00",
- //        "t_created": 1431840040.998817,
- //        "Date": "2015-05-16",
- //        "Notes": "Field recording from the bustling covered market in Menongue, Angola.",
- //        "DateTime": "2015-05-17T07:13:22+0200",
- //        "SoundCloudURL": "http://soundcloud.com/intotheokavango/jer-field-recording-from-the",
- //        "CoreExpedition": true,
- //        "EstimatedGeometry": "beacon",
- //        "SoundType": "Field Recording",
- //        "Member": "Jer",
- //        "ResourceURLs": [
- //            "MenongueMarket_0516.wav"
- //        ]
- //    },
- //    "type": "Feature",
- //    "geometry": {
- //        "coordinates": [
- //            17.665418389490604,
- //            -14.66285528680308
- //        ],
- //        "type": "Point"
- //    },
- //    "id": "55582528b9a21411ed7ddf69"
-
 	var feedPos = 0;
 	var height = 0;
-	var title = feature.properties.Title;
-	var message = feature.properties.Summary;
+	var notes = feature.properties.Notes;
 	var member = feature.properties.Member;
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
-	var url = feature.properties.Url
+	var url = feature.properties.SoundCloudURL;
+	var type = 'sound';
 
 
 	function getData(){
 		return {
-			type: 'blog',
-			message: message,
+			type: 'sound',
+			notes: notes,
 			title: title,
 			date: date,
 			latLng: latLng,
@@ -407,7 +518,7 @@ function SoundPost(feature, m){
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 

@@ -12,7 +12,8 @@ function Feed(){
 	var templates = {
 		tweet: node.select('div.post.tweet').remove().html(),
 		photo: node.select('div.post.photo').remove().html(),
-		blog: node.select('div.post.blog').remove().html()
+		blog: node.select('div.post.blog').remove().html(),
+		sound: node.select('div.post.sound').remove().html()
 	}
 	var postsByDay = [];
 	var allPosts = [];
@@ -30,6 +31,7 @@ function Feed(){
 		var newPosts = [];
 		newPosts = newPosts.concat(loader.getTweets()[day]);
 		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		newPosts = newPosts.concat(loader.getSounds()[day]);
 		var photos = loader.getPhotos()[day];
 		for(var i=0; i<photos.length; i++){
 			if(photos[i].getMember() != null) newPosts.push(photos[i]);
@@ -91,7 +93,20 @@ function Feed(){
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
 		        		.attr('width', w)
-		        		.attr('height', d.size[1]*w/d.size[0]);
+
+		        	if(d.notes){
+		        	d3.select(this).select('p.notes')
+		        		.html(function(){
+		        			var urls = d.notes.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        			}
+			        		}
+		        			return d.notes
+		        		})
+		        	}
+		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
 		        	d3.select(this).select('h3.title')
 		        		.html(d.title);
@@ -99,6 +114,11 @@ function Feed(){
 		        		.html(function(){
 		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
 		        		});
+	        	} else if(d.type == 'sound'){
+	        		d3.select(this).select('p.notes')
+		        		.html(d.notes);
+		        	d3.select(this).select('div.text iframe')
+		        		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
 	        	}
 	        });
 
@@ -108,9 +128,7 @@ function Feed(){
 			posts.each(function(d){
 				d.setFeedPos(this.offsetTop, this.clientHeight);
 			});
-			if(pages.active.id == 'journal'){
-				jump(timeline.getTimeCursor());
-			}
+			jump(timeline.getTimeCursor());
 		});
 
 		initialized = false;
@@ -123,8 +141,28 @@ function Feed(){
 		var forward = d3.event.wheelDeltaY <= 0;
 		var fw = forward ? 1:-1;
 
+		// var len = allPosts.length;
+		// for(var i=Math.constrain(postCursor-fw,0,len-1); forward?(i<len-1):(i>=0); i+=fw){
+		// 	var post = allPosts[i];
+		// 	var d1 = post.getData();
+		// 	if(y >= d1.feedPos && y < d1.feedPos+d1.height + 70){
+		// 		var nextPost = allPosts[i+1];
+		// 		var t;
+		// 		if(nextPost){
+		// 			var d2 = nextPost.getData();
+		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d2.date.getTime())/1000);
+		// 		} else{
+		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d1.date.getTime()+1)/1000);
+		// 		}
+		// 		// if(Math.abs(t-timeline.getTimeCursor().current) > 3600*24) timeline.jumpTo(t);
+		// 		// else timeline.navigateJournal(t);
+		// 		timeline.navigateJournal(t);
+		// 		postCursor = i;
+		// 		return;
+		// 	}
+		// }
 		var len = allPosts.length;
-		for(var i=Math.constrain(postCursor-fw,0,len-1); forward?(i<len-1):(i>=0); i+=fw){
+		for(var i=0; i<len-1; i++){
 			var post = allPosts[i];
 			var d1 = post.getData();
 			if(y >= d1.feedPos && y < d1.feedPos+d1.height + 70){
@@ -136,8 +174,6 @@ function Feed(){
 				} else{
 					t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d1.date.getTime()+1)/1000);
 				}
-				// if(Math.abs(t-timeline.getTimeCursor().current) > 3600*24) timeline.jumpTo(t);
-				// else timeline.navigateJournal(t);
 				timeline.navigateJournal(t);
 				postCursor = i;
 				return;
@@ -147,24 +183,18 @@ function Feed(){
 
 
 	function jump(t){
-
-		var day = t.day;
-		var len = postsByDay[day].length;
-		for(var i=0; i<len; i++){
-			if(!postsByDay[day][i+1] && !postsByDay[day+1]) break;
-			var post = postsByDay[day][i];
-			var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
+		var len = allPosts.length;
+		for(var i=0; i<len-1; i++){
+			var post = allPosts[i];
+			var nextPost = allPosts[i+1];
 			var t1 = post.getData().date.getTime()/1000;
 			var t2 = nextPost.getData().date.getTime()/1000;
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
-				node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				var id = 0;
-				for(var j=0; j<day; j++){
-					if(postsByDay[j]) id += postsByDay[j].length
-				}
-				id += i;
-				postCursor = id;
+				requestAnimationFrame(function(){
+					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+				})
+				postCursor = i;
 				break;
 			}
 		}

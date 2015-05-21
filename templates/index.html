@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="../static/js/MarkerCluster.Default.ie.css" />
   <link rel="stylesheet" type="text/css" href="../static/css/api.css">
   <link rel="stylesheet" type="text/css" href="//cloud.typography.com/6479954/729546/css/fonts.css" />
-  <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/style1.css">
   <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
   
 {% raw %}
@@ -247,9 +247,9 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
     </div>
 
     <div id="statusScreen" class="hidden">
-      <!-- <img src="static/img/spinner.gif" alt="loader"> -->
       <p>Into the Okavango doesn't support tablets and mobiles yet...</p>
       <div class="cta"><a href="http://www.twitter.com">Stay tuned!</a></div>
+      <img src="static/img/spinner.gif" alt="loader">
     </div>
 
     <div id="pageContainer">
@@ -269,7 +269,7 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
               
 
               <div id="cta">
-                <a href="#"><p>The expedition has started, join us!</p></a>
+                <a href="#"><p>The expedition has started, start exploring!</p></a>
               </div>
 
 
@@ -296,6 +296,12 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
               <br>
                 This site displays data which is uploaded daily, via satellite, by the expedition team. Data is also available through a public API, allowing anyone to remix, analyze or visualize the collected information.
               </p>
+              <p>
+                <a href="https://itunes.apple.com/us/podcast/into-the-okavango/id994847647">
+                  <img src="static/img/podcastIcon.png" alt="icon for Itunes podcast" />
+                </a>
+              </p>
+
             </div>
           </div>
 
@@ -400,6 +406,21 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
               </div>
             </div>
 
+            <div class="post photo">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/iconPhoto.svg"/>
+                <div class="text">
+                  <div class="photo">
+                  </div>
+                  <p class="notes"></p>
+                </div>
+              </div>
+            </div>
+
             <div class="post blog">
               <div class="meta">
                 <div class="separator"></div>
@@ -416,20 +437,25 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
               </div>
             </div>
 
-            <div class="post photo">
-              <div class="content">
+            <div class="post sound">
               <div class="meta">
                 <div class="separator"></div>
                 <div class="timestamp"></div>
               </div>
-                <div class="photo">
+              <div class="content">
+                <img class="icon" src="static/img/iconSound.svg"/>
+                <div class="text">
+                  <iframe width="100%" height="166" scrolling="no" frameborder="no"></iframe>
+                  <p class="notes"></p>
                 </div>
               </div>
             </div>
 
           </div>
         </div>
+
         <div class="controls">
+          <div class="scrollLabel">Scroll to navigate<br/>through time</div>
           <div class="button control-zoom">
             <a class="control-zoom-in" href="#" title="Zoom in">+</a>
             <a class="control-zoom-out" href="#" title="Zoom out">-</a>
@@ -464,13 +490,14 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
 
   <script src="static/js/d3.min.js"></script>
   <script src="static/js/leaflet.js"></script>
+  <script src="static/js/leaflet.label.js"></script>
   <script src="static/js/rcolor.js"></script>
   <script src="http://cdn.ractivejs.org/latest/ractive.js"></script>
   <script src="http://cdn.jsdelivr.net/ractive.load/latest/ractive-load.min.js"></script>
   <script src='https://rawgit.com/ractivejs/ractive-events-keys/master/dist/ractive-events-keys.min.js'></script>
   <script src='https://rawgit.com/ractivejs/ractive-events-tap/master/dist/ractive-events-tap.js'></script>
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-  <script src="static/js/build.js"></script>
+  <script src="static/js/build1.js"></script>
 
 {% endblock body %}
 

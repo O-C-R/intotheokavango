@@ -866,7 +866,7 @@ h3, h3.title{
         alignment-baseline: middle;
         text-anchor:end;
         color:white;
-        opacity: 0.4;
+        opacity: 0.5;
         line-height: 1.8em;
       }
 
@@ -1021,6 +1021,10 @@ h3, h3.title{
             margin-bottom:70px;          
           }
 
+            #mapPage div#feed div.post.sound iframe{
+              margin-bottom:35px !important;
+            }
+
             #mapPage div#feed div.post div.content img.icon{
               display:inline-block;
               vertical-align: top;
@@ -1090,10 +1094,15 @@ h3, h3.title{
               vertical-align: top;
             }
 
+            #mapPage div#feed div.post p.notes{
+              margin-top:30px;
+            }
+
             #mapPage div#feed div.post.vertical p.notes{
               display: inline-block;
               vertical-align: top;
               width:29.5%;
+              margin-top:0;
             }
 
               #mapPage div#feed div.post div.photo img{
@@ -1230,7 +1239,7 @@ h3, h3.title{
     #data-content #features-area {
       float: left;
       /*width: 25%;*/
-      min-width: 260px;
+      min-width: 245px;
       height: 400px;
       /*padding: 3% 2% 1% 2%;*/
     }

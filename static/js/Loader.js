@@ -33,9 +33,10 @@ function Loader(){
 		});
 	}
 
+
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 5;
+		var toBeCompleted = 6;
 		function checkForCompletion(){
 			// console.log(toBeCompleted);
 			toBeCompleted --;
@@ -58,14 +59,14 @@ function Loader(){
 		loadPhotos(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
-		// loadSoundPosts(day, checkForCompletion);
+		loadSoundPosts(day, checkForCompletion);
 		// loadBeacons(day, checkForCompletion);
 	}
 
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=60'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -139,6 +140,12 @@ function Loader(){
 		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
 		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
 		        },
+		        onEachFeature: function(feature, layer){
+                	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
+                	if(message){
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
@@ -181,6 +188,12 @@ function Loader(){
 				        return false;
 		            } else return true;
 		        },
+		        onEachFeature: function(feature, layer){
+                	var title = feature.properties.Title;
+                	if(title){
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
                     blogLayer.addLayer(marker);
@@ -219,6 +232,12 @@ function Loader(){
 		        filter: function(feature, layer) {
 		        	return feature.geometry != null;
 		        },
+		        onEachFeature: function(feature, layer){
+					layer.addEventListener('click',function(){
+						pages.active.hide();
+				    	pages['journal'].show();
+					})
+		        },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
                     soundLayer.addLayer(marker);
@@ -255,12 +274,21 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.Dimensions) return false;
 		            if(feature.properties.Member == null){
 			            var photo = PhotoPost(feature);
 				        if(photo) photos[day].push(photo);
 				        return false;
 		            } else return true;
 		        },
+		        onEachFeature: function(feature, layer){
+                	var photoUrl = feature.properties.Url;
+                	var dimensions = feature.properties.Dimensions;
+                	if(photoUrl && dimensions){
+                		var horizontal = dimensions[0]>dimensions[1];
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
 	                    var marker = L.marker(latlng, markerOptions);
 	                    tweetLayer.addLayer(marker);
@@ -315,7 +343,17 @@ function Loader(){
 		        	sightingLayer.addLayer(marker);			        
 			        var sighting = Sighting(feature, marker);
 		            if(sighting) sightings[day].push(sighting);
+		            var name = feature.properties.SpeciesName;
+                	var count = feature.properties.Count;
+		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
+                },
+                onEachFeature: function(feature, layer){
+                	var name = feature.properties.SpeciesName;
+                	var count = feature.properties.Count;
+                	if(name){
+                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
+                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);
@@ -430,12 +468,20 @@ function Loader(){
 		return photos;
 	}
 
+	function getSounds(){
+		return sounds;
+	}
+
 	function getLoading(){
 		return loading;
 	}
 
 	function getLoadedDays(){
 		return loadedDays;
+	}
+
+	function getSightings(){
+		return sightings;
 	}
 
 	function getFeatures(){
@@ -456,12 +502,14 @@ function Loader(){
 		loadDay: loadDay,
 		members: members,
 		getBlogs: getBlogs,
+		getSounds: getSounds,
 		getTweets: getTweets,
 		getPhotos: getPhotos,
 		getLoading: getLoading,
 		getDayCount: getDayCount,
 		getLoadedDays: getLoadedDays,
 		getFeatures: getFeatures,
+		getSightings: getSightings,
 		expeditionYear: expeditionYear	
 	};
 }
