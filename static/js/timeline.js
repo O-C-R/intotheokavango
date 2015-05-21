@@ -290,6 +290,7 @@ function Timeline(){
 				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
 				if(isNightTime != n) nightNode.classed('night',n);
 				isNightTime = n;
+				if(!isNightTime) break;
 			}
 		}
 	}
@@ -300,6 +301,10 @@ function Timeline(){
 			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
 			isUnzoomedTime = u;
 		}
+	}
+
+	function getUnzoomState(u){
+		return isUnzoomedTime;
 	}
 
 
@@ -433,7 +438,8 @@ function Timeline(){
 		update: update,
 		updateControl: updateControl,
 		setDates: setDates,
-		jumpTo: jumpTo
+		jumpTo: jumpTo,
+		getUnzoomState: getUnzoomState
 	};
 }
 
