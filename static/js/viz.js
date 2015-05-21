@@ -5,16 +5,16 @@ var d3Graph = function(timelineVizID, totalsVizID){
     // if(timelineVizDiv){
 
     // }
-    console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
+    //console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
     var timelineVizDiv = d3.select("timelineVizID");
-    var totalsVizDiv = d3.select("totalsVizID");
+    // var totalsVizDiv = d3.select("totalsVizID");
     console.log("D3 GRAPH");
-    console.log(totalsVizDiv);
+    //console.log(totalsVizDiv);
 
-    $("totalsViz").hide("slow", function() {
-        console.log("HIDING totalsVizDiv");
-    });
-    totalsVizDiv.style("opacity", 0);
+    // $("totalsViz").hide("slow", function() {
+    //     console.log("HIDING totalsVizDiv");
+    // });
+    // totalsVizDiv.style("opacity", 0);
    // d3.select(totalsVizDiv).style("opacity", 0);
     // console.log(totalsVizDiv);
     // var public_path = 'http://dev.intotheokavango.org' + path_to_data;
@@ -28,6 +28,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedAmbitEnergy = [];
     var parsedAmbitSpeed = [];
     var speciesSightingsTotals = [];
+    var parsedSensorData = [];
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
 var parseSpeciesSighting = function(item) {
@@ -70,6 +71,15 @@ var parseAmbitSpeed = function(item) {
     ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
     console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
     return ambitData;
+}
+
+var parseSensorData = function(item) {
+    var sensorData = {};
+    sensorData.airTemp = item["properties"]["AirTemp"];
+    sensorData.waterTemp = item["properties"]["WaterTemp"];
+    sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+    return sensorData;
 }
 
 var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
@@ -271,6 +281,41 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
             .orient("left");
     }
 
+    if(feature_type === "sensor") {
+        console.log("feature_type is sensor");
+        console.log(parsedData);
+        for (var i = 0; i < parsedData.length; i++) {
+            if (parsedData[i].hasOwnProperty("airTemp")) {
+                yAxisLabel = "Degrees Celsius";
+                graphTitle = "Air and Water Temperature";
+                var line = d3.svg.line()
+                    .x(function(d) { return xScale(d.time); })
+                    .y(function(d) { return yScale(d.airTemp); });
+
+                // var waterLine = d3.svg.line()
+                //     .x(function(d) { return xScale(d.time); })
+                //     .y(function(d) { return yScale(d.waterTemp); });
+
+                var dateRange = d3.extent(parsedData, function(d) { 
+                    return d.time; 
+                });
+                console.log("dateRange: " + dateRange);
+
+                xScale.domain(dateRange);
+                yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
+                var dateFormat = d3.time.format.utc("%B %d %Y");
+                var timeFormat = d3.time.format.utc("%I:%M:%S");
+                xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+            }
+        }
+
+        // svg.append("path")
+        //   .data([parsedData])
+        //   .attr("class", "line")
+        //   .attr("d", airLine)
+        //   .attr("d", waterLine);
+    }
+
     svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
@@ -333,7 +378,7 @@ var makeTotalsViz = function(data) {
         })
         .rangeBands([0, height]);
     console.log(yScale.range());
-    var svg = d3.select("#totalsViz").append("svg")
+    var svg = d3.select("#timelineViz").append("svg")
         .attr("width", width)
         .attr("height", height);
     
@@ -474,7 +519,7 @@ function loadData(path_to_data, feature_type) {
             }
             
             if (feature_type === "ambit") {
-                console.log("HERE");
+                console.log("AMBIT");
                 //make heart rate viz or energy consumption viz - heart rate for now.
                 for (d in data.results.features) {
                     
@@ -532,11 +577,29 @@ function loadData(path_to_data, feature_type) {
                     makeHistogramPlot(parsedSpeciesSighting, feature_type, speciesName);
                 }
             }
+            if (feature_type === "sensor") {
+                console.log("SENSOR");
+
+                for (d in data.results.features) {
+                    var item = data.results.features[d];
+                    //console.log(item);
+
+                    if (item["properties"].hasOwnProperty("AirTemp") && item["properties"].hasOwnProperty("WaterTemp") || item["properties"].hasOwnProperty("water temp")) {
+                        f = parseSensorData(item);
+                        parsedSensorData.push(f);
+                    }
+                }
+                makeTimeSeriesViz(parsedSensorData, feature_type);
+            }
             if (feature_type === "tweet") {
                 //layout tweets
                 //TO DO: figure out how many tweets to lay out? viz for tweets?
             }
             if (feature_type === "image") {
+
+            }
+
+            if (feature_type === "blog") {
 
             }
         }
