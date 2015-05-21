@@ -128,9 +128,6 @@ function Feed(){
 			posts.each(function(d){
 				d.setFeedPos(this.offsetTop, this.clientHeight);
 			});
-			if(pages.active.id == 'journal'){
-				jump(timeline.getTimeCursor());
-			}
 			jump(timeline.getTimeCursor());
 		});
 
@@ -176,7 +173,9 @@ function Feed(){
 			var t2 = nextPost.getData().date.getTime()/1000;
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
-				node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+				requestAnimationFrame(function(){
+					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+				})
 				postCursor = i;
 				break;
 			}

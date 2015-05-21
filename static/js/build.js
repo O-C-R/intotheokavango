@@ -1686,9 +1686,6 @@ function Feed(){
 			posts.each(function(d){
 				d.setFeedPos(this.offsetTop, this.clientHeight);
 			});
-			if(pages.active.id == 'journal'){
-				jump(timeline.getTimeCursor());
-			}
 			jump(timeline.getTimeCursor());
 		});
 
@@ -1726,16 +1723,18 @@ function Feed(){
 
 
 	function jump(t){
-
 		var len = allPosts.length;
 		for(var i=0; i<len-1; i++){
 			var post = allPosts[i];
 			var nextPost = allPosts[i+1];
 			var t1 = post.getData().date.getTime()/1000;
 			var t2 = nextPost.getData().date.getTime()/1000;
+			console.log(new Date(1000*t1),new Date(1000*t2), t.current >= t1 && t.current < t2);
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
-				node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+				requestAnimationFrame(function(){
+					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+				})
 				postCursor = i;
 				break;
 			}
