@@ -1021,6 +1021,10 @@ h3, h3.title{
             margin-bottom:70px;          
           }
 
+            #mapPage div#feed div.post.sound iframe{
+              margin-bottom:20px;
+            }
+
             #mapPage div#feed div.post div.content img.icon{
               display:inline-block;
               vertical-align: top;
