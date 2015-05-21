@@ -1762,13 +1762,38 @@ function Feed(){
 */
 
 
+function setPopupEvent(m){
+	d3.select('div.leaflet-popup-content-wrapper')
+		.on('click',function(){
+			pages.active.hide();
+			pages['journal'].show();
+			m.closePopup();
+		})
+}
+
+
 function Sighting(feature, m){
 
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
-	var name = feature.properties.SpeciesName;
+	var name = feature.properties.SpeciesName.trim();
+	var count = feature.properties.Count;
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
+	var type = 'sighting';
+
+	// if(marker){
+	// 	marker.addEventListener('popupclose',function(){
+	// 		popupVisible = false;
+	// 		popupDelay = true;
+	// 	})
+	// 	marker.addEventListener('popupopen',function(){
+	// 		popupVisible = true;
+	// 	})
+	// }
+
 
 	function getData(){
 		return {
@@ -1793,12 +1818,31 @@ function Sighting(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<600){
+    			if(!popupVisible) {
+    				// marker.openPopup();
+    				marker.showLabel();
+    				popupVisible = true;
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.hideLabel();
+    				popupVisible = false;
+    			}
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
+
 }
 
 
@@ -1808,6 +1852,7 @@ function Beacon(feature, m){
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var visible = true;
 	var marker = m;
+	var type = 'beacon';
 
 	function getData(){
 		return {
@@ -1835,7 +1880,7 @@ function Beacon(feature, m){
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 
@@ -1852,7 +1897,19 @@ function PhotoPost(feature, m){
 	var marker = m;
 	var member = feature.properties.Member;
 	var notes = feature.properties.Notes;
-	// console.log(member);
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'photo';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 	function getData(){
 		return {
@@ -1866,6 +1923,24 @@ function PhotoPost(feature, m){
 			height: height,
 			notes: notes
 		}
+	}
+
+
+	function animate(t){
+        if(marker){
+
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
 	}
 
 
@@ -1909,7 +1984,8 @@ function PhotoPost(feature, m){
 		setFeedPos: setFeedPos,
 		marker: marker,
 		setVisible: setVisible,
-		getMember: getMember
+		getMember: getMember,
+		animate: animate
 	};
 }
 
@@ -1927,6 +2003,9 @@ function TweetPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'tweet';
 
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
@@ -1940,6 +2019,16 @@ function TweetPost(feature, m){
 			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
 		}
 	} catch(e){}
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -1986,13 +2075,30 @@ function TweetPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -2008,11 +2114,24 @@ function BlogPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
 	var url = feature.properties.Url
+	var type = 'blog';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -2059,13 +2178,30 @@ function BlogPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -2079,12 +2215,15 @@ function SoundPost(feature, m){
 	var member = feature.properties.Member;
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
 	var url = feature.properties.SoundCloudURL;
+	var type = 'sound';
 
 
 	function getData(){
@@ -2137,7 +2276,7 @@ function SoundPost(feature, m){
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 
@@ -2394,6 +2533,15 @@ function Loader(){
 		});
 	}
 
+	function setPopupEvent(p){
+		// console.log(p);
+		// p.addEventListener('click',function(){
+		// 	console.log('aga!', p);
+		// 	pages.active.hide();
+  //   		pages['journal'].show();
+		// })
+	}
+
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
 		var toBeCompleted = 6;
@@ -2426,7 +2574,7 @@ function Loader(){
 
 	function loadPath(day, callback){
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=60'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -2500,6 +2648,13 @@ function Loader(){
 		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
 		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
 		        },
+		        onEachFeature: function(feature, layer){
+                	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
+                	if(message){
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		setPopupEvent(layer.getPopup());
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
@@ -2542,6 +2697,13 @@ function Loader(){
 				        return false;
 		            } else return true;
 		        },
+		        onEachFeature: function(feature, layer){
+                	var title = feature.properties.Title;
+                	if(title){
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		setPopupEvent(layer.getPopup());
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
                     blogLayer.addLayer(marker);
@@ -2579,6 +2741,12 @@ function Loader(){
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	return feature.geometry != null;
+		        },
+		        onEachFeature: function(feature, layer){
+					layer.addEventListener('click',function(){
+						pages.active.hide();
+				    	pages['journal'].show();
+					})
 		        },
 		        pointToLayer: function (feature, latlng) {
                     var marker = L.marker(latlng, markerOptions);
@@ -2623,6 +2791,15 @@ function Loader(){
 				        return false;
 		            } else return true;
 		        },
+		        onEachFeature: function(feature, layer){
+                	var photoUrl = feature.properties.Url;
+                	var dimensions = feature.properties.Dimensions;
+                	if(photoUrl && dimensions){
+                		var horizontal = dimensions[0]>dimensions[1];
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                		setPopupEvent(layer.getPopup());
+                	}
+                },
 		        pointToLayer: function (feature, latlng) {
 	                    var marker = L.marker(latlng, markerOptions);
 	                    tweetLayer.addLayer(marker);
@@ -2677,7 +2854,17 @@ function Loader(){
 		        	sightingLayer.addLayer(marker);			        
 			        var sighting = Sighting(feature, marker);
 		            if(sighting) sightings[day].push(sighting);
+		            var name = feature.properties.SpeciesName;
+                	var count = feature.properties.Count;
+		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
+                },
+                onEachFeature: function(feature, layer){
+                	var name = feature.properties.SpeciesName;
+                	var count = feature.properties.Count;
+                	if(name){
+                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
+                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);
@@ -2804,6 +2991,10 @@ function Loader(){
 		return loadedDays;
 	}
 
+	function getSightings(){
+		return sightings;
+	}
+
 	function getFeatures(){
 		return {
 			sightings: sightings,
@@ -2829,6 +3020,7 @@ function Loader(){
 		getDayCount: getDayCount,
 		getLoadedDays: getLoadedDays,
 		getFeatures: getFeatures,
+		getSightings: getSightings,
 		expeditionYear: expeditionYear	
 	};
 }
@@ -3084,7 +3276,6 @@ function Timeline(){
 			.attr('dy','0.25em')
 			.text(function(d){
 				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				console.log(da);
 				var s = dateToString(da);
 				return s.mo + ' ' + s.da
 			});
@@ -3170,14 +3361,11 @@ function Timeline(){
 
 	function updateDayLabels(){
 
-		console.log( height-margin);
-
 		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
-
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 50 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 40 || i%labelSkip != 0){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -3557,7 +3745,60 @@ Array.prototype.max = function() {
 
 Array.prototype.min = function() {
   return Math.min.apply(null, this);
-};;var playerOrigin = '*';
+};
+
+function initMapLabels(map){
+	L.CircleMarker.include({
+	    bindLabel: function (content, options) {
+	        if (!this._label || this._label.options !== options) {
+	            this._label = new L.Label(options, this);
+	        }
+	        if (!this.label || this.label.options !== options) {
+	            this.label = new L.Label(options, this);
+	        }
+	        this._map = map;
+	        this.label.setContent(content);
+	        this._labelNoHide = options && options.noHide;
+	        if (!this._showLabelAdded) {
+	            if (this._labelNoHide) {
+	                this
+	                    .on('remove', this.hideLabel, this)
+	                    .on('move', this._moveLabel, this);
+	                this._showLabel({latlng: this.getLatLng()});
+	            } else {
+	                this
+	                    .on('mouseover', this._showLabel, this)
+	                    .on('mousemove', this._moveLabel, this)
+	                    .on('mouseout remove', this._hideLabel, this);
+	                if (L.Browser.touch) {
+	                    this.on('click', this._showLabel, this);
+	                }
+	            }
+	            this._showLabelAdded = true;
+	        }
+	        return this;
+	    },
+	    unbindLabel: function () {
+	        if (this._label) {
+	            this._hideLabel();
+	            this._label = null;
+	            this._showLabelAdded = false;
+	            if (this._labelNoHide) {
+	                this
+	                    .off('remove', this._hideLabel, this)
+	                    .off('move', this._moveLabel, this);
+	            } else {
+	                this
+	                    .off('mouseover', this._showLabel, this)
+	                    .off('mousemove', this._moveLabel, this)
+	                    .off('mouseout remove', this._hideLabel, this);
+	            }
+	        }
+	        return this;
+	    }
+	});
+}
+;var playerOrigin = '*';
 var vimeoPlayer;
 
 window.addEventListener('message', onMessageReceived, false);
@@ -3611,29 +3852,29 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	
-	- crash loading feed
-	- marker labels and popups
-
+	- unzoom at car speed
+	- change how night is computed
+		- crash loading feed
+	- loading screen
+	- starts on last day
 	- linkable features and pages
 	- sometimes map doesnt refresh
-	- mouse scroll too slow
-	- loading screen
-	- unzoom at car speed
-	- starts on last day
 	- free camera mode
-	- scroll map while hovering a marker
-	- dim out zoom buttons when max is reached
-	- fix trail in about page
+	- live mode
 	- view labels, 'click to pause, scroll to navigate'
 	- label for day transition
-	- heartrate peak feature
-	- live mode
+	- clicking on popups should open journal on right time
+
+	- mouse scroll too slow
+	- dim out zoom buttons when max is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
-	- no night on journal
+	- fix trail in about page
+	- heartrate peak feature
+	- query resolutions
 
+	- scroll map while hovering a marker
 	- proper teleport
 	- sightings taxonomy color
 	- filter crazy path points (resolution)
@@ -3726,6 +3967,8 @@ document.addEventListener('DOMContentLoaded', function(){
         scrollWheelZoom:false
     });
 
+    initMapLabels(mapWorld);
+
     tweetLayer = new L.layerGroup().addTo(mapWorld);
     photoLayer = new L.layerGroup().addTo(mapWorld);
     sightingLayer = new L.layerGroup().addTo(mapWorld);
@@ -3781,27 +4024,49 @@ document.addEventListener('DOMContentLoaded', function(){
 		    frameCount ++;
 		    if(!blurred && !jumping){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
+
 				    timeline.update(frameRate);
-				    var coord = [0,0];
-				    var i = 0;
+					
+					if(pages.active.id == 'map'){
+						var date = timeline.getTimeCursor();
+						var sightings = loader.getSightings();
+						if(sightings[date.day]){
+							var len = sightings[date.day].length;
+							for(var i=0; i<len; i++){
+								sightings[date.day][i].animate(date.current);
+							}
+						}
+
+						var photos = loader.getPhotos();
+						if(photos[date.day]){
+							var len = photos[date.day].length;
+							for(var i=0; i<len; i++){
+								photos[date.day][i].animate(date.current);
+							}
+						}
+
+						var tweets = loader.getTweets();
+						if(tweets[date.day]){
+							var len = tweets[date.day].length;
+							for(var i=0; i<len; i++){
+								tweets[date.day][i].animate(date.current);
+							}
+						}
+
+						var blogs = loader.getBlogs();
+						if(blogs[date.day]){
+							var len = blogs[date.day].length;
+							for(var i=0; i<len; i++){
+								blogs[date.day][i].animate(date.current);
+							}
+						}
+					}
 					
 					for(m in loader.members){
 						var member = loader.members[m];
-						var isCore = member.move(timeline.getTimeCursor());
-						// if(isCore){
-						// 	var c = member.getLatLng();
-						// 	coord[0] += c.lat;
-						// 	coord[1] += c.lng;
-						// 	i++;
-						// }
+						member.move(timeline.getTimeCursor());
 					}
-					// coord[0] /= i;
-					// coord[1] /= i;
 
-					// var latLng = new L.LatLng(coord[0],coord[1]);
-					// if(loader.members['Steve'].getLatLng().distanceTo(latLng) > 500) latLng = loader.members['Steve'].getLatLng();
-					// var previousCenter = mapWorld.getCenter();
-					
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
 					var matrix;

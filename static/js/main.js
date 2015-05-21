@@ -9,29 +9,29 @@
 
 	TODOS
 
-	
-	- crash loading feed
-	- marker labels and popups
-
+	- unzoom at car speed
+	- change how night is computed
+		- crash loading feed
+	- loading screen
+	- starts on last day
 	- linkable features and pages
 	- sometimes map doesnt refresh
-	- mouse scroll too slow
-	- loading screen
-	- unzoom at car speed
-	- starts on last day
 	- free camera mode
-	- scroll map while hovering a marker
-	- dim out zoom buttons when max is reached
-	- fix trail in about page
+	- live mode
 	- view labels, 'click to pause, scroll to navigate'
 	- label for day transition
-	- heartrate peak feature
-	- live mode
+	- clicking on popups should open journal on right time
+
+	- mouse scroll too slow
+	- dim out zoom buttons when max is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
-	- no night on journal
+	- fix trail in about page
+	- heartrate peak feature
+	- query resolutions
 
+	- scroll map while hovering a marker
 	- proper teleport
 	- sightings taxonomy color
 	- filter crazy path points (resolution)
@@ -124,6 +124,8 @@ document.addEventListener('DOMContentLoaded', function(){
         scrollWheelZoom:false
     });
 
+    initMapLabels(mapWorld);
+
     tweetLayer = new L.layerGroup().addTo(mapWorld);
     photoLayer = new L.layerGroup().addTo(mapWorld);
     sightingLayer = new L.layerGroup().addTo(mapWorld);
@@ -179,27 +181,49 @@ document.addEventListener('DOMContentLoaded', function(){
 		    frameCount ++;
 		    if(!blurred && !jumping){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
+
 				    timeline.update(frameRate);
-				    var coord = [0,0];
-				    var i = 0;
+					
+					if(pages.active.id == 'map'){
+						var date = timeline.getTimeCursor();
+						var sightings = loader.getSightings();
+						if(sightings[date.day]){
+							var len = sightings[date.day].length;
+							for(var i=0; i<len; i++){
+								sightings[date.day][i].animate(date.current);
+							}
+						}
+
+						var photos = loader.getPhotos();
+						if(photos[date.day]){
+							var len = photos[date.day].length;
+							for(var i=0; i<len; i++){
+								photos[date.day][i].animate(date.current);
+							}
+						}
+
+						var tweets = loader.getTweets();
+						if(tweets[date.day]){
+							var len = tweets[date.day].length;
+							for(var i=0; i<len; i++){
+								tweets[date.day][i].animate(date.current);
+							}
+						}
+
+						var blogs = loader.getBlogs();
+						if(blogs[date.day]){
+							var len = blogs[date.day].length;
+							for(var i=0; i<len; i++){
+								blogs[date.day][i].animate(date.current);
+							}
+						}
+					}
 					
 					for(m in loader.members){
 						var member = loader.members[m];
-						var isCore = member.move(timeline.getTimeCursor());
-						// if(isCore){
-						// 	var c = member.getLatLng();
-						// 	coord[0] += c.lat;
-						// 	coord[1] += c.lng;
-						// 	i++;
-						// }
+						member.move(timeline.getTimeCursor());
 					}
-					// coord[0] /= i;
-					// coord[1] /= i;
 
-					// var latLng = new L.LatLng(coord[0],coord[1]);
-					// if(loader.members['Steve'].getLatLng().distanceTo(latLng) > 500) latLng = loader.members['Steve'].getLatLng();
-					// var previousCenter = mapWorld.getCenter();
-					
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
 					var matrix;

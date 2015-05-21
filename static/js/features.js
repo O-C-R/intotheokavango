@@ -5,13 +5,38 @@
 */
 
 
+function setPopupEvent(m){
+	d3.select('div.leaflet-popup-content-wrapper')
+		.on('click',function(){
+			pages.active.hide();
+			pages['journal'].show();
+			m.closePopup();
+		})
+}
+
+
 function Sighting(feature, m){
 
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].photo)*1000)));
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
-	var name = feature.properties.SpeciesName;
+	var name = feature.properties.SpeciesName.trim();
+	var count = feature.properties.Count;
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
+	var type = 'sighting';
+
+	// if(marker){
+	// 	marker.addEventListener('popupclose',function(){
+	// 		popupVisible = false;
+	// 		popupDelay = true;
+	// 	})
+	// 	marker.addEventListener('popupopen',function(){
+	// 		popupVisible = true;
+	// 	})
+	// }
+
 
 	function getData(){
 		return {
@@ -36,12 +61,31 @@ function Sighting(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<600){
+    			if(!popupVisible) {
+    				// marker.openPopup();
+    				marker.showLabel();
+    				popupVisible = true;
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.hideLabel();
+    				popupVisible = false;
+    			}
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
+
 }
 
 
@@ -51,6 +95,7 @@ function Beacon(feature, m){
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var visible = true;
 	var marker = m;
+	var type = 'beacon';
 
 	function getData(){
 		return {
@@ -78,7 +123,7 @@ function Beacon(feature, m){
 		getData: getData,
 		getLatLng: getLatLng,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 
@@ -95,7 +140,19 @@ function PhotoPost(feature, m){
 	var marker = m;
 	var member = feature.properties.Member;
 	var notes = feature.properties.Notes;
-	// console.log(member);
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'photo';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 	function getData(){
 		return {
@@ -109,6 +166,24 @@ function PhotoPost(feature, m){
 			height: height,
 			notes: notes
 		}
+	}
+
+
+	function animate(t){
+        if(marker){
+
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
 	}
 
 
@@ -152,7 +227,8 @@ function PhotoPost(feature, m){
 		setFeedPos: setFeedPos,
 		marker: marker,
 		setVisible: setVisible,
-		getMember: getMember
+		getMember: getMember,
+		animate: animate
 	};
 }
 
@@ -170,6 +246,9 @@ function TweetPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'tweet';
 
 	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	var id = feature.id;
@@ -183,6 +262,16 @@ function TweetPost(feature, m){
 			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
 		}
 	} catch(e){}
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -229,13 +318,30 @@ function TweetPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -251,11 +357,24 @@ function BlogPost(feature, m){
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
 	var marker = m;
+	var popupVisible = false;
+	var popupDelay = false;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
 	var url = feature.properties.Url
+	var type = 'blog';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
 
 
 	function getData(){
@@ -302,13 +421,30 @@ function BlogPost(feature, m){
 		}
 	}
 
+	function animate(t){
+        if(marker){
+    		if(Math.abs(date.getTime()/1000-t)<1000){
+    			if(!popupVisible && !popupDelay) {
+    				marker.openPopup();
+    				setPopupEvent(marker);
+    			}
+    		} else {
+    			if(popupVisible) {
+    				marker.closePopup();
+    			}
+    			popupDelay = false;
+    		}
+        }
+	}
+
 	return{
 		getData: getData,
 		getLatLng: getLatLng,
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
+		animate: animate
 	};
 }
 
@@ -322,12 +458,15 @@ function SoundPost(feature, m){
 	var member = feature.properties.Member;
 	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].tweet)*1000)));
 	var visible = true;
+	var popupVisible = false;
+	var popupDelay = false;
 	var marker = m;
 	var latLng;
 	if(feature.geometry != null) latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
 	else latLng = new L.LatLng(0,0);
 	var id = feature.id;
 	var url = feature.properties.SoundCloudURL;
+	var type = 'sound';
 
 
 	function getData(){
@@ -380,7 +519,7 @@ function SoundPost(feature, m){
 		getFeedPos: getFeedPos,
 		setFeedPos: setFeedPos,
 		marker: marker,
-		setVisible: setVisible
+		setVisible: setVisible,
 	};
 }
 

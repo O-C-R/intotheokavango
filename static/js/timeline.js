@@ -93,7 +93,6 @@ function Timeline(){
 			.attr('dy','0.25em')
 			.text(function(d){
 				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				console.log(da);
 				var s = dateToString(da);
 				return s.mo + ' ' + s.da
 			});
@@ -183,7 +182,7 @@ function Timeline(){
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 50 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 40 || i%labelSkip != 0){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
