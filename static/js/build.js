@@ -1362,7 +1362,7 @@ console.warn('DATA PAGE', id);
                         audio: [],
                         beacon: [],
                         blog:[],
-                        image: ['GoPro', 'documentary', 'specimen'],
+                        image: ['documentary', 'habitat', 'specimen'],
                         sensor: ['databoat1', 'sensor2', 'databoat'],
                         sighting: speciesList,
                         
@@ -3066,15 +3066,38 @@ function Timeline(){
 
 	function initGraphics(){
 
-		node.selectAll('circle.day')
+		var day = node.selectAll('circle.day')
 			.data(dates)
 			.enter()
-			.append('circle')
+			.append('g')
 			.attr('class','day')
+			.attr('transform','translate(0,0)')
+			.style('pointer-events','none')
+			
+		day.append('circle')
 			.attr('cx','80%')
 			.attr('r',dayRad)
 			.attr('fill','rgb(255,255,255)')
-			.style('pointer-events','none');
+
+		day.append('text')
+			.attr('x','66%')
+			.attr('dy','0.25em')
+			.text(function(d){
+				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
+				console.log(da);
+				var s = dateToString(da);
+				return s.mo + ' ' + s.da
+			});
+
+		// node.selectAll('circle.day')
+		// 	.data(dates)
+		// 	.enter()
+		// 	.append('circle')
+		// 	.attr('class','day')
+		// 	.attr('cx','80%')
+		// 	.attr('r',dayRad)
+		// 	.attr('fill','rgb(255,255,255)')
+		// 	.style('pointer-events','none');
 
 		cursor = node.append('g')
 			.style('pointer-events','none')
@@ -3137,10 +3160,29 @@ function Timeline(){
 			.attr('y1',margin)
 			.attr('y2',height);
 
-		node.selectAll('circle.day')
-			.attr('cy',function(d,i){
-				return margin + dayRad + (i*((height-margin-dayRad*2)/(dates.length-1)));
+		node.selectAll('g.day')
+			.attr('transform',function(d,i){
+				return 'translate(0,'+ (margin + dayRad + (i*((height-margin-dayRad*2)/(dates.length-1)))) +')';
 			});
+
+		updateDayLabels();
+	}
+
+	function updateDayLabels(){
+
+		console.log( height-margin);
+
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
+
+		d3.selectAll('#timeline g.day')
+			.each(function(d,i){
+				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
+				if(Math.abs(h - cursorY) < 50 || i%labelSkip != 0){
+					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
+				} else {
+					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
+				}
+			})
 	}
 
 	function initTimeCursor(){
@@ -3214,16 +3256,23 @@ function Timeline(){
 			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
 		}
 		var d = new Date(offsetTimezone(cursorDate.getTime()));
+		var s = dateToString(d);
+		cursor.select('text tspan:first-child').text(s.mo + ' ' + s.da);
+		cursor.select('text tspan:last-child').text(s.ho + ':' + s.mi);
+
+		if(frameCount%10==0) updateDayLabels();
+	}
+
+	function dateToString(d){
 		var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 		var mo = monthNames[d.getMonth()];
 		var da = d.getDate();
 		if(da < 10) da = '0' + da;
-		cursor.select('text tspan:first-child').text(mo + ' ' + da);
 		var ho = d.getHours();
 		if(ho < 10) ho = '0'+ho;
 		var mi = d.getMinutes();
 		if(mi < 10) mi = '0'+mi;
-		cursor.select('text tspan:last-child').text(ho + ':' + mi);
+		return {mo:mo, da:da, ho:ho, mi:mi};
 	}
 
 	function toggleNightTime(i,forward){
@@ -3562,12 +3611,11 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
+	
 	- crash loading feed
-	- add note field to documentary images + vertical photos
 	- marker labels and popups
 
 	- linkable features and pages
-	- labels timeline
 	- sometimes map doesnt refresh
 	- mouse scroll too slow
 	- loading screen

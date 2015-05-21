@@ -873,6 +873,22 @@ h3, h3.title{
               text-anchor:end;
             }
 
+            #mapPage div.pane svg#timeline g.day text{
+              fill:white;
+              font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
+              font-weight: 700;
+              font-style: normal;
+              font-size: 10px;
+              text-transform: uppercase;
+              text-anchor:end;
+              transition:opacity 0.2s;
+              opacity: 1;
+            }
+
+              #mapPage div.pane svg#timeline g.day.hidden text{
+                opacity: 0;
+              }
+
         #mapPage div.pane div#feed{
           padding:35px 19.4%;
           line-height: 1.5em;
