@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
-					// mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
 
 					var matrix;
 					try{
