@@ -131,6 +131,7 @@ function Feed(){
 			if(pages.active.id == 'journal'){
 				jump(timeline.getTimeCursor());
 			}
+			jump(timeline.getTimeCursor());
 		});
 
 		initialized = false;
@@ -167,24 +168,16 @@ function Feed(){
 
 
 	function jump(t){
-
-		var day = t.day;
-		var len = postsByDay[day].length;
-		for(var i=0; i<len; i++){
-			if(!postsByDay[day][i+1] && !postsByDay[day+1]) break;
-			var post = postsByDay[day][i];
-			var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
+		var len = allPosts.length;
+		for(var i=0; i<len-1; i++){
+			var post = allPosts[i];
+			var nextPost = allPosts[i+1];
 			var t1 = post.getData().date.getTime()/1000;
 			var t2 = nextPost.getData().date.getTime()/1000;
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
 				node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				var id = 0;
-				for(var j=0; j<day; j++){
-					if(postsByDay[j]) id += postsByDay[j].length
-				}
-				id += i;
-				postCursor = id;
+				postCursor = i;
 				break;
 			}
 		}

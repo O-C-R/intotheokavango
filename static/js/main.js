@@ -9,8 +9,8 @@
 
 	TODOS
 
-	- loading screen
-	- starts on last day
+	- cache busting
+	- legit teleport
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
@@ -162,8 +162,10 @@ document.addEventListener('DOMContentLoaded', function(){
 				timeline.init(day);
 				timeline.initGraphics();
 				timeline.initTimeCursor();
+				timeline.checkUnzoom(true);
 				isLoading = false;
 				updateLoadingScreen(false);
+				feed.jump(timeline.getTimeCursor());
 				animate(new Date().getTime()-16);
 			});
 		});
@@ -221,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					
 					for(m in loader.members){
 						var member = loader.members[m];
-						member.move(timeline.getTimeCursor());
+						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
@@ -351,13 +353,15 @@ function updateLoadingScreen(force){
 	var hide = (force || !(isMobile||isLoading));
 	if(hidden != hide) {
 		if(hide) {
-			d3.select('#statusScreen')
-				.transition()
-				.duration(500)
-				.style('opacity',0)
-				.each('end',function(){
-					d3.select(this).classed('hidden',true);
-				})
+			setTimeout(function(){
+				d3.select('#statusScreen')
+					.transition()
+					.duration(500)
+					.style('opacity',0)
+					.each('end',function(){
+						d3.select(this).classed('hidden',true);
+					})
+			},500);
 		} else {
 			d3.select('#statusScreen')
 				.style('opacity',1)

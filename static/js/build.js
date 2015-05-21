@@ -1689,6 +1689,7 @@ function Feed(){
 			if(pages.active.id == 'journal'){
 				jump(timeline.getTimeCursor());
 			}
+			jump(timeline.getTimeCursor());
 		});
 
 		initialized = false;
@@ -1726,23 +1727,16 @@ function Feed(){
 
 	function jump(t){
 
-		var day = t.day;
-		var len = postsByDay[day].length;
-		for(var i=0; i<len; i++){
-			if(!postsByDay[day][i+1] && !postsByDay[day+1]) break;
-			var post = postsByDay[day][i];
-			var nextPost = postsByDay[day][i+1] || postsByDay[day+1][0];
+		var len = allPosts.length;
+		for(var i=0; i<len-1; i++){
+			var post = allPosts[i];
+			var nextPost = allPosts[i+1];
 			var t1 = post.getData().date.getTime()/1000;
 			var t2 = nextPost.getData().date.getTime()/1000;
 			if(t.current >= t1 && t.current < t2){
 				var d = post.getData();
 				node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				var id = 0;
-				for(var j=0; j<day; j++){
-					if(postsByDay[j]) id += postsByDay[j].length
-				}
-				id += i;
-				postCursor = id;
+				postCursor = i;
 				break;
 			}
 		}
@@ -2398,7 +2392,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17);
+		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17, {animate:lastActive.id=='journal'});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -2438,6 +2432,7 @@ function JournalPage(){
 
 
 	page.show = function(){
+		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
@@ -2446,7 +2441,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		mapWorld.setZoom(15);
+		mapWorld.setZoom(15, {animate:lastActive.id=='map'});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 
@@ -3070,7 +3065,7 @@ function Member(n, l, d){
 	}
 
 
-	function move(time){
+	function move(time, force){
 		if(!time) return;
 		var forward = time.current >= time.last;
 		var fw = forward ? 1:-1;
@@ -3109,13 +3104,13 @@ function Member(n, l, d){
 			// console.log('could not find path: ' + name);
 		}
 
-		// if(latLng.distanceTo(tLatLng) > 1000){
-		// 	latLng.lat = tLatLng.lat;
-		// 	latLng.lng = tLatLng.lng;
-		// } else {
+		if(force){
+			latLng.lat = tLatLng.lat;
+			latLng.lng = tLatLng.lng;
+		} else {
 			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
 			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
-		// }
+		}
 		marker.setLatLng(latLng);
 
 		if(interval.length==2) return interval[0].core;
@@ -3231,6 +3226,9 @@ function Timeline(){
 			dates.push(d);
 			totalTimeFrame[1] = t+(24*3600*(i)-1) -4*3600;
 		}
+		timeCursor = dates[dates.length-2];
+		timeCursor = timeCursor-1;
+		dayCursor = dates.length-2;
 	}
 
 	function init(day, lastDay){
@@ -3372,9 +3370,7 @@ function Timeline(){
 		}
 		timeCursor = timestamps.min();
 		prevTimeCursor = timeFrame[0]-1;
-		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
-		// console.log(new Date(timeCursor*1000), new Date(nightTime[dayCursor][0]*1000), new Date(nightTime[dayCursor][1]*1000));
-		// console.log('NIGHT1',isNightTime);
+		checkNightTime();
 	}
 
 	function setTimeFrame(){
@@ -3448,12 +3444,6 @@ function Timeline(){
 		return {mo:mo, da:da, ho:ho, mi:mi};
 	}
 
-	function toggleNightTime(i,forward){
-		isNightTime = (i==0 && !forward) || (i==1 && forward);
-		timeCursor = nightTime[dayCursor][i] + (forward?1:-1);
-		if(pages.active.id !='journal' || !isNightTime) nightNode.classed('night',isNightTime);
-	}
-
 	function checkNightTime(){
 		var len = nightTime.length;
 		for(var i=0; i<nightTime.length; i++){
@@ -3466,15 +3456,16 @@ function Timeline(){
 		}
 	}
 
-	function checkUnzoom(){
+	function checkUnzoom(force){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
+			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
 
-	function getUnzoomState(u){
+	function getUnzoomState(){
+		checkUnzoom();
 		return isUnzoomedTime;
 	}
 
@@ -3558,7 +3549,11 @@ function Timeline(){
 			speed = 0;
 			wheelDelta = 0;
 			cullMarkersByDay();
-			checkUnzoom();
+			checkUnzoom(true);
+			for(m in loader.members){
+				var member = loader.members[m];
+				member.move(getTimeCursor(), true);
+			}
 		}
 
 		isLoading = true;
@@ -3599,6 +3594,10 @@ function Timeline(){
 		nightTime[day] = interval;
 	}
 
+	function setDayCursor(i){
+		dayCursor = i;
+	}
+
 	return {
 		checkNightTime: checkNightTime,
 		init: init,
@@ -3615,7 +3614,9 @@ function Timeline(){
 		updateControl: updateControl,
 		setDates: setDates,
 		jumpTo: jumpTo,
-		getUnzoomState: getUnzoomState
+		getUnzoomState: getUnzoomState,
+		setDayCursor: setDayCursor,
+		checkUnzoom: checkUnzoom
 	};
 }
 
@@ -3862,8 +3863,8 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- loading screen
-	- starts on last day
+	- cache busting
+	- legit teleport
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 	- accelerate scroll
@@ -4015,8 +4016,10 @@ document.addEventListener('DOMContentLoaded', function(){
 				timeline.init(day);
 				timeline.initGraphics();
 				timeline.initTimeCursor();
+				timeline.checkUnzoom(true);
 				isLoading = false;
 				updateLoadingScreen(false);
+				feed.jump(timeline.getTimeCursor());
 				animate(new Date().getTime()-16);
 			});
 		});
@@ -4074,7 +4077,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					
 					for(m in loader.members){
 						var member = loader.members[m];
-						member.move(timeline.getTimeCursor());
+						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
 					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
@@ -4204,13 +4207,15 @@ function updateLoadingScreen(force){
 	var hide = (force || !(isMobile||isLoading));
 	if(hidden != hide) {
 		if(hide) {
-			d3.select('#statusScreen')
-				.transition()
-				.duration(500)
-				.style('opacity',0)
-				.each('end',function(){
-					d3.select(this).classed('hidden',true);
-				})
+			setTimeout(function(){
+				d3.select('#statusScreen')
+					.transition()
+					.duration(500)
+					.style('opacity',0)
+					.each('end',function(){
+						d3.select(this).classed('hidden',true);
+					})
+			},500);
 		} else {
 			d3.select('#statusScreen')
 				.style('opacity',1)

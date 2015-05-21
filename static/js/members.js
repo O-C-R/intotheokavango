@@ -55,7 +55,7 @@ function Member(n, l, d){
 	}
 
 
-	function move(time){
+	function move(time, force){
 		if(!time) return;
 		var forward = time.current >= time.last;
 		var fw = forward ? 1:-1;
@@ -94,13 +94,13 @@ function Member(n, l, d){
 			// console.log('could not find path: ' + name);
 		}
 
-		// if(latLng.distanceTo(tLatLng) > 1000){
-		// 	latLng.lat = tLatLng.lat;
-		// 	latLng.lng = tLatLng.lng;
-		// } else {
+		if(force){
+			latLng.lat = tLatLng.lat;
+			latLng.lng = tLatLng.lng;
+		} else {
 			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
 			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
-		// }
+		}
 		marker.setLatLng(latLng);
 
 		if(interval.length==2) return interval[0].core;

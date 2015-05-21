@@ -117,7 +117,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17);
+		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17, {animate:lastActive.id=='journal'});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -157,6 +157,7 @@ function JournalPage(){
 
 
 	page.show = function(){
+		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
 		pages.active = this;
@@ -165,7 +166,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		mapWorld.setZoom(15);
+		mapWorld.setZoom(15, {animate:lastActive.id=='map'});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 

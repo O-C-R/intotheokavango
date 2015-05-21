@@ -60,6 +60,9 @@ function Timeline(){
 			dates.push(d);
 			totalTimeFrame[1] = t+(24*3600*(i)-1) -4*3600;
 		}
+		timeCursor = dates[dates.length-2];
+		timeCursor = timeCursor-1;
+		dayCursor = dates.length-2;
 	}
 
 	function init(day, lastDay){
@@ -201,9 +204,7 @@ function Timeline(){
 		}
 		timeCursor = timestamps.min();
 		prevTimeCursor = timeFrame[0]-1;
-		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
-		// console.log(new Date(timeCursor*1000), new Date(nightTime[dayCursor][0]*1000), new Date(nightTime[dayCursor][1]*1000));
-		// console.log('NIGHT1',isNightTime);
+		checkNightTime();
 	}
 
 	function setTimeFrame(){
@@ -277,12 +278,6 @@ function Timeline(){
 		return {mo:mo, da:da, ho:ho, mi:mi};
 	}
 
-	function toggleNightTime(i,forward){
-		isNightTime = (i==0 && !forward) || (i==1 && forward);
-		timeCursor = nightTime[dayCursor][i] + (forward?1:-1);
-		if(pages.active.id !='journal' || !isNightTime) nightNode.classed('night',isNightTime);
-	}
-
 	function checkNightTime(){
 		var len = nightTime.length;
 		for(var i=0; i<nightTime.length; i++){
@@ -295,15 +290,16 @@ function Timeline(){
 		}
 	}
 
-	function checkUnzoom(){
+	function checkUnzoom(force){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17);
+			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
 
-	function getUnzoomState(u){
+	function getUnzoomState(){
+		checkUnzoom();
 		return isUnzoomedTime;
 	}
 
@@ -387,7 +383,11 @@ function Timeline(){
 			speed = 0;
 			wheelDelta = 0;
 			cullMarkersByDay();
-			checkUnzoom();
+			checkUnzoom(true);
+			for(m in loader.members){
+				var member = loader.members[m];
+				member.move(getTimeCursor(), true);
+			}
 		}
 
 		isLoading = true;
@@ -428,6 +428,10 @@ function Timeline(){
 		nightTime[day] = interval;
 	}
 
+	function setDayCursor(i){
+		dayCursor = i;
+	}
+
 	return {
 		checkNightTime: checkNightTime,
 		init: init,
@@ -444,7 +448,9 @@ function Timeline(){
 		updateControl: updateControl,
 		setDates: setDates,
 		jumpTo: jumpTo,
-		getUnzoomState: getUnzoomState
+		getUnzoomState: getUnzoomState,
+		setDayCursor: setDayCursor,
+		checkUnzoom: checkUnzoom
 	};
 }
 
