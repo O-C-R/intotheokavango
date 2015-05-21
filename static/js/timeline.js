@@ -45,7 +45,7 @@ function Timeline(){
 		.attr('stroke','#FFFFFF')
 		.style('pointer-events','none');
 
-	var nightNode = d3.select('#mapWorld').append('div').attr('id','night');
+	var nightNode = d3.select('#mapWorld div.leaflet-objects-pane').append('div').attr('id','night');
 
 	function setDates(count,start){
 		dates = [];
@@ -238,15 +238,8 @@ function Timeline(){
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
 		var lastDay = Math.constrain(Math.floor(Math.map(prevTimeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
 				
-		if(day != lastDay) {
-			newDay();
-		} else{
-			for(var i=0; i<2; i++){
-				if(timeCursor < nightTime[dayCursor][i] && prevTimeCursor >= nightTime[dayCursor][i]) toggleNightTime(i,false); 
-				if(timeCursor >= nightTime[dayCursor][i] && prevTimeCursor < nightTime[dayCursor][i]) toggleNightTime(i,true); 
-			}
-			// console.log(new Date(timeCursor*1000), new Date(nightTime[dayCursor][0]*1000), new Date(nightTime[dayCursor][1]*1000));
-		}
+		if(day != lastDay) newDay();
+		checkNightTime();
 		updateCursor();
 	}
 
@@ -287,8 +280,11 @@ function Timeline(){
 	}
 
 	function checkNightTime(){
-		isNightTime = timeCursor < nightTime[dayCursor][0] || prevTimeCursor >= nightTime[dayCursor][1];
-		nightNode.classed('night',isNightTime);
+		if(nightTime[dayCursor]){
+			var n = timeCursor < nightTime[dayCursor][0] || timeCursor >= nightTime[dayCursor][1];
+			if(isNightTime != n) nightNode.classed('night',n);
+			isNightTime = n;
+		}
 	}
 
 

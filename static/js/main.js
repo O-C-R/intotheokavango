@@ -9,19 +9,21 @@
 
 	TODOS
 
-	- unzoom at car speed
 	- change how night is computed
 		- crash loading feed
+	- unzoom at car speed
 	- loading screen
 	- starts on last day
-	- linkable features and pages
 	- sometimes map doesnt refresh
 	- free camera mode
-	- live mode
 	- view labels, 'click to pause, scroll to navigate'
-	- label for day transition
-	- clicking on popups should open journal on right time
+	- accelerate scroll
+	- pas de nuit May 19?
+		
+	- linkable features and pages
+	- live mode
 
+	- clicking on popups should open journal on right time
 	- mouse scroll too slow
 	- dim out zoom buttons when max is reached
 	- togglePause highlight on map
@@ -236,7 +238,9 @@ document.addEventListener('DOMContentLoaded', function(){
 					d3.select('#mapWorld div.scrollPane').style('transform',matrix);
 					d3.select('#mapWorld div.scrollPane').style('-webkit-transform',matrix);
 					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
-				
+					d3.select('#mapWorld div#night').style('transform',matrix);
+					d3.select('#mapWorld div#night').style('-webkit-transform',matrix);
+
 				} else {
 					wanderer.wander();
 			    	var target = wanderer.update();
