@@ -52,7 +52,7 @@ function Page(i){
 		// mapWorld.setZoom(id == 'journal' ? 15 : 17, {animate:false});
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
-		if(isMobile) d3.select('#statusScreen').classed('hidden',true);
+		updateLoadingScreen(true);
 		pauseVimeoPlayer();
 	}
 
@@ -123,7 +123,7 @@ function MapPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
-		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
+		updateLoadingScreen(false);
 		pauseVimeoPlayer();
 		timeline.checkNightTime();
 	}
@@ -172,7 +172,7 @@ function JournalPage(){
 		page.node.select('.controls').classed('hidden',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
-		if(isMobile) d3.select('#statusScreen').classed('hidden',false);
+		updateLoadingScreen(false);
 		pauseVimeoPlayer();
 	}
 

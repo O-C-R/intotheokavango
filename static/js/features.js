@@ -63,9 +63,8 @@ function Sighting(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<600){
+    		if(Math.abs(date.getTime()/1000-t)<600 && pages.active.id == 'map'){
     			if(!popupVisible) {
-    				// marker.openPopup();
     				marker.showLabel();
     				popupVisible = true;
     			}
@@ -172,7 +171,7 @@ function PhotoPost(feature, m){
 	function animate(t){
         if(marker){
 
-    		if(Math.abs(date.getTime()/1000-t)<1000){
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
     			if(!popupVisible && !popupDelay) {
     				marker.openPopup();
     				setPopupEvent(marker);
@@ -320,7 +319,7 @@ function TweetPost(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000){
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
     			if(!popupVisible && !popupDelay) {
     				marker.openPopup();
     				setPopupEvent(marker);
@@ -423,7 +422,7 @@ function BlogPost(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000){
+    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
     			if(!popupVisible && !popupDelay) {
     				marker.openPopup();
     				setPopupEvent(marker);

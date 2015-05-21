@@ -369,6 +369,8 @@ function Timeline(){
 
 
 		function resume(){
+			isLoading = false;
+			updateLoadingScreen(false);
 			feed.init(day);
 			init(day);
 			setTimeFrame();
@@ -385,8 +387,11 @@ function Timeline(){
 			speed = 0;
 			wheelDelta = 0;
 			cullMarkersByDay();
+			checkUnzoom();
 		}
 
+		isLoading = true;
+		updateLoadingScreen(false);
 		var day = Math.constrain(Math.floor(Math.map(d-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
 		timeCursor = d;
 		prevTimeCursor = timeCursor-1;

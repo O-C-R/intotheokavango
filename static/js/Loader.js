@@ -33,14 +33,6 @@ function Loader(){
 		});
 	}
 
-	function setPopupEvent(p){
-		// console.log(p);
-		// p.addEventListener('click',function(){
-		// 	console.log('aga!', p);
-		// 	pages.active.hide();
-  //   		pages['journal'].show();
-		// })
-	}
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
@@ -152,7 +144,6 @@ function Loader(){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
                 		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
-                		setPopupEvent(layer.getPopup());
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -201,7 +192,6 @@ function Loader(){
                 	var title = feature.properties.Title;
                 	if(title){
                 		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
-                		setPopupEvent(layer.getPopup());
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -297,7 +287,6 @@ function Loader(){
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
                 		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
-                		setPopupEvent(layer.getPopup());
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
