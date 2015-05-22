@@ -1,8 +1,9 @@
 ### new
-- 'core' system
-- audio -- pull created time from file
+- fuzzy species name searches
+- species linking
 - add SensorType (FeatureSubType) to SMS sensors
 - video ingestion
+- puring ambits
 
 ### server
 - make github private
