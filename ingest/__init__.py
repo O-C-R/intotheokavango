@@ -55,6 +55,8 @@ def ingest_request(feature_type, request):
     except ImportError as e:
         log.error(log.exc(e))
         return False, "FeatureType \"%s\" not recognized" % feature_type
+    if feature is True:    # stop executing, but still return success (note 'is')
+        return True, ""
     if not feature:
         return False, error
     return ingest_data(feature_type, feature)
@@ -248,7 +250,8 @@ def verify_expedition(data):
     if data['properties']['Member'] is not None:
         if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
             data['properties']['Member'] = None
-        data['properties']['Member'] = data['properties']['Member'].strip()
+        else:
+            data['properties']['Member'] = data['properties']['Member'].strip()
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
@@ -362,7 +365,9 @@ def process_image(path, member=None, t_utc=None):
         try:
             exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
         except AttributeError:
-            log.error("--> no EXIF data in image")
+            log.warning("--> no EXIF data in image")
+            log.warning("--> substituting current time for t_utc")
+            data['t_utc'] = util.timestamp()
         else:
             # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
             date_field = exif['DateTimeOriginal'] if 'DateTimeOriginal' in exif else exif['DateTime']

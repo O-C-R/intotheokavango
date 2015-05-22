@@ -37,7 +37,9 @@ $(document).ready(function() {
 
                 // Add the uploaded file content to the form data collection
                 if (image.length > 0) {
-                    data.append("upload", image[0]);
+                    for (var i in image) {
+                        data.append("upload_" + i, image[i]);
+                    }
                 }
 
                 var metadata = $('#imageUpload').serializeJSON()

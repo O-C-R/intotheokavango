@@ -1,5 +1,5 @@
 import json
-from ingest import ingest_json_body, save_files, process_image
+from ingest import ingest_json_body, save_files, process_image, ingest_data
 from housepy import config, log, util, strings
 
 """Expecting JSON or form metadata with Member and a timestamp in the local timezone"""
@@ -30,12 +30,17 @@ def parse(request):
         data['Member'] = data['TeamMember']
         del data['TeamMember']            
 
-    # process the image
-    for path in paths:
+    # process the image -- add the same metadata for each one, and update with the image's data
+    for path in paths:        
         if path[-4:] != "json":
             image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
-            data.update(image_data)
-            break
+            current_data = data.copy()
+            current_data.update(image_data)
+            success, value = ingest_data("image", current_data)
+            if not success:
+                return None, value
+            ## note that this might still end up ingesting prior images
 
-    return data
+    # stop executing, but still return success
+    return True     
 
