@@ -154,13 +154,13 @@ function Member(n, l, d){
 
 	function unfocus(unswollen){
 		d3.select(marker._icon).classed('swollen',false);
+		d3.select(marker._icon).classed('focused',false);
+		d3.select(marker._icon).select('p')
+				.style('color',null);
 		if(!unswollen){
-			d3.select(marker._icon).classed('focused',false);
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
 			mapWorld.scrollWheelZoom.enable();
-			d3.select(marker._icon).select('p')
-				.style('color',null);
 		}
 	}
 
