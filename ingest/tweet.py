@@ -36,6 +36,7 @@ def main(): ## called via tweet_grabber.py
             continue        
         log.info("--> %s has %s total tweets" % (account, len(timeline)))
         for t, tweet in enumerate(timeline):
+            # log.debug(json.dumps(tweet, indent=4, default=lambda x: str(x)))
             log.info("Tweet %s:%s" % (a, t))
             text = tweet.get('text')
             if a == 0 or HASHTAG.lower() in text.lower():  # the first entry in the accounts is the official account -- all tweets are processed
@@ -49,6 +50,15 @@ def main(): ## called via tweet_grabber.py
                     data['Retweet'] = text[:2] == "RT"
                     data['Url'] = "https://twitter.com/%s/status/%s" % (account, tweet.get('id'))
                     data['TweetID'] = tweet.get('id')
+                    data['Images'] = []
+                    try:
+                        for image in tweet['extended_entities']['media']:
+                            if image['type'] != "photo":
+                                continue
+                            data['Images'].append({'Url': image['media_url']})
+                            log.info("--> added image %s" % image['media_url'])
+                    except KeyError as e:
+                        pass
                     dup = db.features.find_one({'properties.FeatureType': 'tweet', 'properties.TweetID': data['TweetID']})
                     if dup is not None:
                         log.info("--> skipping duplicate tweet")
@@ -64,4 +74,3 @@ def main(): ## called via tweet_grabber.py
                     continue
             else:
                 log.info("--> skipping unrelated tweet")
-
