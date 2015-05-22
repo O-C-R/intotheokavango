@@ -1,5 +1,4 @@
 ### new
-- multiple images on ingest
 - fuzzy species name searches
 - species linking
 - add SensorType (FeatureSubType) to SMS sensors

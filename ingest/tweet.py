@@ -51,6 +51,10 @@ def main(): ## called via tweet_grabber.py
                     data['Url'] = "https://twitter.com/%s/status/%s" % (account, tweet.get('id'))
                     data['TweetID'] = tweet.get('id')
                     data['Images'] = []
+                    dup = db.features.find_one({'properties.FeatureType': 'tweet', 'properties.TweetID': data['TweetID']})
+                    if dup is not None:
+                        log.info("--> skipping duplicate tweet")
+                        continue
                     try:
                         for image in tweet['extended_entities']['media']:
                             if image['type'] != "photo":
@@ -59,10 +63,6 @@ def main(): ## called via tweet_grabber.py
                             log.info("--> added image %s" % image['media_url'])
                     except KeyError as e:
                         pass
-                    dup = db.features.find_one({'properties.FeatureType': 'tweet', 'properties.TweetID': data['TweetID']})
-                    if dup is not None:
-                        log.info("--> skipping duplicate tweet")
-                        continue
                     log.info("--> %s (RT: %s): %s" % (account, data['Retweet'], data['Text']))
                     success, value = ingest_data("tweet", data)
                     if not success:

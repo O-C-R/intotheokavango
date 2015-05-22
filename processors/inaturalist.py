@@ -14,16 +14,17 @@ oauth = OAuth2Session(settings['app_id'], client=client)
 token = oauth.fetch_token(SITE + '/oauth/token', client_id=settings['app_id'], client_secret=settings['app_secret'], username=settings['username'], password=settings['password'])
 
 def post_inaturalist(feature):
-    log.info("post_inaturalist")
 
     # 12 hour delay on inat uploads to allow time for ambit ingestion
     t_now = util.timestamp()
     if t_now - feature['properties']['t_utc'] < 60 * 60 * 12: 
+        log.info("post_inaturalist")        
         log.info("--> skipping too recent feature")
         return
     if t_now - feature['properties']['t_utc'] > 60 * 60 * 72: 
         # skipping too old of a feature
         return
+    log.info("post_inaturalist")
 
     # skip features without geometry
     if 'geometry' not in feature or feature['geometry'] is None:
