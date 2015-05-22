@@ -1,4 +1,4 @@
-from housepy import util, log, config, strings
+from housepy import util, log, config, strings, json
 from ingest import ingest_json_file, ingest_data
 
 def parse(request):
@@ -7,16 +7,20 @@ def parse(request):
     try:
         t_local = strings.as_numeric(data['t_local'])
         data = data['data']        
+        log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
+        if 'gps_long' in data and 'gps_lat' in data:
+            data['Longitude'] = data['gps_long']
+            del data['gps_long']
+            data['Latitude'] = data['gps_lat']
+            del data['gps_lat']
         data['FeatureType'] = "sensor"
         data['FeatureSubType'] = "hybrid"
         data['SensorName'] = "DataBoat"
-        data['LocationUpdate'] = False
         data['t_utc'] = util.delocalize_timestamp(t_local, tz=config['local_tz'])
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))
         return None, "Unexpected format"   
     return data
-
 
 
 """

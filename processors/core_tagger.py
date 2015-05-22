@@ -6,8 +6,12 @@ from mongo import db
 def main():    
     log.info("core_tagger...")
 
+    t = util.timestamp()
+    
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.CoreExpedition': {'$exists': False}})
     for feature in features:
+        if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
+            continue        
         log.info("Updating feature %s" % feature['_id'])
         if 'Member' not in feature['properties']:
             log.warning("--> no member, feature_type is %s" % feature['properties']['FeatureType'])
