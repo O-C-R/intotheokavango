@@ -1751,37 +1751,13 @@ function Feed(){
 			});
 			jump(timeline.getTimeCursor());
 		});
-
 		initialized = false;
 
 	}
 
-	function scroll(){
-		var day = timeline.getTimeCursor().day;
-		var y = node.node().parentNode.scrollTop;
-		var forward = d3.event.wheelDeltaY <= 0;
-		var fw = forward ? 1:-1;
 
-		// var len = allPosts.length;
-		// for(var i=Math.constrain(postCursor-fw,0,len-1); forward?(i<len-1):(i>=0); i+=fw){
-		// 	var post = allPosts[i];
-		// 	var d1 = post.getData();
-		// 	if(y >= d1.feedPos && y < d1.feedPos+d1.height + 70){
-		// 		var nextPost = allPosts[i+1];
-		// 		var t;
-		// 		if(nextPost){
-		// 			var d2 = nextPost.getData();
-		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d2.date.getTime())/1000);
-		// 		} else{
-		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d1.date.getTime()+1)/1000);
-		// 		}
-		// 		// if(Math.abs(t-timeline.getTimeCursor().current) > 3600*24) timeline.jumpTo(t);
-		// 		// else timeline.navigateJournal(t);
-		// 		timeline.navigateJournal(t);
-		// 		postCursor = i;
-		// 		return;
-		// 	}
-		// }
+	function scroll(){
+		var y = node.node().parentNode.scrollTop;
 		var len = allPosts.length;
 		for(var i=0; i<len-1; i++){
 			var post = allPosts[i];
@@ -3110,13 +3086,8 @@ function Member(n, l, d){
 	var marker = L.marker(latLng, {icon: icon}).addTo(mapWorld);
 
 
-	// (function init(){
-	// 	var l = L.latLng(-12.811059,18.175099);
-	// 	var t = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
-	// 	var c = true;
-	// 	pathQueueByDay[0].push({latLng:l, time:t, core:c})
-	// })();
-
+	d3.select(marker._icon)
+		.on('click',focus)
 
 	function addAmbitGeo(d, l, t, c, origin){
 		if(!pathQueueByDay[d]) pathQueueByDay[d] = [];
@@ -3223,10 +3194,40 @@ function Member(n, l, d){
 	    timeCursor = -1;
 	}
 
-	function fillEmptyPathQueue(d){
-		// pathQueueByDay[d].push({latLng:l, time:t, core:c});
+	function focus(){
+		if(mapWorld.focusMember) mapWorld.focusMember.unfocus();
+		d3.select(marker._icon).classed('focused',true);
+		d3.select(marker._icon).classed('swollen',false);
+		mapWorld.focusMember = loader.members[name];
+		mapWorld.dragging.disable();
+		mapWorld.scrollWheelZoom.disable();
 	}
 
+	function dim(){
+		d3.select(marker._icon).classed('swollen',true);
+	}
+
+	function light(strength){
+		// d3.select(marker._icon).classed('focused',true);
+		strength = 1-strength;
+		if(strength>0){
+			d3.select(marker._icon).select('p')
+				.style('color','rgb('+(Math.floor(255-strength*180))+',255,'+(Math.floor(255-strength*120))+')');
+		}
+		d3.select(marker._icon).classed('swollen',false);
+	}
+
+	function unfocus(unswollen){
+		d3.select(marker._icon).classed('swollen',false);
+		if(!unswollen){
+			d3.select(marker._icon).classed('focused',false);
+			mapWorld.focusMember = null;
+			mapWorld.dragging.enable();
+			mapWorld.scrollWheelZoom.enable();
+			d3.select(marker._icon).select('p')
+				.style('color',null);
+		}
+	}
 
 	return{
 		addAmbitGeo: addAmbitGeo,
@@ -3239,7 +3240,10 @@ function Member(n, l, d){
 		timeCursor: timeCursor,
 		initPathQueue: initPathQueue,
 		teleport: teleport,
-		fillEmptyPathQueue: fillEmptyPathQueue
+		focus: focus,
+		unfocus: unfocus,
+		dim: dim,
+		light: light,
 	}
 }
 
@@ -3307,7 +3311,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-2;
+		dayCursor = dates.length-3; // !!!!!!
 	}
 
 	function init(day, lastDay){
@@ -3480,7 +3484,6 @@ function Timeline(){
 		prevTimeCursor = timeCursor;
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
-		// console.log(new Date(timeCursor*1000), 'LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),'LOL',new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 
 		wheelDelta = 0;
 
@@ -3678,6 +3681,10 @@ function Timeline(){
 		dayCursor = i;
 	}
 
+	function getPaused(){
+		return paused;
+	}
+
 	return {
 		checkNightTime: checkNightTime,
 		init: init,
@@ -3696,7 +3703,8 @@ function Timeline(){
 		jumpTo: jumpTo,
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
-		checkUnzoom: checkUnzoom
+		checkUnzoom: checkUnzoom,
+		getPaused, getPaused
 	};
 }
 
@@ -3943,12 +3951,10 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- cache busting
 	- free camera mode
 	- view labels, 'click to pause, scroll to navigate'
 
 	- accelerate scroll
-	- ambit May 19?
 		
 	- live mode
 	- linkable features and pages
@@ -3997,6 +4003,10 @@ var soundLayer;
 var timeline;
 var feed;
 var wanderer;
+var mouseOffset = L.point(0, 0);
+var mapOffset = L.point(0, 0);
+var mapLatLng;
+var mapTLatLng;
 
 var expeditionYear = '15';
 
@@ -4027,7 +4037,6 @@ var paused = false;
 var blurred = false;
 var jumping = false;
 
-var carCounter = 0;
 var isMobile = false;
 var isLoading = true;
 
@@ -4041,10 +4050,13 @@ document.addEventListener('DOMContentLoaded', function(){
 	  else d3.select('#statusScreen img').remove();
 	})();
 
+	mapTLatLng = new L.LatLng(-12.811059,18.175099);
+	mapLatLng = new L.LatLng(-12.811059,18.175099);
+
     mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        center:new L.LatLng(-12.811059,18.175099),
+        center:mapLatLng,
         attributionControl: false,
         doubleClickZoom: false,
         scrollWheelZoom: true,
@@ -4057,10 +4069,6 @@ document.addEventListener('DOMContentLoaded', function(){
         zoom:17,
         scrollWheelZoom:false
     });
-
-    // mapWorld.addEventListener('drag',function(e){
-    // 	console.log(e);
-    // })
 
     initMapLabels(mapWorld);
 
@@ -4104,6 +4112,8 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
+				console.log(loader.members);
+				loader.members['Steve'].focus();
 				animate(new Date().getTime()-16);
 			});
 		});
@@ -4164,7 +4174,17 @@ document.addEventListener('DOMContentLoaded', function(){
 						member.move(timeline.getTimeCursor(), {animate:false});
 					}
 
-					mapWorld.panTo(loader.members['Steve'].getLatLng(), {animate:false});
+					if(mapWorld.focusMember){
+						mapTLatLng = mapWorld.focusMember.getLatLng();
+						if(pages.active.id == 'map'){
+							var center = mapWorld.project(mapTLatLng);
+							var offset = mapWorld.unproject(center.subtract(mapOffset));
+							mapTLatLng = offset;
+						}
+						mapLatLng.lat = Math.lerp(mapLatLng.lat,mapTLatLng.lat,0.24);
+						mapLatLng.lng = Math.lerp(mapLatLng.lng,mapTLatLng.lng,0.24);
+						mapWorld.panTo(mapLatLng, {animate:false});
+					}
 
 					var matrix;
 					try{
@@ -4211,29 +4231,72 @@ document.addEventListener('DOMContentLoaded', function(){
 		    		resize();
 		    	});
 	    }
-
-	    function dragmove(d) {
-	    	console.log(d3.event);
-			// d3.select(this)
-			//     .attr("cx", d.x = Math.max(radius, Math.min(width - radius, d3.event.x)))
-			//     .attr("cy", d.y = Math.max(radius, Math.min(height - radius, d3.event.y)));
-		}
-
+	    
+	    var lastPlayMode;
+	    var r2;
 	    var drag = d3.behavior.drag()
-		    .on("drag", dragmove);
-		    // .origin(function(d) { return d; })
+		    .on('dragstart', function(){
+		    	if(mapWorld.focusMember){
+			    	mouseOffset = L.point(0, 0);
+			    	mapOffset = L.point(0, 0);
+			    	d3.select(this).classed('dragged',true);
+			    	lastPlayMode = timeline.getPaused();
+			    }
+		    })
+		    .on('drag', function(){
+		    	if(mapWorld.focusMember){
+			    	if(!timeline.getPaused()) timeline.togglePause('pause');
+			    	mouseOffset = mouseOffset.add(L.point(d3.event.dx,d3.event.dy));
+			    	var theta = Math.atan2(mouseOffset.y, mouseOffset.x);
+			    	var r1 = Math.sqrt(Math.pow(mouseOffset.x,2)+Math.pow(mouseOffset.y,2));
+			    	r1 = Math.pow(r1,0.4)*10;
+			    	mapOffset = L.point(r1*Math.cos(theta),r1*Math.sin(theta));
+			    	var r2 = Math.sqrt(Math.pow(mapOffset.x,2)+Math.pow(mapOffset.y,2));
+			    	if(r2 > 75){
+			    		mapWorld.focusMember.dim();
+			    	} else {
+			    		mapWorld.focusMember.light(1-(r2/75));
+			    	}
+			    }
+		    })
+		    .on('dragend', function(){
+		    	if(mapWorld.focusMember){
+			    	var r2 = Math.sqrt(Math.pow(mapOffset.x,2)+Math.pow(mapOffset.y,2));
+			    	var theta = Math.atan2(mapOffset.y, mapOffset.x);
+			    	if(r2 > 75){
+			    		timeline.togglePause('pause');
+			    		r2 *= 1.4;
+			    		console.log(mapOffset);
+			    		mapOffset = L.point(r2*Math.cos(theta),r2*Math.sin(theta));
+			    		console.log(mapOffset);
+			    		mapWorld.focusMember.unfocus(true);
+			    		setTimeout(function(){
+			    			mouseOffset = L.point(0, 0);
+			    			mapOffset = L.point(0, 0);
+			    			mapWorld.focusMember.unfocus();
+			    		},500);
+			    	} else {
+			    		mapWorld.focusMember.light(0);
+			    		mouseOffset = L.point(0, 0);
+			    		mapOffset = L.point(0, 0);
+			    		timeline.togglePause(lastPlayMode?'pause':'play');
+			    	}
+			    	d3.select(this).classed('dragged',false);
+			    }
+		    });
 
 	    d3.select('#mapWorld div.leaflet-objects-pane')
 	    	.append('div')
 		    	.attr('class','scrollPane')
 		    	.append('div')
 			    	.on('click',function(){
-			    		if(pages.active.id == 'map') timeline.togglePause();
+			    		if (d3.event.defaultPrevented) return;
+						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
 			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
-			    	// .call(drag);
+			    	.call(drag);
 
 	    d3.select('#mapPage div.button.control-playback')
 	    	.on('click',function(){

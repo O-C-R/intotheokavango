@@ -21,13 +21,8 @@ function Member(n, l, d){
 	var marker = L.marker(latLng, {icon: icon}).addTo(mapWorld);
 
 
-	// (function init(){
-	// 	var l = L.latLng(-12.811059,18.175099);
-	// 	var t = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
-	// 	var c = true;
-	// 	pathQueueByDay[0].push({latLng:l, time:t, core:c})
-	// })();
-
+	d3.select(marker._icon)
+		.on('click',focus)
 
 	function addAmbitGeo(d, l, t, c, origin){
 		if(!pathQueueByDay[d]) pathQueueByDay[d] = [];
@@ -134,10 +129,40 @@ function Member(n, l, d){
 	    timeCursor = -1;
 	}
 
-	function fillEmptyPathQueue(d){
-		// pathQueueByDay[d].push({latLng:l, time:t, core:c});
+	function focus(){
+		if(mapWorld.focusMember) mapWorld.focusMember.unfocus();
+		d3.select(marker._icon).classed('focused',true);
+		d3.select(marker._icon).classed('swollen',false);
+		mapWorld.focusMember = loader.members[name];
+		mapWorld.dragging.disable();
+		mapWorld.scrollWheelZoom.disable();
 	}
 
+	function dim(){
+		d3.select(marker._icon).classed('swollen',true);
+	}
+
+	function light(strength){
+		// d3.select(marker._icon).classed('focused',true);
+		strength = 1-strength;
+		if(strength>0){
+			d3.select(marker._icon).select('p')
+				.style('color','rgb('+(Math.floor(255-strength*180))+',255,'+(Math.floor(255-strength*120))+')');
+		}
+		d3.select(marker._icon).classed('swollen',false);
+	}
+
+	function unfocus(unswollen){
+		d3.select(marker._icon).classed('swollen',false);
+		if(!unswollen){
+			d3.select(marker._icon).classed('focused',false);
+			mapWorld.focusMember = null;
+			mapWorld.dragging.enable();
+			mapWorld.scrollWheelZoom.enable();
+			d3.select(marker._icon).select('p')
+				.style('color',null);
+		}
+	}
 
 	return{
 		addAmbitGeo: addAmbitGeo,
@@ -150,7 +175,10 @@ function Member(n, l, d){
 		timeCursor: timeCursor,
 		initPathQueue: initPathQueue,
 		teleport: teleport,
-		fillEmptyPathQueue: fillEmptyPathQueue
+		focus: focus,
+		unfocus: unfocus,
+		dim: dim,
+		light: light,
 	}
 }
 
