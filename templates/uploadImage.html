@@ -44,6 +44,7 @@ $(document).ready(function() {
 
                 var metadata = $('#imageUpload').serializeJSON()
                 metadata['Notes'] = $('#Notes').val()
+                metadata['SightingID'] = $('#SightingID').val()
 
                 var jsonBlob = new Blob([JSON.stringify(metadata)], {type : 'text/json'});
 
@@ -103,6 +104,9 @@ $(document).ready(function() {
     <label for="Notes">Notes</label>
     <br />
     <textarea type="" name="Notes" id="Notes" value=""></textarea>
+    <br /><br />
+    <label for="SightingID">Sighting ID</label><br />
+    <input type="text" name="SightingID" id="SightingID" value="">
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 <div>
