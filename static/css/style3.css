@@ -873,6 +873,7 @@ h3, h3.title{
         color:white;
         opacity: 0.5;
         line-height: 1.8em;
+        pointer-events:none;
       }
 
         #mapPage div.button{
