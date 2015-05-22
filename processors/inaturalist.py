@@ -21,6 +21,9 @@ def post_inaturalist(feature):
     if t_now - feature['properties']['t_utc'] < 60 * 60 * 12: 
         log.info("--> skipping too recent feature")
         return
+    if t_now - feature['properties']['t_utc'] > 60 * 60 * 72: 
+        # skipping too old of a feature
+        return
 
     # skip features without geometry
     if 'geometry' not in feature or feature['geometry'] is None:
