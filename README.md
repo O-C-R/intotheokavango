@@ -11,7 +11,6 @@ requires housepy (https://github.com/brianhouse/housepy)
 
     sudo pip-3.4 install -r requirements.txt
 
-
 ##### Server management
 
 ###### Login

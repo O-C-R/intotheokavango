@@ -48,6 +48,7 @@ def parse(request):
     member = "%s: " % data['Member'] if ('Member' in data and data['Member'] is not None and len(data['Member'].strip())) else ""
     notes = data['Notes'] if 'Notes' in data else ""
     title = "%s%s" % (member, notes)
+    data['Title'] = title
     if not len(title.strip()):
         title = util.datestring(data['t_utc'], tz=config['local_tz'])
     log.info("--> title is %s" % title)        
