@@ -106,7 +106,8 @@ class Api(server.Handler):
 
         # special parsing for SpeciesSearch
         species_search = self.get_argument('speciesSearch', None)
-        search['$text'] = {'$search': species_search}
+        if species_search is not None:
+            search['$text'] = {'$search': species_search}
 
         # get limit and order
         # limit = self.get_argument('limit', 100) # this fails on int arguments, which I think is a tornado bug
