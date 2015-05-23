@@ -136,6 +136,7 @@ function Member(n, l, d){
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
+		mapLatLng = mapWorld.getCenter();
 	}
 
 	function dim(){
@@ -143,7 +144,6 @@ function Member(n, l, d){
 	}
 
 	function light(strength){
-		// d3.select(marker._icon).classed('focused',true);
 		strength = 1-strength;
 		if(strength>0){
 			d3.select(marker._icon).select('p')

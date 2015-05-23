@@ -2848,7 +2848,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3966,6 +3966,7 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
+	- click on icons to open popups
 	- find unfocused back
 	- new icons
 	- pause unfocuses member markers
@@ -3976,7 +3977,9 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	- linkable features and pages
 	- sightings taxonomy color
 	- scroll map while hovering a marker
-	- test resolution	
+	- test resolution query
+	- stacked features on map view
+
 
 	- clicking on popups should open journal on right time
 	- dim out zoom buttons when max is reached

@@ -62,7 +62,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-3; // !!!!!!
+		dayCursor = dates.length-2; // !!!!!!
 	}
 
 	function init(day, lastDay){

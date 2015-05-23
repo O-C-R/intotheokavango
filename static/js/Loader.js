@@ -131,6 +131,9 @@ function Loader(){
 	        iconSize:[20,20]
 	    };
 
+	    var loadingImages = 0;
+
+	    // http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
@@ -147,6 +150,12 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
+
+		        	// if(feature.properties.TweetID == 601828768697552896) console.log(feature);
+		        	// var images = feature.properties.Images;
+		        	// console.log(images);
+		        	// if(images && images.length>0) console.log(images);
+
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
@@ -286,7 +295,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -325,6 +334,7 @@ function Loader(){
 		    fillOpacity: 0.7,
 		};
 
+		// http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
@@ -406,6 +416,7 @@ function Loader(){
 			
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(day < 7) return false;
 		        	// set a minimum distance of 200m between each beacon
 		        	if(beacons[day].length>0){
 		        		var coords = [];
@@ -427,7 +438,7 @@ function Loader(){
                 }
 		    });
 
-			if (beacons.length > 0 && beacons[0].length>0) {
+			if (beacons.length > 0 && beacons[day].length>0) {
 				var paths = [{
 					"type":"Feature",
 					"properties":{

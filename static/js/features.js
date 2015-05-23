@@ -254,13 +254,17 @@ function TweetPost(feature, m){
 	var url = feature.properties.Url
 	var photoUrl;
 	var size = [];
-	try{
-		if(tweetProperties.extended_entities.media[0].type == 'photo'){
-			photoUrl = tweetProperties.extended_entities.media[0].media_url;
-			size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
-			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
-		}
-	} catch(e){}
+	if(expeditionYear < '15'){
+		try{
+			if(tweetProperties.extended_entities.media[0].type == 'photo'){
+				photoUrl = tweetProperties.extended_entities.media[0].media_url;
+				size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
+				size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
+			}
+		} catch(e){}
+	} else {
+		
+	}
 
 	if(marker){
 		marker.addEventListener('popupclose',function(){

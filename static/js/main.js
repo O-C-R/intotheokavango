@@ -9,15 +9,20 @@
 
 	TODOS
 
-	- free camera mode
+	- click on icons to open popups
+	- find unfocused back
+	- new icons
+	- pause unfocuses member markers
+	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
-
 	- accelerate scroll
-		
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
-	- sometimes map doesnt refresh
+	- scroll map while hovering a marker
+	- test resolution query
+	- stacked features on map view
+
 
 	- clicking on popups should open journal on right time
 	- dim out zoom buttons when max is reached
@@ -27,7 +32,6 @@
 	- fix trail in about page
 	- heartrate peak feature
 
-	- scroll map while hovering a marker
 	- proper teleport
 	- filter crazy path points (resolution)
 	- core features?
