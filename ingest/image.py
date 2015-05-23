@@ -41,6 +41,8 @@ def parse(request):
     for path in paths:        
         if path[-4:] != "json":
             image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
+            if image_data is None:
+                return None, "Bad image"
             current_data = data.copy()
             current_data.update(image_data)
             success, value = ingest_data("image", current_data)

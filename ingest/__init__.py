@@ -1,4 +1,4 @@
-import importlib, os, json, tornado, json, shutil, uuid, os
+import importlib, os, json, tornado, json, shutil, uuid, os, zipfile
 from PIL import ExifTags, Image
 from housepy import config, log, server, util, strings
 from housepy.server import Application
@@ -339,7 +339,22 @@ def save_files(request):
             with open(path, 'wb') as f:
                 f.write(fileinfo['body'])
                 log.info("--> saved %s" % path)
-            paths.append(path)
+            if zipfile.is_zipfile(path) is True:
+                log.info("Examining zip file...")
+                with zipfile.ZipFile(path, 'r') as archive:
+                    filenames = archive.namelist()
+                    for filename in filenames:
+                        if filename[0] == '.' or filename[0] == '_' or '/' in filename:        # zipped files cannot start with . (invisible), _ (system), or contain longer paths
+                            continue
+                        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
+                        temp_path = archive.extract(filename, dir_path)
+                        path = os.path.abspath(os.path.join(dir_path, "%s_%s" % (util.timestamp(), filename)))
+                        shutil.move(temp_path, path)
+                        log.info("--> saved %s" % path)
+                        paths.append(path)
+                    log.info("--> zip file extracted")                    
+            else:
+                paths.append(path)
     except Exception as e:
         log.error(log.exc(e))
     return paths
@@ -353,6 +368,7 @@ def save_file(request):
 
 def process_image(path, member=None, t_utc=None):
     # try to get EXIF data
+    log.info("process_image %s..." % path)
     data = {}
     if member is not None:
         data['Member'] = member
