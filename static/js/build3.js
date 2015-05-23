@@ -2060,13 +2060,17 @@ function TweetPost(feature, m){
 	var url = feature.properties.Url
 	var photoUrl;
 	var size = [];
-	try{
-		if(tweetProperties.extended_entities.media[0].type == 'photo'){
-			photoUrl = tweetProperties.extended_entities.media[0].media_url;
-			size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
-			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
-		}
-	} catch(e){}
+	if(expeditionYear < '15'){
+		try{
+			if(tweetProperties.extended_entities.media[0].type == 'photo'){
+				photoUrl = tweetProperties.extended_entities.media[0].media_url;
+				size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
+				size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
+			}
+		} catch(e){}
+	} else {
+		
+	}
 
 	if(marker){
 		marker.addEventListener('popupclose',function(){
@@ -2680,6 +2684,9 @@ function Loader(){
 	        iconSize:[20,20]
 	    };
 
+	    var loadingImages = 0;
+
+	    // http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
@@ -2696,6 +2703,12 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
+
+		        	// if(feature.properties.TweetID == 601828768697552896) console.log(feature);
+		        	// var images = feature.properties.Images;
+		        	// console.log(images);
+		        	// if(images && images.length>0) console.log(images);
+
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
@@ -2874,6 +2887,7 @@ function Loader(){
 		    fillOpacity: 0.7,
 		};
 
+		// http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
@@ -2955,6 +2969,7 @@ function Loader(){
 			
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(day < 7) return false;
 		        	// set a minimum distance of 200m between each beacon
 		        	if(beacons[day].length>0){
 		        		var coords = [];
@@ -2976,7 +2991,7 @@ function Loader(){
                 }
 		    });
 
-			if (beacons.length > 0 && beacons[0].length>0) {
+			if (beacons.length > 0 && beacons[day].length>0) {
 				var paths = [{
 					"type":"Feature",
 					"properties":{
@@ -3201,6 +3216,7 @@ function Member(n, l, d){
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
+		mapLatLng = mapWorld.getCenter();
 	}
 
 	function dim(){
@@ -3208,7 +3224,6 @@ function Member(n, l, d){
 	}
 
 	function light(strength){
-		// d3.select(marker._icon).classed('focused',true);
 		strength = 1-strength;
 		if(strength>0){
 			d3.select(marker._icon).select('p')
@@ -3219,13 +3234,13 @@ function Member(n, l, d){
 
 	function unfocus(unswollen){
 		d3.select(marker._icon).classed('swollen',false);
+		d3.select(marker._icon).classed('focused',false);
+		d3.select(marker._icon).select('p')
+				.style('color',null);
 		if(!unswollen){
-			d3.select(marker._icon).classed('focused',false);
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
 			mapWorld.scrollWheelZoom.enable();
-			d3.select(marker._icon).select('p')
-				.style('color',null);
 		}
 	}
 
@@ -3311,7 +3326,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-3; // !!!!!!
+		dayCursor = dates.length-2; // !!!!!!
 	}
 
 	function init(day, lastDay){
@@ -3951,15 +3966,17 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- free camera mode
+	- find unfocused back
+	- new icons
+	- pause unfocuses member markers
+	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
-
 	- accelerate scroll
-		
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
-	- sometimes map doesnt refresh
+	- scroll map while hovering a marker
+	- test resolution	
 
 	- clicking on popups should open journal on right time
 	- dim out zoom buttons when max is reached
@@ -3969,7 +3986,6 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	- fix trail in about page
 	- heartrate peak feature
 
-	- scroll map while hovering a marker
 	- proper teleport
 	- filter crazy path points (resolution)
 	- core features?
