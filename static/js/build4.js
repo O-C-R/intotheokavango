@@ -3966,6 +3966,7 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
+	- click on icons to open popups
 	- find unfocused back
 	- new icons
 	- pause unfocuses member markers
@@ -3978,6 +3979,7 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	- scroll map while hovering a marker
 	- test resolution query
 	- stacked features on map view
+
 
 	- clicking on popups should open journal on right time
 	- dim out zoom buttons when max is reached

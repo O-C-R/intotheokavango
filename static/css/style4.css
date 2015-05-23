@@ -207,6 +207,7 @@ h3, h3.title{
 
         #mapWorld div.leaflet-popup div.leaflet-popup-content-wrapper div.leaflet-popup-content{
           margin:20px;
+          width: auto !important;
         }
 
           #mapWorld div.leaflet-popup div.leaflet-popup-content-wrapper div.leaflet-popup-content img:not(.photo){
