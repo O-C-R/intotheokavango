@@ -1,0 +1,501 @@
+
+
+{% extends "page.html" %}
+{% block title %}Into the Okavango 2015{% endblock title %}
+
+
+
+{% block head %}
+
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+  <link rel="stylesheet" href="../static/js/leaflet.label.css" />
+  <link rel="stylesheet" href="../static/js/MarkerCluster.css" />
+  <link rel="stylesheet" href="../static/js/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="../static/js/MarkerCluster.Default.ie.css" />
+  <link rel="stylesheet" type="text/css" href="../static/css/api.css">
+  <link rel="stylesheet" type="text/css" href="//cloud.typography.com/6479954/729546/css/fonts.css" />
+  <link rel="stylesheet" type="text/css" href="../static/css/style4.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+  
+{% raw %}
+<script id='query-template' type='text/ractive'>
+    <h2>Endpoint Query String</h2>
+    <button id="query-button" on-click="runQuery">Run Query</button>
+    <pre id="query-endpoint">{{renderedURL}}</pre>
+    
+    <div id="tag-area"> 
+      <Tag queryTags="{{queryTags}}"></Tag>
+    </div> 
+    <div class="input-section">
+        <h2>Select the type of Feature you want to explore</h2>
+        <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select view" />
+        <div id="dropdown-child" style="display:{{dropDownDisplay}}">
+            <RactiveDropdownComponent items="{{categoriesItems}}" selector="categories" show="{{show}}" selectedText="select {{selector}}" />
+        </div>
+        <div id="dropdown-grandchild" style="display:{{dropDownGrandchild}}">
+            <RactiveDropdownComponent items="{{modelsItems}}" selector="models" show="{{show}}" selectedText="select {{selector}}" />
+        </div>
+        <br><br><br>
+    </div>
+    <div class="input-section">
+        <h2>Get the data output as</h2>
+        <label><input type='radio' name='{{output}}' value='viz' checked={{vizChecked}}> VIZ</label>
+        <label><input type='radio' name='{{output}}' value='map' checked={{mapChecked}}> MAP</label>
+        <label><input type='radio' name='{{output}}' value='json' checked={{jsonChecked}}> JSON</label>
+    </div>
+    <div class="input-section">
+        <h2>Limit the number of results to <input type='number' value='{{limit}}' show="{{limit}}" min='1' max="2000" /></h2>
+    </div>
+    <div class="input-section">
+        <h2>Which order do you want the results?</h2>
+        <label><input type='radio' name='{{order}}' value='ascending'> ascending</label>
+        <label><input type='radio' name='{{order}}' value='descending'> descending</label>
+    </div>
+    <div class="input-section">
+      <h2>Which day of the expedition do you want to see?</h2>
+      <label>Expedition Day <input type='number' value='{{expeditionDay}}' show="{{expeditionDay}}" min='1' max="90" /></label>
+    </div>
+    <div class="input-section">
+        <h2>Specify a Date Range</h2>
+        <label>Start Date <input type="date" name="{{startDate}}" value='{{startDate}}'></label>
+        <label> and/or 
+        <br><br>End Date <input type="date" name="{{endDate}}" value='{{endDate}}' min="{{startDate}}"></label>
+    </div>
+</script>
+
+<script id='featuresTemplate' type='text/ractive'>
+    <div id="features-left">
+        {{ >totals}}
+    </div>
+    <div id="features-right">
+        {{ >featureTypes}}
+    </div>
+
+    {{#partial featureTypes}} 
+      <ul>
+      {{#each featuresArray}}
+        <li>{{ title }}</li>
+      {{/each}} 
+      </ul>
+    {{/partial}} 
+    {{#partial totals}} 
+      <ul>
+      {{#each featuresArray}}
+          <li>{{ total }}</li>
+      {{/each}} 
+      </ul>
+    {{/partial}}
+</script>
+
+
+<!-- Dropdown Template -->
+<script id='RactiveDropdownComponentTemplate' type='text/ractive'>
+  <div class="{{selectorClass}} {{ isOpened ? 'opened' : '' }}" id="ractiveDropdown">
+      <span class="label" on-enter="selectItem" on-tap="toggleDropdown" on-uparrow="move:up" on-downarrow="move:down" on-leftarrow="move:up" on-rightarrow="move:down" tabindex="0">{{ selectedText }}</span>
+      <ul style="height: {{ liHeight * show + (padding * 2) }}px">
+          {{#each items: i}}
+          <li tabindex="0" on-tap="selectItem:{{i}}" class="{{ (selectedIndex == i) ? 'active' : '' }}">{{.}}</li>
+          {{/each}}
+      </ul>
+  </div>
+</script>
+
+<!-- tag component template -->
+<script id="tagTemplate" type="text/ractive">
+  <div class="btn-group">
+      {{#each queryTags:i}}
+      <span class="btn btn-primary" >
+          <span>{{.}}</span>
+          <span on-click="splice('queryTags', i, 1)">x</span>
+      </span>
+      {{/each}}
+  </div>
+</script>
+
+<!-- d3 component template -->
+<script id="d3-template" type="text/ractive">
+    
+    <div id="timelineViz"></div>
+</script>
+
+<!-- main data section ractive template -->
+<script id="content-template" type="text/ractive">
+  <div id="data-header">
+      <ul id="data-navigation">
+          <li class="documentation" on-click='setActive("documentation")'>Documentation</li>
+          <li class="explorer" on-click='setActive("explorer")'>Explorer</li>
+          <li class="overview" on-click='setActive("overview")'>Overview</li>
+      </ul>
+      <div class="title" id="api-view-title">{{activeSection.nav_title}}</div>
+    </div>
+
+  {{#if section === "overview"}}
+  <div class="data-description">
+    <p>The Okavango Database is a growing record of data generated by the explorers and scientists on their 90 day expedition to the Okavango Delta. The database encompasses wildlife sightings, tweets, audio recordings and images taken by the participants, as well as sensor measurements capturing things like temperature, pH levels, and heart rates. The intention of the Okavango Database API is to share the data in almost real-time as it’s uploaded, so that people all over the world can follow the journey as it unfolds. It also allows for others to use the data for their own purposes. The visualization below offers an example of how this data can be visualized.</p>
+    
+    <iframe src="https://player.vimeo.com/video/124307636?autoplay=1&loop=1&title=0&byline=0&portrait=0" width="900" height="502" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+  </div>
+  {{/if}}
+
+  {{#if section === "explorer"}}
+  <div class="data-description">
+    <p>The API Explorer page contains some user interface tools to help make it easier to understand how to build your database query. By choosing between different buttons, you can decide whether you want your data to return in the raw JSON format, plotted on a map, or visualized on a graph. You can also select how many entries to return, as well as what kind of data you’re interested in seeing. For more information on all possible endpoints (types of queries you can make), please consult the API Documentation section.</p>
+  
+    <div id="widgets-area">
+      <div id="features-area">
+        <h2>Data Collected so far</h2>
+        <div id="features-totals">
+            <!--Ractive template-->
+            <FeaturesWidget />
+        </div>
+          <h2>Show Me</h2>
+          <div class="showMeButton" id="heartrate-button" ><button on-click="heartRateQuery">a HeartRate Graph</button></div>
+          <div class="showMeButton" id="hippoSightings-button"><button on-click="hippoSighting">Hippo Sightings on a Map</button></div>
+      </div>
+      <div id="query-area">
+          <!--Ractive template-->
+          <QueryComponent />
+      </div>
+     </div>
+   </div>
+  {{/if}}
+
+  {{#if section === "documentation"}}
+  <div class="data-description" id="api-documentation">
+    <h2>What is an API?</h2>
+    <p>API stands for application programming interface, which usually involves a set of processes and commands that make it convenient for people to access computer code or information that someone has already produced. For instance, if you want to make your own app post a message to Facebook, you would probably use Facebook’s API to integrate your app with theirs.</p>
+    <h2>What is a Database?</h2>
+    <p>A database is an organized collection of data. For the Okavango Wildlife Database, each type of data &#8212; a wildlife sighting, image, sensor reading or audio recording, to name a few &#8212; is uploaded to an online server via satellite. As the expedition unfolds, the database will grow, holding more and more records of what the explorers and scientists have witnessed on the trip.</p>
+    <h2>What is a Database API?</h2>
+    <p>The Okavango Database API is the interface that allows you to ask the database to show you what’s inside. Usually, API’s are software-to-software interfaces that aren’t that easy for humans to understand. To ask the database to give you data back, you make a specific query in the form of a URL. The database is able to parse and recognize this request, and returns the data to you in some kind of structured way, like an XML or JSON file. In our case, the Okavango Database returns information in JSON (Javascript Object Notation).</p>
+    <h2>Calling the API</h2>
+    <ul>
+      <li>Basically, it&#39;s like this: <code>/api/&lt;view&gt;/&lt;output&gt;?&lt;query&gt;</code></li>
+      <li>The view is what kind of thing you want back. The core of the API lies in the features view, but you can also view expeditions, members and species as general lists.</li>
+      <li>The output returns the data as JSON if nothing is specified, otherwise you can specify <code>map</code> to see the data plotted spatially or <code>viz</code> for a graph.</li>
+      <li>The query defines the filter (ex: <code>FeatureType=sighting</code>). Multiple filters are appended with <code>&</code> in between.</li>
+    </ul>
+    <h2>API Endpoints</h2>
+    <ul>
+      <li>The following list outlines all possible methods for accessing features in the Okavango Database. These methods are also known as endpoints, and are requested with a URL. For example, to load all of the elephant sightings (limited to the first 100 by default), you would request: <code><a href="http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant" target="_blank">
+http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant</a></code></li>
+    <li>The Elephant sightings could be filtered further, by the expedition member who saw them, geographic region, or day of expedition, for example.</li>
+    <h3>Each API endpoint call contains the following general information:</h3>
+      <li><code>limit:</code> the amount of entries returned. The default limit is 100, but this can be changed (ex: <code>limit=30</code>). Larger limits tax the database, so it is recommended to keep your limit request as small as possible.</li>
+      <li><code>resolution:</code> returns a feature for every <code>resolution</code> seconds. This might be useful if you want a larger sample set or time period, but don’t want to overload a graph with every single data point. <code>full</code> returns all features.</li>
+      <li><code>filter:</code> feature endpoints can be filtered by member, expedition, as well as general filters like <code>limit, resolution,</code> and <code>order.</code></li>
+      <li><code>returned:</code> the amount of entries returned (this usually correlates to limit, but may be less than the limit indicated if there are fewer results in the database).</li>
+      <li><code>order:</code> results are returned by default in ascending order (indicated by setting <code>order</code> to <code>ascending</code> or <code>1</code>), or descending order (indicated by setting <code>order</code> to <code>descending</code> or <code>-1<code>).</li>
+      <li><code>total:</code> indicates the total amount of matching results for the query in the database, even if the amount returned is limited.</li>
+      <h3>Additional Filters:</h3>
+      <li><code>startDate:</code> specifies the starting date of the features to be returned. May be combined with <code>endDate.</code> Format is <code>yyyy-mm-dd</code> (ex: <code>startDate=2015-06-03</code>).</li>
+      <li><code>endDate:</code> specifies the ending date of the features to be returned. May be combined with <code>startDate.</code> Format is <code>yyyy-mm-dd</code> (ex: <code>endDate=2015-06-03</code>).</li>
+      <li><code>geoBounds:</code> upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So the Okavango Delta is something like <code>geoBounds=20,-17,26,-22</code></li>
+      <li><code>expeditionDay:</code> returns data from a specific day of the expedition (ex: <code>expeditionDay=1</code>)</li>
+      <h3>View Endpoints:</h3>
+      <li>These endpoints offer overviews of all the members, expeditions and species that could be used to further filter features in the database.</li>
+      <li><code>members:</code> reveals an array of features associated with each member. Endpoint url: <code><a href="http://intotheokavango.org/api/members" target="_blank">http://intotheokavango.org/api/members</a></code></li>
+      <li><code>expeditions:</code> reveals all of the expeditions to the Okavango Delta, along with start date and duration. Endpoint url: <code><a href="http://intotheokavango.org/api/expeditions" target="_blank">http://intotheokavango.org/api/expeditions</a></code></li>
+      <li><code>species:</code> reveals all of the species sightings on the expeditions. Endpoint url: <code><a href="http://intotheokavango.org/api/species" target="_blank">http://intotheokavango.org/api/species</a></code></li>
+      <h3>Features Endpoints:</h3>
+      <li>If you try to call the features view, the format looks quite different from the other view endpoints. This is because the Features view contains the bulk of what’s in the database, and is the main collection to be searched and filtered.</li>
+      <li>The primary way to filter the features is by <code>FeatureType</code> (ex: <code>FeatureType=ambit</code>).</li>
+      <li>Here is a list of the possible FeatureTypes, and the data they contain: </li>
+      <li><code>ambit:</code> contains heart rate and other activity data captured from ambit watches worn by certain explorers.</li>
+      <li><code>ambit_geo:</code> contains geolocation data from the ambit watches.</li>
+      <li><code>audio:</code> audio recordings taken in the field.</li>
+      <li><code>beacon:</code> geolocation data sent by beacons every 30 minutes.</li>
+      <li><code>image:</code> all images uploaded to the database. These can be filtered further by <code>ImageType: GoPro, Documentary</code> or <code>Specimen.</code></li>
+      <li><code>sensor:</code> sensor readings taken by environmental sensors attached to the expedition boat. Data includes temperature, pH levels and other environmental readings.</li>
+      <li><code>sighting:</code> all species sightings on the expedition. You can further filter by <code>SpeciesName</code> (ex: <code>SpeciesName=Elephant</code>). The results return a timestamped geolocated point, with a <code>Count</code> of how many species were sighted, as well as images if they were taken. A <code>Taxonomy</code> object returns the scientific name, and a <code>Notes</code> field records a description uploaded with the sighting.</li>
+      <li><code>tweet:</code> a list of all tweets with the hashtag #okavango15.</li>
+      <li><code>longform:</code> returns longform blog entries posted to the okavango collection on <a href="https://medium.com/tag/okavango15" target="_blank">Medium.</a></li>
+      </ul>
+  </div>
+  {{/if}}
+</script>
+
+{% endraw %}
+
+
+{% endblock head %}
+
+
+{% block body %}
+
+  <div id="mapContainer">
+    <div id="mapWorld">
+    </div>
+  </div>
+
+  <div id="contentContainer">
+    <div id="header" class="header">
+      <ul id="navigation">
+        <li class="map">Map</li>
+        <li class="journal">Journal</li>
+        <li class="data">Data</li>
+        <li class="about">About</li>
+        <li class="share"><a href="http://twitter.com/intotheokavango" target="_blank"><img src="static/img/twitterIcon.svg"/></a></li>
+      </ul>
+      <div id="title">
+        <h1>Into the Okavango 2015</h1>
+        <img src="static/img/logo.svg" alt="Into the Okavango logo"/>
+      </div>
+    </div>
+
+    <div id="statusScreen" class="hidden">
+      <p>Into the Okavango doesn't support tablets and mobiles yet...</p>
+      <div class="cta"><a href="http://www.twitter.com">Stay tuned!</a></div>
+      <img src="static/img/spinner.gif" alt="loader">
+    </div>
+
+    <div id="pageContainer">
+
+      <div id="aboutPage" class="page hidden">
+        <div id="video">
+          <div class="cover">
+            <img src="static/img/spinner.gif" alt="loader">
+          </div>
+          <div class="vimeoContainer">
+            <iframe src="https://player.vimeo.com/video/124421450?autoplay=1&api=1" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          </div>
+        </div>
+        <div id="introduction">
+          <div class="row" id="intro">
+            <div class="column">
+              
+
+              <div id="cta">
+                <a href="#"><p>The expedition has started, start exploring!</p></a>
+              </div>
+
+
+              <p>90 days, 1,000 miles, 3 countries, 2 rivers, 31 adventurers, 100% open data.<br>Join us in real-time as we explore</p>
+              <h1>The beating heart of our planet</h1>
+            </div>
+            <div class="column">
+
+              <div class="logos">
+                <a href="http://www.nationalgeographic.com/">
+                  <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+                </a>
+                <a href="http://www.o-c-r.org/">
+                  <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+                </a>
+                <a href="http://www.wildbirdtrust.com/">
+                  <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+                </a>
+              </div>
+
+              <p>
+                The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unexplored. Starting in May a team of Ba’Yei, scientists, engineers and adventurers will journey a 1000 miles down the Cuito River, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
+              <br>
+              <br>
+                This site displays data which is uploaded daily, via satellite, by the expedition team. Data is also available through a public API, allowing anyone to remix, analyze or visualize the collected information.
+              </p>
+              <p>
+                <a href="https://itunes.apple.com/us/podcast/into-the-okavango/id994847647">
+                  <img src="static/img/podcastIcon.png" alt="icon for Itunes podcast" />
+                </a>
+              </p>
+
+            </div>
+          </div>
+
+          <div id="beaconContainer">
+            <img src="static/img/introBeacon.svg" alt="" id="beacon"/>
+          </div>
+
+          <div class="row" id="goals">
+            <div class="column">
+              <div class="goalIcon"><img src="static/img/iconIntroUnderstand.png"/></div>
+              <h2>Understand 
+              <br>
+                the wilderness
+              </h2>
+              <p>
+                To effectively protect the Okavango and its catchments it is essential to gain knowledge and insight into the functioning of the system as a whole. Starting in 2011 the Okavango Wilderness Project has conducted yearly transects of the Delta, gathering unique data and immersing the expedition members in the ebb and flow of this pristine wilderness. In 2015 the expedition will be extended to include a transect of one of the Delta’s feeder rivers, the Cuito. With its source deep in the remote highlands of Angola, this is one of the least known places on Earth. Travelling down the river, the team will collect data on insects, fish, birds, reptiles and mammals, as well as conduct water quality assessments and landscape surveys.
+              </p>
+            </div>
+            <div class="column right">
+              <div class="goalIcon"><img src="static/img/iconIntroPreserve.png"/></div>
+              <h2>Raise awareness<br>
+                and preserve
+              </h2>
+              <p>
+                Although the Okavango itself is protected as a UNESCO World Heritage Site, its catchment and water supply in Angola and Namibia remain vulnerable to human interference. By gathering and freely disseminating information about the functioning and health of the entire system the 2015 expedition aims to raise the levels of both understanding and awareness of this unique and fragile system.
+              <br>
+              <br>
+                Once base-line data on the system becomes freely available effective measures can then be implemented to insure the continued health and survival of this great African wilderness.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div id="team">
+          <div class="background">
+            <div class="slides">
+              <img src="static/img/slides/0.jpg"/>
+              <img src="static/img/slides/1.jpg"/>
+              <img src="static/img/slides/2.jpg"/>
+            </div>
+            <div class="overlay"></div>
+          </div>
+          
+          <div class="content">
+            <div class="column">
+              <h2>
+                Expedition team<br><span class="title"><span class="explorerBox legend"></span> National Geographic Emerging Explorers</span>
+              </h2>
+              <p>
+                Alex Paullin <span class="title">Camp Logistics</span><br>Brian House <span class="title">Sound Artist</span><br>Chris Boyes <span class="title">Expedition Leader</span><br>Giles Trevethick <span class="title">Research Coordinator</span><br>Gobonamang Kgetho <span class="title">Poler</span><br>Gregg Treinish<span class="explorerBox"></span> <span class="title">Sensor Network Deployment</span><br>James Kydd <span class="title">Expedition photographer</span><br>Jer Thorp<span class="explorerBox"></span> <span class="title">Data Artist</span><br>John Hilton <span class="title">Expedition Director</span><br>Karen Ross <span class="title">Botswana WHS Bid Leader</span><br>Kgalalela Mpetsang <span class="title">Poler</span><br>Leillamang Kgetho <span class="title">Poler</span><br>Maans Booysen <span class="title">Ornithology</span><br>Pieter Hugo <span class="title">Camp Logistics</span><br>Shah Selbe<span class="explorerBox"></span> <span class="title">Expedition Technologist</span><br>Steve Boyes<span class="explorerBox"></span> <span class="title">Project Leader</span><br>Topho Retiyo <span class="title">Poler</span><br>Water Setlabosha <span class="title">Poler</span><br>
+              </p>
+            </div>
+            <div class="column">
+              <h2>
+                Scientific team
+              </h2>
+              <p>
+                Adjany Costa <span class="title">Ichthyologist and Ornithologist</span><br>Bill Branch <span class="title">Herpetologist</span><br>David Goyder <span class="title">Botanist - Kew Gardens</span><br>Gotz Neef <span class="title">Botanist & Entomologist</span><br>Matt Janks <span class="title">Botanist</span><br>Nigel Barker <span class="title">Botanist</span><br>Nkosinathi Mazungula <span class="title">Ichthyologist</span><br>Paul Skelton <span class="title">Ichthyologist</span><br>Francisco Maiato <span class="title">Botanist</span><br>
+              </p>
+              <h2>
+                Documentary team
+              </h2>
+              <p>
+                Alexandra Fuller<span class="title">Writer</span><br>Cory Richards<span class="title">Photographer</span><br>Mark Stone <span class="title">Assistant</span><br>Neil Gelinas <span class="title">Filmmaker</span>
+              </p>
+              
+              <div class="logos">
+                <a href="http://www.nationalgeographic.com/">
+                  <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+                </a>
+                <a href="http://www.o-c-r.org/">
+                  <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+                </a>
+                <a href="http://www.wildbirdtrust.com/">
+                  <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="mapPage" class="page hidden">
+        <div class="pane dimmed">
+          <svg id="timeline"/>
+        </div>
+        <div class="pane hidden">
+
+        </div>
+        <div class="pane hidden">
+          <div id="feed">
+
+            <div class="post tweet">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/iconTweet.svg"/>
+                <p class="message">
+                </p>
+                <div class="photo">
+                </div>
+              </div>
+            </div>
+
+            <div class="post photo">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/iconPhoto.svg"/>
+                <div class="text">
+                  <div class="photo">
+                  </div>
+                  <p class="notes"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="post blog">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/mediumIcon.svg"/>
+                <div class="text">
+                  <h3 class="title">
+                  </h3>
+                  <p class="message">
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="post sound">
+              <div class="meta">
+                <div class="separator"></div>
+                <div class="timestamp"></div>
+              </div>
+              <div class="content">
+                <img class="icon" src="static/img/iconSound.svg"/>
+                <div class="text">
+                  <iframe width="100%" height="166" scrolling="no" frameborder="no"></iframe>
+                  <p class="notes"></p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="scrollLabel">Scroll to navigate<br/>through time</div>
+          <div class="button control-zoom">
+            <a class="control-zoom-in" href="#" title="Zoom in">+</a>
+            <a class="control-zoom-out" href="#" title="Zoom out">-</a>
+          </div>
+          <div class="button control-playback"></div>
+        </div>
+        <div class="logos">
+          <a href="http://www.nationalgeographic.com/">
+            <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+          </a>
+          <a href="http://www.o-c-r.org/">
+            <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+          </a>
+          <a href="http://www.wildbirdtrust.com/">
+            <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+          </a>
+        </div>
+      </div>
+
+      <!-- DataPage -->
+      <div id="dataPage" class="page hidden">  
+          <div id="data-content"></div>
+        </div>
+      </div>
+      <!--@End DataPage -->
+
+      <div id="sharePage" class="page hidden">
+        <h1>SHARE</h1>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/js/d3.min.js"></script>
+  <script src="static/js/leaflet.js"></script>
+  <script src="static/js/leaflet.label.js"></script>
+  <script src="static/js/rcolor.js"></script>
+  <script src="http://cdn.ractivejs.org/latest/ractive.js"></script>
+  <script src="http://cdn.jsdelivr.net/ractive.load/latest/ractive-load.min.js"></script>
+  <script src='https://rawgit.com/ractivejs/ractive-events-keys/master/dist/ractive-events-keys.min.js'></script>
+  <script src='https://rawgit.com/ractivejs/ractive-events-tap/master/dist/ractive-events-tap.js'></script>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src="static/js/build4.js"></script>
+
+{% endblock body %}
+
