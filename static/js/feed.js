@@ -130,37 +130,13 @@ function Feed(){
 			});
 			jump(timeline.getTimeCursor());
 		});
-
 		initialized = false;
 
 	}
 
-	function scroll(){
-		var day = timeline.getTimeCursor().day;
-		var y = node.node().parentNode.scrollTop;
-		var forward = d3.event.wheelDeltaY <= 0;
-		var fw = forward ? 1:-1;
 
-		// var len = allPosts.length;
-		// for(var i=Math.constrain(postCursor-fw,0,len-1); forward?(i<len-1):(i>=0); i+=fw){
-		// 	var post = allPosts[i];
-		// 	var d1 = post.getData();
-		// 	if(y >= d1.feedPos && y < d1.feedPos+d1.height + 70){
-		// 		var nextPost = allPosts[i+1];
-		// 		var t;
-		// 		if(nextPost){
-		// 			var d2 = nextPost.getData();
-		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d2.date.getTime())/1000);
-		// 		} else{
-		// 			t = Math.round(Math.map(y,d1.feedPos,d1.feedPos+d1.height+70,d1.date.getTime(),d1.date.getTime()+1)/1000);
-		// 		}
-		// 		// if(Math.abs(t-timeline.getTimeCursor().current) > 3600*24) timeline.jumpTo(t);
-		// 		// else timeline.navigateJournal(t);
-		// 		timeline.navigateJournal(t);
-		// 		postCursor = i;
-		// 		return;
-		// 	}
-		// }
+	function scroll(){
+		var y = node.node().parentNode.scrollTop;
 		var len = allPosts.length;
 		for(var i=0; i<len-1; i++){
 			var post = allPosts[i];

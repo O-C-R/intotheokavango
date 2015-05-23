@@ -62,7 +62,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-2;
+		dayCursor = dates.length-3; // !!!!!!
 	}
 
 	function init(day, lastDay){
@@ -235,7 +235,6 @@ function Timeline(){
 		prevTimeCursor = timeCursor;
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
-		// console.log(new Date(timeCursor*1000), 'LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),'LOL',new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 
 		wheelDelta = 0;
 
@@ -433,6 +432,10 @@ function Timeline(){
 		dayCursor = i;
 	}
 
+	function getPaused(){
+		return paused;
+	}
+
 	return {
 		checkNightTime: checkNightTime,
 		init: init,
@@ -451,7 +454,8 @@ function Timeline(){
 		jumpTo: jumpTo,
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
-		checkUnzoom: checkUnzoom
+		checkUnzoom: checkUnzoom,
+		getPaused, getPaused
 	};
 }
 
