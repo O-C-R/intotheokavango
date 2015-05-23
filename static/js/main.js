@@ -9,6 +9,7 @@
 
 	TODOS
 
+	- click on icons to open popups
 	- find unfocused back
 	- new icons
 	- pause unfocuses member markers
@@ -19,7 +20,9 @@
 	- linkable features and pages
 	- sightings taxonomy color
 	- scroll map while hovering a marker
-	- test resolution	
+	- test resolution query
+	- stacked features on map view
+
 
 	- clicking on popups should open journal on right time
 	- dim out zoom buttons when max is reached

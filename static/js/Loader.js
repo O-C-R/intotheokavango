@@ -295,7 +295,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
