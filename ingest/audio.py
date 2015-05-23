@@ -45,11 +45,12 @@ def parse(request):
     if 'TeamMember' in data:
         data['Member'] = data['TeamMember']
         del data['TeamMember']              
-    member = "%s: " % data['Member'] if 'Member' in data else ""
+    member = "%s: " % data['Member'] if ('Member' in data and data['Member'] is not None and len(data['Member'].strip())) else ""
     notes = data['Notes'] if 'Notes' in data else ""
     title = "%s%s" % (member, notes)
     if not len(title.strip()):
         title = util.datestring(data['t_utc'], tz=config['local_tz'])
+    log.info("--> title is %s" % title)        
     soundcloud_url = post_track(path, title)#yield gen.Task(post_track, path)
     log.debug("yielded")
     if soundcloud_url is None:
