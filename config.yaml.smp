@@ -70,4 +70,8 @@ iNaturalist:
     password:
     project_id:
 
+youtube:
+    client_id: 
+    client_secret: 
+
 members: 

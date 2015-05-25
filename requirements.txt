@@ -13,3 +13,4 @@ requests>=2.5.1
 twilio>=3.8.0
 Pillow>=2.7.0
 feedparser>=5.2.0
+future>=0.14.3
