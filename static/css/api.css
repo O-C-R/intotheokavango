@@ -189,7 +189,7 @@
 
     #totalsViz text {
         fill: white;
-        font: 10px 'Sentinel SSm A', 'Sentinel SSm B';;
+        font: 10px 'Sentinel SSm A', 'Sentinel SSm B';
         text-anchor: end;
     }
 

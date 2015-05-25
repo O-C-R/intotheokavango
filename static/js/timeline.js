@@ -455,7 +455,7 @@ function Timeline(){
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
 		checkUnzoom: checkUnzoom,
-		getPaused, getPaused
+		getPaused: getPaused
 	};
 }
 
