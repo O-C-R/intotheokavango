@@ -15,7 +15,7 @@ YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
 def main():
-    features = db.features.find({'properties.FeatureType': "video", 'YouTubeURL': None})
+    features = db.features.find({'properties.FeatureType': "video", 'properties.YouTubeURL': None})
     for feature in features:
         try:
             options = { 'file': os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", feature['properties']['UploadPath'])),
@@ -51,8 +51,8 @@ def upload(youtube, options):
     body = {'snippet': {'title': options['title'], 
                         'description': options['description'], 
                         'categoryId': 22, 
-                        'status': {'privacyStatus': "public"}
-                        }
+                        },
+            'status': {'privacyStatus': "public"}
             }
     insert_request = youtube.videos().insert(part=",".join(list(body.keys())), body=body, media_body=MediaFileUpload(options['file'], chunksize=-1, resumable=True))
     try:
