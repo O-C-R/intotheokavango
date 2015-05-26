@@ -24,13 +24,13 @@ def main():
         try:
             path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", feature['properties']['UploadPath']))
             title = feature['properties']['Title']
-            soundcloud_url = upload(path, title)
-            db.features.update({'_id': feature['_id']}, {'$set': {'properties.SoundCloudURL': youtube_url}})
+            soundcloud_url = upload(client, path, title)
+            db.features.update({'_id': feature['_id']}, {'$set': {'properties.SoundCloudURL': soundcloud_url}})
         except Exception as e:
             log.error(log.exc(e))
 
 
-def upload(path, title):
+def upload(client, path, title):
     log.info("Posting %s to soundcloud..." % path)
     try:
         with open(path, 'rb') as f:
