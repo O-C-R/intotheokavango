@@ -44,7 +44,7 @@ $(document).ready(function() {
                 }
 
                 var metadata = $('#imageUpload').serializeJSON()
-                metadata['Notes'] = $('#Notes').val()
+                metadata['Title'] = $('#Title').val()
                 var timestamp = new Date(metadata['t_utc']);
                 metadata['t_utc'] = Math.floor(timestamp.getTime()/ 1000)
 
@@ -96,7 +96,7 @@ $(document).ready(function() {
 <br />
 <form id="imageUpload" style="padding-bottom:20px">
 
-    <label for="audio">Audio</label>
+    <label for="audio">File</label><br />
     <input type="file" name="Audio" id="Audio" value="" multiple>
     <br /><br />
     <label for="TeamMember">Team Member</label>
@@ -107,9 +107,10 @@ $(document).ready(function() {
     <br />
     <input type="text" name="t_utc" id="t_utc" value="">
     <br /><br />
-    <label for="Notes">Notes</label>
+    <label for="Title">Title</label>
     <br />
-    <textarea type="" name="Notes" id="Notes" value=""></textarea>
+    <input type="text" name="Title" id="Title" value="">
+    <br /><br />
 </form>
 <div id="test" style="background-color:#ffcc00;width:120px">Click to Submit</div>
 <div>
