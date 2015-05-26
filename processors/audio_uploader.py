@@ -18,7 +18,7 @@ def main():
         log.error("Could not establish SoundCloud client: %s" % log.exc(e))
 
 
-    features = db.features.find({'properties.FeatureType': "audio", 'properties.SoundCloudURL': None})
+    features = db.features.find({'properties.FeatureType': "audio", 'properties.SoundCloudURL': {'$exists': True, '$eq': None}})
     for feature in features:
         log.info("Uploading %s..." % feature['properties']['UploadPath'])
         try:
