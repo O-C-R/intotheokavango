@@ -20,14 +20,14 @@ def main():
 
     features = db.features.find({'properties.FeatureType': "audio", 'properties.SoundCloudURL': None})
     for feature in features:
+        log.info("Uploading %s..." % feature['properties']['UploadPath'])
         try:
             path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", feature['properties']['UploadPath']))
             title = feature['properties']['Title']
             soundcloud_url = upload(path, title)
             db.features.update({'_id': feature['_id']}, {'$set': {'properties.SoundCloudURL': youtube_url}})
-        except HttpError as e:
-            data = json.loads(e.content.decode('utf-8'))
-            log.error("An HTTP error %d occurred:\n%s" % (e.resp.status, json.dumps(data, indent=4)))
+        except Exception as e:
+            log.error(log.exc(e))
 
 
 def upload(path, title):

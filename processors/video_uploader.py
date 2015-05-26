@@ -17,11 +17,13 @@ YOUTUBE_API_VERSION = "v3"
 def main():
     features = db.features.find({'properties.FeatureType': "video", 'properties.YouTubeURL': None})
     for feature in features:
+        log.info("Uploading %s..." % feature['properties']['UploadPath'])
         try:
             options = { 'file': os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", feature['properties']['UploadPath'])),
                         'title': feature['properties']['Title'],
-                        'description': feature['properties']['Notes'] if 'Notes' in feature['properties'] else ""
+                        'description': ""
                         }
+                        # 'description': feature['properties']['Notes'] if 'Notes' in feature['properties'] else ""                        
         except Exception as e:
             log.error(log.exc(e))
         try:
