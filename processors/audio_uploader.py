@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import soundcloud
+import soundcloud, os, random, sys, time, json, io, tempfile
 from housepy import config, log, util
 from mongo import db
 
