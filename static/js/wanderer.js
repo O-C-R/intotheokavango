@@ -12,9 +12,8 @@ function Wanderer(p){
 	var acceleration = {'x':0,'y':0};
 	var r = 0.0003;
 	var wanderTheta = 0;
-	var maxSpeed = 0.000005;
-	var maxForce = 0.000000125;
-
+	var maxSpeed = 0.000003;
+	var maxForce = 0.0000001;
 
 	if(debug){
 		var svg = d3.select('#beaconContainer')

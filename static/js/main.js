@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function(){
 	  else d3.select('#statusScreen img').remove();
 	})();
 
+
+	
 	mapTLatLng = new L.LatLng(-12.811059,18.175099);
 	mapLatLng = new L.LatLng(-12.811059,18.175099);
 
@@ -401,6 +403,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		if(timeline) timeline.resize();
 	}
+
+	
 
 });
 
