@@ -22,7 +22,7 @@ def parse(request):
             data['latitude'] = math.degrees(float(sample['Latitude']))
             continue
         if key == "GPSAltitude":
-            data['altitude'] = float(sample['Latitude'])
+            data['altitude'] = float(sample['GPSAltitude'])
             continue
         if type(value) != str:
             continue                            

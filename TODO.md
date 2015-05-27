@@ -2,7 +2,6 @@
 - are sightings without images being pushed? or are the images not being added?
 
 ### new
-- make audio async
 - add SensorType (FeatureSubType) to SMS sensors
 
 
