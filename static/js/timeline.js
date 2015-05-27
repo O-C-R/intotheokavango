@@ -21,6 +21,7 @@ function Timeline(){
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
+	var scrollStreak = 1;
 	var paused = false;
 	var isNightTime = false;
 	var nightTime = [];
@@ -236,6 +237,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
+		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -332,14 +334,16 @@ function Timeline(){
 		}
 	}
 
+	
+
 	function navigateMap(delta){
-		// console.log(new Date(timeCursor*1000));
+		scrollStreak *= 1.082;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		wheelDelta = -delta/4;
+		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
 			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;

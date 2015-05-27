@@ -2389,8 +2389,8 @@ function Page(i){
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
 		if(id != 'about') {
-			console.log('2');
-			pauseVimeoPlayer();
+			// console.log('2');
+			// pauseVimeoPlayer();
 		}
 	}
 
@@ -2462,8 +2462,8 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		console.log('3');
-		pauseVimeoPlayer();
+		// console.log('3');
+		// pauseVimeoPlayer();
 		timeline.checkNightTime();
 	}
 
@@ -2513,8 +2513,8 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		console.log('4');
-		pauseVimeoPlayer();
+		// console.log('4');
+		// pauseVimeoPlayer();
 	}
 
 
@@ -3301,6 +3301,7 @@ function Timeline(){
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
+	var scrollStreak = 1;
 	var paused = false;
 	var isNightTime = false;
 	var nightTime = [];
@@ -3516,6 +3517,8 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
+		console.log(scrollStreak);
+		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -3612,14 +3615,17 @@ function Timeline(){
 		}
 	}
 
+	
+
 	function navigateMap(delta){
-		// console.log(new Date(timeCursor*1000));
+		scrollStreak *= 1.075;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		wheelDelta = -delta/4;
+		// console.log(successiveScrolls);
+		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
 			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
@@ -3939,8 +3945,7 @@ function initMapLabels(map){
 
 	TODOS
 
-	- vimeo
-	- accelerate zoom
+	- accelerate scroll
 	- twitter images
 	- soundcloud filtering
 	- IE

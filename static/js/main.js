@@ -9,8 +9,7 @@
 
 	TODOS
 
-	- vimeo
-	- accelerate zoom
+	- accelerate scroll
 	- twitter images
 	- soundcloud filtering
 	- IE

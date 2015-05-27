@@ -11,7 +11,6 @@ function onMessageReceived(event) {
     }
     var data = JSON.parse(event.data);
     if(data.event == 'ready') onReady();
-    // if(data.event == 'play') onPlay();
 }
 
 function onReady() {
@@ -28,12 +27,8 @@ function onReady() {
         .remove();
 }
 
-// function onPlay(){
-    
-// }
-
 function pauseVimeoPlayer(){
-    console.log('pausing vimeo');
+    // console.log('pausing vimeo');
     var data = {
       method: 'pause'
     };
