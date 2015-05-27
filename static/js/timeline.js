@@ -284,7 +284,6 @@ function Timeline(){
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
 				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(!n) console.log('DAY');
 				if(!n) break;
 			}
 		}
@@ -292,10 +291,10 @@ function Timeline(){
 		isNightTime = n;
 	}
 
-	function checkUnzoom(force){
+	function checkUnzoom(force, reset){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
+			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}

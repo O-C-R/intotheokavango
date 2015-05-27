@@ -3226,6 +3226,7 @@ function Member(n, l, d){
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
+		timeline.checkUnzoom(false, true);
 	}
 
 	function dim(){
@@ -3557,7 +3558,6 @@ function Timeline(){
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
 				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(!n) console.log('DAY');
 				if(!n) break;
 			}
 		}
@@ -3565,10 +3565,10 @@ function Timeline(){
 		isNightTime = n;
 	}
 
-	function checkUnzoom(force){
+	function checkUnzoom(force, reset){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
+			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
@@ -3922,50 +3922,7 @@ function initMapLabels(map){
 	    }
 	});
 }
-;var playerOrigin = '*';
-var vimeoPlayer;
-
-window.addEventListener('message', onMessageReceived, false);
-function onMessageReceived(event) {
-    if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
-        return false;
-    }           
-    if (playerOrigin === '*') {
-        playerOrigin = event.origin;
-    }
-    var data = JSON.parse(event.data);
-    if(data.event == 'ready') onReady();
-    if(data.event == 'play') onPlay();
-}
-
-function onReady() {
-    var data = {
-      method: 'addEventListener',
-      value: 'play'
-    };
-    var message = JSON.stringify(data);
-    vimeoPlayer = d3.select('iframe').node();
-    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-function onPlay(){
-    d3.select('#aboutPage #video div.cover')
-        .transition()
-        .style('opacity',0)
-        .remove();
-}
-
-function pauseVimeoPlayer(){
-    var data = {
-      method: 'pause'
-    };
-    vimeoPlayer = d3.select('iframe').node();
-    if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-    d3.select('#aboutPage #video div.cover').remove();
-};
+;
 
 /*
 
@@ -3976,20 +3933,20 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- zoom back when focusing
-	- add links to map tweets
 	- vimeo
 	- accelerate zoom
 	- twitter images
 	- soundcloud filtering
 	- IE
 	- Firefox
-	- zoom limits
+	- away marker
+	- linkable features
+	- add links to map tweets
+	- new icons
 
 
 	- click on icons to open popups
 	- find unfocused back
-	- new icons
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'

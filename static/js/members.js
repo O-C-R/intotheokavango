@@ -137,6 +137,7 @@ function Member(n, l, d){
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
+		timeline.checkUnzoom(false, true);
 	}
 
 	function dim(){

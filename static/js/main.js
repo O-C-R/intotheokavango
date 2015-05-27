@@ -9,20 +9,20 @@
 
 	TODOS
 
-	- zoom back when focusing
-	- add links to map tweets
 	- vimeo
 	- accelerate zoom
 	- twitter images
 	- soundcloud filtering
 	- IE
 	- Firefox
-	- zoom limits
+	- away marker
+	- linkable features
+	- add links to map tweets
+	- new icons
 
 
 	- click on icons to open popups
 	- find unfocused back
-	- new icons
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
