@@ -214,6 +214,11 @@
       shape-rendering: crispEdges;
     }
 
+    .temperature .label {
+      color: white;
+      font: 12px 'Gotham A', 'Gotham B', Helvetica, Arial;
+    }
+
     .title {
       font-weight: bold;
       font: 12px sans-serif;

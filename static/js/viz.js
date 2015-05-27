@@ -76,7 +76,14 @@ var parseAmbitSpeed = function(item) {
 var parseSensorData = function(item) {
     var sensorData = {};
     sensorData.airTemp = item["properties"]["AirTemp"];
-    sensorData.waterTemp = item["properties"]["WaterTemp"];
+    if (item["properties"].hasOwnProperty("water temp")) {
+        sensorData.waterTemp = item["properties"]["water temp"];
+    } else if (item["properties"].hasOwnProperty["WaterTemp"]) {
+        sensorData.waterTemp = item["properties"]["WaterTemp"];
+    } else {
+        sensorData.waterTemp = item["properties"]["WaterTemp"];
+    }
+    
     sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
 
     return sensorData;
@@ -180,7 +187,7 @@ var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
 
 var makeTimeSeriesViz = function(parsedData,feature_type) {
     //TIMESERIES VIZ
-    var margin = {top: 70.5, right: 30, bottom: 60, left: 40.5},
+    var margin = {top: 70.5, right: 100, bottom: 60, left: 40.5},
     width = 800 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     left_width = 100;
@@ -282,38 +289,71 @@ var makeTimeSeriesViz = function(parsedData,feature_type) {
     }
 
     if(feature_type === "sensor") {
+        yAxisLabel = "Degrees Celsius";
+        graphTitle = "Air and Water Temperature";
+        var color = d3.scale.ordinal()
+            .domain(["waterTemp", "airTemp"])
+            .range(["#4BFF87", "#686d9d"]);
+
         console.log("feature_type is sensor");
         console.log(parsedData);
-        for (var i = 0; i < parsedData.length; i++) {
-            if (parsedData[i].hasOwnProperty("airTemp")) {
-                yAxisLabel = "Degrees Celsius";
-                graphTitle = "Air and Water Temperature";
-                var line = d3.svg.line()
-                    .x(function(d) { return xScale(d.time); })
-                    .y(function(d) { return yScale(d.airTemp); });
+        color.domain(d3.keys(parsedData[0]).filter(function(key) { return key !== "time"; }));
 
-                // var waterLine = d3.svg.line()
-                //     .x(function(d) { return xScale(d.time); })
-                //     .y(function(d) { return yScale(d.waterTemp); });
+        var line = d3.svg.line()
+            .x(function(d) { return xScale(d.date); })
+            .y(function(d) { return yScale(d.temperature); });
 
-                var dateRange = d3.extent(parsedData, function(d) { 
-                    return d.time; 
-                });
-                console.log("dateRange: " + dateRange);
+        var temps = color.domain().map(function(name) {
+            return {
+              name: name,
+              values: parsedData.map(function(d) {
+                return {date: d.time, temperature: +d[name]};
+                })
+            };
+        });
 
-                xScale.domain(dateRange);
-                yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
-                var dateFormat = d3.time.format.utc("%B %d %Y");
-                var timeFormat = d3.time.format.utc("%I:%M:%S");
-                xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
-            }
-        }
+        console.log(temps);
 
-        // svg.append("path")
-        //   .data([parsedData])
-        //   .attr("class", "line")
-        //   .attr("d", airLine)
-        //   .attr("d", waterLine);
+        var dateRange = d3.extent(parsedData, function(d) { 
+            return d.time; 
+            });
+        xScale.domain(dateRange);
+
+        yScale.domain([
+            d3.min(temps, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
+            d3.max(temps, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+        ]);
+
+        var dateFormat = d3.time.format.utc("%B %d %Y");
+        var timeFormat = d3.time.format.utc("%I:%M:%S");
+        xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+
+        xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+
+        yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+
+        var temp = svg.selectAll(".temperature")
+          .data(temps)
+        .enter().append("g")
+          .attr("class", "temperature");
+
+        temp.append("path")
+          .attr("class", "line")
+          .attr("d", function(d) { return line(d.values); })
+          .style("stroke", function(d) { return color(d.name); });
+
+        temp.append("text")
+          .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+          .attr("transform", function(d) { return "translate(" + xScale(d.value.date) + "," + yScale(d.value.temperature) + ")"; })
+          .attr("x", 3)
+          .attr("dy", ".35em")
+          .attr("class", "label")
+          .style("fill", "white")
+          .text(function(d) { return d.name; });
     }
 
     svg.append("g")
