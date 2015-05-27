@@ -33,6 +33,7 @@ function onReady() {
 // }
 
 function pauseVimeoPlayer(){
+    console.log('pausing vimeo');
     var data = {
       method: 'pause'
     };
