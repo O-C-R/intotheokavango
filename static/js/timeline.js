@@ -52,7 +52,7 @@ function Timeline(){
 
 	function setDates(count,start){
 		dates = [];
-		dayCount = count-1;
+		dayCount = count;
 		var t = new Date(start).getTime()/1000-3600*24;
 		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){
@@ -280,14 +280,16 @@ function Timeline(){
 
 	function checkNightTime(){
 		var len = nightTime.length;
+		var n = false;
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
-				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(isNightTime != n) nightNode.classed('night',n);
-				isNightTime = n;
-				if(!isNightTime) break;
+				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(!n) console.log('DAY');
+				if(!n) break;
 			}
 		}
+		if(isNightTime != n) nightNode.classed('night',n);
+		isNightTime = n;
 	}
 
 	function checkUnzoom(force){
