@@ -189,7 +189,7 @@ h3, h3.title{
       }
 
     #mapWorld div.leaflet-popup{
-      
+      max-width: 400px; 
     }
 
       #mapWorld div.leaflet-popup a.leaflet-popup-close-button{

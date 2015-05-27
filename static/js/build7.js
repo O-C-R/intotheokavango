@@ -2361,6 +2361,7 @@ function AboutPage(){
 	page.hide = function(){
 		page.node.classed('hidden',true);
 		page.button.classed('active',false);
+		console.log('1');
 		pauseVimeoPlayer();
 		d3.select('#aboutPage #video div.cover').remove();
 	}
@@ -2387,7 +2388,10 @@ function Page(i){
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
-		pauseVimeoPlayer();
+		if(id != 'about') {
+			// console.log('2');
+			// pauseVimeoPlayer();
+		}
 	}
 
 
@@ -2458,7 +2462,8 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		pauseVimeoPlayer();
+		// console.log('3');
+		// pauseVimeoPlayer();
 		timeline.checkNightTime();
 	}
 
@@ -2508,7 +2513,8 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		pauseVimeoPlayer();
+		// console.log('4');
+		// pauseVimeoPlayer();
 	}
 
 
@@ -2576,11 +2582,14 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2016-09-17&limit=0&resolution=86400';
+			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2015-09-17&limit=0&resolution=86400';
 			d3.json(query, function(error, data){
 				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 				data = data.results;
-				var len = data.features.length+1;
+				var t1 = data.features[0].properties.t_utc;
+				var t2 = data.features[data.features.length-1].properties.t_utc;
+				var len = Math.ceil((t2-t1)/(3600*24))+1;
+				// var len = data.features.length+1;
 				callback(len, d);
 			});
 		});
@@ -2589,7 +2598,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 6;
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			// console.log(toBeCompleted);
 			toBeCompleted --;
@@ -2613,7 +2622,7 @@ function Loader(){
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
-		// loadBeacons(day, checkForCompletion);
+		loadBeacons(day, checkForCompletion);
 	}
 
 
@@ -2657,10 +2666,11 @@ function Loader(){
 					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
 				}
 			}
-			activityInterval[0]+(10*60);
-			activityInterval[1]-(10*60);
-			// console.log(day, new Date(activityInterval[0]*1000),new Date(activityInterval[1]*1000));
+			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
+			activityInterval[0]+=(10*60);
+			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
+			console.log(day, new Date(activityInterval[0]*1000), new Date(activityInterval[1]*1000));
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
@@ -2944,6 +2954,11 @@ function Loader(){
 
 	function loadBeacons(day, callback){
 
+		if(day < 7){
+			callback();
+			return;
+		}
+
 		var starIcon = L.icon({
 		    iconUrl: '../static/img/star2.png',
 		    shadowUrl: '../static/img/starShadow2.png',
@@ -2969,8 +2984,8 @@ function Loader(){
 			
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(day < 7) return false;
 		        	// set a minimum distance of 200m between each beacon
+		        	if(feature.properties.CoreExpedition) return false;
 		        	if(beacons[day].length>0){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
@@ -2991,7 +3006,7 @@ function Loader(){
                 }
 		    });
 
-			if (beacons.length > 0 && beacons[day].length>0) {
+			if (beaconCoords.length>0) {
 				var paths = [{
 					"type":"Feature",
 					"properties":{
@@ -3007,9 +3022,9 @@ function Loader(){
 				    fillColor: "#fff",
 				    color: "#AEB1FF",
 				    weight: 3,
-				    opacity: 0.25
+				    opacity: 0.35
 				};
-							
+				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
 				beaconPathLayer.addLayer(beaconPath);
 	        }
@@ -3217,6 +3232,7 @@ function Member(n, l, d){
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
+		timeline.checkUnzoom(false, true);
 	}
 
 	function dim(){
@@ -3285,6 +3301,7 @@ function Timeline(){
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
+	var scrollStreak = 1;
 	var paused = false;
 	var isNightTime = false;
 	var nightTime = [];
@@ -3316,7 +3333,7 @@ function Timeline(){
 
 	function setDates(count,start){
 		dates = [];
-		dayCount = count-2;
+		dayCount = count;
 		var t = new Date(start).getTime()/1000-3600*24;
 		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){
@@ -3500,6 +3517,8 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
+		console.log(scrollStreak);
+		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -3544,20 +3563,21 @@ function Timeline(){
 
 	function checkNightTime(){
 		var len = nightTime.length;
+		var n = false;
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
-				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(isNightTime != n) nightNode.classed('night',n);
-				isNightTime = n;
-				if(!isNightTime) break;
+				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(!n) break;
 			}
 		}
+		if(isNightTime != n) nightNode.classed('night',n);
+		isNightTime = n;
 	}
 
-	function checkUnzoom(force){
+	function checkUnzoom(force, reset){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
+			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
@@ -3595,14 +3615,17 @@ function Timeline(){
 		}
 	}
 
+	
+
 	function navigateMap(delta){
-		// console.log(new Date(timeCursor*1000));
+		scrollStreak *= 1.075;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		wheelDelta = -delta/4;
+		// console.log(successiveScrolls);
+		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
 			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
@@ -3911,50 +3934,7 @@ function initMapLabels(map){
 	    }
 	});
 }
-;var playerOrigin = '*';
-var vimeoPlayer;
-
-window.addEventListener('message', onMessageReceived, false);
-function onMessageReceived(event) {
-    if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
-        return false;
-    }           
-    if (playerOrigin === '*') {
-        playerOrigin = event.origin;
-    }
-    var data = JSON.parse(event.data);
-    if(data.event == 'ready') onReady();
-    if(data.event == 'play') onPlay();
-}
-
-function onReady() {
-    var data = {
-      method: 'addEventListener',
-      value: 'play'
-    };
-    var message = JSON.stringify(data);
-    vimeoPlayer = d3.select('iframe').node();
-    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-function onPlay(){
-    d3.select('#aboutPage #video div.cover')
-        .transition()
-        .style('opacity',0)
-        .remove();
-}
-
-function pauseVimeoPlayer(){
-    var data = {
-      method: 'pause'
-    };
-    vimeoPlayer = d3.select('iframe').node();
-    if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-    d3.select('#aboutPage #video div.cover').remove();
-};
+;
 
 /*
 
@@ -3965,9 +3945,19 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
+	- accelerate scroll
+	- twitter images
+	- soundcloud filtering
+	- IE
+	- Firefox
+	- away marker
+	- linkable features
+	- add links to map tweets
+	- new icons
+
+
 	- click on icons to open popups
 	- find unfocused back
-	- new icons
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
@@ -4120,7 +4110,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		// pages.mapWorld.show();
 		pages.about.show();
 		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate){
+		loader.getDayCount(function(dayCount,startDate,endDate){
 			timeline.setDates(dayCount,startDate);
 			loader.loadDay(timeline.getTimeCursor().day,function(day){
 				timeline.setTimeFrame();
@@ -4132,7 +4122,6 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
-				console.log(loader.members);
 				loader.members['Steve'].focus();
 				animate(new Date().getTime()-16);
 			});
@@ -4325,13 +4314,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		

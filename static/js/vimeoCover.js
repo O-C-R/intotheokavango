@@ -11,7 +11,6 @@ function onMessageReceived(event) {
     }
     var data = JSON.parse(event.data);
     if(data.event == 'ready') onReady();
-    if(data.event == 'play') onPlay();
 }
 
 function onReady() {
@@ -22,9 +21,6 @@ function onReady() {
     var message = JSON.stringify(data);
     vimeoPlayer = d3.select('iframe').node();
     vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-function onPlay(){
     d3.select('#aboutPage #video div.cover')
         .transition()
         .style('opacity',0)
@@ -32,6 +28,7 @@ function onPlay(){
 }
 
 function pauseVimeoPlayer(){
+    // console.log('pausing vimeo');
     var data = {
       method: 'pause'
     };

@@ -2576,11 +2576,14 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2016-09-17&limit=0&resolution=86400';
+			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2015-09-17&limit=0&resolution=86400';
 			d3.json(query, function(error, data){
 				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 				data = data.results;
-				var len = data.features.length+1;
+				var t1 = data.features[0].properties.t_utc;
+				var t2 = data.features[data.features.length-1].properties.t_utc;
+				var len = Math.ceil((t2-t1)/(3600*24))+1;
+				// var len = data.features.length+1;
 				callback(len, d);
 			});
 		});
@@ -2589,7 +2592,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 6;
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			// console.log(toBeCompleted);
 			toBeCompleted --;
@@ -2613,7 +2616,7 @@ function Loader(){
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
-		// loadBeacons(day, checkForCompletion);
+		loadBeacons(day, checkForCompletion);
 	}
 
 
@@ -2657,10 +2660,11 @@ function Loader(){
 					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
 				}
 			}
-			activityInterval[0]+(10*60);
-			activityInterval[1]-(10*60);
-			// console.log(day, new Date(activityInterval[0]*1000),new Date(activityInterval[1]*1000));
+			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
+			activityInterval[0]+=(10*60);
+			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
+			console.log(day, new Date(activityInterval[0]*1000), new Date(activityInterval[1]*1000));
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
@@ -2944,6 +2948,11 @@ function Loader(){
 
 	function loadBeacons(day, callback){
 
+		if(day < 7){
+			callback();
+			return;
+		}
+
 		var starIcon = L.icon({
 		    iconUrl: '../static/img/star2.png',
 		    shadowUrl: '../static/img/starShadow2.png',
@@ -2969,8 +2978,8 @@ function Loader(){
 			
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(day < 7) return false;
 		        	// set a minimum distance of 200m between each beacon
+		        	if(feature.properties.CoreExpedition) return false;
 		        	if(beacons[day].length>0){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
@@ -2991,7 +3000,7 @@ function Loader(){
                 }
 		    });
 
-			if (beacons.length > 0 && beacons[day].length>0) {
+			if (beaconCoords.length>0) {
 				var paths = [{
 					"type":"Feature",
 					"properties":{
@@ -3007,9 +3016,9 @@ function Loader(){
 				    fillColor: "#fff",
 				    color: "#AEB1FF",
 				    weight: 3,
-				    opacity: 0.25
+				    opacity: 0.35
 				};
-							
+				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
 				beaconPathLayer.addLayer(beaconPath);
 	        }
@@ -3316,7 +3325,7 @@ function Timeline(){
 
 	function setDates(count,start){
 		dates = [];
-		dayCount = count-2;
+		dayCount = count;
 		var t = new Date(start).getTime()/1000-3600*24;
 		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){
@@ -3544,14 +3553,16 @@ function Timeline(){
 
 	function checkNightTime(){
 		var len = nightTime.length;
+		var n = false;
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
-				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(isNightTime != n) nightNode.classed('night',n);
-				isNightTime = n;
-				if(!isNightTime) break;
+				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(!n) console.log('DAY');
+				if(!n) break;
 			}
 		}
+		if(isNightTime != n) nightNode.classed('night',n);
+		isNightTime = n;
 	}
 
 	function checkUnzoom(force){
@@ -3965,6 +3976,17 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
+	- zoom back when focusing
+	- add links to map tweets
+	- vimeo
+	- accelerate zoom
+	- twitter images
+	- soundcloud filtering
+	- IE
+	- Firefox
+	- zoom limits
+
+
 	- click on icons to open popups
 	- find unfocused back
 	- new icons
@@ -4120,7 +4142,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		// pages.mapWorld.show();
 		pages.about.show();
 		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate){
+		loader.getDayCount(function(dayCount,startDate,endDate){
 			timeline.setDates(dayCount,startDate);
 			loader.loadDay(timeline.getTimeCursor().day,function(day){
 				timeline.setTimeFrame();
@@ -4132,7 +4154,6 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
-				console.log(loader.members);
 				loader.members['Steve'].focus();
 				animate(new Date().getTime()-16);
 			});
@@ -4325,13 +4346,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		

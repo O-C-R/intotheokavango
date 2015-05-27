@@ -9,9 +9,19 @@
 
 	TODOS
 
+	- accelerate scroll
+	- twitter images
+	- soundcloud filtering
+	- IE
+	- Firefox
+	- away marker
+	- linkable features
+	- add links to map tweets
+	- new icons
+
+
 	- click on icons to open popups
 	- find unfocused back
-	- new icons
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
@@ -164,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		// pages.mapWorld.show();
 		pages.about.show();
 		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate){
+		loader.getDayCount(function(dayCount,startDate,endDate){
 			timeline.setDates(dayCount,startDate);
 			loader.loadDay(timeline.getTimeCursor().day,function(day){
 				timeline.setTimeFrame();
@@ -176,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
-				console.log(loader.members);
 				loader.members['Steve'].focus();
 				animate(new Date().getTime()-16);
 			});
@@ -369,13 +378,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		

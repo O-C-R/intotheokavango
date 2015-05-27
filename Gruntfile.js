@@ -8,8 +8,8 @@ module.exports = function(grunt) {
         separator: ';',
       },
       dist: {
-        src: ['static/js/dummy_data.js','static/js/viz.js','static/js/dataPage.js','static/js/feed.js','static/js/features.js','static/js/layout.js','static/js/loader.js','static/js/members.js','static/js/timeline.js','static/js/wanderer.js','static/js/utils.js','static/js/vimeoCover.js','static/js/main.js'],
-        dest: 'static/js/build5.js',
+        src: ['static/js/dummy_data.js','static/js/viz.js','static/js/dataPage.js','static/js/feed.js','static/js/features.js','static/js/layout.js','static/js/loader.js','static/js/members.js','static/js/timeline.js','static/js/wanderer.js','static/js/utils.js','static/js/main.js'],
+        dest: 'static/js/build7.js',
       }
     },
     shell: {

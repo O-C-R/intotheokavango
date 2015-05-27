@@ -21,6 +21,7 @@ function Timeline(){
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
+	var scrollStreak = 1;
 	var paused = false;
 	var isNightTime = false;
 	var nightTime = [];
@@ -62,7 +63,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-2; // !!!!!!
+		dayCursor = dates.length-2;
 	}
 
 	function init(day, lastDay){
@@ -236,6 +237,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
+		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -280,20 +282,21 @@ function Timeline(){
 
 	function checkNightTime(){
 		var len = nightTime.length;
+		var n = false;
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
-				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(isNightTime != n) nightNode.classed('night',n);
-				isNightTime = n;
-				if(!isNightTime) break;
+				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(!n) break;
 			}
 		}
+		if(isNightTime != n) nightNode.classed('night',n);
+		isNightTime = n;
 	}
 
-	function checkUnzoom(force){
+	function checkUnzoom(force, reset){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
+			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
@@ -331,14 +334,16 @@ function Timeline(){
 		}
 	}
 
+	
+
 	function navigateMap(delta){
-		// console.log(new Date(timeCursor*1000));
+		scrollStreak *= 1.082;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		wheelDelta = -delta/4;
+		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
 			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
