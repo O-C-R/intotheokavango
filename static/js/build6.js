@@ -3316,7 +3316,7 @@ function Timeline(){
 
 	function setDates(count,start){
 		dates = [];
-		dayCount = count-2;
+		dayCount = count-1;
 		var t = new Date(start).getTime()/1000-3600*24;
 		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){

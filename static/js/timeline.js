@@ -52,7 +52,7 @@ function Timeline(){
 
 	function setDates(count,start){
 		dates = [];
-		dayCount = count;
+		dayCount = count-1;
 		var t = new Date(start).getTime()/1000-3600*24;
 		totalTimeFrame[0] = t -4*3600;
 		for(var i=0; i<=dayCount; i++){
@@ -62,7 +62,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-2; // !!!!!!
+		dayCursor = dates.length-2;
 	}
 
 	function init(day, lastDay){
