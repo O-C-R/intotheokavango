@@ -2681,7 +2681,7 @@ function Loader(){
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 	    var loadingImages = 0;
@@ -2723,16 +2723,16 @@ function Loader(){
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconMedium.png',
 	        shadowUrl: '../static/img/featureIconShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -2774,16 +2774,16 @@ function Loader(){
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconSound.png',
 	        shadowUrl: '../static/img/featureIconShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=audio&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -2825,7 +2825,7 @@ function Loader(){
 	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
