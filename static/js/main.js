@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function(){
         dragging: false,
         keyboard: false,
         minZoom: 0,                    
-        maxZoom: 20,
+        maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
     });
@@ -416,10 +416,20 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(timeline) timeline.resize();
 	}
 
+
 	
 
 });
 
+
+function teleportMap(){
+	if(mapWorld.focusMember){
+		mapTLatLng = mapWorld.focusMember.getLatLng();
+		mapLatLng.lat = mapTLatLng.lat;
+		mapLatLng.lng = mapTLatLng.lng;
+		mapWorld.panTo(mapLatLng, {animate:false});
+	}
+}
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;

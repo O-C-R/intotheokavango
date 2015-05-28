@@ -390,6 +390,7 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			teleportMap();
 			updateCursor(true);
 		}
 

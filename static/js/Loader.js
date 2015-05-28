@@ -148,12 +148,6 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-
-		        	// if(feature.properties.TweetID == 601828768697552896) console.log(feature);
-		        	// var images = feature.properties.Images;
-		        	// console.log(images);
-		        	// if(images && images.length>0) console.log(images);
-
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
@@ -355,13 +349,6 @@ function Loader(){
                 	var count = feature.properties.Count;
 		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
-                },
-                onEachFeature: function(feature, layer){
-                	var name = feature.properties.SpeciesName;
-                	var count = feature.properties.Count;
-                	if(name){
-                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
-                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);

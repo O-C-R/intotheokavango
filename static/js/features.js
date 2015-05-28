@@ -27,17 +27,6 @@ function Sighting(feature, m){
 	var marker = m;
 	var type = 'sighting';
 
-	// if(marker){
-	// 	marker.addEventListener('popupclose',function(){
-	// 		popupVisible = false;
-	// 		popupDelay = true;
-	// 	})
-	// 	marker.addEventListener('popupopen',function(){
-	// 		popupVisible = true;
-	// 	})
-	// }
-
-
 	function getData(){
 		return {
 			type: 'sighting',

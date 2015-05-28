@@ -1840,17 +1840,6 @@ function Sighting(feature, m){
 	var marker = m;
 	var type = 'sighting';
 
-	// if(marker){
-	// 	marker.addEventListener('popupclose',function(){
-	// 		popupVisible = false;
-	// 		popupDelay = true;
-	// 	})
-	// 	marker.addEventListener('popupopen',function(){
-	// 		popupVisible = true;
-	// 	})
-	// }
-
-
 	function getData(){
 		return {
 			type: 'sighting',
@@ -2714,12 +2703,6 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-
-		        	// if(feature.properties.TweetID == 601828768697552896) console.log(feature);
-		        	// var images = feature.properties.Images;
-		        	// console.log(images);
-		        	// if(images && images.length>0) console.log(images);
-
                     var marker = L.marker(latlng, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
@@ -2921,13 +2904,6 @@ function Loader(){
                 	var count = feature.properties.Count;
 		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
-                },
-                onEachFeature: function(feature, layer){
-                	var name = feature.properties.SpeciesName;
-                	var count = feature.properties.Count;
-                	if(name){
-                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
-                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);
@@ -3141,7 +3117,6 @@ function Member(n, l, d){
 			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
 			latLng = new L.LatLng(lat,lng);
 		} else {}
-
 		marker.setLatLng(latLng);
 	}
 
@@ -3671,6 +3646,7 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			teleportMap();
 			updateCursor(true);
 		}
 
@@ -4075,7 +4051,7 @@ document.addEventListener('DOMContentLoaded', function(){
         dragging: false,
         keyboard: false,
         minZoom: 0,                    
-        maxZoom: 20,
+        maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
     });
@@ -4350,10 +4326,20 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(timeline) timeline.resize();
 	}
 
+
 	
 
 });
 
+
+function teleportMap(){
+	if(mapWorld.focusMember){
+		mapTLatLng = mapWorld.focusMember.getLatLng();
+		mapLatLng.lat = mapTLatLng.lat;
+		mapLatLng.lng = mapTLatLng.lng;
+		mapWorld.panTo(mapLatLng, {animate:false});
+	}
+}
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
