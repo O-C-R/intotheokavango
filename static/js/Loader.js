@@ -115,13 +115,13 @@ function Loader(){
 	function loadTweets(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconTweet.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
@@ -148,7 +148,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+		        	var scatterX = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
 		        	if(tweet) tweets[day].push(tweet);
@@ -163,8 +166,8 @@ function Loader(){
 	function loadBlogPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconUrl: '../static/img/featureIconMedium.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
 	        iconSize:     [40,40],
 	        shadowSize:   [40,40],
 	        iconAnchor:   [15,35],
@@ -196,7 +199,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     blogLayer.addLayer(marker);
                     var blog = BlogPost(feature, marker);
 		        	if(blog) blogs[day].push(blog);
@@ -211,8 +217,8 @@ function Loader(){
 	function loadSoundPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconUrl: '../static/img/featureIconSound.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
 	        iconSize:     [40,40],
 	        shadowSize:   [40,40],
 	        iconAnchor:   [15,35],
@@ -240,7 +246,10 @@ function Loader(){
 					})
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     soundLayer.addLayer(marker);
                     var sound = SoundPost(feature, marker);
 		        	if(sound) sounds[day].push(sound);
@@ -255,8 +264,8 @@ function Loader(){
 	function loadPhotos(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/picIcon.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconUrl: '../static/img/featureIconPhoto.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
 	        iconSize:     [30,30],
 	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
@@ -291,7 +300,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-	                    var marker = L.marker(latlng, markerOptions);
+	                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
+	                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+	                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+	                    var marker = L.marker(latlng2, markerOptions);
 	                    tweetLayer.addLayer(marker);
 	                    var photo = PhotoPost(feature, marker);
 				        if(photo) photos[day].push(photo);
@@ -305,17 +317,6 @@ function Loader(){
 	function loadSightings(day, callback){
 
 		var colorMap = [];
-
-		var quoteIcon = L.icon({
-		    iconUrl: '../static/img/quote.png',
-		    shadowUrl: '../static/img/quoteShadow.png',
-
-		    iconSize:     [40,40],
-		    shadowSize:   [40,40],
-		    iconAnchor:   [15,35],
-		    shadowAnchor: [15,35],
-		    popupAnchor:  [10,-40]
-		});
 
 		var sightingOptions = {
 		    radius: 2,
