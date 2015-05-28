@@ -23,36 +23,24 @@
 	- remove link at the end of image tweets
 	- highlight pause button
 	- add video features
-
-	- pause unfocuses member markers
-	- tweet images
-	- view labels, 'click to pause, scroll to navigate'
-	- accelerate scroll
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
 	- scroll map while hovering a marker
 	- test resolution query
 	- stacked features on map view
-
-
 	- clicking on popups should open journal on right time
-	- dim out zoom buttons when max is reached
+	- dim out zoom buttons when max zoom is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- fix trail in about page
-	- heartrate peak feature
-
-	- proper teleport
-	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link
 	- API error handling
 	- scrollbar event for feed navigation?
 	- remove global functions/variables
-	- margin journal alignment with timeline
-	- finer grained culling
+	- margin journal alignment with timeline + 35px
 	- dim out night sections of timeline
 
 */
@@ -369,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 

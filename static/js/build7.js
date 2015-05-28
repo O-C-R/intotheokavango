@@ -3295,6 +3295,11 @@ function Timeline(){
 	var unzoomedTime = [[1431948652,1432199688]];
 	var isUnzoomedTime = false;
 
+	var milestones = {
+		0 : 'Menongue',
+		7 : 'Cuito'
+	}
+
 
 	node.append('line')
 		.attr('x1','80%')
@@ -3353,10 +3358,15 @@ function Timeline(){
 		day.append('text')
 			.attr('x','66%')
 			.attr('dy','0.25em')
-			.text(function(d){
+			.text(function(d,i){
+				if(milestones[i]) return milestones[i];
 				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
+				var s;
 				var s = dateToString(da);
 				return s.mo + ' ' + s.da
+			})
+			.style('fill',function(d,i){
+				return 'rgba(255,255,255,'+(milestones[i]?1:0.5);
 			});
 
 		// node.selectAll('circle.day')
@@ -3440,11 +3450,11 @@ function Timeline(){
 
 	function updateDayLabels(){
 
-		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/50));
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/45));
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 40 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 45 || i%labelSkip != 0){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -3933,36 +3943,24 @@ function initMapLabels(map){
 	- remove link at the end of image tweets
 	- highlight pause button
 	- add video features
-
-	- pause unfocuses member markers
-	- tweet images
-	- view labels, 'click to pause, scroll to navigate'
-	- accelerate scroll
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
 	- scroll map while hovering a marker
 	- test resolution query
 	- stacked features on map view
-
-
 	- clicking on popups should open journal on right time
-	- dim out zoom buttons when max is reached
+	- dim out zoom buttons when max zoom is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- fix trail in about page
-	- heartrate peak feature
-
-	- proper teleport
-	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link
 	- API error handling
 	- scrollbar event for feed navigation?
 	- remove global functions/variables
-	- margin journal alignment with timeline
-	- finer grained culling
+	- margin journal alignment with timeline + 35px
 	- dim out night sections of timeline
 
 */
@@ -4279,7 +4277,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 
