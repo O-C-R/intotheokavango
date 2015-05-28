@@ -9,15 +9,15 @@
 
 	TODOS
 
-	- accelerate scroll
-	- twitter images
+	- journal doesn't load all days ?
 	- soundcloud filtering
+	- new icons
+	- linkable features
 	- IE
 	- Firefox
 	- away marker
-	- linkable features
-	- add links to map tweets
-	- new icons
+	- scroll for zoom vs time
+	- faster setdates
 
 
 	- click on icons to open popups
@@ -410,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
 
+		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
 

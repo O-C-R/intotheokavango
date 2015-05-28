@@ -27,7 +27,6 @@ function Timeline(){
 	var nightTime = [];
 
 	var dayCount = 16;
-	var graphicsInitialized = false;
 	var dates = [];
 	var dayRad = 2.5;
 	var margin = 10;
@@ -213,13 +212,11 @@ function Timeline(){
 		var loaded = loader.getLoadedDays();
 		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
 		timeFrame = [dates[dayCursor].getTime()/1000 -4*3600,dates[dayCursor+1].getTime()/1000-1 -4*3600];
-		// console.log('LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 		for(var i=dayCursor-1; i>=0; i--){
 			if(loaded[i]) {
 				timeFrame[0] = dates[i].getTime()/1000 -4*3600;
 			} else break;
 		}
-		// console.log('Aasdsaddssa', dates.slice());
 		for(var i=dayCursor; i<dates.length-1; i++){
 			if(loaded[i]) {
 				timeFrame[1] = dates[i+1].getTime()/1000-1 -4*3600;

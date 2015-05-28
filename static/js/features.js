@@ -263,7 +263,11 @@ function TweetPost(feature, m){
 			}
 		} catch(e){}
 	} else {
-		
+		var images = feature.properties.Images;
+    	if(images && images.length>0){
+			// console.log(images[0].Url);
+    		photoUrl = images[0].Url;
+    	}
 	}
 
 	if(marker){

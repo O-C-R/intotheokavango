@@ -23,16 +23,8 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2015-09-17&limit=0&resolution=86400';
-			d3.json(query, function(error, data){
-				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-				data = data.results;
-				var t1 = data.features[0].properties.t_utc;
-				var t2 = data.features[data.features.length-1].properties.t_utc;
-				var len = Math.ceil((t2-t1)/(3600*24))+1;
-				// var len = data.features.length+1;
-				callback(len, d);
-			});
+			var len = data['okavango_'+expeditionYear].Days + 2;
+			callback(len, d);
 		});
 	}
 
@@ -41,7 +33,6 @@ function Loader(){
 		console.log('loading data for day #' + day);
 		var toBeCompleted = 7;
 		function checkForCompletion(){
-			// console.log(toBeCompleted);
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
 				console.log('loading completed for day #' + day);
@@ -111,7 +102,6 @@ function Loader(){
 			activityInterval[0]+=(10*60);
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
-			console.log(day, new Date(activityInterval[0]*1000), new Date(activityInterval[1]*1000));
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   

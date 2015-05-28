@@ -1638,15 +1638,15 @@ function Feed(){
 	}
 	var postsByDay = [];
 	var allPosts = [];
+	var posts;
 	var postCursor = 0;
-
-	var initialized = false;
-
+	var resizing = false;
 
 	function init(day){
+		
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		var w = node.style('width');
-		w = parseFloat(+w.slice(0,w.length-2));
+		var w = d3.select(node.node().parentNode).style('width');
+		w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
 
 		// Definitely not optimized
 		var newPosts = [];
@@ -1666,7 +1666,7 @@ function Feed(){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
 
-		var posts = node.selectAll('div.post')
+		posts = node.selectAll('div.post')
 	        .data(allPosts, function(d){ 
 	        	d = d.getData();
 	        	return d.date.getTime() + '-' + d.latLng.lat;
@@ -1705,27 +1705,27 @@ function Feed(){
 			        		.append('img')
 			        		.attr('src',d.photoUrl)
 			        		.attr('alt','Photo taken on ' + t)
-			        		.attr('width', w)
-			        		.attr('height', d.size[1]*w/d.size[0]);
+			        		.on('load',function(){
+			        			jump();
+			        		})
 		        	}
 	        	} else if(d.type == 'photo'){
 		        	d3.select(this).select('div.photo')
 		        		.append('img')
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
-		        		.attr('width', w)
 
 		        	if(d.notes){
-		        	d3.select(this).select('p.notes')
-		        		.html(function(){
-		        			var urls = d.notes.match(/http[^\s]*/gi);
-		        			if(urls){
-			        			for(var i=0; i<urls.length; i++){
-			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
-			        			}
-			        		}
-		        			return d.notes
-		        		})
+			        	d3.select(this).select('p.notes')
+			        		.html(function(){
+			        			var urls = d.notes.match(/http[^\s]*/gi);
+			        			if(urls){
+				        			for(var i=0; i<urls.length; i++){
+				        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+				        			}
+				        		}
+			        			return d.notes
+			        		})
 		        	}
 		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
@@ -1744,14 +1744,7 @@ function Feed(){
 	        });
 
 		posts.order();
-
-		requestAnimationFrame(function(){
-			posts.each(function(d){
-				d.setFeedPos(this.offsetTop, this.clientHeight);
-			});
-			jump(timeline.getTimeCursor());
-		});
-		initialized = false;
+		jump();
 
 	}
 
@@ -1779,28 +1772,42 @@ function Feed(){
 	}
 
 
-	function jump(t){
-		var len = allPosts.length;
-		for(var i=0; i<len-1; i++){
-			var post = allPosts[i];
-			var nextPost = allPosts[i+1];
-			var t1 = post.getData().date.getTime()/1000;
-			var t2 = nextPost.getData().date.getTime()/1000;
-			if(t.current >= t1 && t.current < t2){
-				var d = post.getData();
-				requestAnimationFrame(function(){
-					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				})
-				postCursor = i;
-				break;
-			}
+	function jump(preventJump){
+		var t = timeline.getTimeCursor();
+		if(!resizing){
+			requestAnimationFrame(function(){
+				if(posts){
+					posts.each(function(d){
+						d.setFeedPos(this.offsetTop, this.clientHeight);
+					});
+				}
+				resizing = false;
+				if(!preventJump){
+					var len = allPosts.length;
+					for(var i=0; i<len-1; i++){
+						var post = allPosts[i];
+						var nextPost = allPosts[i+1];
+						var t1 = post.getData().date.getTime()/1000;
+						var t2 = nextPost.getData().date.getTime()/1000;
+						if(t.current >= t1 && t.current < t2){
+							var d = post.getData();
+							requestAnimationFrame(function(){
+								node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+							})
+							postCursor = i;
+							break;
+						}
+					}
+				}
+			});
 		}
+		resizing = true;
 	}
 	
 
 	return{
 		init: init,
-		jump: jump
+		jump: jump,
 	};
 }
 
@@ -2069,7 +2076,11 @@ function TweetPost(feature, m){
 			}
 		} catch(e){}
 	} else {
-		
+		var images = feature.properties.Images;
+    	if(images && images.length>0){
+			// console.log(images[0].Url);
+    		photoUrl = images[0].Url;
+    	}
 	}
 
 	if(marker){
@@ -2361,7 +2372,6 @@ function AboutPage(){
 	page.hide = function(){
 		page.node.classed('hidden',true);
 		page.button.classed('active',false);
-		console.log('1');
 		pauseVimeoPlayer();
 		d3.select('#aboutPage #video div.cover').remove();
 	}
@@ -2389,7 +2399,6 @@ function Page(i){
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
 		if(id != 'about') {
-			// console.log('2');
 			// pauseVimeoPlayer();
 		}
 	}
@@ -2462,7 +2471,6 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		// console.log('3');
 		// pauseVimeoPlayer();
 		timeline.checkNightTime();
 	}
@@ -2513,7 +2521,6 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		// console.log('4');
 		// pauseVimeoPlayer();
 	}
 
@@ -2582,16 +2589,8 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2015-09-17&limit=0&resolution=86400';
-			d3.json(query, function(error, data){
-				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-				data = data.results;
-				var t1 = data.features[0].properties.t_utc;
-				var t2 = data.features[data.features.length-1].properties.t_utc;
-				var len = Math.ceil((t2-t1)/(3600*24))+1;
-				// var len = data.features.length+1;
-				callback(len, d);
-			});
+			var len = data['okavango_'+expeditionYear].Days + 2;
+			callback(len, d);
 		});
 	}
 
@@ -2670,7 +2669,6 @@ function Loader(){
 			activityInterval[0]+=(10*60);
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
-			console.log(day, new Date(activityInterval[0]*1000), new Date(activityInterval[1]*1000));
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
@@ -3307,7 +3305,6 @@ function Timeline(){
 	var nightTime = [];
 
 	var dayCount = 16;
-	var graphicsInitialized = false;
 	var dates = [];
 	var dayRad = 2.5;
 	var margin = 10;
@@ -3493,13 +3490,11 @@ function Timeline(){
 		var loaded = loader.getLoadedDays();
 		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
 		timeFrame = [dates[dayCursor].getTime()/1000 -4*3600,dates[dayCursor+1].getTime()/1000-1 -4*3600];
-		// console.log('LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 		for(var i=dayCursor-1; i>=0; i--){
 			if(loaded[i]) {
 				timeFrame[0] = dates[i].getTime()/1000 -4*3600;
 			} else break;
 		}
-		// console.log('Aasdsaddssa', dates.slice());
 		for(var i=dayCursor; i<dates.length-1; i++){
 			if(loaded[i]) {
 				timeFrame[1] = dates[i+1].getTime()/1000-1 -4*3600;
@@ -3517,7 +3512,6 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
-		console.log(scrollStreak);
 		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
@@ -3618,13 +3612,12 @@ function Timeline(){
 	
 
 	function navigateMap(delta){
-		scrollStreak *= 1.075;
+		scrollStreak *= 1.082;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		// console.log(successiveScrolls);
 		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
@@ -3945,15 +3938,15 @@ function initMapLabels(map){
 
 	TODOS
 
-	- accelerate scroll
-	- twitter images
+	- journal doesn't load all days ?
 	- soundcloud filtering
+	- new icons
+	- linkable features
 	- IE
 	- Firefox
 	- away marker
-	- linkable features
-	- add links to map tweets
-	- new icons
+	- scroll for zoom vs time
+	- faster setdates
 
 
 	- click on icons to open popups
@@ -4346,6 +4339,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
 
+		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
 

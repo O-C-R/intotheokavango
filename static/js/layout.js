@@ -27,7 +27,6 @@ function AboutPage(){
 	page.hide = function(){
 		page.node.classed('hidden',true);
 		page.button.classed('active',false);
-		console.log('1');
 		pauseVimeoPlayer();
 		d3.select('#aboutPage #video div.cover').remove();
 	}
@@ -55,7 +54,6 @@ function Page(i){
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
 		if(id != 'about') {
-			// console.log('2');
 			// pauseVimeoPlayer();
 		}
 	}
@@ -128,7 +126,6 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		// console.log('3');
 		// pauseVimeoPlayer();
 		timeline.checkNightTime();
 	}
@@ -179,7 +176,6 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		// console.log('4');
 		// pauseVimeoPlayer();
 	}
 
