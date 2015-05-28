@@ -68,7 +68,7 @@ function Feed(){
 		        			var urls = d.message.match(/http[^\s]*/gi);
 		        			if(urls){
 			        			for(var i=0; i<urls.length; i++){
-			        				d.message = d.message.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
 			        			}
 			        		}
 			        		var handles = d.message.match(/@[^\s]*/gi);

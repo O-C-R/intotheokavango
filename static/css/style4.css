@@ -180,6 +180,7 @@ h3, h3.title{
       font-size: 9px;
       text-transform: uppercase;
       border:none;
+      pointer-events:none;
     }
 
       #mapWorld div.leaflet-label:before{

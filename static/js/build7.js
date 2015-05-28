@@ -1689,7 +1689,7 @@ function Feed(){
 		        			var urls = d.message.match(/http[^\s]*/gi);
 		        			if(urls){
 			        			for(var i=0; i<urls.length; i++){
-			        				d.message = d.message.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
 			        			}
 			        		}
 			        		var handles = d.message.match(/@[^\s]*/gi);
@@ -2471,8 +2471,8 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		// pauseVimeoPlayer();
 		timeline.checkNightTime();
+		timeline.updateCursor(true);
 	}
 
 	page.hide = function(){
@@ -2521,7 +2521,7 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		// pauseVimeoPlayer();
+		timeline.updateCursor(true);
 	}
 
 
@@ -2590,7 +2590,11 @@ function Loader(){
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
 			var len = data['okavango_'+expeditionYear].Days + 2;
-			callback(len, d);
+			var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1);
+			d3.json(query, function(error, data) {
+				if(data.results.features.length == 0) len --;
+				callback(len, d);
+			});
 		});
 	}
 
@@ -2599,7 +2603,6 @@ function Loader(){
 		console.log('loading data for day #' + day);
 		var toBeCompleted = 7;
 		function checkForCompletion(){
-			// console.log(toBeCompleted);
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
 				console.log('loading completed for day #' + day);
@@ -2701,8 +2704,8 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
-		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Text.charAt(0) != '@');
+		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Tweet.text.charAt(0) != '@');
 		        },
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
@@ -2800,7 +2803,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	return feature.geometry != null;
+		        	return feature.geometry != null && feature.properties.SoundCloudURL;
 		        },
 		        onEachFeature: function(feature, layer){
 					layer.addEventListener('click',function(){
@@ -2835,7 +2838,7 @@ function Loader(){
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
@@ -3427,7 +3430,7 @@ function Timeline(){
 			if(!jumping){
 				cursorHovered = true;
 				cursorTY = Math.constrain(d3.event.layerY-30,margin+dayRad,height-dayRad);
-				updateCursor(d3.event.layerY-30);
+				updateCursor(false, d3.event.layerY-30);
 			}
 		}).on('mouseout',function(){
 			cursorHovered = false;
@@ -3462,7 +3465,7 @@ function Timeline(){
 
 	function updateDayLabels(){
 
-		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/50));
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
@@ -3525,11 +3528,11 @@ function Timeline(){
 		// if(frameCount%60==0) console.log(new Date(timeCursor*1000), timeCursor);
 	}
 
-	function updateCursor(hover){
+	function updateCursor(force, hover){
 
 		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-
-		cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		else cursorY = cursorTY;
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
@@ -3668,6 +3671,7 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			updateCursor(true);
 		}
 
 		isLoading = true;
@@ -3735,7 +3739,8 @@ function Timeline(){
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
 		checkUnzoom: checkUnzoom,
-		getPaused: getPaused
+		getPaused: getPaused,
+		updateCursor: updateCursor
 	};
 }
 
@@ -3938,19 +3943,21 @@ function initMapLabels(map){
 
 	TODOS
 
-	- journal doesn't load all days ?
-	- soundcloud filtering
+	- sometines the journal doesnt load neighboring days
+	- culling
 	- new icons
 	- linkable features
 	- IE
 	- Firefox
 	- away marker
-	- scroll for zoom vs time
-	- faster setdates
-
-
+	- label scroll for zoom vs time
 	- click on icons to open popups
-	- find unfocused back
+	- refine medium popup
+	- actual names for timeline labels
+	- remove link at the end of image tweets
+	- highlight pause button
+	- add video features
+
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
@@ -4278,7 +4285,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    			mapWorld.focusMember.unfocus();
 			    		},500);
 			    	} else {
-			    		mapWorld.focusMember.light(0);
+			    		mapWorld.focusMember.light(1);
 			    		mouseOffset = L.point(0, 0);
 			    		mapOffset = L.point(0, 0);
 			    		timeline.togglePause(lastPlayMode?'pause':'play');

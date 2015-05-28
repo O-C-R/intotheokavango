@@ -9,19 +9,21 @@
 
 	TODOS
 
-	- journal doesn't load all days ?
-	- soundcloud filtering
+	- sometines the journal doesnt load neighboring days
+	- culling
 	- new icons
 	- linkable features
 	- IE
 	- Firefox
 	- away marker
-	- scroll for zoom vs time
-	- faster setdates
-
-
+	- label scroll for zoom vs time
 	- click on icons to open popups
-	- find unfocused back
+	- refine medium popup
+	- actual names for timeline labels
+	- remove link at the end of image tweets
+	- highlight pause button
+	- add video features
+
 	- pause unfocuses member markers
 	- tweet images
 	- view labels, 'click to pause, scroll to navigate'
@@ -349,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    			mapWorld.focusMember.unfocus();
 			    		},500);
 			    	} else {
-			    		mapWorld.focusMember.light(0);
+			    		mapWorld.focusMember.light(1);
 			    		mouseOffset = L.point(0, 0);
 			    		mapOffset = L.point(0, 0);
 			    		timeline.togglePause(lastPlayMode?'pause':'play');

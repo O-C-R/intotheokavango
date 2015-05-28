@@ -126,8 +126,8 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		// pauseVimeoPlayer();
 		timeline.checkNightTime();
+		timeline.updateCursor(true);
 	}
 
 	page.hide = function(){
@@ -176,7 +176,7 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		// pauseVimeoPlayer();
+		timeline.updateCursor(true);
 	}
 
 

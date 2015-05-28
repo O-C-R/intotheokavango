@@ -24,7 +24,11 @@ function Loader(){
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
 			var len = data['okavango_'+expeditionYear].Days + 2;
-			callback(len, d);
+			var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1);
+			d3.json(query, function(error, data) {
+				if(data.results.features.length == 0) len --;
+				callback(len, d);
+			});
 		});
 	}
 
@@ -134,8 +138,8 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
-		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Text.charAt(0) != '@');
+		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Tweet.text.charAt(0) != '@');
 		        },
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
@@ -233,7 +237,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	return feature.geometry != null;
+		        	return feature.geometry != null && feature.properties.SoundCloudURL;
 		        },
 		        onEachFeature: function(feature, layer){
 					layer.addEventListener('click',function(){
@@ -268,7 +272,7 @@ function Loader(){
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'

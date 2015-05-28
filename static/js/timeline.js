@@ -149,7 +149,7 @@ function Timeline(){
 			if(!jumping){
 				cursorHovered = true;
 				cursorTY = Math.constrain(d3.event.layerY-30,margin+dayRad,height-dayRad);
-				updateCursor(d3.event.layerY-30);
+				updateCursor(false, d3.event.layerY-30);
 			}
 		}).on('mouseout',function(){
 			cursorHovered = false;
@@ -184,7 +184,7 @@ function Timeline(){
 
 	function updateDayLabels(){
 
-		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/50));
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
@@ -247,11 +247,11 @@ function Timeline(){
 		// if(frameCount%60==0) console.log(new Date(timeCursor*1000), timeCursor);
 	}
 
-	function updateCursor(hover){
+	function updateCursor(force, hover){
 
 		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-
-		cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		else cursorY = cursorTY;
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
@@ -390,6 +390,7 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			updateCursor(true);
 		}
 
 		isLoading = true;
@@ -457,7 +458,8 @@ function Timeline(){
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
 		checkUnzoom: checkUnzoom,
-		getPaused: getPaused
+		getPaused: getPaused,
+		updateCursor: updateCursor
 	};
 }
 
