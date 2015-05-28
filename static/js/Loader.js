@@ -84,7 +84,7 @@ function Loader(){
 			    	var time = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
 			    	var core = feature.properties.CoreExpedition;
 			        if(!members[name]) {
-			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.0005, 18.175099+((Math.random()*2)-1)*0.0005);
+			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.00075, 18.175099+((Math.random()*2)-1)*0.00075);
 			        	members[name] = Member(name, latLng, day);
 			        }
 			        // members[name].addAmbitGeo(day, latLng, time, core, time < new Date('2015-05-19'));
@@ -148,8 +148,8 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-		        	var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+		        	var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
                     var marker = L.marker(latlng2, markerOptions);
                     tweetLayer.addLayer(marker);
@@ -199,8 +199,8 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
                     var marker = L.marker(latlng2, markerOptions);
                     blogLayer.addLayer(marker);
@@ -246,8 +246,8 @@ function Loader(){
 					})
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
                     var marker = L.marker(latlng2, markerOptions);
                     soundLayer.addLayer(marker);
@@ -300,8 +300,8 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-	                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-	                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+	                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+	                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
 	                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
 	                    var marker = L.marker(latlng2, markerOptions);
 	                    tweetLayer.addLayer(marker);
@@ -339,8 +339,8 @@ function Loader(){
 		            return (feature.geometry.coordinates[0] != 0);
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
 			        var marker = L.circleMarker(latlng2, sightingOptions);
 		        	sightingLayer.addLayer(marker);			        

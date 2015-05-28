@@ -9,9 +9,9 @@
 
 	TODOS
 
+	- click on popup doesn't open them
 	- sometines the journal doesnt load neighboring days
 	- culling
-	- new icons
 	- linkable features
 	- IE
 	- Firefox
@@ -329,9 +329,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    	if(r2 > 75){
 			    		timeline.togglePause('pause');
 			    		r2 *= 1.4;
-			    		console.log(mapOffset);
 			    		mapOffset = L.point(r2*Math.cos(theta),r2*Math.sin(theta));
-			    		console.log(mapOffset);
 			    		mapWorld.focusMember.unfocus(true);
 			    		setTimeout(function(){
 			    			mouseOffset = L.point(0, 0);
