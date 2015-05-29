@@ -104,24 +104,15 @@ function Timeline(){
 			.attr('dy','0.25em')
 			.text(function(d,i){
 				if(milestones[i]) return milestones[i];
-				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				var s;
-				var s = dateToString(da);
-				return s.mo + ' ' + s.da
+				return 'day ' + i
+				// var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
+				// var s;
+				// var s = dateToString(da);
+				// return s.mo + ' ' + s.da
 			})
 			.style('fill',function(d,i){
 				return 'rgba(255,255,255,'+(milestones[i]?1:0.5);
 			});
-
-		// node.selectAll('circle.day')
-		// 	.data(dates)
-		// 	.enter()
-		// 	.append('circle')
-		// 	.attr('class','day')
-		// 	.attr('cx','80%')
-		// 	.attr('r',dayRad)
-		// 	.attr('fill','rgb(255,255,255)')
-		// 	.style('pointer-events','none');
 
 		cursor = node.append('g')
 			.style('pointer-events','none')
@@ -188,6 +179,9 @@ function Timeline(){
 			.attr('transform',function(d,i){
 				return 'translate(0,'+ (margin + dayRad + (i*((height-margin-dayRad*2)/(dates.length-1)))) +')';
 			});
+
+		try{ updateCursor(true);
+		} catch(e) {}
 
 		updateDayLabels();
 	}

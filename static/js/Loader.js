@@ -24,11 +24,20 @@ function Loader(){
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
 			var len = data['okavango_'+expeditionYear].Days + 2;
-			var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1);
-			d3.json(query, function(error, data) {
-				if(data.results.features.length == 0) len --;
-				callback(len, d);
-			});
+			var findLastDay = function(){
+				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
+				d3.json(query, function(error, data) {
+					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+					if(data.total == 0) {
+						len --;
+						findLastDay();
+					} else {
+						callback(len, d);
+					}
+				});
+			}
+			findLastDay();
+
 		});
 	}
 
