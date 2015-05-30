@@ -23,16 +23,21 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2015-09-17&limit=0&resolution=86400';
-			d3.json(query, function(error, data){
-				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-				data = data.results;
-				var t1 = data.features[0].properties.t_utc;
-				var t2 = data.features[data.features.length-1].properties.t_utc;
-				var len = Math.ceil((t2-t1)/(3600*24))+1;
-				// var len = data.features.length+1;
-				callback(len, d);
-			});
+			var len = data['okavango_'+expeditionYear].Days + 2;
+			var findLastDay = function(){
+				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
+				d3.json(query, function(error, data) {
+					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+					if(data.total == 0) {
+						len --;
+						findLastDay();
+					} else {
+						callback(len, d);
+					}
+				});
+			}
+			findLastDay();
+
 		});
 	}
 
@@ -41,7 +46,6 @@ function Loader(){
 		console.log('loading data for day #' + day);
 		var toBeCompleted = 7;
 		function checkForCompletion(){
-			// console.log(toBeCompleted);
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
 				console.log('loading completed for day #' + day);
@@ -89,7 +93,7 @@ function Loader(){
 			    	var time = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
 			    	var core = feature.properties.CoreExpedition;
 			        if(!members[name]) {
-			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.0005, 18.175099+((Math.random()*2)-1)*0.0005);
+			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.00075, 18.175099+((Math.random()*2)-1)*0.00075);
 			        	members[name] = Member(name, latLng, day);
 			        }
 			        // members[name].addAmbitGeo(day, latLng, time, core, time < new Date('2015-05-19'));
@@ -111,7 +115,6 @@ function Loader(){
 			activityInterval[0]+=(10*60);
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
-			console.log(day, new Date(activityInterval[0]*1000), new Date(activityInterval[1]*1000));
 			timeline.setNightTime(day, activityInterval);
 			callback();
 		});   
@@ -121,18 +124,18 @@ function Loader(){
 	function loadTweets(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconTweet.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 	    var loadingImages = 0;
@@ -144,8 +147,8 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
-		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Text.charAt(0) != '@');
+		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Tweet.text.charAt(0) != '@');
 		        },
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
@@ -154,13 +157,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-
-		        	// if(feature.properties.TweetID == 601828768697552896) console.log(feature);
-		        	// var images = feature.properties.Images;
-		        	// console.log(images);
-		        	// if(images && images.length>0) console.log(images);
-
-                    var marker = L.marker(latlng, markerOptions);
+		        	var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
 		        	if(tweet) tweets[day].push(tweet);
@@ -175,18 +175,18 @@ function Loader(){
 	function loadBlogPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconMedium.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -208,7 +208,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     blogLayer.addLayer(marker);
                     var blog = BlogPost(feature, marker);
 		        	if(blog) blogs[day].push(blog);
@@ -223,18 +226,18 @@ function Loader(){
 	function loadSoundPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconSound.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=audio&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -243,7 +246,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	return feature.geometry != null;
+		        	return feature.geometry != null && feature.properties.SoundCloudURL;
 		        },
 		        onEachFeature: function(feature, layer){
 					layer.addEventListener('click',function(){
@@ -252,7 +255,10 @@ function Loader(){
 					})
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     soundLayer.addLayer(marker);
                     var sound = SoundPost(feature, marker);
 		        	if(sound) sounds[day].push(sound);
@@ -267,18 +273,18 @@ function Loader(){
 	function loadPhotos(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/picIcon.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconUrl: '../static/img/featureIconPhoto.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
 	        iconSize:     [30,30],
 	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
@@ -303,7 +309,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-	                    var marker = L.marker(latlng, markerOptions);
+	                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+	                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+	                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+	                    var marker = L.marker(latlng2, markerOptions);
 	                    tweetLayer.addLayer(marker);
 	                    var photo = PhotoPost(feature, marker);
 				        if(photo) photos[day].push(photo);
@@ -317,17 +326,6 @@ function Loader(){
 	function loadSightings(day, callback){
 
 		var colorMap = [];
-
-		var quoteIcon = L.icon({
-		    iconUrl: '../static/img/quote.png',
-		    shadowUrl: '../static/img/quoteShadow.png',
-
-		    iconSize:     [40,40],
-		    shadowSize:   [40,40],
-		    iconAnchor:   [15,35],
-		    shadowAnchor: [15,35],
-		    popupAnchor:  [10,-40]
-		});
 
 		var sightingOptions = {
 		    radius: 2,
@@ -350,8 +348,8 @@ function Loader(){
 		            return (feature.geometry.coordinates[0] != 0);
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
 			        var marker = L.circleMarker(latlng2, sightingOptions);
 		        	sightingLayer.addLayer(marker);			        
@@ -361,13 +359,6 @@ function Loader(){
                 	var count = feature.properties.Count;
 		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
-                },
-                onEachFeature: function(feature, layer){
-                	var name = feature.properties.SpeciesName;
-                	var count = feature.properties.Count;
-                	if(name){
-                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
-                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);

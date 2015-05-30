@@ -1638,15 +1638,15 @@ function Feed(){
 	}
 	var postsByDay = [];
 	var allPosts = [];
+	var posts;
 	var postCursor = 0;
-
-	var initialized = false;
-
+	var resizing = false;
 
 	function init(day){
+		
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		var w = node.style('width');
-		w = parseFloat(+w.slice(0,w.length-2));
+		var w = d3.select(node.node().parentNode).style('width');
+		w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
 
 		// Definitely not optimized
 		var newPosts = [];
@@ -1666,7 +1666,7 @@ function Feed(){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
 
-		var posts = node.selectAll('div.post')
+		posts = node.selectAll('div.post')
 	        .data(allPosts, function(d){ 
 	        	d = d.getData();
 	        	return d.date.getTime() + '-' + d.latLng.lat;
@@ -1689,7 +1689,7 @@ function Feed(){
 		        			var urls = d.message.match(/http[^\s]*/gi);
 		        			if(urls){
 			        			for(var i=0; i<urls.length; i++){
-			        				d.message = d.message.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
 			        			}
 			        		}
 			        		var handles = d.message.match(/@[^\s]*/gi);
@@ -1705,27 +1705,27 @@ function Feed(){
 			        		.append('img')
 			        		.attr('src',d.photoUrl)
 			        		.attr('alt','Photo taken on ' + t)
-			        		.attr('width', w)
-			        		.attr('height', d.size[1]*w/d.size[0]);
+			        		.on('load',function(){
+			        			jump();
+			        		})
 		        	}
 	        	} else if(d.type == 'photo'){
 		        	d3.select(this).select('div.photo')
 		        		.append('img')
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
-		        		.attr('width', w)
 
 		        	if(d.notes){
-		        	d3.select(this).select('p.notes')
-		        		.html(function(){
-		        			var urls = d.notes.match(/http[^\s]*/gi);
-		        			if(urls){
-			        			for(var i=0; i<urls.length; i++){
-			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
-			        			}
-			        		}
-		        			return d.notes
-		        		})
+			        	d3.select(this).select('p.notes')
+			        		.html(function(){
+			        			var urls = d.notes.match(/http[^\s]*/gi);
+			        			if(urls){
+				        			for(var i=0; i<urls.length; i++){
+				        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+				        			}
+				        		}
+			        			return d.notes
+			        		})
 		        	}
 		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
@@ -1744,14 +1744,7 @@ function Feed(){
 	        });
 
 		posts.order();
-
-		requestAnimationFrame(function(){
-			posts.each(function(d){
-				d.setFeedPos(this.offsetTop, this.clientHeight);
-			});
-			jump(timeline.getTimeCursor());
-		});
-		initialized = false;
+		jump();
 
 	}
 
@@ -1779,28 +1772,42 @@ function Feed(){
 	}
 
 
-	function jump(t){
-		var len = allPosts.length;
-		for(var i=0; i<len-1; i++){
-			var post = allPosts[i];
-			var nextPost = allPosts[i+1];
-			var t1 = post.getData().date.getTime()/1000;
-			var t2 = nextPost.getData().date.getTime()/1000;
-			if(t.current >= t1 && t.current < t2){
-				var d = post.getData();
-				requestAnimationFrame(function(){
-					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				})
-				postCursor = i;
-				break;
-			}
+	function jump(preventJump){
+		var t = timeline.getTimeCursor();
+		if(!resizing){
+			requestAnimationFrame(function(){
+				if(posts){
+					posts.each(function(d){
+						d.setFeedPos(this.offsetTop, this.clientHeight);
+					});
+				}
+				resizing = false;
+				if(!preventJump){
+					var len = allPosts.length;
+					for(var i=0; i<len-1; i++){
+						var post = allPosts[i];
+						var nextPost = allPosts[i+1];
+						var t1 = post.getData().date.getTime()/1000;
+						var t2 = nextPost.getData().date.getTime()/1000;
+						if(t.current >= t1 && t.current < t2){
+							var d = post.getData();
+							requestAnimationFrame(function(){
+								node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+							})
+							postCursor = i;
+							break;
+						}
+					}
+				}
+			});
 		}
+		resizing = true;
 	}
 	
 
 	return{
 		init: init,
-		jump: jump
+		jump: jump,
 	};
 }
 
@@ -1832,17 +1839,6 @@ function Sighting(feature, m){
 	var popupDelay = false;
 	var marker = m;
 	var type = 'sighting';
-
-	// if(marker){
-	// 	marker.addEventListener('popupclose',function(){
-	// 		popupVisible = false;
-	// 		popupDelay = true;
-	// 	})
-	// 	marker.addEventListener('popupopen',function(){
-	// 		popupVisible = true;
-	// 	})
-	// }
-
 
 	function getData(){
 		return {
@@ -2060,13 +2056,21 @@ function TweetPost(feature, m){
 	var url = feature.properties.Url
 	var photoUrl;
 	var size = [];
-	try{
-		if(tweetProperties.extended_entities.media[0].type == 'photo'){
-			photoUrl = tweetProperties.extended_entities.media[0].media_url;
-			size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
-			size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
-		}
-	} catch(e){}
+	if(expeditionYear < '15'){
+		try{
+			if(tweetProperties.extended_entities.media[0].type == 'photo'){
+				photoUrl = tweetProperties.extended_entities.media[0].media_url;
+				size[0] = tweetProperties.extended_entities.media[0].sizes.large.w;
+				size[1] = tweetProperties.extended_entities.media[0].sizes.large.h;
+			}
+		} catch(e){}
+	} else {
+		var images = feature.properties.Images;
+    	if(images && images.length>0){
+			// console.log(images[0].Url);
+    		photoUrl = images[0].Url;
+    	}
+	}
 
 	if(marker){
 		marker.addEventListener('popupclose',function(){
@@ -2383,7 +2387,9 @@ function Page(i){
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
-		pauseVimeoPlayer();
+		if(id != 'about') {
+			// pauseVimeoPlayer();
+		}
 	}
 
 
@@ -2454,8 +2460,8 @@ function MapPage(){
 		d3.select('#mapPage div.logos').classed('hidden',false);
 		d3.select('#contentContainer').classed('fixed',true);
 		updateLoadingScreen(false);
-		pauseVimeoPlayer();
 		timeline.checkNightTime();
+		timeline.updateCursor(true);
 	}
 
 	page.hide = function(){
@@ -2504,7 +2510,7 @@ function JournalPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
-		pauseVimeoPlayer();
+		timeline.updateCursor(true);
 	}
 
 
@@ -2572,22 +2578,29 @@ function Loader(){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;
 			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			query = 'http://intotheokavango.org/api/features/?FeatureType=ambit&expedition=okavango_'+expeditionYear+'&startDate='+d+'&endDate=2016-09-17&limit=0&resolution=86400';
-			d3.json(query, function(error, data){
-				if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-				data = data.results;
-				var len = data.features.length+1;
-				callback(len, d);
-			});
+			var len = data['okavango_'+expeditionYear].Days + 2;
+			var findLastDay = function(){
+				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
+				d3.json(query, function(error, data) {
+					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+					if(data.total == 0) {
+						len --;
+						findLastDay();
+					} else {
+						callback(len, d);
+					}
+				});
+			}
+			findLastDay();
+
 		});
 	}
 
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 6;
+		var toBeCompleted = 7;
 		function checkForCompletion(){
-			// console.log(toBeCompleted);
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
 				console.log('loading completed for day #' + day);
@@ -2609,7 +2622,7 @@ function Loader(){
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
-		// loadBeacons(day, checkForCompletion);
+		loadBeacons(day, checkForCompletion);
 	}
 
 
@@ -2635,7 +2648,7 @@ function Loader(){
 			    	var time = feature.properties.t_utc + timeOffsets[expeditionYear].timeAmbit + timeOffsets[expeditionYear].dateAmbit;
 			    	var core = feature.properties.CoreExpedition;
 			        if(!members[name]) {
-			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.0005, 18.175099+((Math.random()*2)-1)*0.0005);
+			        	// latLng = L.latLng(-12.811059+((Math.random()*2)-1)*0.00075, 18.175099+((Math.random()*2)-1)*0.00075);
 			        	members[name] = Member(name, latLng, day);
 			        }
 			        // members[name].addAmbitGeo(day, latLng, time, core, time < new Date('2015-05-19'));
@@ -2653,9 +2666,9 @@ function Loader(){
 					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
 				}
 			}
-			activityInterval[0]+(10*60);
-			activityInterval[1]-(10*60);
-			// console.log(day, new Date(activityInterval[0]*1000),new Date(activityInterval[1]*1000));
+			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
+			activityInterval[0]+=(10*60);
+			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 			callback();
@@ -2666,28 +2679,31 @@ function Loader(){
 	function loadTweets(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconTweet.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
+	    var loadingImages = 0;
+
+	    // http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt');
-		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt');
+		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Text.charAt(0) != '@');
+		        	else return (feature.geometry.coordinates[0] != 0 && feature.properties.Tweet.text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Tweet.text.charAt(0) != '@');
 		        },
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
@@ -2696,7 +2712,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+		        	var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     tweetLayer.addLayer(marker);
                     var tweet = TweetPost(feature, marker);
 		        	if(tweet) tweets[day].push(tweet);
@@ -2711,18 +2730,18 @@ function Loader(){
 	function loadBlogPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconMedium.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -2744,7 +2763,10 @@ function Loader(){
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     blogLayer.addLayer(marker);
                     var blog = BlogPost(feature, marker);
 		        	if(blog) blogs[day].push(blog);
@@ -2759,18 +2781,18 @@ function Loader(){
 	function loadSoundPosts(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/quote.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
-	        iconSize:     [40,40],
-	        shadowSize:   [40,40],
+	        iconUrl: '../static/img/featureIconSound.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=audio&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
@@ -2779,7 +2801,7 @@ function Loader(){
 			data = data.results;	
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	return feature.geometry != null;
+		        	return feature.geometry != null && feature.properties.SoundCloudURL;
 		        },
 		        onEachFeature: function(feature, layer){
 					layer.addEventListener('click',function(){
@@ -2788,7 +2810,10 @@ function Loader(){
 					})
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var marker = L.marker(latlng, markerOptions);
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
                     soundLayer.addLayer(marker);
                     var sound = SoundPost(feature, marker);
 		        	if(sound) sounds[day].push(sound);
@@ -2803,18 +2828,18 @@ function Loader(){
 	function loadPhotos(day, callback){
 
 		var markerIcon = L.icon({
-	        iconUrl: '../static/img/picIcon.png',
-	        shadowUrl: '../static/img/quoteShadow.png',
+	        iconUrl: '../static/img/featureIconPhoto.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
 	        iconSize:     [30,30],
 	        shadowSize:   [30,30],
 	        iconAnchor:   [15,35],
 	        shadowAnchor: [15,35],
-	        popupAnchor:  [10,-40]
+	        popupAnchor:  [10,-30]
 	    });
 
 	    var markerOptions = {
 	        icon:markerIcon,
-	        iconSize:[20,20]
+	        iconSize:[30,30]
 	    };
 
 		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
@@ -2835,11 +2860,14 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="300px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
-	                    var marker = L.marker(latlng, markerOptions);
+	                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+	                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+	                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+	                    var marker = L.marker(latlng2, markerOptions);
 	                    tweetLayer.addLayer(marker);
 	                    var photo = PhotoPost(feature, marker);
 				        if(photo) photos[day].push(photo);
@@ -2854,17 +2882,6 @@ function Loader(){
 
 		var colorMap = [];
 
-		var quoteIcon = L.icon({
-		    iconUrl: '../static/img/quote.png',
-		    shadowUrl: '../static/img/quoteShadow.png',
-
-		    iconSize:     [40,40],
-		    shadowSize:   [40,40],
-		    iconAnchor:   [15,35],
-		    shadowAnchor: [15,35],
-		    popupAnchor:  [10,-40]
-		});
-
 		var sightingOptions = {
 		    radius: 2,
 		    fillColor: "#FFF",
@@ -2874,6 +2891,7 @@ function Loader(){
 		    fillOpacity: 0.7,
 		};
 
+		// http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
@@ -2885,8 +2903,8 @@ function Loader(){
 		            return (feature.geometry.coordinates[0] != 0);
 		        },
 		        pointToLayer: function (feature, latlng) {
-                    var scatterX = ((Math.random() * 2) - 1) * 0.0005;
-                    var scatterY = ((Math.random() * 2) - 1) * 0.0005;
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
 			        var marker = L.circleMarker(latlng2, sightingOptions);
 		        	sightingLayer.addLayer(marker);			        
@@ -2896,13 +2914,6 @@ function Loader(){
                 	var count = feature.properties.Count;
 		            marker.bindLabel((count?count + ' ' : '') + name);
 			        return marker;
-                },
-                onEachFeature: function(feature, layer){
-                	var name = feature.properties.SpeciesName;
-                	var count = feature.properties.Count;
-                	if(name){
-                		layer.bindPopup('<div class="speciesLabel">'+ (count?count + ' ' : '') + name+'</div>');
-                	}
                 },
 			    style: function(feature) {
 			    	var c = Math.sqrt(feature.properties["Count"]);
@@ -2930,6 +2941,11 @@ function Loader(){
 
 	function loadBeacons(day, callback){
 
+		if(day < 7){
+			callback();
+			return;
+		}
+
 		var starIcon = L.icon({
 		    iconUrl: '../static/img/star2.png',
 		    shadowUrl: '../static/img/starShadow2.png',
@@ -2956,6 +2972,7 @@ function Loader(){
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// set a minimum distance of 200m between each beacon
+		        	if(feature.properties.CoreExpedition) return false;
 		        	if(beacons[day].length>0){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
@@ -2976,7 +2993,7 @@ function Loader(){
                 }
 		    });
 
-			if (beacons.length > 0 && beacons[0].length>0) {
+			if (beaconCoords.length>0) {
 				var paths = [{
 					"type":"Feature",
 					"properties":{
@@ -2992,9 +3009,9 @@ function Loader(){
 				    fillColor: "#fff",
 				    color: "#AEB1FF",
 				    weight: 3,
-				    opacity: 0.25
+				    opacity: 0.35
 				};
-							
+				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
 				beaconPathLayer.addLayer(beaconPath);
 	        }
@@ -3110,7 +3127,6 @@ function Member(n, l, d){
 			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
 			latLng = new L.LatLng(lat,lng);
 		} else {}
-
 		marker.setLatLng(latLng);
 	}
 
@@ -3201,6 +3217,8 @@ function Member(n, l, d){
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
 		mapWorld.scrollWheelZoom.disable();
+		mapLatLng = mapWorld.getCenter();
+		timeline.checkUnzoom(false, true);
 	}
 
 	function dim(){
@@ -3208,7 +3226,6 @@ function Member(n, l, d){
 	}
 
 	function light(strength){
-		// d3.select(marker._icon).classed('focused',true);
 		strength = 1-strength;
 		if(strength>0){
 			d3.select(marker._icon).select('p')
@@ -3219,13 +3236,13 @@ function Member(n, l, d){
 
 	function unfocus(unswollen){
 		d3.select(marker._icon).classed('swollen',false);
+		d3.select(marker._icon).classed('focused',false);
+		d3.select(marker._icon).select('p')
+				.style('color',null);
 		if(!unswollen){
-			d3.select(marker._icon).classed('focused',false);
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
 			mapWorld.scrollWheelZoom.enable();
-			d3.select(marker._icon).select('p')
-				.style('color',null);
 		}
 	}
 
@@ -3270,12 +3287,12 @@ function Timeline(){
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
+	var scrollStreak = 1;
 	var paused = false;
 	var isNightTime = false;
 	var nightTime = [];
 
 	var dayCount = 16;
-	var graphicsInitialized = false;
 	var dates = [];
 	var dayRad = 2.5;
 	var margin = 10;
@@ -3287,6 +3304,11 @@ function Timeline(){
 
 	var unzoomedTime = [[1431948652,1432199688]];
 	var isUnzoomedTime = false;
+
+	var milestones = {
+		0 : 'Menongue',
+		7 : 'Cuito'
+	}
 
 
 	node.append('line')
@@ -3311,7 +3333,7 @@ function Timeline(){
 		}
 		timeCursor = dates[dates.length-2];
 		timeCursor = timeCursor-1;
-		dayCursor = dates.length-3; // !!!!!!
+		dayCursor = dates.length-2;
 	}
 
 	function init(day, lastDay){
@@ -3346,21 +3368,17 @@ function Timeline(){
 		day.append('text')
 			.attr('x','66%')
 			.attr('dy','0.25em')
-			.text(function(d){
-				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				var s = dateToString(da);
-				return s.mo + ' ' + s.da
+			.text(function(d,i){
+				if(milestones[i]) return milestones[i];
+				return 'day ' + i
+				// var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
+				// var s;
+				// var s = dateToString(da);
+				// return s.mo + ' ' + s.da
+			})
+			.style('fill',function(d,i){
+				return 'rgba(255,255,255,'+(milestones[i]?1:0.5);
 			});
-
-		// node.selectAll('circle.day')
-		// 	.data(dates)
-		// 	.enter()
-		// 	.append('circle')
-		// 	.attr('class','day')
-		// 	.attr('cx','80%')
-		// 	.attr('r',dayRad)
-		// 	.attr('fill','rgb(255,255,255)')
-		// 	.style('pointer-events','none');
 
 		cursor = node.append('g')
 			.style('pointer-events','none')
@@ -3398,7 +3416,7 @@ function Timeline(){
 			if(!jumping){
 				cursorHovered = true;
 				cursorTY = Math.constrain(d3.event.layerY-30,margin+dayRad,height-dayRad);
-				updateCursor(d3.event.layerY-30);
+				updateCursor(false, d3.event.layerY-30);
 			}
 		}).on('mouseout',function(){
 			cursorHovered = false;
@@ -3428,16 +3446,19 @@ function Timeline(){
 				return 'translate(0,'+ (margin + dayRad + (i*((height-margin-dayRad*2)/(dates.length-1)))) +')';
 			});
 
+		try{ updateCursor(true);
+		} catch(e) {}
+
 		updateDayLabels();
 	}
 
 	function updateDayLabels(){
 
-		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/45));
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 40 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 45 || i%labelSkip != 0){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -3461,13 +3482,11 @@ function Timeline(){
 		var loaded = loader.getLoadedDays();
 		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
 		timeFrame = [dates[dayCursor].getTime()/1000 -4*3600,dates[dayCursor+1].getTime()/1000-1 -4*3600];
-		// console.log('LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 		for(var i=dayCursor-1; i>=0; i--){
 			if(loaded[i]) {
 				timeFrame[0] = dates[i].getTime()/1000 -4*3600;
 			} else break;
 		}
-		// console.log('Aasdsaddssa', dates.slice());
 		for(var i=dayCursor; i<dates.length-1; i++){
 			if(loaded[i]) {
 				timeFrame[1] = dates[i+1].getTime()/1000-1 -4*3600;
@@ -3485,6 +3504,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
+		scrollStreak = Math.lerp(scrollStreak,1,0.2);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -3497,11 +3517,11 @@ function Timeline(){
 		// if(frameCount%60==0) console.log(new Date(timeCursor*1000), timeCursor);
 	}
 
-	function updateCursor(hover){
+	function updateCursor(force, hover){
 
 		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-
-		cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		else cursorY = cursorTY;
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
@@ -3529,20 +3549,21 @@ function Timeline(){
 
 	function checkNightTime(){
 		var len = nightTime.length;
+		var n = false;
 		for(var i=0; i<nightTime.length; i++){
 			if(nightTime[i]){
-				var n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
-				if(isNightTime != n) nightNode.classed('night',n);
-				isNightTime = n;
-				if(!isNightTime) break;
+				n = !(timeCursor >= nightTime[i][0] && timeCursor < nightTime[i][1]);
+				if(!n) break;
 			}
 		}
+		if(isNightTime != n) nightNode.classed('night',n);
+		isNightTime = n;
 	}
 
-	function checkUnzoom(force){
+	function checkUnzoom(force, reset){
 		for(var i=0; i<unzoomedTime.length; i++){
 			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u) mapWorld.setZoom(u?15:17, {animate:!force});
+			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
 			isUnzoomedTime = u;
 		}
 	}
@@ -3580,14 +3601,16 @@ function Timeline(){
 		}
 	}
 
+	
+
 	function navigateMap(delta){
-		// console.log(new Date(timeCursor*1000));
+		scrollStreak *= 1.082;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
 			tSpeed = paused ? 0 : autoSpeed;
 		})
-		wheelDelta = -delta/4;
+		wheelDelta = -delta/4*scrollStreak;
 		updateControl(wheelDelta>0?'FastForward':'FastBackward');
 		if(pages.active.id == 'map'){
 			d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
@@ -3637,6 +3660,8 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			teleportMap();
+			updateCursor(true);
 		}
 
 		isLoading = true;
@@ -3704,7 +3729,8 @@ function Timeline(){
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
 		checkUnzoom: checkUnzoom,
-		getPaused, getPaused
+		getPaused: getPaused,
+		updateCursor: updateCursor
 	};
 }
 
@@ -3724,9 +3750,8 @@ function Wanderer(p){
 	var acceleration = {'x':0,'y':0};
 	var r = 0.0003;
 	var wanderTheta = 0;
-	var maxSpeed = 0.000005;
-	var maxForce = 0.000000125;
-
+	var maxSpeed = 0.000003;
+	var maxForce = 0.0000001;
 
 	if(debug){
 		var svg = d3.select('#beaconContainer')
@@ -3897,50 +3922,7 @@ function initMapLabels(map){
 	    }
 	});
 }
-;var playerOrigin = '*';
-var vimeoPlayer;
-
-window.addEventListener('message', onMessageReceived, false);
-function onMessageReceived(event) {
-    if (!(/^https?:\/\/player.vimeo.com/).test(event.origin)) {
-        return false;
-    }           
-    if (playerOrigin === '*') {
-        playerOrigin = event.origin;
-    }
-    var data = JSON.parse(event.data);
-    if(data.event == 'ready') onReady();
-    if(data.event == 'play') onPlay();
-}
-
-function onReady() {
-    var data = {
-      method: 'addEventListener',
-      value: 'play'
-    };
-    var message = JSON.stringify(data);
-    vimeoPlayer = d3.select('iframe').node();
-    vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-function onPlay(){
-    d3.select('#aboutPage #video div.cover')
-        .transition()
-        .style('opacity',0)
-        .remove();
-}
-
-function pauseVimeoPlayer(){
-    var data = {
-      method: 'pause'
-    };
-    vimeoPlayer = d3.select('iframe').node();
-    if(vimeoPlayer) vimeoPlayer.contentWindow.postMessage(data, playerOrigin);
-}
-
-if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-    d3.select('#aboutPage #video div.cover').remove();
-};
+;
 
 /*
 
@@ -3951,34 +3933,38 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 
 	TODOS
 
-	- free camera mode
-	- view labels, 'click to pause, scroll to navigate'
-
-	- accelerate scroll
-		
+	- click on popup doesn't open them
+	- sometines the journal doesnt load neighboring days
+	- culling
+	- linkable features
+	- IE
+	- Firefox
+	- away marker
+	- label scroll for zoom vs time
+	- click on icons to open popups
+	- refine medium popup
+	- actual names for timeline labels
+	- remove link at the end of image tweets
+	- highlight pause button
+	- add video features
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
-	- sometimes map doesnt refresh
-
+	- scroll map while hovering a marker
+	- test resolution query
+	- stacked features on map view
 	- clicking on popups should open journal on right time
-	- dim out zoom buttons when max is reached
+	- dim out zoom buttons when max zoom is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- fix trail in about page
-	- heartrate peak feature
-
-	- scroll map while hovering a marker
-	- proper teleport
-	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link
 	- API error handling
 	- scrollbar event for feed navigation?
 	- remove global functions/variables
-	- margin journal alignment with timeline
-	- finer grained culling
+	- margin journal alignment with timeline + 35px
 	- dim out night sections of timeline
 
 */
@@ -4050,6 +4036,8 @@ document.addEventListener('DOMContentLoaded', function(){
 	  else d3.select('#statusScreen img').remove();
 	})();
 
+
+	
 	mapTLatLng = new L.LatLng(-12.811059,18.175099);
 	mapLatLng = new L.LatLng(-12.811059,18.175099);
 
@@ -4065,7 +4053,7 @@ document.addEventListener('DOMContentLoaded', function(){
         dragging: false,
         keyboard: false,
         minZoom: 0,                    
-        maxZoom: 20,
+        maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
     });
@@ -4100,7 +4088,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		// pages.mapWorld.show();
 		pages.about.show();
 		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate){
+		loader.getDayCount(function(dayCount,startDate,endDate){
 			timeline.setDates(dayCount,startDate);
 			loader.loadDay(timeline.getTimeCursor().day,function(day){
 				timeline.setTimeFrame();
@@ -4112,7 +4100,6 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
-				console.log(loader.members);
 				loader.members['Steve'].focus();
 				animate(new Date().getTime()-16);
 			});
@@ -4266,9 +4253,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    	if(r2 > 75){
 			    		timeline.togglePause('pause');
 			    		r2 *= 1.4;
-			    		console.log(mapOffset);
 			    		mapOffset = L.point(r2*Math.cos(theta),r2*Math.sin(theta));
-			    		console.log(mapOffset);
 			    		mapWorld.focusMember.unfocus(true);
 			    		setTimeout(function(){
 			    			mouseOffset = L.point(0, 0);
@@ -4276,7 +4261,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    			mapWorld.focusMember.unfocus();
 			    		},500);
 			    	} else {
-			    		mapWorld.focusMember.light(0);
+			    		mapWorld.focusMember.light(1);
 			    		mouseOffset = L.point(0, 0);
 			    		mapOffset = L.point(0, 0);
 			    		timeline.togglePause(lastPlayMode?'pause':'play');
@@ -4294,7 +4279,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 
@@ -4305,13 +4290,13 @@ document.addEventListener('DOMContentLoaded', function(){
 
 	    d3.select('a.control-zoom-out')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()-1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 
 	    d3.select('a.control-zoom-in')
 	    	.on('click',function(){
-	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,9,17)));
+	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
 		
@@ -4337,11 +4322,24 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
 
+		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
 
+
+	
+
 });
 
+
+function teleportMap(){
+	if(mapWorld.focusMember){
+		mapTLatLng = mapWorld.focusMember.getLatLng();
+		mapLatLng.lat = mapTLatLng.lat;
+		mapLatLng.lng = mapTLatLng.lng;
+		mapWorld.panTo(mapLatLng, {animate:false});
+	}
+}
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;

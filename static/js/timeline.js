@@ -27,7 +27,6 @@ function Timeline(){
 	var nightTime = [];
 
 	var dayCount = 16;
-	var graphicsInitialized = false;
 	var dates = [];
 	var dayRad = 2.5;
 	var margin = 10;
@@ -39,6 +38,11 @@ function Timeline(){
 
 	var unzoomedTime = [[1431948652,1432199688]];
 	var isUnzoomedTime = false;
+
+	var milestones = {
+		0 : 'Menongue',
+		7 : 'Cuito'
+	}
 
 
 	node.append('line')
@@ -98,21 +102,17 @@ function Timeline(){
 		day.append('text')
 			.attr('x','66%')
 			.attr('dy','0.25em')
-			.text(function(d){
-				var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				var s = dateToString(da);
-				return s.mo + ' ' + s.da
+			.text(function(d,i){
+				if(milestones[i]) return milestones[i];
+				return 'day ' + i
+				// var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
+				// var s;
+				// var s = dateToString(da);
+				// return s.mo + ' ' + s.da
+			})
+			.style('fill',function(d,i){
+				return 'rgba(255,255,255,'+(milestones[i]?1:0.5);
 			});
-
-		// node.selectAll('circle.day')
-		// 	.data(dates)
-		// 	.enter()
-		// 	.append('circle')
-		// 	.attr('class','day')
-		// 	.attr('cx','80%')
-		// 	.attr('r',dayRad)
-		// 	.attr('fill','rgb(255,255,255)')
-		// 	.style('pointer-events','none');
 
 		cursor = node.append('g')
 			.style('pointer-events','none')
@@ -150,7 +150,7 @@ function Timeline(){
 			if(!jumping){
 				cursorHovered = true;
 				cursorTY = Math.constrain(d3.event.layerY-30,margin+dayRad,height-dayRad);
-				updateCursor(d3.event.layerY-30);
+				updateCursor(false, d3.event.layerY-30);
 			}
 		}).on('mouseout',function(){
 			cursorHovered = false;
@@ -180,16 +180,19 @@ function Timeline(){
 				return 'translate(0,'+ (margin + dayRad + (i*((height-margin-dayRad*2)/(dates.length-1)))) +')';
 			});
 
+		try{ updateCursor(true);
+		} catch(e) {}
+
 		updateDayLabels();
 	}
 
 	function updateDayLabels(){
 
-		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/40));
+		var labelSkip = Math.ceil(d3.selectAll('#timeline g.day')[0].length/((height-margin)/45));
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 40 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 45 || i%labelSkip != 0){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -213,13 +216,11 @@ function Timeline(){
 		var loaded = loader.getLoadedDays();
 		if(timeCursor != -1) dayCursor = Math.constrain(Math.floor(Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount-1);
 		timeFrame = [dates[dayCursor].getTime()/1000 -4*3600,dates[dayCursor+1].getTime()/1000-1 -4*3600];
-		// console.log('LOL', new Date(totalTimeFrame[0]*1000),new Date(totalTimeFrame[1]*1000),new Date(timeFrame[0]*1000),new Date(timeFrame[1]*1000));
 		for(var i=dayCursor-1; i>=0; i--){
 			if(loaded[i]) {
 				timeFrame[0] = dates[i].getTime()/1000 -4*3600;
 			} else break;
 		}
-		// console.log('Aasdsaddssa', dates.slice());
 		for(var i=dayCursor; i<dates.length-1; i++){
 			if(loaded[i]) {
 				timeFrame[1] = dates[i+1].getTime()/1000-1 -4*3600;
@@ -250,11 +251,11 @@ function Timeline(){
 		// if(frameCount%60==0) console.log(new Date(timeCursor*1000), timeCursor);
 	}
 
-	function updateCursor(hover){
+	function updateCursor(force, hover){
 
 		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-
-		cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+		else cursorY = cursorTY;
 		cursor.attr('transform','translate(0,'+cursorY+')');
 		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
 		else if(hover){
@@ -393,6 +394,8 @@ function Timeline(){
 				var member = loader.members[m];
 				member.move(getTimeCursor(), true);
 			}
+			teleportMap();
+			updateCursor(true);
 		}
 
 		isLoading = true;
@@ -460,7 +463,8 @@ function Timeline(){
 		getUnzoomState: getUnzoomState,
 		setDayCursor: setDayCursor,
 		checkUnzoom: checkUnzoom,
-		getPaused: getPaused
+		getPaused: getPaused,
+		updateCursor: updateCursor
 	};
 }
 

@@ -9,48 +9,38 @@
 
 	TODOS
 
-	- accelerate scroll
-	- twitter images
-	- soundcloud filtering
+	- click on popup doesn't open them
+	- sometines the journal doesnt load neighboring days
+	- culling
+	- linkable features
 	- IE
 	- Firefox
 	- away marker
-	- linkable features
-	- add links to map tweets
-	- new icons
-
-
+	- label scroll for zoom vs time
 	- click on icons to open popups
-	- find unfocused back
-	- pause unfocuses member markers
-	- tweet images
-	- view labels, 'click to pause, scroll to navigate'
-	- accelerate scroll
+	- refine medium popup
+	- actual names for timeline labels
+	- remove link at the end of image tweets
+	- highlight pause button
+	- add video features
 	- live mode
 	- linkable features and pages
 	- sightings taxonomy color
 	- scroll map while hovering a marker
 	- test resolution query
 	- stacked features on map view
-
-
 	- clicking on popups should open journal on right time
-	- dim out zoom buttons when max is reached
+	- dim out zoom buttons when max zoom is reached
 	- togglePause highlight on map
 	- highlight journal in header nav on new contents
 	- transitions between pages
 	- fix trail in about page
-	- heartrate peak feature
-
-	- proper teleport
-	- filter crazy path points (resolution)
 	- core features?
 	- add location to post meta + link
 	- API error handling
 	- scrollbar event for feed navigation?
 	- remove global functions/variables
-	- margin journal alignment with timeline
-	- finer grained culling
+	- margin journal alignment with timeline + 35px
 	- dim out night sections of timeline
 
 */
@@ -139,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function(){
         dragging: false,
         keyboard: false,
         minZoom: 0,                    
-        maxZoom: 20,
+        maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
     });
@@ -339,9 +329,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    	if(r2 > 75){
 			    		timeline.togglePause('pause');
 			    		r2 *= 1.4;
-			    		console.log(mapOffset);
 			    		mapOffset = L.point(r2*Math.cos(theta),r2*Math.sin(theta));
-			    		console.log(mapOffset);
 			    		mapWorld.focusMember.unfocus(true);
 			    		setTimeout(function(){
 			    			mouseOffset = L.point(0, 0);
@@ -349,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    			mapWorld.focusMember.unfocus();
 			    		},500);
 			    	} else {
-			    		mapWorld.focusMember.light(0);
+			    		mapWorld.focusMember.light(1);
 			    		mouseOffset = L.point(0, 0);
 			    		mapOffset = L.point(0, 0);
 			    		timeline.togglePause(lastPlayMode?'pause':'play');
@@ -367,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 
@@ -410,13 +398,24 @@ document.addEventListener('DOMContentLoaded', function(){
 			.style('height',Math.round(document.body.clientWidth*0.53) + 'px')
 			.style('width',document.body.clientWidth + 'px');
 
+		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
+
 
 	
 
 });
 
+
+function teleportMap(){
+	if(mapWorld.focusMember){
+		mapTLatLng = mapWorld.focusMember.getLatLng();
+		mapLatLng.lat = mapTLatLng.lat;
+		mapLatLng.lng = mapTLatLng.lng;
+		mapWorld.panTo(mapLatLng, {animate:false});
+	}
+}
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;

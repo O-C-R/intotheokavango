@@ -27,17 +27,6 @@ function Sighting(feature, m){
 	var marker = m;
 	var type = 'sighting';
 
-	// if(marker){
-	// 	marker.addEventListener('popupclose',function(){
-	// 		popupVisible = false;
-	// 		popupDelay = true;
-	// 	})
-	// 	marker.addEventListener('popupopen',function(){
-	// 		popupVisible = true;
-	// 	})
-	// }
-
-
 	function getData(){
 		return {
 			type: 'sighting',
@@ -263,7 +252,11 @@ function TweetPost(feature, m){
 			}
 		} catch(e){}
 	} else {
-		
+		var images = feature.properties.Images;
+    	if(images && images.length>0){
+			// console.log(images[0].Url);
+    		photoUrl = images[0].Url;
+    	}
 	}
 
 	if(marker){

@@ -17,15 +17,15 @@ function Feed(){
 	}
 	var postsByDay = [];
 	var allPosts = [];
+	var posts;
 	var postCursor = 0;
-
-	var initialized = false;
-
+	var resizing = false;
 
 	function init(day){
+		
 		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		var w = node.style('width');
-		w = parseFloat(+w.slice(0,w.length-2));
+		var w = d3.select(node.node().parentNode).style('width');
+		w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
 
 		// Definitely not optimized
 		var newPosts = [];
@@ -45,7 +45,7 @@ function Feed(){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
 
-		var posts = node.selectAll('div.post')
+		posts = node.selectAll('div.post')
 	        .data(allPosts, function(d){ 
 	        	d = d.getData();
 	        	return d.date.getTime() + '-' + d.latLng.lat;
@@ -68,7 +68,7 @@ function Feed(){
 		        			var urls = d.message.match(/http[^\s]*/gi);
 		        			if(urls){
 			        			for(var i=0; i<urls.length; i++){
-			        				d.message = d.message.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
 			        			}
 			        		}
 			        		var handles = d.message.match(/@[^\s]*/gi);
@@ -84,27 +84,27 @@ function Feed(){
 			        		.append('img')
 			        		.attr('src',d.photoUrl)
 			        		.attr('alt','Photo taken on ' + t)
-			        		.attr('width', w)
-			        		.attr('height', d.size[1]*w/d.size[0]);
+			        		.on('load',function(){
+			        			jump();
+			        		})
 		        	}
 	        	} else if(d.type == 'photo'){
 		        	d3.select(this).select('div.photo')
 		        		.append('img')
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
 		        		.attr('alt','Photo taken on ' + t)
-		        		.attr('width', w)
 
 		        	if(d.notes){
-		        	d3.select(this).select('p.notes')
-		        		.html(function(){
-		        			var urls = d.notes.match(/http[^\s]*/gi);
-		        			if(urls){
-			        			for(var i=0; i<urls.length; i++){
-			        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
-			        			}
-			        		}
-		        			return d.notes
-		        		})
+			        	d3.select(this).select('p.notes')
+			        		.html(function(){
+			        			var urls = d.notes.match(/http[^\s]*/gi);
+			        			if(urls){
+				        			for(var i=0; i<urls.length; i++){
+				        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+				        			}
+				        		}
+			        			return d.notes
+			        		})
 		        	}
 		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
 	        	} else if(d.type == 'blog'){
@@ -123,14 +123,7 @@ function Feed(){
 	        });
 
 		posts.order();
-
-		requestAnimationFrame(function(){
-			posts.each(function(d){
-				d.setFeedPos(this.offsetTop, this.clientHeight);
-			});
-			jump(timeline.getTimeCursor());
-		});
-		initialized = false;
+		jump();
 
 	}
 
@@ -158,28 +151,42 @@ function Feed(){
 	}
 
 
-	function jump(t){
-		var len = allPosts.length;
-		for(var i=0; i<len-1; i++){
-			var post = allPosts[i];
-			var nextPost = allPosts[i+1];
-			var t1 = post.getData().date.getTime()/1000;
-			var t2 = nextPost.getData().date.getTime()/1000;
-			if(t.current >= t1 && t.current < t2){
-				var d = post.getData();
-				requestAnimationFrame(function(){
-					node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
-				})
-				postCursor = i;
-				break;
-			}
+	function jump(preventJump){
+		var t = timeline.getTimeCursor();
+		if(!resizing){
+			requestAnimationFrame(function(){
+				if(posts){
+					posts.each(function(d){
+						d.setFeedPos(this.offsetTop, this.clientHeight);
+					});
+				}
+				resizing = false;
+				if(!preventJump){
+					var len = allPosts.length;
+					for(var i=0; i<len-1; i++){
+						var post = allPosts[i];
+						var nextPost = allPosts[i+1];
+						var t1 = post.getData().date.getTime()/1000;
+						var t2 = nextPost.getData().date.getTime()/1000;
+						if(t.current >= t1 && t.current < t2){
+							var d = post.getData();
+							requestAnimationFrame(function(){
+								node.node().parentNode.scrollTop = Math.map(t.current,t1,t2,d.feedPos,d.feedPos + d.height);
+							})
+							postCursor = i;
+							break;
+						}
+					}
+				}
+			});
 		}
+		resizing = true;
 	}
 	
 
 	return{
 		init: init,
-		jump: jump
+		jump: jump,
 	};
 }
 

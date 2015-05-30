@@ -180,6 +180,7 @@ h3, h3.title{
       font-size: 9px;
       text-transform: uppercase;
       border:none;
+      pointer-events:none;
     }
 
       #mapWorld div.leaflet-label:before{
@@ -1046,14 +1047,10 @@ h3, h3.title{
               }
 
             #mapPage div#feed div.post div.content p.message{
-              display:inline-block;
-              vertical-align: middle;
-              margin:0 0 0 5%;
-              width:85%;
-              /*font-style: italic;*/
+              margin:0;
+              width:100%;
               font-size: 20px;
               line-height: 1.85em;
-              margin-top:-7px;
             }
 
 
@@ -1094,6 +1091,10 @@ h3, h3.title{
               margin-top:7px;
               display: inline-block;
             }
+
+              #mapPage div#feed div.post.tweet div.photo{
+                margin-top:35px;
+              }
 
             #mapPage div#feed div.post.vertical div.photo{
               width:64%;

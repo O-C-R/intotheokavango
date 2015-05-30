@@ -45,7 +45,6 @@ function Member(n, l, d){
 			var lng = Math.map(time, interval[0].time, interval[1].time, interval[0].latLng.lng, interval[1].latLng.lng);
 			latLng = new L.LatLng(lat,lng);
 		} else {}
-
 		marker.setLatLng(latLng);
 	}
 
