@@ -114,8 +114,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
     }
 
     var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
+
+        var xAxisLabel = "";
+        var graphTitle = "";
+        var yAxisLabel = "";
+
         //HISTOGRAM VIZ
-        var margin = {top: 70.5, right: 30, bottom: 40, left: 50.5},
+        var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
         width = ($('body').width()*0.9) - margin.left - margin.right,
         height = 525 - margin.top - margin.bottom,
         left_width = 100;
@@ -155,6 +160,10 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var max = d3.max(parsedData, function(d) {
                 return d.count;
             });
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
             
             yScale.domain([0, max]);
 
@@ -187,6 +196,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             //makeBinnedData(parsedImageData);
 
             yAxisLabel = "Count";
+            var dateFormat = d3.time.format("%B %d %Y");
+            var timeFormat = d3.time.format("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             if (feature_type === 'image') {
                 graphTitle = "Images Per Day";
@@ -282,7 +294,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
         svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
+              .call(xAxis)
+            .append("text")
+              .attr("class", "label")
+              .attr("y", 40)
+              .attr("x", width/2)
+              .attr("text-anchor", "middle") 
+              .text(xAxisLabel);
 
         svg.append("g")
               .attr("class", "y axis")
