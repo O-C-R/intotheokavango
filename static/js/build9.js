@@ -3448,8 +3448,8 @@ function Member(n, l, d){
 			latLng.lat = tLatLng.lat;
 			latLng.lng = tLatLng.lng;
 		} else {
-			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
-			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
+			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.22);
+			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.22);
 		}
 		marker.setLatLng(latLng);
 
@@ -3557,7 +3557,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2;
+	var autoSpeed = 3;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -3778,7 +3778,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
-		scrollStreak = Math.lerp(scrollStreak,1,0.2);
+		scrollStreak = Math.lerp(scrollStreak,1,0.24);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -3880,7 +3880,7 @@ function Timeline(){
 	
 
 	function navigateMap(delta){
-		scrollStreak *= 1.082;
+		scrollStreak *= 1.085;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){

@@ -92,8 +92,8 @@ function Member(n, l, d){
 			latLng.lat = tLatLng.lat;
 			latLng.lng = tLatLng.lng;
 		} else {
-			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
-			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
+			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.22);
+			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.22);
 		}
 		marker.setLatLng(latLng);
 
