@@ -355,7 +355,8 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		// if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 

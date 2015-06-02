@@ -2964,7 +2964,7 @@ function Loader(){
 
 		var beaconCoords = [];
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&Satellite=TS091180'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -2972,7 +2972,7 @@ function Loader(){
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// set a minimum distance of 200m between each beacon
-		        	if(feature.properties.CoreExpedition) return false;
+		        	// if(feature.properties.CoreExpedition) return false;
 		        	if(beacons[day].length>0){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
@@ -4279,7 +4279,8 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		// if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 
