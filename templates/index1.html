@@ -27,6 +27,11 @@
     <div id="tag-area"> 
       <Tag queryTags="{{queryTags}}"></Tag>
     </div> 
+    <div>
+    <h2>Show Me</h2>
+      <button class="showMeButton" id="heartrate-button" on-click="heartRateQuery">a HeartRate Graph</button>
+      <button class="showMeButton" id="hippoSightings-button" on-click="hippoSighting">Hippo Sightings on a Map</button>
+    </div>
     <div class="input-section">
         <h2>Select the type of Feature you want to explore</h2>
         <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select view" />
@@ -150,9 +155,6 @@
             <!--Ractive template-->
             <FeaturesWidget />
         </div>
-          <h2>Show Me</h2>
-          <div class="showMeButton" id="heartrate-button" ><button on-click="heartRateQuery">a HeartRate Graph</button></div>
-          <div class="showMeButton" id="hippoSightings-button"><button on-click="hippoSighting">Hippo Sightings on a Map</button></div>
       </div>
       <div id="query-area">
           <!--Ractive template-->

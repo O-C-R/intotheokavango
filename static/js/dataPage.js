@@ -276,8 +276,6 @@ console.warn('DATA PAGE', id);
 
                 self.on('RactiveDropdownComponent.onSelect', function(item, selector) {
 
-
-
                     self.set('selectedItem', item);
                     console.info('callback fired!', selector, item);
                     //console.log('queryTag: ' + this.get('queryTag'));
@@ -366,7 +364,7 @@ console.warn('DATA PAGE', id);
                         var updatedUrl = "http://intotheokavango.org/api/features/viz";
                             //this.set('queryObj.output', "features/" + newValue);
                         this.set('apiUrl', updatedUrl);
-
+                        console.log("Show Me Button : Heart Rate Query");
                     }
                 });
 
@@ -381,6 +379,7 @@ console.warn('DATA PAGE', id);
                         this.set('jsonChecked', false);
                         var updatedUrl = "http://intotheokavango.org/api/features/map";
                         this.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Hippo Sighting Query");
                     }
                 })
 
@@ -760,8 +759,8 @@ console.warn('DATA PAGE', id);
                         audio: [],
                         beacon: [],
                         blog:[],
-                        image: ['documentary', 'habitat', 'specimen'],
-                        sensor: ['databoat1', 'sensor2', 'databoat'],
+                        image: ['Documentary', 'GoPro', 'Habitat', 'Specimen'],
+                        sensor: ['DataBoat'],
                         sighting: speciesList,
                         
                         tweet: []
