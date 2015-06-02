@@ -7,6 +7,7 @@
 function Loader(){
 
 	var loading = [];
+	var ambits = [];
 	var tweets = [];
 	var photos = [];
 	var sightings = [];
@@ -72,8 +73,11 @@ function Loader(){
 
 
 	function loadPath(day, callback){
+
+		var ambitCoords = {};
+
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=10'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -85,6 +89,8 @@ function Loader(){
 			    	var name = feature.properties.Member;
 			    	var timestamp = feature.properties.t_utc;
 			        var marker = L.circleMarker(latLng);
+			        if(!ambitCoords[name]) ambitCoords[name] = [];
+			        ambitCoords[name].push([latLng.lng, latLng.lat]);
 			        return marker;
 			    },
 			    onEachFeature: function(feature){
@@ -116,6 +122,29 @@ function Loader(){
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
+			
+			for(m in members){
+				if (ambitCoords[m] && ambitCoords[m].length>0) {
+					var paths = [{
+						"type":"Feature",
+						"geometry":{
+							"type":"LineString",
+							"coordinates":ambitCoords[m]
+						}
+					}];
+
+					var pathStyle = {
+					    fillColor: "#fff",
+					    color: "#C1BEFF",
+					    weight: 2.5,
+					    opacity: 0.4,
+					};
+					
+					var ambitPath = L.geoJson(paths, {	style:pathStyle	});
+					ambitLayer.addLayer(ambitPath);
+		        }
+			}
+
 			callback();
 		});   
 	}
@@ -402,9 +431,17 @@ function Loader(){
 		    popupAnchor:  [0,-10]
 		});
 
+		// var beaconOptions = {
+		// 	icon:starIcon,
+		// 	iconSize:[20,20]
+		// };
+
 		var beaconOptions = {
-			icon:starIcon,
-			iconSize:[20,20]
+		    radius: 4,
+		    fillColor: "#FFF",
+		    weight: 0,
+		    opacity: 1,
+		    fillOpacity: 1,
 		};
 
 		var beaconCoords = [];
@@ -429,7 +466,8 @@ function Loader(){
 		        	return true;
 		        },
 		        pointToLayer: function (feature, latlng) {
-		        	var marker = L.marker(latlng, beaconOptions);
+		        	// var marker = L.marker(latlng, beaconOptions);
+		        	var marker = L.circleMarker(latlng, beaconOptions);
 		        	var beacon = Beacon(feature, marker);
 		            if(beacon) beacons[day].push(beacon);
 			        beaconLayer.addLayer(marker);
@@ -441,9 +479,6 @@ function Loader(){
 			if (beaconCoords.length>0) {
 				var paths = [{
 					"type":"Feature",
-					"properties":{
-						"test":"yes"
-					},
 					"geometry":{
 						"type":"LineString",
 						"coordinates":beaconCoords
@@ -452,9 +487,12 @@ function Loader(){
 
 				var pathStyle = {
 				    fillColor: "#fff",
-				    color: "#AEB1FF",
-				    weight: 3,
-				    opacity: 0.35
+				    color: "#fff",
+				    // color: "#AEB1FF",
+				    weight: 2.5,
+				    opacity: 0.75,
+				    dashArray: "10,10",
+				    noClip: true
 				};
 				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
@@ -501,7 +539,8 @@ function Loader(){
 			tweets: tweets,
 			photos: photos,
 			beacons: beacons,
-			blogs: blogs
+			blogs: blogs,
+			ambits: ambits
 		}
 	}
 

@@ -134,7 +134,7 @@ function Member(n, l, d){
 		d3.select(marker._icon).classed('swollen',false);
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
-		mapWorld.scrollWheelZoom.disable();
+		// mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
 		timeline.checkUnzoom(false, true);
 	}
@@ -160,7 +160,7 @@ function Member(n, l, d){
 		if(!unswollen){
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
-			mapWorld.scrollWheelZoom.enable();
+			// mapWorld.scrollWheelZoom.enable();
 		}
 	}
 
