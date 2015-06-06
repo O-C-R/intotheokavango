@@ -73,6 +73,16 @@ var d3Graph = function(timelineVizID, totalsVizID){
         return ambitData;
     }
 
+    var parseAmbitGeo = function(item) {
+        var ambitGeoData = {};
+        if (item["properties"].hasOwnPropery("GPSSpeed")) {
+            ambitGeoData.speed = item["properties"]["GPSSpeed"];
+        }
+        ambitGeoData.member = item["properties"]["Member"];
+        ambitGeoData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return ambitGeoData;
+    }
+
     var parseSensorData = function(item) {
         var sensorData = {};
         sensorData.airTemp = item["properties"]["AirTemp"];
@@ -794,6 +804,18 @@ var d3Graph = function(timelineVizID, totalsVizID){
                             makeTimeSeriesViz(parsedAmbitEnergy,feature_type);
                             makeTimeSeriesViz(parsedAmbitSpeed,feature_type);
                 }
+
+                if (feature_type === "ambit_geo") {
+                    console.log("AMBIT_GEO");
+
+                    for (d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                    }
+
+                }
+
                 if (feature_type === "sighting") {
                     //make sightings viz - totals of all the SpeciesNames sightings
                     console.log("SIGHTING");
