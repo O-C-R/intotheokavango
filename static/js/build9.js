@@ -2797,6 +2797,7 @@ function PagePane(i){
 function Loader(){
 
 	var loading = [];
+	var ambits = [];
 	var tweets = [];
 	var photos = [];
 	var sightings = [];
@@ -2862,8 +2863,11 @@ function Loader(){
 
 
 	function loadPath(day, callback){
+
+		var ambitCoords = {};
+
 		loading[day] = true;
-		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=10'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;		
@@ -2875,6 +2879,8 @@ function Loader(){
 			    	var name = feature.properties.Member;
 			    	var timestamp = feature.properties.t_utc;
 			        var marker = L.circleMarker(latLng);
+			        if(!ambitCoords[name]) ambitCoords[name] = [];
+			        ambitCoords[name].push([latLng.lng, latLng.lat]);
 			        return marker;
 			    },
 			    onEachFeature: function(feature){
@@ -2906,6 +2912,29 @@ function Loader(){
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
+			
+			for(m in members){
+				if (ambitCoords[m] && ambitCoords[m].length>0) {
+					var paths = [{
+						"type":"Feature",
+						"geometry":{
+							"type":"LineString",
+							"coordinates":ambitCoords[m]
+						}
+					}];
+
+					var pathStyle = {
+					    fillColor: "#fff",
+					    color: "#C1BEFF",
+					    weight: 2.5,
+					    opacity: 0.4,
+					};
+					
+					var ambitPath = L.geoJson(paths, {	style:pathStyle	});
+					ambitLayer.addLayer(ambitPath);
+		        }
+			}
+
 			callback();
 		});   
 	}
@@ -3192,14 +3221,22 @@ function Loader(){
 		    popupAnchor:  [0,-10]
 		});
 
+		// var beaconOptions = {
+		// 	icon:starIcon,
+		// 	iconSize:[20,20]
+		// };
+
 		var beaconOptions = {
-			icon:starIcon,
-			iconSize:[20,20]
+		    radius: 4,
+		    fillColor: "#FFF",
+		    weight: 0,
+		    opacity: 1,
+		    fillOpacity: 1,
 		};
 
 		var beaconCoords = [];
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&Satellite=TS091180'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -3207,7 +3244,7 @@ function Loader(){
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// set a minimum distance of 200m between each beacon
-		        	if(feature.properties.CoreExpedition) return false;
+		        	// if(feature.properties.CoreExpedition) return false;
 		        	if(beacons[day].length>0){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
@@ -3219,7 +3256,8 @@ function Loader(){
 		        	return true;
 		        },
 		        pointToLayer: function (feature, latlng) {
-		        	var marker = L.marker(latlng, beaconOptions);
+		        	// var marker = L.marker(latlng, beaconOptions);
+		        	var marker = L.circleMarker(latlng, beaconOptions);
 		        	var beacon = Beacon(feature, marker);
 		            if(beacon) beacons[day].push(beacon);
 			        beaconLayer.addLayer(marker);
@@ -3231,9 +3269,6 @@ function Loader(){
 			if (beaconCoords.length>0) {
 				var paths = [{
 					"type":"Feature",
-					"properties":{
-						"test":"yes"
-					},
 					"geometry":{
 						"type":"LineString",
 						"coordinates":beaconCoords
@@ -3242,9 +3277,12 @@ function Loader(){
 
 				var pathStyle = {
 				    fillColor: "#fff",
-				    color: "#AEB1FF",
-				    weight: 3,
-				    opacity: 0.35
+				    color: "#fff",
+				    // color: "#AEB1FF",
+				    weight: 2.5,
+				    opacity: 0.75,
+				    dashArray: "10,10",
+				    noClip: true
 				};
 				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
@@ -3291,7 +3329,8 @@ function Loader(){
 			tweets: tweets,
 			photos: photos,
 			beacons: beacons,
-			blogs: blogs
+			blogs: blogs,
+			ambits: ambits
 		}
 	}
 
@@ -3409,8 +3448,8 @@ function Member(n, l, d){
 			latLng.lat = tLatLng.lat;
 			latLng.lng = tLatLng.lng;
 		} else {
-			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
-			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
+			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.22);
+			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.22);
 		}
 		marker.setLatLng(latLng);
 
@@ -3451,7 +3490,7 @@ function Member(n, l, d){
 		d3.select(marker._icon).classed('swollen',false);
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
-		mapWorld.scrollWheelZoom.disable();
+		// mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
 		timeline.checkUnzoom(false, true);
 	}
@@ -3477,7 +3516,7 @@ function Member(n, l, d){
 		if(!unswollen){
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
-			mapWorld.scrollWheelZoom.enable();
+			// mapWorld.scrollWheelZoom.enable();
 		}
 	}
 
@@ -3518,7 +3557,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2;
+	var autoSpeed = 3;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -3739,7 +3778,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
-		scrollStreak = Math.lerp(scrollStreak,1,0.2);
+		scrollStreak = Math.lerp(scrollStreak,1,0.24);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -3753,21 +3792,22 @@ function Timeline(){
 	}
 
 	function updateCursor(force, hover){
+		if(cursor){
+			if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+			if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+			else cursorY = cursorTY;
+			cursor.attr('transform','translate(0,'+cursorY+')');
+			if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
+			else if(hover){
+				cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+			}
+			var d = new Date(offsetTimezone(cursorDate.getTime()));
+			var s = dateToString(d);
+			cursor.select('text tspan:first-child').text(s.mo + ' ' + s.da);
+			cursor.select('text tspan:last-child').text(s.ho + ':' + s.mi);
 
-		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
-		else cursorY = cursorTY;
-		cursor.attr('transform','translate(0,'+cursorY+')');
-		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
-		else if(hover){
-			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+			if(frameCount%10==0) updateDayLabels();
 		}
-		var d = new Date(offsetTimezone(cursorDate.getTime()));
-		var s = dateToString(d);
-		cursor.select('text tspan:first-child').text(s.mo + ' ' + s.da);
-		cursor.select('text tspan:last-child').text(s.ho + ':' + s.mi);
-
-		if(frameCount%10==0) updateDayLabels();
 	}
 
 	function dateToString(d){
@@ -3817,7 +3857,8 @@ function Timeline(){
 	}
 
 	function cullMarkersByDay(){
-		var features = ['sightings', 'tweets', 'photos', 'beacons', 'blogs'];
+		// beacon path is not culled
+		var features = ['sightings', 'tweets', 'photos', 'blogs', 'ambits'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){
@@ -3839,7 +3880,7 @@ function Timeline(){
 	
 
 	function navigateMap(delta){
-		scrollStreak *= 1.082;
+		scrollStreak *= 1.085;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
@@ -4168,10 +4209,14 @@ function initMapLabels(map){
 
 	TODOS
 
+	- trail ambit
 	- click on popup doesn't open them
+	- multiple medium posts
 	- sometines the journal doesnt load neighboring days
 	- culling
 	- linkable features
+	- gallery page
+
 	- IE
 	- Firefox
 	- away marker
@@ -4221,6 +4266,7 @@ var beaconLayer;
 var beaconPathLayer;
 var blogLayer;
 var soundLayer;
+var ambitLayer;
 var timeline;
 var feed;
 var wanderer;
@@ -4302,6 +4348,7 @@ document.addEventListener('DOMContentLoaded', function(){
     beaconPathLayer = new L.layerGroup().addTo(mapWorld);
     blogLayer = new L.layerGroup().addTo(mapWorld);
     soundLayer = new L.layerGroup().addTo(mapWorld);
+    ambitLayer = new L.layerGroup().addTo(mapWorld);
 
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
@@ -4432,7 +4479,21 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
 
 
-	function setLayoutInteractions(){			
+	function setLayoutInteractions(){	
+
+		mapWorld.on('zoomend',function(e){
+			if(e.target._zoom < 15){
+				if(mapWorld.hasLayer(beaconLayer)) {
+					mapWorld.removeLayer(beaconLayer);
+					mapWorld.removeLayer(beaconPathLayer);
+				}
+			} else {
+				if(!mapWorld.hasLayer(beaconLayer)) {
+					beaconLayer.addTo(mapWorld);
+					beaconPathLayer.addTo(mapWorld);
+				}
+			}
+		})		
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
@@ -4514,7 +4575,8 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		// if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 

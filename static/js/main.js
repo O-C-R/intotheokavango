@@ -9,10 +9,14 @@
 
 	TODOS
 
+	- trail ambit
 	- click on popup doesn't open them
+	- multiple medium posts
 	- sometines the journal doesnt load neighboring days
 	- culling
 	- linkable features
+	- gallery page
+
 	- IE
 	- Firefox
 	- away marker
@@ -62,6 +66,7 @@ var beaconLayer;
 var beaconPathLayer;
 var blogLayer;
 var soundLayer;
+var ambitLayer;
 var timeline;
 var feed;
 var wanderer;
@@ -143,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function(){
     beaconPathLayer = new L.layerGroup().addTo(mapWorld);
     blogLayer = new L.layerGroup().addTo(mapWorld);
     soundLayer = new L.layerGroup().addTo(mapWorld);
+    ambitLayer = new L.layerGroup().addTo(mapWorld);
 
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
@@ -273,7 +279,21 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
 
 
-	function setLayoutInteractions(){			
+	function setLayoutInteractions(){	
+
+		mapWorld.on('zoomend',function(e){
+			if(e.target._zoom < 15){
+				if(mapWorld.hasLayer(beaconLayer)) {
+					mapWorld.removeLayer(beaconLayer);
+					mapWorld.removeLayer(beaconPathLayer);
+				}
+			} else {
+				if(!mapWorld.hasLayer(beaconLayer)) {
+					beaconLayer.addTo(mapWorld);
+					beaconPathLayer.addTo(mapWorld);
+				}
+			}
+		})		
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
@@ -355,7 +375,8 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		// if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
+			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
 

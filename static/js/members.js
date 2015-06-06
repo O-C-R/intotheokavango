@@ -92,8 +92,8 @@ function Member(n, l, d){
 			latLng.lat = tLatLng.lat;
 			latLng.lng = tLatLng.lng;
 		} else {
-			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.3);
-			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.3);
+			latLng.lat = Math.lerp(latLng.lat,tLatLng.lat,0.22);
+			latLng.lng = Math.lerp(latLng.lng,tLatLng.lng,0.22);
 		}
 		marker.setLatLng(latLng);
 
@@ -134,7 +134,7 @@ function Member(n, l, d){
 		d3.select(marker._icon).classed('swollen',false);
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
-		mapWorld.scrollWheelZoom.disable();
+		// mapWorld.scrollWheelZoom.disable();
 		mapLatLng = mapWorld.getCenter();
 		timeline.checkUnzoom(false, true);
 	}
@@ -160,7 +160,7 @@ function Member(n, l, d){
 		if(!unswollen){
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
-			mapWorld.scrollWheelZoom.enable();
+			// mapWorld.scrollWheelZoom.enable();
 		}
 	}
 

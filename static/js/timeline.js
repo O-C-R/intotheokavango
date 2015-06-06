@@ -17,7 +17,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2;
+	var autoSpeed = 2.5;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -238,7 +238,7 @@ function Timeline(){
 		timeCursor += (speed*60/frameRate)*(isNightTime ? 300:1) + wheelDelta*(isNightTime && pages.active.id == 'map' ? 20:1);
 		timeCursor = Math.constrain(timeCursor, timeFrame[0], timeFrame[1]);
 
-		scrollStreak = Math.lerp(scrollStreak,1,0.2);
+		scrollStreak = Math.lerp(scrollStreak,1,0.24);
 		wheelDelta = 0;
 
 		var day = Math.constrain(Math.floor(Math.map(timeCursor-4*3600,totalTimeFrame[0],totalTimeFrame[1],0,dayCount)),0,dayCount);
@@ -252,21 +252,22 @@ function Timeline(){
 	}
 
 	function updateCursor(force, hover){
+		if(cursor){
+			if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
+			if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
+			else cursorY = cursorTY;
+			cursor.attr('transform','translate(0,'+cursorY+')');
+			if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
+			else if(hover){
+				cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+			}
+			var d = new Date(offsetTimezone(cursorDate.getTime()));
+			var s = dateToString(d);
+			cursor.select('text tspan:first-child').text(s.mo + ' ' + s.da);
+			cursor.select('text tspan:last-child').text(s.ho + ':' + s.mi);
 
-		if(!cursorHovered) cursorTY = margin + Math.map(timeCursor,totalTimeFrame[0],totalTimeFrame[1],0,height-margin-dayRad*2);
-		if(!force) cursorY = Math.lerp(cursorY,cursorTY,0.2);
-		else cursorY = cursorTY;
-		cursor.attr('transform','translate(0,'+cursorY+')');
-		if(!cursorHovered) cursorDate = new Date(timeCursor*1000);
-		else if(hover){
-			cursorDate = new Date(Math.constrain(Math.map(hover,margin,height-dayRad*2,totalTimeFrame[0],totalTimeFrame[1]),totalTimeFrame[0],totalTimeFrame[1])*1000);
+			if(frameCount%10==0) updateDayLabels();
 		}
-		var d = new Date(offsetTimezone(cursorDate.getTime()));
-		var s = dateToString(d);
-		cursor.select('text tspan:first-child').text(s.mo + ' ' + s.da);
-		cursor.select('text tspan:last-child').text(s.ho + ':' + s.mi);
-
-		if(frameCount%10==0) updateDayLabels();
 	}
 
 	function dateToString(d){
@@ -316,7 +317,8 @@ function Timeline(){
 	}
 
 	function cullMarkersByDay(){
-		var features = ['sightings', 'tweets', 'photos', 'beacons', 'blogs'];
+		// beacon path is not culled
+		var features = ['sightings', 'tweets', 'photos', 'blogs', 'ambits'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){
@@ -338,7 +340,7 @@ function Timeline(){
 	
 
 	function navigateMap(delta){
-		scrollStreak *= 1.082;
+		scrollStreak *= 1.085;
 		tSpeed = 0;
 		speed = 0;
 		requestAnimationFrame(function(){
