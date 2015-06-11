@@ -351,9 +351,10 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     var makeTimeSeriesViz = function(parsedData,feature_type) {
         //TIMESERIES VIZ
-        var margin = {top: 70.5, right: 100, bottom: 60, left: 40.5},
-        width = 800 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom,
+
+        var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
+        width = ($('body').width()*0.9) - margin.left - margin.right,
+        height = 525 - margin.top - margin.bottom,
         left_width = 100;
 
         var yAxisLabel = "";
@@ -403,8 +404,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
-
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("energy")) {
                     console.log("data has energy key");
                     yAxisLabel = "Average Calories Burned";
@@ -422,8 +422,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.energy; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
-
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("speed")) {
                     console.log("data has speed key");
                     yAxisLabel = "Meters per Second";
@@ -441,7 +440,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 }
             }
 
@@ -475,7 +474,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
             var dateFormat = d3.time.format.utc("%B %d %Y");
             var timeFormat = d3.time.format.utc("%I:%M:%S");
-            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -524,7 +523,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
             var dateFormat = d3.time.format.utc("%B %d %Y");
             var timeFormat = d3.time.format.utc("%I:%M:%S");
-            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
