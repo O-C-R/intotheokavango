@@ -1,21 +1,21 @@
 
 
 /*
-	API Explorer, Genevieve's turf.
-	Please note I have been using the following javascript pattern: 
-	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
-	UI Built out with Ractive.js: http://www.ractivejs.org/
+    API Explorer, Genevieve's turf.
+    Please note I have been using the following javascript pattern: 
+    http://radar.oreilly.com/2014/03/javascript-without-the-this.html
+    UI Built out with Ractive.js: http://www.ractivejs.org/
 */
 
 
 function DataPage(id){
 console.warn('DATA PAGE', id);
     var ractive, page;
-	/* 	Extends Page in layout.js
-		Which among others gives you access to the following methods:
-		- page.getNode()
-		- page.show()
-		- page.hide()	*/
+    /*  Extends Page in layout.js
+        Which among others gives you access to the following methods:
+        - page.getNode()
+        - page.show()
+        - page.hide()   */
     page = Page(id);
     page._show = page.show.bind(page);
     page._hide = page.hide.bind(page);
@@ -35,7 +35,7 @@ console.warn('DATA PAGE', id);
 
 
 
-	///////////////////
+    ///////////////////
     // DATA & VARS
     ///////////////////
     var sections = {
@@ -352,36 +352,36 @@ console.warn('DATA PAGE', id);
                     }
                 });
 
-                // this.on({
-                //     heartRateQuery: function() {
-                //         this.set('queryObj.filter', 'features');
-                //         this.set('queryObj.featureType', 'FeatureType=ambit');
-                //         this.set('queryObj.output', 'output=viz');
-                //         this.set('mapChecked', false);
-                //         this.set('vizChecked', true);
-                //         this.set('jsonChecked', false);
+                this.on({
+                    heartRateQuery: function() {
+                        this.set('queryObj.filter', 'features');
+                        this.set('queryObj.featureType', 'FeatureType=ambit');
+                        this.set('queryObj.output', 'output=viz');
+                        this.set('mapChecked', false);
+                        this.set('vizChecked', true);
+                        this.set('jsonChecked', false);
                         
-                //         var updatedUrl = "http://intotheokavango.org/api/features/viz";
-                //             //this.set('queryObj.output', "features/" + newValue);
-                //         this.set('apiUrl', updatedUrl);
-                //         console.log("Show Me Button : Heart Rate Query");
-                //     }
-                // });
+                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                            //this.set('queryObj.output', "features/" + newValue);
+                        this.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Heart Rate Query");
+                    }
+                });
 
-                // this.on({
-                //     hippoSighting: function() {
-                //         this.set('queryObj.filter', 'features');
-                //         this.set('queryObj.featureType', 'FeatureType=sighting');
-                //         this.set('queryObj.species', 'SpeciesName=Hippo');
-                //         this.set('queryObj.output', 'output=map');
-                //         this.set('mapChecked', true);
-                //         this.set('vizChecked', false);
-                //         this.set('jsonChecked', false);
-                //         var updatedUrl = "http://intotheokavango.org/api/features/map";
-                //         this.set('apiUrl', updatedUrl);
-                //         console.log("Show Me Button : Hippo Sighting Query");
-                //     }
-                // })
+                this.on({
+                    hippoSighting: function() {
+                        this.set('queryObj.filter', 'features');
+                        this.set('queryObj.featureType', 'FeatureType=sighting');
+                        this.set('queryObj.species', 'SpeciesName=Hippo');
+                        this.set('queryObj.output', 'output=map');
+                        this.set('mapChecked', true);
+                        this.set('vizChecked', false);
+                        this.set('jsonChecked', false);
+                        var updatedUrl = "http://intotheokavango.org/api/features/map";
+                        this.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Hippo Sighting Query");
+                    }
+                })
 
                 this.observe('output', function(newValue, oldValue) {
                     //console.log('output: ' + newValue);
@@ -815,55 +815,8 @@ console.warn('DATA PAGE', id);
         });
         Template.components.FeaturesWidget = FeaturesWidget;
     })(Ractive);
-
-
+    
     /*
-    ################################
-    ### ShowMeButtonsComponent ###
-    ################################
-    */
-    (function(Template){
-        var ShowMeWidget = Template.extend({
-            template: "#showMeTemplate",
-            oninit: function () {
-                this.on( 'activate', function () {
-                  alert( 'Activating!' );
-                });
-                this.on({
-                    heartRateQuery: function() {
-                        ractive.set('queryObj.filter', 'features');
-                        ractive.set('queryObj.featureType', 'FeatureType=ambit');
-                        ractive.set('queryObj.output', 'output=viz');
-                        ractive.set('mapChecked', false);
-                        ractive.set('vizChecked', true);
-                        ractive.set('jsonChecked', false);
-                        
-                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
-                            //this.set('queryObj.output', "features/" + newValue);
-                        ractive.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Heart Rate Query");
-                    }
-                });
-                this.on({
-                    hippoSighting: function() {
-                        ractive.set('queryObj.filter', 'features');
-                        ractive.set('queryObj.featureType', 'FeatureType=sighting');
-                        ractive.set('queryObj.species', 'SpeciesName=Hippo');
-                        ractive.set('queryObj.output', 'output=map');
-                        ractive.set('mapChecked', true);
-                        ractive.set('vizChecked', false);
-                        ractive.set('jsonChecked', false);
-                        var updatedUrl = "http://intotheokavango.org/api/features/map";
-                        ractive.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Hippo Sighting Query");
-                    }
-                });
-            }
-        });
-        Template.components.ShowMeWidget = ShowMeWidget;
-    })(Ractive);
-    /*
-
     #############
     ### USAGE ###/*
     #############
@@ -906,7 +859,7 @@ console.warn('DATA PAGE', id);
     }
 
 
-	page.getFeatureTotalData = function(featureType) {
+    page.getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
             //console.log(featureType + " data");
@@ -933,16 +886,16 @@ console.warn('DATA PAGE', id);
                 // makeTotalsViz(featuresCountArray);
             }
         });
-	};
+    };
 
-	page.loadRactive = function() {
-		console.warn("loading ractive!!!");
-		ractive = new Ractive({
-	      	el: '#data-content',
-	      	// We could pass in a string, but for the sake of convenience
-	      	// we're passing the ID of the <script> tag above.
-	      	// template: '#navTemplate',
-	      	template: '#content-template',
+    page.loadRactive = function() {
+        console.warn("loading ractive!!!");
+        ractive = new Ractive({
+            el: '#data-content',
+            // We could pass in a string, but for the sake of convenience
+            // we're passing the ID of the <script> tag above.
+            // template: '#navTemplate',
+            template: '#content-template',
             oninit:function(){
                 console.warn('ON INIT')
                 this.setActive('overview');
@@ -958,25 +911,25 @@ console.warn('DATA PAGE', id);
                 button.classed('active', true);
                 var activeSection = this.get('sections.'+id);
                 this.set('activeSection', activeSection);
-            },	     	
+            },          
             // delimiters: [ '{[{', '}]}' ], //dont' need delimiters if using {% raw %} and {% endraw %}
-	      	// Here, we're passing in some initial data
-	      	data: { 
+            // Here, we're passing in some initial data
+            data: { 
                 'section': 'overview',
                 'sections': {
                     'documentation': {  nav_title: 'Documentation' , view_title: 'API Documentation', pageActive: false, content: "This is where we have information about the API" },
                     'overview': {  nav_title: 'Overview' , view_title: 'API Overview', pageActive: true, content: "This is where we embed a few interesting endpoint visualizations" },
                     'explorer': {  nav_title: 'Explorer' , view_title: 'API Explorer', pageActive: false, content: "This is where we have UI elements to explore the API" },
                 }
-			}
-		});
-		
-		window.ra = ractive;
-	}
+            }
+        });
+        
+        window.ra = ractive;
+    }
 
 
 
-	page.loadRactive();
+    page.loadRactive();
     page.getFeatureTotalData(features[index]);
     page.getSpeciesList();
     
@@ -996,6 +949,5 @@ console.warn('DATA PAGE', id);
     // });
     //console.log(Object.keys(d3Page));
     
-	return page;
+    return page;
 }
-

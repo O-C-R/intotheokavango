@@ -27,6 +27,11 @@
     <div id="tag-area"> 
       <Tag queryTags="{{queryTags}}"></Tag>
     </div> 
+    <div>
+    <h2>Show Me</h2>
+      <button class="showMeButton" id="heartrate-button" on-click="heartRateQuery">a HeartRate Graph</button>
+      <button class="showMeButton" id="hippoSightings-button" on-click="hippoSighting">Hippo Sightings on a Map</button>
+    </div>
     <div class="input-section">
         <h2>Select the type of Feature you want to explore</h2>
         <RactiveDropdownComponent id="dropdown-parent" items="{{items}}" selector="items" show="{{show}}" selectedText="select view" />
@@ -86,14 +91,6 @@
       {{/each}} 
       </ul>
     {{/partial}}
-</script>
-
-<script id='showMeTemplate' type='text/ractive'>
-  <div id="stuff">
-    <h2>Show Me</h2>
-    <div><button class="showMeButton" id="heartrate-button" on-click="heartRateQuery">a HeartRate Graph</button></div>
-    <div><button class="showMeButton" id="hippoSightings-button" on-click="hippoSighting">Hippo Sightings on a Map</button></div>
-  </div>
 </script>
 
 
@@ -158,10 +155,7 @@
             <!--Ractive template-->
             <FeaturesWidget />
         </div>
-           <!--Ractive template-->
-            <ShowMeWidget />
       </div>
-     
       <div id="query-area">
           <!--Ractive template-->
           <QueryComponent />
@@ -507,4 +501,3 @@ http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephan
   <script src="static/js/build9.js"></script>
 
 {% endblock body %}
-
