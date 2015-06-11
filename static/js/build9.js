@@ -66,6 +66,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedSensorData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
+    var parsedBeaconData = [];
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
     var parseSpeciesSighting = function(item) {
@@ -110,6 +111,29 @@ var d3Graph = function(timelineVizID, totalsVizID){
         return ambitData;
     }
 
+    var parseAmbitGeo = function(item) {
+        var ambitGeoData = {};
+        if (item["properties"].hasOwnPropery("GPSSpeed")) {
+            ambitGeoData.speed = item["properties"]["GPSSpeed"];
+        }
+        ambitGeoData.member = item["properties"]["Member"];
+        ambitGeoData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return ambitGeoData;
+    }
+
+    var parseBeaconData = function(item) {
+        var beaconData = {};
+        if(item["properties"].hasOwnProperty("Speed")) {
+            var tempSpeed = item["properties"]["Speed"];
+            var cleanSpeed = tempSpeed.split(' ');
+            beaconData.speed = cleanSpeed[0];
+        }
+
+        beaconData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
+        return beaconData;
+    }
+
     var parseSensorData = function(item) {
         var sensorData = {};
         sensorData.airTemp = item["properties"]["AirTemp"];
@@ -151,8 +175,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
     }
 
     var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
+
+        var xAxisLabel = "";
+        var graphTitle = "";
+        var yAxisLabel = "";
+
         //HISTOGRAM VIZ
-        var margin = {top: 70.5, right: 30, bottom: 40, left: 50.5},
+        var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
         width = ($('body').width()*0.9) - margin.left - margin.right,
         height = 525 - margin.top - margin.bottom,
         left_width = 100;
@@ -192,6 +221,10 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var max = d3.max(parsedData, function(d) {
                 return d.count;
             });
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
             
             yScale.domain([0, max]);
 
@@ -224,6 +257,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             //makeBinnedData(parsedImageData);
 
             yAxisLabel = "Count";
+            var dateFormat = d3.time.format("%B %d %Y");
+            var timeFormat = d3.time.format("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             if (feature_type === 'image') {
                 graphTitle = "Images Per Day";
@@ -319,7 +355,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
         svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
+              .call(xAxis)
+            .append("text")
+              .attr("class", "label")
+              .attr("y", 40)
+              .attr("x", width/2)
+              .attr("text-anchor", "middle") 
+              .text(xAxisLabel);
 
         svg.append("g")
               .attr("class", "y axis")
@@ -438,6 +480,38 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
                 }
             }
+
+            xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+
+            yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+        }
+
+        if (feature_type === "beacon") {
+            yAxisLabel = "km/h";
+            graphTitle = "Speed of Expedition";
+            console.log("feature_type is beacon");
+            console.log(parsedData);
+            var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.speed); });
+
+           var dateRange = d3.extent(parsedData, function(d) { 
+                return d.time; 
+            });
+            console.log("dateRange: " + dateRange);
+
+            xScale.domain(dateRange);
+            yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
+            var yDomain = d3.extent(parsedData, function(d) { return d.speed; });
+            console.log("yDomain: " + yDomain);
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -813,6 +887,36 @@ var d3Graph = function(timelineVizID, totalsVizID){
                             makeTimeSeriesViz(parsedAmbitEnergy,feature_type);
                             makeTimeSeriesViz(parsedAmbitSpeed,feature_type);
                 }
+
+                if (feature_type === "ambit_geo") {
+                    console.log("AMBIT_GEO");
+
+                    for (d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                    }
+                }
+
+                if (feature_type === "beacon") {
+                    console.log("BEACON");
+
+                    for(d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                        if(item["properties"].hasOwnProperty("Speed")) {
+                            if(item["properties"]["Speed"].indexOf("Unknown") != -1) {
+                                console.log("Bad Beacon Data");
+                            } else {
+                                f = parseBeaconData(item);
+                                parsedBeaconData.push(f);
+                            }
+                        }
+                    }
+                    makeTimeSeriesViz(parsedBeaconData, feature_type);
+                }
+
                 if (feature_type === "sighting") {
                     //make sightings viz - totals of all the SpeciesNames sightings
                     console.log("SIGHTING");
@@ -1253,36 +1357,36 @@ console.warn('DATA PAGE', id);
                     }
                 });
 
-                this.on({
-                    heartRateQuery: function() {
-                        this.set('queryObj.filter', 'features');
-                        this.set('queryObj.featureType', 'FeatureType=ambit');
-                        this.set('queryObj.output', 'output=viz');
-                        this.set('mapChecked', false);
-                        this.set('vizChecked', true);
-                        this.set('jsonChecked', false);
+                // this.on({
+                //     heartRateQuery: function() {
+                //         this.set('queryObj.filter', 'features');
+                //         this.set('queryObj.featureType', 'FeatureType=ambit');
+                //         this.set('queryObj.output', 'output=viz');
+                //         this.set('mapChecked', false);
+                //         this.set('vizChecked', true);
+                //         this.set('jsonChecked', false);
                         
-                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
-                            //this.set('queryObj.output', "features/" + newValue);
-                        this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Heart Rate Query");
-                    }
-                });
+                //         var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                //             //this.set('queryObj.output', "features/" + newValue);
+                //         this.set('apiUrl', updatedUrl);
+                //         console.log("Show Me Button : Heart Rate Query");
+                //     }
+                // });
 
-                this.on({
-                    hippoSighting: function() {
-                        this.set('queryObj.filter', 'features');
-                        this.set('queryObj.featureType', 'FeatureType=sighting');
-                        this.set('queryObj.species', 'SpeciesName=Hippo');
-                        this.set('queryObj.output', 'output=map');
-                        this.set('mapChecked', true);
-                        this.set('vizChecked', false);
-                        this.set('jsonChecked', false);
-                        var updatedUrl = "http://intotheokavango.org/api/features/map";
-                        this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Hippo Sighting Query");
-                    }
-                })
+                // this.on({
+                //     hippoSighting: function() {
+                //         this.set('queryObj.filter', 'features');
+                //         this.set('queryObj.featureType', 'FeatureType=sighting');
+                //         this.set('queryObj.species', 'SpeciesName=Hippo');
+                //         this.set('queryObj.output', 'output=map');
+                //         this.set('mapChecked', true);
+                //         this.set('vizChecked', false);
+                //         this.set('jsonChecked', false);
+                //         var updatedUrl = "http://intotheokavango.org/api/features/map";
+                //         this.set('apiUrl', updatedUrl);
+                //         console.log("Show Me Button : Hippo Sighting Query");
+                //     }
+                // })
 
                 this.observe('output', function(newValue, oldValue) {
                     //console.log('output: ' + newValue);
@@ -1716,7 +1820,53 @@ console.warn('DATA PAGE', id);
         });
         Template.components.FeaturesWidget = FeaturesWidget;
     })(Ractive);
-    
+
+
+    /*
+    ################################
+    ### ShowMeButtonsComponent ###
+    ################################
+    */
+    (function(Template){
+        var ShowMeWidget = Template.extend({
+            template: "#showMeTemplate",
+            oninit: function () {
+                this.on( 'activate', function () {
+                  alert( 'Activating!' );
+                });
+                this.on({
+                    heartRateQuery: function() {
+                        ractive.set('queryObj.filter', 'features');
+                        ractive.set('queryObj.featureType', 'FeatureType=ambit');
+                        ractive.set('queryObj.output', 'output=viz');
+                        ractive.set('mapChecked', false);
+                        ractive.set('vizChecked', true);
+                        ractive.set('jsonChecked', false);
+                        
+                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                            //this.set('queryObj.output', "features/" + newValue);
+                        ractive.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Heart Rate Query");
+                    }
+                });
+                this.on({
+                    hippoSighting: function() {
+                        ractive.set('queryObj.filter', 'features');
+                        ractive.set('queryObj.featureType', 'FeatureType=sighting');
+                        ractive.set('queryObj.species', 'SpeciesName=Hippo');
+                        ractive.set('queryObj.output', 'output=map');
+                        ractive.set('mapChecked', true);
+                        ractive.set('vizChecked', false);
+                        ractive.set('jsonChecked', false);
+                        var updatedUrl = "http://intotheokavango.org/api/features/map";
+                        ractive.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Hippo Sighting Query");
+                    }
+                });
+            }
+        });
+        Template.components.ShowMeWidget = ShowMeWidget;
+    })(Ractive);
     /*
 
     #############
@@ -3557,7 +3707,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 3;
+	var autoSpeed = 2.5;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
