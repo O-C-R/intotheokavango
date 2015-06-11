@@ -352,36 +352,36 @@ console.warn('DATA PAGE', id);
                     }
                 });
 
-                this.on({
-                    heartRateQuery: function() {
-                        this.set('queryObj.filter', 'features');
-                        this.set('queryObj.featureType', 'FeatureType=ambit');
-                        this.set('queryObj.output', 'output=viz');
-                        this.set('mapChecked', false);
-                        this.set('vizChecked', true);
-                        this.set('jsonChecked', false);
+                // this.on({
+                //     heartRateQuery: function() {
+                //         this.set('queryObj.filter', 'features');
+                //         this.set('queryObj.featureType', 'FeatureType=ambit');
+                //         this.set('queryObj.output', 'output=viz');
+                //         this.set('mapChecked', false);
+                //         this.set('vizChecked', true);
+                //         this.set('jsonChecked', false);
                         
-                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
-                            //this.set('queryObj.output', "features/" + newValue);
-                        this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Heart Rate Query");
-                    }
-                });
+                //         var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                //             //this.set('queryObj.output', "features/" + newValue);
+                //         this.set('apiUrl', updatedUrl);
+                //         console.log("Show Me Button : Heart Rate Query");
+                //     }
+                // });
 
-                this.on({
-                    hippoSighting: function() {
-                        this.set('queryObj.filter', 'features');
-                        this.set('queryObj.featureType', 'FeatureType=sighting');
-                        this.set('queryObj.species', 'SpeciesName=Hippo');
-                        this.set('queryObj.output', 'output=map');
-                        this.set('mapChecked', true);
-                        this.set('vizChecked', false);
-                        this.set('jsonChecked', false);
-                        var updatedUrl = "http://intotheokavango.org/api/features/map";
-                        this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Hippo Sighting Query");
-                    }
-                })
+                // this.on({
+                //     hippoSighting: function() {
+                //         this.set('queryObj.filter', 'features');
+                //         this.set('queryObj.featureType', 'FeatureType=sighting');
+                //         this.set('queryObj.species', 'SpeciesName=Hippo');
+                //         this.set('queryObj.output', 'output=map');
+                //         this.set('mapChecked', true);
+                //         this.set('vizChecked', false);
+                //         this.set('jsonChecked', false);
+                //         var updatedUrl = "http://intotheokavango.org/api/features/map";
+                //         this.set('apiUrl', updatedUrl);
+                //         console.log("Show Me Button : Hippo Sighting Query");
+                //     }
+                // })
 
                 this.observe('output', function(newValue, oldValue) {
                     //console.log('output: ' + newValue);
@@ -815,7 +815,53 @@ console.warn('DATA PAGE', id);
         });
         Template.components.FeaturesWidget = FeaturesWidget;
     })(Ractive);
-    
+
+
+    /*
+    ################################
+    ### ShowMeButtonsComponent ###
+    ################################
+    */
+    (function(Template){
+        var ShowMeWidget = Template.extend({
+            template: "#showMeTemplate",
+            oninit: function () {
+                this.on( 'activate', function () {
+                  alert( 'Activating!' );
+                });
+                this.on({
+                    heartRateQuery: function() {
+                        ractive.set('queryObj.filter', 'features');
+                        ractive.set('queryObj.featureType', 'FeatureType=ambit');
+                        ractive.set('queryObj.output', 'output=viz');
+                        ractive.set('mapChecked', false);
+                        ractive.set('vizChecked', true);
+                        ractive.set('jsonChecked', false);
+                        
+                        var updatedUrl = "http://intotheokavango.org/api/features/viz";
+                            //this.set('queryObj.output', "features/" + newValue);
+                        ractive.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Heart Rate Query");
+                    }
+                });
+                this.on({
+                    hippoSighting: function() {
+                        ractive.set('queryObj.filter', 'features');
+                        ractive.set('queryObj.featureType', 'FeatureType=sighting');
+                        ractive.set('queryObj.species', 'SpeciesName=Hippo');
+                        ractive.set('queryObj.output', 'output=map');
+                        ractive.set('mapChecked', true);
+                        ractive.set('vizChecked', false);
+                        ractive.set('jsonChecked', false);
+                        var updatedUrl = "http://intotheokavango.org/api/features/map";
+                        ractive.set('apiUrl', updatedUrl);
+                        console.log("Show Me Button : Hippo Sighting Query");
+                    }
+                });
+            }
+        });
+        Template.components.ShowMeWidget = ShowMeWidget;
+    })(Ractive);
     /*
 
     #############
