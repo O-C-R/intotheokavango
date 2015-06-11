@@ -29,6 +29,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedSensorData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
+    var parsedBeaconData = [];
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
     var parseSpeciesSighting = function(item) {
@@ -81,6 +82,20 @@ var d3Graph = function(timelineVizID, totalsVizID){
         ambitGeoData.member = item["properties"]["Member"];
         ambitGeoData.time = new Date(+item["properties"]["t_utc"] * 1000);
         return ambitGeoData;
+    }
+
+    var parseBeaconData = function(item) {
+        var beaconData = {};
+        if(item["properties"].hasOwnProperty("Speed")) {
+            var tempSpeed = item["properties"]["Speed"];
+            var cleanSpeed = tempSpeed.split(' ');
+            var intSpeed = parseInt(cleanSpeed[0]);
+            beaconData.speed = intSpeed;
+        }
+
+        beaconData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
+        return beaconData;
     }
 
     var parseSensorData = function(item) {
@@ -429,6 +444,38 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
                 }
             }
+
+            xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+
+            yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+        }
+
+        if (feature_type === "beacon") {
+            yAxisLabel = "km/h";
+            graphTitle = "Speed of Expedition";
+            console.log("feature_type is beacon");
+            console.log(parsedData);
+            var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.speed); });
+
+           var dateRange = d3.extent(parsedData, function(d) { 
+                return d.time; 
+            });
+            console.log("dateRange: " + dateRange);
+
+            xScale.domain(dateRange);
+            yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
+            var yDomain = d3.extent(parsedData, function(d) { return d.speed; });
+            console.log("yDomain: " + yDomain);
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -813,7 +860,25 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         console.log(item);
 
                     }
+                }
 
+                if (feature_type === "beacon") {
+                    console.log("BEACON");
+
+                    for(d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                        if(item["properties"].hasOwnProperty("Speed")) {
+                            if(item["properties"]["Speed"].indexOf("Unknown") != -1) {
+                                console.log("Bad Beacon Data");
+                            } else {
+                                f = parseBeaconData(item);
+                                parsedBeaconData.push(f);
+                            }
+                        }
+                    }
+                    makeTimeSeriesViz(parsedBeaconData, feature_type);
                 }
 
                 if (feature_type === "sighting") {
