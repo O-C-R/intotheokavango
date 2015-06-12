@@ -294,7 +294,7 @@ function Timeline(){
 	}
 
 	function checkUnzoom(force, reset){
-		if(mapWorld.focusMember){
+		if(mapWorld.focusMember && pages.active.id == 'map'){
 			for(var i=0; i<unzoomedTime.length; i++){
 				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
 				if(u) break;
