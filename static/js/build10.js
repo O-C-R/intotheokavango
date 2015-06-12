@@ -4335,21 +4335,17 @@ function initMapLabels(map){
 
 	TODOS
 
-	- PM Joey
+	- popup doesn't open to journal
 	- sometimes loading fails on map / journal
-	- colors + pattern on ambit_geo path
 	- complete instruction labels
-	- check popup click
-	- video
+	- low resolution ambit-geo in free mode
+
+	- PM Joey
 	- videos
 	- redo layout for tweets on the map
 	- new milestones?
-
-
-	- remove markers on journal
 	- instagram
 	- remove non-core members + unfocus
-	- navigate map in free mode
 	- trail ambit
 	- click on popup doesn't open them
 	- multiple medium posts
