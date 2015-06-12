@@ -133,11 +133,14 @@ function Loader(){
 						}
 					}];
 
+					var c = members[m].getColor();
+
 					var pathStyle = {
 					    fillColor: "#fff",
-					    color: "#C1BEFF",
+					    color: 'rgba('+c[0]+','+c[1]+','+c[2]+',1)',
 					    weight: 2.5,
-					    opacity: 0.4,
+					    opacity: 0.6,
+					    'pointer-events': 'none !important'
 					};
 					
 					var ambitPath = L.geoJson(paths, {	style:pathStyle	});
@@ -170,7 +173,7 @@ function Loader(){
 	    var loadingImages = 0;
 
 	    // http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_15&expeditionDay=7&limit=0
-		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=30'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -218,7 +221,7 @@ function Loader(){
 	        iconSize:[30,30]
 	    };
 
-		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
+		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=300';
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
@@ -373,6 +376,7 @@ function Loader(){
 			
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.CoreExpedition) return false;
 		        	if(feature.geometry == 'null') return false;
 		            return (feature.geometry.coordinates[0] != 0);
 		        },
@@ -492,7 +496,8 @@ function Loader(){
 				    weight: 2.5,
 				    opacity: 0.75,
 				    dashArray: "10,10",
-				    noClip: true
+				    noClip: true,
+				    'pointer-events': 'none !important'
 				};
 				
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});

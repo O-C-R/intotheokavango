@@ -36,8 +36,10 @@ function Timeline(){
 	var cursorHovered = false;
 	var cursorDate = new Date();
 
-	var unzoomedTime = [[1431948652,1432199688]];
 	var isUnzoomedTime = false;
+	var unzoomedTime = [[1431948652,1432199688],
+						[1433756474, 1433833065],
+						[1433848882,new Date().getTime()/1000]];
 
 	var milestones = {
 		0 : 'Menongue',
@@ -105,10 +107,6 @@ function Timeline(){
 			.text(function(d,i){
 				if(milestones[i]) return milestones[i];
 				return 'day ' + i
-				// var da = new Date(d.getTime()+timeOffsets[expeditionYear].timezone*3600*1000);
-				// var s;
-				// var s = dateToString(da);
-				// return s.mo + ' ' + s.da
 			})
 			.style('fill',function(d,i){
 				return 'rgba(255,255,255,'+(milestones[i]?1:0.5);
@@ -296,9 +294,14 @@ function Timeline(){
 	}
 
 	function checkUnzoom(force, reset){
-		for(var i=0; i<unzoomedTime.length; i++){
-			var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
-			if(isUnzoomedTime != u || reset) mapWorld.setZoom(u?15:17, {animate:!force});
+		if(mapWorld.focusMember){
+			for(var i=0; i<unzoomedTime.length; i++){
+				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+				if(u) break;
+			}
+			if(isUnzoomedTime != u || reset) {
+				mapWorld.setZoom(u?15:17, {animate:!force});
+			}
 			isUnzoomedTime = u;
 		}
 	}
@@ -318,7 +321,7 @@ function Timeline(){
 
 	function cullMarkersByDay(){
 		// beacon path is not culled
-		var features = ['sightings', 'tweets', 'photos', 'blogs', 'ambits'];
+		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){

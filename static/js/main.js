@@ -9,10 +9,25 @@
 
 	TODOS
 
+	- PM Joey
+	- sometimes loading fails on map / journal
+	- colors + pattern on ambit_geo path
+	- complete instruction labels
+	- check popup click
+	- video
+	- videos
+	- redo layout for tweets on the map
+	- new milestones?
+
+
+	- remove markers on journal
+	- instagram
+	- remove non-core members + unfocus
+	- navigate map in free mode
 	- trail ambit
 	- click on popup doesn't open them
 	- multiple medium posts
-	- sometines the journal doesnt load neighboring days
+	- sometimes the journal doesnt load neighboring days
 	- culling
 	- linkable features
 	- gallery page
@@ -107,6 +122,16 @@ var jumping = false;
 var isMobile = false;
 var isLoading = true;
 
+var pathColorsRegistered = 0;
+var pathColors = [[128,255,173],
+				  [255,180,94],
+				  [231,255,152],
+				  [179,247,255],
+				  [182,255,145],
+				  [237,255,180],
+				  [139,255,128],
+				  [225,255,128]];
+
 document.addEventListener('DOMContentLoaded', function(){
 
 	(function() {
@@ -125,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function(){
     mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
+        autoPan: true,
         center:mapLatLng,
         attributionControl: false,
         doubleClickZoom: false,
@@ -375,7 +401,6 @@ document.addEventListener('DOMContentLoaded', function(){
 						if(pages.active.id == 'map') timeline.togglePause();
 			    	})
 			    	.on('wheel',function(){
-			    		// if(pages.active.id == 'map' && mapWorld.focusMember) timeline.navigateMap(-d3.event.deltaY);
 			    		if(pages.active.id == 'map') timeline.navigateMap(-d3.event.deltaY);
 			    	})
 			    	.call(drag);
@@ -432,9 +457,9 @@ document.addEventListener('DOMContentLoaded', function(){
 function teleportMap(){
 	if(mapWorld.focusMember){
 		mapTLatLng = mapWorld.focusMember.getLatLng();
-		mapLatLng.lat = mapTLatLng.lat;
-		mapLatLng.lng = mapTLatLng.lng;
-		mapWorld.panTo(mapLatLng, {animate:false});
+		// mapLatLng.lat = mapTLatLng.lat;
+		// mapLatLng.lng = mapTLatLng.lng;
+		// mapWorld.panTo(mapLatLng, {animate:false});
 	}
 }
 

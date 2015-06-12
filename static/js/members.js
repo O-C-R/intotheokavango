@@ -12,6 +12,8 @@ function Member(n, l, d){
 	var pathQueue = [];
 	var timeCursor = 0;
 	var dayCursor = d;
+	var color = pathColors[pathColorsRegistered];
+	pathColorsRegistered ++;
 	var latLng = l;
 	var tLatLng = new L.LatLng(l.lat,l.lng);
 	var icon = L.divIcon({
@@ -23,6 +25,8 @@ function Member(n, l, d){
 
 	d3.select(marker._icon)
 		.on('click',focus)
+		.select('p')
+		.style('color','rgba('+color[0]+','+color[1]+','+color[2]+',1)');
 
 	function addAmbitGeo(d, l, t, c, origin){
 		if(!pathQueueByDay[d]) pathQueueByDay[d] = [];
@@ -134,8 +138,7 @@ function Member(n, l, d){
 		d3.select(marker._icon).classed('swollen',false);
 		mapWorld.focusMember = loader.members[name];
 		mapWorld.dragging.disable();
-		// mapWorld.scrollWheelZoom.disable();
-		mapLatLng = mapWorld.getCenter();
+		mapTLatLng = mapWorld.getCenter();
 		timeline.checkUnzoom(false, true);
 	}
 
@@ -147,7 +150,7 @@ function Member(n, l, d){
 		strength = 1-strength;
 		if(strength>0){
 			d3.select(marker._icon).select('p')
-				.style('color','rgb('+(Math.floor(255-strength*180))+',255,'+(Math.floor(255-strength*120))+')');
+				.style('color','rgb('+(Math.floor(255-strength*color[0]))+','+color[1]+','+(Math.floor(255-strength*color[2]))+')');
 		}
 		d3.select(marker._icon).classed('swollen',false);
 	}
@@ -160,8 +163,11 @@ function Member(n, l, d){
 		if(!unswollen){
 			mapWorld.focusMember = null;
 			mapWorld.dragging.enable();
-			// mapWorld.scrollWheelZoom.enable();
 		}
+	}
+
+	function getColor(){
+		return color;
 	}
 
 	return{
@@ -179,6 +185,7 @@ function Member(n, l, d){
 		unfocus: unfocus,
 		dim: dim,
 		light: light,
+		getColor: getColor
 	}
 }
 

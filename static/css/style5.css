@@ -1389,6 +1389,10 @@ svg.wanderer{
   position:absolute;
 }
 
+svg path.leaflet-clickable{
+  pointer-events:none !important;
+}
+
 .memberMarker {
   font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
   font-weight: 700;
