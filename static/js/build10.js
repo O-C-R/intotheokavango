@@ -66,6 +66,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedSensorData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
+    var parsedBeaconData = [];
     // var path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
 
     var parseSpeciesSighting = function(item) {
@@ -110,6 +111,30 @@ var d3Graph = function(timelineVizID, totalsVizID){
         return ambitData;
     }
 
+    var parseAmbitGeo = function(item) {
+        var ambitGeoData = {};
+        if (item["properties"].hasOwnPropery("GPSSpeed")) {
+            ambitGeoData.speed = item["properties"]["GPSSpeed"];
+        }
+        ambitGeoData.member = item["properties"]["Member"];
+        ambitGeoData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return ambitGeoData;
+    }
+
+    var parseBeaconData = function(item) {
+        var beaconData = {};
+        if(item["properties"].hasOwnProperty("Speed")) {
+            var tempSpeed = item["properties"]["Speed"];
+            var cleanSpeed = tempSpeed.split(' ');
+            var intSpeed = parseInt(cleanSpeed[0]);
+            beaconData.speed = intSpeed;
+        }
+
+        beaconData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
+        return beaconData;
+    }
+
     var parseSensorData = function(item) {
         var sensorData = {};
         sensorData.airTemp = item["properties"]["AirTemp"];
@@ -151,8 +176,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
     }
 
     var makeHistogramPlot = function(parsedData, feature_type, subTitle) {
+
+        var xAxisLabel = "";
+        var graphTitle = "";
+        var yAxisLabel = "";
+
         //HISTOGRAM VIZ
-        var margin = {top: 70.5, right: 30, bottom: 40, left: 50.5},
+        var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
         width = ($('body').width()*0.9) - margin.left - margin.right,
         height = 525 - margin.top - margin.bottom,
         left_width = 100;
@@ -192,6 +222,10 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var max = d3.max(parsedData, function(d) {
                 return d.count;
             });
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
             
             yScale.domain([0, max]);
 
@@ -224,6 +258,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             //makeBinnedData(parsedImageData);
 
             yAxisLabel = "Count";
+            var dateFormat = d3.time.format("%B %d %Y");
+            var timeFormat = d3.time.format("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             if (feature_type === 'image') {
                 graphTitle = "Images Per Day";
@@ -319,7 +356,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
         svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
+              .call(xAxis)
+            .append("text")
+              .attr("class", "label")
+              .attr("y", 40)
+              .attr("x", width/2)
+              .attr("text-anchor", "middle") 
+              .text(xAxisLabel);
 
         svg.append("g")
               .attr("class", "y axis")
@@ -345,9 +388,10 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     var makeTimeSeriesViz = function(parsedData,feature_type) {
         //TIMESERIES VIZ
-        var margin = {top: 70.5, right: 100, bottom: 60, left: 40.5},
-        width = 800 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom,
+
+        var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
+        width = ($('body').width()*0.9) - margin.left - margin.right,
+        height = 525 - margin.top - margin.bottom,
         left_width = 100;
 
         var yAxisLabel = "";
@@ -397,8 +441,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
-
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("energy")) {
                     console.log("data has energy key");
                     yAxisLabel = "Average Calories Burned";
@@ -416,8 +459,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.energy; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
-
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("speed")) {
                     console.log("data has speed key");
                     yAxisLabel = "Meters per Second";
@@ -435,9 +477,41 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
-                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 }
             }
+
+            xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+
+            yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+        }
+
+        if (feature_type === "beacon") {
+            yAxisLabel = "km/h";
+            graphTitle = "Speed of Expedition";
+            console.log("feature_type is beacon");
+            console.log(parsedData);
+            var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.speed); });
+
+           var dateRange = d3.extent(parsedData, function(d) { 
+                return d.time; 
+            });
+            console.log("dateRange: " + dateRange);
+
+            xScale.domain(dateRange);
+            yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
+            var yDomain = d3.extent(parsedData, function(d) { return d.speed; });
+            console.log("yDomain: " + yDomain);
+
+            var dateFormat = d3.time.format.utc("%B %d %Y");
+            var timeFormat = d3.time.format.utc("%I:%M:%S");
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -486,7 +560,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
             var dateFormat = d3.time.format.utc("%B %d %Y");
             var timeFormat = d3.time.format.utc("%I:%M:%S");
-            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + timeFormat(dateRange[1]);
+            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -813,6 +887,36 @@ var d3Graph = function(timelineVizID, totalsVizID){
                             makeTimeSeriesViz(parsedAmbitEnergy,feature_type);
                             makeTimeSeriesViz(parsedAmbitSpeed,feature_type);
                 }
+
+                if (feature_type === "ambit_geo") {
+                    console.log("AMBIT_GEO");
+
+                    for (d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                    }
+                }
+
+                if (feature_type === "beacon") {
+                    console.log("BEACON");
+
+                    for(d in data.results.features) {
+                        var item = data.results.features[d];
+                        console.log(item);
+
+                        if(item["properties"].hasOwnProperty("Speed")) {
+                            if(item["properties"]["Speed"].indexOf("Unknown") != -1) {
+                                console.log("Bad Beacon Data");
+                            } else {
+                                f = parseBeaconData(item);
+                                parsedBeaconData.push(f);
+                            }
+                        }
+                    }
+                    makeTimeSeriesViz(parsedBeaconData, feature_type);
+                }
+
                 if (feature_type === "sighting") {
                     //make sightings viz - totals of all the SpeciesNames sightings
                     console.log("SIGHTING");
@@ -902,21 +1006,21 @@ var d3Graph = function(timelineVizID, totalsVizID){
 };;
 
 /*
-	API Explorer, Genevieve's turf.
-	Please note I have been using the following javascript pattern: 
-	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
-	UI Built out with Ractive.js: http://www.ractivejs.org/
+    API Explorer, Genevieve's turf.
+    Please note I have been using the following javascript pattern: 
+    http://radar.oreilly.com/2014/03/javascript-without-the-this.html
+    UI Built out with Ractive.js: http://www.ractivejs.org/
 */
 
 
 function DataPage(id){
 console.warn('DATA PAGE', id);
     var ractive, page;
-	/* 	Extends Page in layout.js
-		Which among others gives you access to the following methods:
-		- page.getNode()
-		- page.show()
-		- page.hide()	*/
+    /*  Extends Page in layout.js
+        Which among others gives you access to the following methods:
+        - page.getNode()
+        - page.show()
+        - page.hide()   */
     page = Page(id);
     page._show = page.show.bind(page);
     page._hide = page.hide.bind(page);
@@ -936,7 +1040,7 @@ console.warn('DATA PAGE', id);
 
 
 
-	///////////////////
+    ///////////////////
     // DATA & VARS
     ///////////////////
     var sections = {
@@ -1718,7 +1822,6 @@ console.warn('DATA PAGE', id);
     })(Ractive);
     
     /*
-
     #############
     ### USAGE ###/*
     #############
@@ -1761,7 +1864,7 @@ console.warn('DATA PAGE', id);
     }
 
 
-	page.getFeatureTotalData = function(featureType) {
+    page.getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
             //console.log(featureType + " data");
@@ -1788,16 +1891,16 @@ console.warn('DATA PAGE', id);
                 // makeTotalsViz(featuresCountArray);
             }
         });
-	};
+    };
 
-	page.loadRactive = function() {
-		console.warn("loading ractive!!!");
-		ractive = new Ractive({
-	      	el: '#data-content',
-	      	// We could pass in a string, but for the sake of convenience
-	      	// we're passing the ID of the <script> tag above.
-	      	// template: '#navTemplate',
-	      	template: '#content-template',
+    page.loadRactive = function() {
+        console.warn("loading ractive!!!");
+        ractive = new Ractive({
+            el: '#data-content',
+            // We could pass in a string, but for the sake of convenience
+            // we're passing the ID of the <script> tag above.
+            // template: '#navTemplate',
+            template: '#content-template',
             oninit:function(){
                 console.warn('ON INIT')
                 this.setActive('overview');
@@ -1813,25 +1916,25 @@ console.warn('DATA PAGE', id);
                 button.classed('active', true);
                 var activeSection = this.get('sections.'+id);
                 this.set('activeSection', activeSection);
-            },	     	
+            },          
             // delimiters: [ '{[{', '}]}' ], //dont' need delimiters if using {% raw %} and {% endraw %}
-	      	// Here, we're passing in some initial data
-	      	data: { 
+            // Here, we're passing in some initial data
+            data: { 
                 'section': 'overview',
                 'sections': {
                     'documentation': {  nav_title: 'Documentation' , view_title: 'API Documentation', pageActive: false, content: "This is where we have information about the API" },
                     'overview': {  nav_title: 'Overview' , view_title: 'API Overview', pageActive: true, content: "This is where we embed a few interesting endpoint visualizations" },
                     'explorer': {  nav_title: 'Explorer' , view_title: 'API Explorer', pageActive: false, content: "This is where we have UI elements to explore the API" },
                 }
-			}
-		});
-		
-		window.ra = ractive;
-	}
+            }
+        });
+        
+        window.ra = ractive;
+    }
 
 
 
-	page.loadRactive();
+    page.loadRactive();
     page.getFeatureTotalData(features[index]);
     page.getSpeciesList();
     
@@ -1851,9 +1954,8 @@ console.warn('DATA PAGE', id);
     // });
     //console.log(Object.keys(d3Page));
     
-	return page;
+    return page;
 }
-
 ;
 
 /*
@@ -2976,6 +3078,9 @@ function Loader(){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
                 		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3027,6 +3132,9 @@ function Loader(){
                 	var title = feature.properties.Title;
                 	if(title){
                 		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3128,6 +3236,9 @@ function Loader(){
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
                 		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -4365,7 +4476,7 @@ document.addEventListener('DOMContentLoaded', function(){
     mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        autoPan: true,
+        autoPan: false,
         center:mapLatLng,
         attributionControl: false,
         doubleClickZoom: false,
@@ -4447,35 +4558,39 @@ document.addEventListener('DOMContentLoaded', function(){
 				    timeline.update(frameRate);
 					
 					var date = timeline.getTimeCursor();
-					var sightings = loader.getSightings();
-					if(sightings[date.day]){
-						var len = sightings[date.day].length;
-						for(var i=0; i<len; i++){
-							sightings[date.day][i].animate(date.current);
-						}
-					}
 
-					var photos = loader.getPhotos();
-					if(photos[date.day]){
-						var len = photos[date.day].length;
-						for(var i=0; i<len; i++){
-							photos[date.day][i].animate(date.current);
+					if(!timeline.getPaused() && frameCount&5 == 0){
+						console.log(frameCount);
+						var sightings = loader.getSightings();
+						if(sightings[date.day]){
+							var len = sightings[date.day].length;
+							for(var i=0; i<len; i++){
+								sightings[date.day][i].animate(date.current);
+							}
 						}
-					}
 
-					var tweets = loader.getTweets();
-					if(tweets[date.day]){
-						var len = tweets[date.day].length;
-						for(var i=0; i<len; i++){
-							tweets[date.day][i].animate(date.current);
+						var photos = loader.getPhotos();
+						if(photos[date.day]){
+							var len = photos[date.day].length;
+							for(var i=0; i<len; i++){
+								photos[date.day][i].animate(date.current);
+							}
 						}
-					}
 
-					var blogs = loader.getBlogs();
-					if(blogs[date.day]){
-						var len = blogs[date.day].length;
-						for(var i=0; i<len; i++){
-							blogs[date.day][i].animate(date.current);
+						var tweets = loader.getTweets();
+						if(tweets[date.day]){
+							var len = tweets[date.day].length;
+							for(var i=0; i<len; i++){
+								tweets[date.day][i].animate(date.current);
+							}
+						}
+
+						var blogs = loader.getBlogs();
+						if(blogs[date.day]){
+							var len = blogs[date.day].length;
+							for(var i=0; i<len; i++){
+								blogs[date.day][i].animate(date.current);
+							}
 						}
 					}
 					

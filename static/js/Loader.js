@@ -186,6 +186,9 @@ function Loader(){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
                 		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -237,6 +240,9 @@ function Loader(){
                 	var title = feature.properties.Title;
                 	if(title){
                 		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -338,6 +344,9 @@ function Loader(){
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
                 		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {

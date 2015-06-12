@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function(){
     mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        autoPan: true,
+        autoPan: false,
         center:mapLatLng,
         attributionControl: false,
         doubleClickZoom: false,
@@ -232,35 +232,39 @@ document.addEventListener('DOMContentLoaded', function(){
 				    timeline.update(frameRate);
 					
 					var date = timeline.getTimeCursor();
-					var sightings = loader.getSightings();
-					if(sightings[date.day]){
-						var len = sightings[date.day].length;
-						for(var i=0; i<len; i++){
-							sightings[date.day][i].animate(date.current);
-						}
-					}
 
-					var photos = loader.getPhotos();
-					if(photos[date.day]){
-						var len = photos[date.day].length;
-						for(var i=0; i<len; i++){
-							photos[date.day][i].animate(date.current);
+					if(!timeline.getPaused() && frameCount&5 == 0){
+						console.log(frameCount);
+						var sightings = loader.getSightings();
+						if(sightings[date.day]){
+							var len = sightings[date.day].length;
+							for(var i=0; i<len; i++){
+								sightings[date.day][i].animate(date.current);
+							}
 						}
-					}
 
-					var tweets = loader.getTweets();
-					if(tweets[date.day]){
-						var len = tweets[date.day].length;
-						for(var i=0; i<len; i++){
-							tweets[date.day][i].animate(date.current);
+						var photos = loader.getPhotos();
+						if(photos[date.day]){
+							var len = photos[date.day].length;
+							for(var i=0; i<len; i++){
+								photos[date.day][i].animate(date.current);
+							}
 						}
-					}
 
-					var blogs = loader.getBlogs();
-					if(blogs[date.day]){
-						var len = blogs[date.day].length;
-						for(var i=0; i<len; i++){
-							blogs[date.day][i].animate(date.current);
+						var tweets = loader.getTweets();
+						if(tweets[date.day]){
+							var len = tweets[date.day].length;
+							for(var i=0; i<len; i++){
+								tweets[date.day][i].animate(date.current);
+							}
+						}
+
+						var blogs = loader.getBlogs();
+						if(blogs[date.day]){
+							var len = blogs[date.day].length;
+							for(var i=0; i<len; i++){
+								blogs[date.day][i].animate(date.current);
+							}
 						}
 					}
 					
