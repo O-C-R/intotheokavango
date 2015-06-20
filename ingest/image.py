@@ -35,6 +35,8 @@ def parse(request):
         data['SightingID'] = None
     if 'Notes' in data and not len(data['Notes'].strip()):
         data['Notes'] = None
+    if 'Member' in data and data['Member'].lower() == "gopro":
+        data['Member'] = None
 
     # process the image -- add the same metadata for each one, and update with the image's data
     images = []
