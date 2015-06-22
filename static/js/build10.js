@@ -3271,13 +3271,19 @@ function Loader(){
 
 		// http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_15&expeditionDay=7&limit=0
 		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		console.log(query);
 		d3.json(query, function(error, data) {
+
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			data = data.results;	
-			
+
+			console.log(data.features);
+
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(!feature.properties.CoreExpedition) return false;
+		        	console.log('aga', feature);
+		        	// if(!feature.properties.CoreExpedition) return false;
+		            console.log(feature);
 		        	if(feature.geometry == 'null') return false;
 		            return (feature.geometry.coordinates[0] != 0);
 		        },
