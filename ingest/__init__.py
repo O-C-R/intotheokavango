@@ -381,9 +381,10 @@ def process_image(path, member=None, t_utc=None):
         try:
             exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
         except AttributeError:
-            log.warning("--> no EXIF data in image")
-            log.warning("--> substituting current time for t_utc")
-            data['t_utc'] = util.timestamp()
+            log.warning("--> no EXIF data in image")            
+            if 't_utc' not in data:
+                log.warning("--> substituting current time for t_utc")
+                data['t_utc'] = util.timestamp()
         else:
             # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
             date_field = exif['DateTimeOriginal'] if 'DateTimeOriginal' in exif else exif['DateTime']
