@@ -598,14 +598,14 @@ var d3Graph = function(timelineVizID, totalsVizID){
         sortArrOfObjectsByParam(data, "total", false);
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
-            width = 800 - margin.left - margin.right,
+            width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
             height = barHeight * data.length,
-            left_width = 300;
+            left_width = 400;
 
         var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
-            .range([0, width - left_width]);
+            .range([0, width - (left_width + 80) ]);
             console.log(data);
             
         var yScale = d3.scale.ordinal()
@@ -614,6 +614,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 console.log(d.type); //hmm it doesn't console anything
             })
             .rangeBands([0, height]);
+
         console.log(yScale.range());
         var svg = d3.select("#timelineViz").append("svg")
             .attr("width", width)
@@ -628,22 +629,27 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .attr("x", left_width)
             .attr("y", yScale)
             .attr("width", function(d) { return xScale(d.total); })
+            .style("fill", "#4bff87")
             .attr("height", barHeight - 1);
 
         bar.append("text")
-            .attr("x", function(d) { return xScale(d.total) - 5 + left_width; })
+            .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
             .attr("y", barHeight / 2)
             .attr("dy", "0.35em")
             .attr("text-anchor", "beginning")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.total; });
 
         bar.append("text")
-            .attr("x", left_width * 0.92)
+            .attr("x", left_width - 20)
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
             .attr("y", barHeight / 2)
             .attr("dy", "0.35em")
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "end")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.type; });
     }
 
@@ -735,6 +741,29 @@ var d3Graph = function(timelineVizID, totalsVizID){
         })
     }
 
+    var speciesCountObj = {};
+    var speciesCountArray = [];
+
+    var getSpeciesCount = function(sightings) {
+
+            for (var i = 0; i < sightings.length; ++i) {
+                if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
+                    speciesCountObj[sightings[i].properties.SpeciesName] = 0;
+                    console.log("doesn't have species property");
+                }
+                speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+            }
+            console.log(Object.keys(speciesCountObj));
+
+            for (s in speciesCountObj){
+                myObj = {};
+                myObj.species = s;
+                myObj.count  = speciesCountObj[s];
+                speciesCountArray.push(myObj);
+            }
+            console.log(speciesCountArray);
+        }
+
     //get the totals for all features, recursively - then draw a totals bar chart viz
     var getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
@@ -790,6 +819,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 return error;
             } else {
                 console.log("Initial Data", data);
+                console.log("feature_type", feature_type);
 
                 //parse item differently based on feature_type
                 if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
@@ -906,6 +936,25 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         //timelineVizDiv.fadeIn();
                         //totalsVizDiv.hide();
                         makeHistogramPlot(parsedSpeciesSighting, feature_type, speciesName);
+                    } else {
+
+                        getSpeciesCount(data.results.features);
+                        makeTotalsViz(speciesCountArray);
+                        // console.log("these are the species");
+                        // for(species in data.results) {
+                            
+                        //     var count = data.results[species];
+                        //     console.log(species + ": " + count);
+
+                        //     var sightingCount = {};
+                        //     sightingCount.type = species;
+                        //     sightingCount.total = count;
+                        //     speciesSightingsTotals.push(sightingCount);
+                        // }
+                        // console.log(speciesSightingsTotals);
+                        // //totalsVizDiv.fadeIn();
+                        // makeTotalsViz(speciesSightingsTotals);
+                        console.log("no species in query");
                     }
                 }
                 if (feature_type === "sensor") {
