@@ -619,11 +619,21 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var svg = d3.select("#timelineViz").append("svg")
             .attr("width", width)
             .attr("height", height);
+
+        var title = svg.append("text")
+            .attr("x", 0)
+            .attr("y", 20)
+            .style("fill", "white")
+            .style("font-size", "18px")
+            .text("TOTAL SIGHTINGS");
+
         
         var bar = svg.selectAll("g")
                 .data(data)
             .enter().append("g")
                 .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+
 
         bar.append("rect")
             .attr("x", left_width)
