@@ -83,6 +83,7 @@ function Loader(){
 			data = data.results;		
 		    L.geoJson(data, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.CoreExpedition) return false;
 			        return (feature.geometry.coordinates[0] != 0);
 			    },
 			    pointToLayer: function (feature, latLng) {
