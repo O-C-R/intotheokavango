@@ -613,7 +613,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 return d.type; 
                 console.log(d.type); //hmm it doesn't console anything
             })
-            .rangeBands([0, height]);
+            .rangeBands([60, height]);
 
         console.log(yScale.range());
         var svg = d3.select("#timelineViz").append("svg")
@@ -633,8 +633,6 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .enter().append("g")
                 .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
-
-
         bar.append("rect")
             .attr("x", left_width)
             .attr("y", yScale)
@@ -645,7 +643,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         bar.append("text")
             .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
             .attr("text-anchor", "beginning")
             .attr("class", "label")
@@ -655,7 +653,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         bar.append("text")
             .attr("x", left_width - 20)
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
             .attr("text-anchor", "end")
             .attr("class", "label")
