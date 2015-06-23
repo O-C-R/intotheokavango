@@ -1,6 +1,6 @@
 import json
 from housepy import util, log, config, strings
-from ingest import ingest_json_file, ingest_data
+from ingest import ingest_json_body, ingest_data
 
 def parse(request):
     log.info("sensornet.parse")
