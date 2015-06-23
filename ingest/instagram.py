@@ -4,7 +4,7 @@ from housepy import config, log, strings, util, net
 from mongo import db
 
 """
-    Grab instagrams from main timeline and hashtagged tweets from associated accounts
+    Grab recent instagrams from accounts on the list
 
 """
 
