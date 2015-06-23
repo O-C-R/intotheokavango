@@ -1,4 +1,5 @@
-from housepy import util, log, config, strings, json
+import json
+from housepy import util, log, config, strings
 from ingest import ingest_json_file, ingest_data
 
 def parse(request):
