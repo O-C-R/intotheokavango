@@ -23,11 +23,17 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-        }         
+        } 
+        #test {
+            width: 100%;
+            height: 100px;
+        }        
     </style>
 {% endblock head %}
 
 {% block body %}
     {{ search }}
+    <div id="test">THIS IS A MAP</div>
     <div id="map"></div>
+    
 {% endblock body %}
