@@ -16,7 +16,8 @@ def parse(request):
             del data['gps_lat']
         data['FeatureType'] = "sensor"
         data['FeatureSubType'] = "hybrid"
-        data['SensorName'] = "Sensornet"
+        data['SensorName'] = "sensornet"
+        data['CoreExpedition'] = False
         data['t_utc'] = util.delocalize_timestamp(t_local, tz=config['local_tz'])
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))

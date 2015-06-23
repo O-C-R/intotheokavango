@@ -169,18 +169,19 @@ def estimate_geometry(data, db):
                 pass
 
             # is/was the member core at this point?
-            try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
-                log.info("--> core is %s" % core)
-            except Exception as e:
-                log.info("--> no core entry at time %s" % t)
+            if 'CoreExpedition' in data['properties']:
+                core = data['properties']['CoreExpedition']
+            else:   # there should never be an else
+                log.warning("--> no CoreExpedition for estimator")
+                core = False
+            log.info("--> core is %s" % core)
 
         # find geodata from the nearest beacon
-        # but only do it if there is no Member, or the Member is/was core at that point
+        # but only do it if there is no Member (always core, unless overridden), or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        if 'Member' not in data['properties'] or data['properties']['Member'] is None or (core and not feature_type == "ambit"):  ## for some reason, ambit points are snapping to beacons (which may in fact be more often?) but that's bad form with individual gps data, right? and we'll plot that via ambit_geo
+        if core and not feature_type == "ambit":  ## don't let ambit readings pop to beacons
             try:
                 beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
                 beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
@@ -260,6 +261,8 @@ def verify_expedition(data):
     return data
 
 def tag_core(data):
+    if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
+        return data
     try:
         db = Application.instance.db
     except AttributeError:
