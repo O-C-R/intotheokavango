@@ -20,12 +20,12 @@
     </div>
         <script type="text/javascript">
 
-        var url = "http://dev.intotheokavango.org/api/features?FeatureType=sighting";
+        var url = "http://intotheokavango.org/api/features?FeatureType=sighting";
 
         var parseSighting = function(item) {
             if(item["properties"].hasOwnProperty("FeatureType")){
                 var sighting = {};
-                sighting.species = item["properties"]["BirdName"];
+                sighting.species = item["properties"]["SpeciesName"];
                 sighting.time =  new Date(+item["properties"]["t_utc"] * 1000);
                 sighting.count = item["properties"]["Count"];
                 return sighting;
@@ -55,10 +55,10 @@
 
             for (var i = 0; i < sightings.length; ++i) {
                 if (!speciesCountObj.hasOwnProperty(sightings[i].properties.BirdName)) {
-                    speciesCountObj[sightings[i].properties.BirdName] = 0;
+                    speciesCountObj[sightings[i].properties.SpeciesName] = 0;
                     console.log("doesn't have species property");
                 }
-                speciesCountObj[sightings[i].properties.BirdName] += sightings[i].properties.Count;
+                speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
             }
             console.log(Object.keys(speciesCountObj));
 
