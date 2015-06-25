@@ -158,7 +158,6 @@ def estimate_geometry(data, db):
         # find geodata from this Member
         member_closest_before = None
         member_closest_after = None
-        core = False
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)

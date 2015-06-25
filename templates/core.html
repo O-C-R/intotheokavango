@@ -41,7 +41,7 @@
 <form style="padding-bottom:20px">
 
     {% for member in dbmembers %}
-    <input type="checkbox" id="{{ member.Name }}" {% if member.Core %}checked="checked"{% endif %} /> {{ member.Name }}<br />
+    <input type="checkbox" id="{{ member.Name }}" {% if member.Core %}checked="checked"{% endif %} /> <a href="/setCore/{{ member.Name }}">{{ member.Name }}</a><br />
     {% endfor %}
 
 </form>
