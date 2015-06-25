@@ -152,7 +152,7 @@ def estimate_geometry(data, db):
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     feature_type = data['properties']['FeatureType']
-    log.info("--> t is %s" % t)
+    log.info("--> t is %s (%s)" % (t, util.datestring(t, tz=config['local_tz'])))
     try:
 
         # find geodata from this Member
@@ -168,13 +168,13 @@ def estimate_geometry(data, db):
             except IndexError:
                 pass
 
-            # is/was the member core at this point?
-            if 'CoreExpedition' in data['properties']:
-                core = data['properties']['CoreExpedition']
-            else:   # there should never be an else
-                log.warning("--> no CoreExpedition for estimator")
-                core = False
-            log.info("--> core is %s" % core)
+        # core?
+        if 'CoreExpedition' in data['properties']:
+            core = data['properties']['CoreExpedition']
+        else:   # there should never be an else
+            log.warning("--> no CoreExpedition for estimator")
+            core = False
+        log.info("--> core is %s" % core)
 
         # find geodata from the nearest beacon
         # but only do it if there is no Member (always core, unless overridden), or the Member is/was core at that point
