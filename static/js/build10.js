@@ -635,14 +635,14 @@ var d3Graph = function(timelineVizID, totalsVizID){
         sortArrOfObjectsByParam(data, "total", false);
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
-            width = 800 - margin.left - margin.right,
+            width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
             height = barHeight * data.length,
-            left_width = 300;
+            left_width = 400;
 
         var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
-            .range([0, width - left_width]);
+            .range([0, width - (left_width + 80) ]);
             console.log(data);
             
         var yScale = d3.scale.ordinal()
@@ -650,11 +650,20 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 return d.type; 
                 console.log(d.type); //hmm it doesn't console anything
             })
-            .rangeBands([0, height]);
+            .rangeBands([60, height]);
+
         console.log(yScale.range());
         var svg = d3.select("#timelineViz").append("svg")
             .attr("width", width)
             .attr("height", height);
+
+        var title = svg.append("text")
+            .attr("x", 0)
+            .attr("y", 20)
+            .style("fill", "white")
+            .style("font-size", "18px")
+            .text("TOTAL SIGHTINGS");
+
         
         var bar = svg.selectAll("g")
                 .data(data)
@@ -665,22 +674,27 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .attr("x", left_width)
             .attr("y", yScale)
             .attr("width", function(d) { return xScale(d.total); })
+            .style("fill", "#4bff87")
             .attr("height", barHeight - 1);
 
         bar.append("text")
-            .attr("x", function(d) { return xScale(d.total) - 5 + left_width; })
+            .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
             .attr("text-anchor", "beginning")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.total; });
 
         bar.append("text")
-            .attr("x", left_width * 0.92)
+            .attr("x", left_width - 20)
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "end")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.type; });
     }
 
@@ -3515,12 +3529,15 @@ function Loader(){
 
 ;/* global variables */
 var map;                     // the map object
+var center;
 
 /* create the map */
 function initMap () {
+    console.log("center: " + center);
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
-        center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
+        //center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
+        center: center,
         zoomControl: true,
         attributionControl: false,
         doubleClickZoom: true,
@@ -3555,7 +3572,7 @@ function loadData () {
     console.log(url);
     $.getJSON(url, function(data) {
         var featureCollection = data['results'];
-        console.log(featureCollection);
+        //console.log(featureCollection);
         var sightingsWithGeoLoc = [];
         
         for (d in featureCollection.features) {
@@ -3567,7 +3584,7 @@ function loadData () {
                 sightingsWithGeoLoc.push(item);
             }
         }
-        console.log(sightingsWithGeoLoc);
+        //console.log(sightingsWithGeoLoc);
         filteredFeatureCollection = {};
         filteredFeatureCollection.features = sightingsWithGeoLoc;
         filteredFeatureCollection.type = "FeatureCollection";
@@ -3576,7 +3593,10 @@ function loadData () {
             pointToLayer: function (feature, latlng) {
                 console.log("latlng: " + latlng);
                 console.log(feature['properties']['t_created']);
+                center = latlng;
+                console.log("center: " + center);
                 return L.circleMarker(latlng, geojsonMarkerOptions);
+                
             },
             onEachFeature: function (feature, layer) {
                 layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
