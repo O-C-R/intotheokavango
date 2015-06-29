@@ -1,6 +1,7 @@
 /* global variables */
 var map;                     // the map object
 var center;
+var featureGroup;
 
 /* create the map */
 function initMap () {
@@ -53,6 +54,7 @@ function loadData () {
             } else {
                 //console.log("sighting with geometry");
                 sightingsWithGeoLoc.push(item);
+                //newCenter = item.geometry.coordinates;
             }
         }
         //console.log(sightingsWithGeoLoc);
@@ -60,7 +62,7 @@ function loadData () {
         filteredFeatureCollection.features = sightingsWithGeoLoc;
         filteredFeatureCollection.type = "FeatureCollection";
 
-        L.geoJson(filteredFeatureCollection, {
+        featureGroup = L.geoJson(filteredFeatureCollection, {
             pointToLayer: function (feature, latlng) {
                 console.log("latlng: " + latlng);
                 console.log(feature['properties']['t_created']);
@@ -73,6 +75,7 @@ function loadData () {
                 layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
             }
         }).addTo(map);
+        map.fitBounds(featureGroup.getBounds());
     }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
 }
 
