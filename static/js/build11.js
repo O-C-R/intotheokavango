@@ -3584,7 +3584,6 @@ function loadData () {
             } else {
                 //console.log("sighting with geometry");
                 sightingsWithGeoLoc.push(item);
-                //newCenter = item.geometry.coordinates;
             }
         }
         //console.log(sightingsWithGeoLoc);
@@ -3594,10 +3593,6 @@ function loadData () {
 
         featureGroup = L.geoJson(filteredFeatureCollection, {
             pointToLayer: function (feature, latlng) {
-                console.log("latlng: " + latlng);
-                console.log(feature['properties']['t_created']);
-                center = latlng;
-                console.log("center: " + center);
                 return L.circleMarker(latlng, geojsonMarkerOptions);
                 
             },
