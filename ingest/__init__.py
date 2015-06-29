@@ -152,13 +152,12 @@ def estimate_geometry(data, db):
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     feature_type = data['properties']['FeatureType']
-    log.info("--> t is %s" % t)
+    log.info("--> t is %s (%s)" % (t, util.datestring(t, tz=config['local_tz'])))
     try:
 
         # find geodata from this Member
         member_closest_before = None
         member_closest_after = None
-        core = False
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)
@@ -168,19 +167,20 @@ def estimate_geometry(data, db):
             except IndexError:
                 pass
 
-            # is/was the member core at this point?
-            try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
-                log.info("--> core is %s" % core)
-            except Exception as e:
-                log.info("--> no core entry at time %s" % t)
+        # core?
+        if 'CoreExpedition' in data['properties']:
+            core = data['properties']['CoreExpedition']
+        else:   # there should never be an else
+            log.warning("--> no CoreExpedition for estimator")
+            core = False
+        log.info("--> core is %s" % core)
 
         # find geodata from the nearest beacon
-        # but only do it if there is no Member, or the Member is/was core at that point
+        # but only do it if there is no Member (always core, unless overridden), or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        if 'Member' not in data['properties'] or data['properties']['Member'] is None or (core and not feature_type == "ambit"):  ## for some reason, ambit points are snapping to beacons (which may in fact be more often?) but that's bad form with individual gps data, right? and we'll plot that via ambit_geo
+        if core and not feature_type == "ambit":  ## don't let ambit readings pop to beacons
             try:
                 beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
                 beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
@@ -251,7 +251,7 @@ def verify_expedition(data):
         if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
             data['properties']['Member'] = None
         else:
-            data['properties']['Member'] = data['properties']['Member'].strip()
+            data['properties']['Member'] = data['properties']['Member'].strip().split(' ')[0]
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'o') # sorry Gotz
@@ -260,6 +260,8 @@ def verify_expedition(data):
     return data
 
 def tag_core(data):
+    if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
+        return data
     try:
         db = Application.instance.db
     except AttributeError:
@@ -277,7 +279,7 @@ def tag_core(data):
         else:
             t = data['properties']['t_utc']   
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
                 log.info("--> core is %s" % core)
             except IndexError:
                 log.info("--> no core entry at time %s" % t)
@@ -381,9 +383,10 @@ def process_image(path, member=None, t_utc=None):
         try:
             exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
         except AttributeError:
-            log.warning("--> no EXIF data in image")
-            log.warning("--> substituting current time for t_utc")
-            data['t_utc'] = util.timestamp()
+            log.warning("--> no EXIF data in image")            
+            if 't_utc' not in data:
+                log.warning("--> substituting current time for t_utc")
+                data['t_utc'] = util.timestamp()
         else:
             # log.debug(json.dumps(exif, indent=4, default=lambda x: str(x)))
             date_field = exif['DateTimeOriginal'] if 'DateTimeOriginal' in exif else exif['DateTime']

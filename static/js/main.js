@@ -204,7 +204,13 @@ document.addEventListener('DOMContentLoaded', function(){
 				isLoading = false;
 				updateLoadingScreen(false);
 				feed.jump(timeline.getTimeCursor());
-				loader.members['Steve'].focus();
+				if(loader.members['Steve']) loader.members['Steve'].focus();
+				else {
+					for(var k in loader.members){
+						loader.members[k].focus();
+						break;
+					}
+				}
 				animate(new Date().getTime()-16);
 			});
 		});

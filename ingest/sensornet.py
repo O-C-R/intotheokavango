@@ -1,10 +1,10 @@
 import json
 from housepy import util, log, config, strings
-from ingest import ingest_json_file, ingest_data
+from ingest import ingest_json_body, ingest_data
 
 def parse(request):
-    log.info("databoat.parse")
-    data = ingest_json_file(request)
+    log.info("sensornet.parse")
+    data = ingest_json_body(request)
     try:
         t_local = strings.as_numeric(data['t_local'])
         data = data['data']        
@@ -16,7 +16,8 @@ def parse(request):
             del data['gps_lat']
         data['FeatureType'] = "sensor"
         data['FeatureSubType'] = "hybrid"
-        data['SensorName'] = "databoat"
+        data['SensorName'] = "sensornet"
+        data['CoreExpedition'] = False
         data['t_utc'] = util.delocalize_timestamp(t_local, tz=config['local_tz'])
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))

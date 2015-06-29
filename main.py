@@ -26,15 +26,21 @@ class Core(server.Handler):
     def get(self, page=None):
         log.info("Core.get")
         self.set_header("Access-Control-Allow-Origin", "*")
-        members = []
-        for member in config['members']:
-            result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
-            if not len(result) or 'Core' not in result[0]:
-                core = False
-            else:
-                core = result[0]['Core']
-            members.append({'Name': member, 'Core': core})
-        return self.render("core.html", dbmembers=members)
+        if page is None or not len(page):
+            members = []
+            for member in config['members']:
+                result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
+                if not len(result) or 'Core' not in result[0]:
+                    core = False
+                else:
+                    core = result[0]['Core']
+                members.append({'Name': member, 'Core': core})
+            return self.render("core.html", dbmembers=members)
+        else:
+            coretags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
+            for c, coretag in enumerate(coretags):
+                coretags[c] = util.datestring(coretag['t_utc'], config['local_tz']), coretag['Core']
+            return self.render("core_member.html", member=page, coretags=coretags)
 
     def post(self, nop=None):
         log.info("Core.post")
@@ -51,7 +57,7 @@ class Core(server.Handler):
 
 
 handlers = [
-    (r"/setCore", Core),
+    (r"/setCore/?([^/]*)", Core),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
     (r"/?([^/]*)", Home),    
