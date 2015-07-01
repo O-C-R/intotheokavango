@@ -159,9 +159,9 @@ def format_csv(data):
     header = []
     for feature in features:
         feature.update(feature['properties'])
-        if 'taxonomy' in feature and feature['taxonomy'] is not None:
-            feature.update(feature['taxonomy'])
-            del feature['taxonomy']
+        if 'Taxonomy' in feature and feature['Taxonomy'] is not None:
+            feature.update(feature['Taxonomy'])
+            del feature['Taxonomy']
         if feature['geometry'] is not None:
             feature.update({"Longitude": feature['geometry']['coordinates'][0], "Latitude": feature['geometry']['coordinates'][1]})
         del feature['properties']
