@@ -28,7 +28,8 @@ def main():
         else:
             t = feature['properties']['t_utc']
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
+                log.info("--> core is %s" % core)
             except Exception as e:
                 log.info("--> no core entry at time %s" % t)
                 continue

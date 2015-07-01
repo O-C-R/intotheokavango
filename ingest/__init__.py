@@ -103,7 +103,7 @@ def verify_geojson(data):
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
         for key, value in data['properties'].items():
             fixed_key = strings.camelcase(key) if key != 't_utc' else key
-            fixed_key = "pH" if fixed_key == "Ph" else fixed_key
+            fixed_key = "pH" if (fixed_key == "Ph" or fixed_key == "PH") else fixed_key
             data['properties'][fixed_key] = strings.as_numeric(value)
             if key != fixed_key:                
                 del data['properties'][key]
@@ -279,7 +279,7 @@ def tag_core(data):
         else:
             t = data['properties']['t_utc']   
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]['Core']
+                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
                 log.info("--> core is %s" % core)
             except IndexError:
                 log.info("--> no core entry at time %s" % t)
