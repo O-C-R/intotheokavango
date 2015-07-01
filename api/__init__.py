@@ -32,6 +32,7 @@ class Api(server.Handler):
 
         # add a header for unrestricted access
         self.set_header("Access-Control-Allow-Origin", "*")
+        csv = False
 
         # do the routing and load view module
         if not len(view_name):
@@ -47,11 +48,14 @@ class Api(server.Handler):
             log.error(log.exc(e))
             return self.error("View \"%s\" not recognized" % view_name)
         if len(output):
-            feature_type = self.get_argument('FeatureType', None)
-            try:
-                return self.render("api/%s.html" % output, query=(self.request.uri).replace("/%s" % output, ""), feature_type=feature_type)
-            except Exception as e:
-                return self.error("Could not render %s" % output)
+            if output == "csv":
+                csv = True
+            else:
+                feature_type = self.get_argument('FeatureType', None)
+                try:
+                    return self.render("api/%s.html" % output, query=(self.request.uri).replace("/%s" % output, ""), feature_type=feature_type)
+                except Exception as e:
+                    return self.error("Could not render %s" % output)
 
         # time to build our search filter
         search = {}
@@ -123,6 +127,7 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     item = True if type(item) == str and item.lower() == "true" else item
                     item = False if type(item) == str and item.lower() == "false" else item
+                    item = {'$exists': True} if item == '*' else item
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
             search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' and param != '$text' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
@@ -134,12 +139,56 @@ class Api(server.Handler):
         log.info("FILTER %s" % search)
 
         # pass our search to the view module for execution and formatting
-        try:         
-            result = view.assemble(self, search, limit, order, resolution)   
-            if result is None:
-                return
-            results, total, returned = result
-            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
-            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
-        except Exception as e:
-            return self.error(log.exc(e))
+        # try:         
+        result = view.assemble(self, search, limit, order, resolution)   
+        if result is None:
+            return
+        if csv:
+            return self.csv(format_csv(result), "data.csv")
+        results, total, returned = result
+        search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+        return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
+        # except Exception as e:
+        #     return self.error(log.exc(e))
+
+def format_csv(data):
+    import csv    
+    features = data[0]['features']
+
+    # build header
+    header = []
+    for feature in features:
+        feature.update(feature['properties'])
+        if 'Taxonomy' in feature and feature['Taxonomy'] is not None:
+            feature.update(feature['Taxonomy'])
+            del feature['Taxonomy']
+        if feature['geometry'] is not None:
+            feature.update({"Longitude": feature['geometry']['coordinates'][0], "Latitude": feature['geometry']['coordinates'][1]})
+        del feature['properties']
+        del feature['geometry']
+        for key in feature:            
+            if key not in header:
+                header.append(key)
+    header.sort()
+    log.debug(header)
+
+    # populate rows
+    csv = []
+    csv.append(','.join(header))
+    with open('data.csv', 'w', newline='') as csvfile:
+        for feature in features:
+            row = []
+            for column in header:
+                if column in feature:
+                    value = feature[column]
+                    if type(value) == str:
+                        value = strings.singlespace(value)
+                        value.replace('"', "'")
+                        value = "%s" % value
+                    row.append(str(value).replace(",", ""))
+                else:
+                    row.append("None")
+            csv.append(','.join(row))
+    return '\n'.join(csv)
+
+    # print(json.dumps(features, indent=4, default=lambda x: str(x)))
