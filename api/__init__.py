@@ -123,6 +123,7 @@ class Api(server.Handler):
                     item = strings.as_numeric(item)
                     item = True if type(item) == str and item.lower() == "true" else item
                     item = False if type(item) == str and item.lower() == "false" else item
+                    item = {'$exists': True} if item == '*' else item
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
             search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' and param != '$text' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
