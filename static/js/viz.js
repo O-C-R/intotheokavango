@@ -30,6 +30,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedSensorWaterData = [];
     var parsedSensorPHData = [];
     var parsedSensorTdsData = [];
+    var parsedSensorDoData = [];
+    var parsedSensorHumidityData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
     var parsedBeaconData = [];
@@ -140,6 +142,26 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var sensorData = {};
 
         sensorData.Tds = item["properties"]["Tds"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorDoData = function(item) {
+        var sensorData = {};
+        sensorData.Do = item["properties"]["Do"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorHumidityData = function(item) {
+        var sensorData = {};
+        if (item["properties"].hasOwnProperty("Humidity")) {
+            sensorData.humidity = item["properties"]["Humidity"];
+        } else if (item["properties"].hasOwnProperty("humidity")) {
+            sensorData.humidity = item["properties"]["humidity"];
+        }
         sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
 
         return sensorData;
@@ -639,7 +661,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("Tds")) {
                     console.log("data has Tds key");
-                    yAxisLabel = "Tds Units";
+                    yAxisLabel = "Parts per Million";
                     graphTitle = "Tds Levels";
                     var line = d3.svg.line()
                         .x(function(d) { return xScale(d.time); })
@@ -655,7 +677,44 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
-                } else {
+                } else if (parsedData[i].hasOwnProperty("Do")) {
+                    console.log("data has Do key");
+                    yAxisLabel = "mg/L";
+                    graphTitle = "Dissolved Oxygen Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.Do); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.Do; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("humidity")) {
+                    console.log("data has Humidity key");
+                    yAxisLabel = "Percent of water vapor to dry air";
+                    graphTitle = "Humidity Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.humidity); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.humidity; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                }
+                else {
                     console.log("data has a different key");
                 }
             }
@@ -1105,16 +1164,29 @@ var d3Graph = function(timelineVizID, totalsVizID){
                             f = parseSensorTdsData(item);
                             parsedSensorTdsData.push(f);
                         }
+                        if (item["properties"].hasOwnProperty("Do")) {
+                            f = parseSensorDoData(item);
+                            parsedSensorDoData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Humidity") || item["properties"].hasOwnProperty("humidity")) {
+                            f = parseSensorHumidityData(item);
+                            parsedSensorHumidityData.push(f)
+                        }
                     }
 
                     console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
                     console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
                     console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
                     console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
+                    console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
+                    console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
                     makeTimeSeriesViz(parsedSensorAirData, feature_type);
                     makeTimeSeriesViz(parsedSensorWaterData, feature_type);
+                    makeTimeSeriesViz(parsedSensorHumidityData, feature_type);
                     makeTimeSeriesViz(parsedSensorPHData, feature_type);
                     makeTimeSeriesViz(parsedSensorTdsData, feature_type);
+                    makeTimeSeriesViz(parsedSensorDoData, feature_type);
+
 
                 }
                 if (feature_type === "tweet") {

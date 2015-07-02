@@ -63,8 +63,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedAmbitEnergy = [];
     var parsedAmbitSpeed = [];
     var speciesSightingsTotals = [];
-    var parsedSensorTempData = [];
+    var parsedSensorAirData = [];
+    var parsedSensorWaterData = [];
     var parsedSensorPHData = [];
+    var parsedSensorTdsData = [];
+    var parsedSensorDoData = [];
+    var parsedSensorHumidityData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
     var parsedBeaconData = [];
@@ -136,9 +140,16 @@ var d3Graph = function(timelineVizID, totalsVizID){
         return beaconData;
     }
 
-    var parseSensorTempData = function(item) {
+    var parseSensorAirData = function(item) {
         var sensorData = {};
         sensorData.airTemp = item["properties"]["AirTemp"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorWaterData = function(item) {
+        var sensorData = {};
         if (item["properties"].hasOwnProperty("water temp")) {
             sensorData.waterTemp = item["properties"]["water temp"];
         } else if (item["properties"].hasOwnProperty["WaterTemp"]) {
@@ -146,16 +157,46 @@ var d3Graph = function(timelineVizID, totalsVizID){
         } else {
             sensorData.waterTemp = item["properties"]["WaterTemp"];
         }
-        
         sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
-
         return sensorData;
     }
 
     var parseSensorPHData = function(item) {
         var sensorData = {};
-        sensorData.pH = item["properties"]["PH"];
+
+        if (item["properties"].hasOwnProperty("pH")) {
+            sensorData.pH = item["properties"]["pH"];
+        } else if (item["properties"].hasOwnProperty("PH")) {
+            sensorData.pH = item["properties"]["PH"];
+        } else {
+            sensorData.pH = item["properties"]["pH"];
+        }
         sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return sensorData;
+    }
+
+    var parseSensorTdsData = function(item) {
+        var sensorData = {};
+
+        sensorData.Tds = item["properties"]["Tds"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorDoData = function(item) {
+        var sensorData = {};
+        sensorData.Do = item["properties"]["Do"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorHumidityData = function(item) {
+        var sensorData = {};
+        sensorData.humidity = item["properties"]["Humidity"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
         return sensorData;
     }
 
@@ -393,7 +434,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .text(graphTitle); 
 
     }
-/*
+
     var makeTimeSeriesViz = function(parsedData,feature_type) {
         //TIMESERIES VIZ
 
@@ -535,8 +576,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
             console.log(parsedData);
             
             for (var i = 0; i < parsedData.length; i++) {
-                /*
-                if (parsedData[i].hasOwnProperty("waterTemp") || parsedData[i].hasOwnProperty("airTemp")) {
+             /*
+                if (parsedData[i].hasOwnProperty("waterTemp") && parsedData[i].hasOwnProperty("airTemp")) {
 
                     //graph titles
                     yAxisLabel = "Degrees Celsius";
@@ -562,7 +603,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         };
                     });
 
-                    console.log(temps);
+                    //console.log(temps);
 
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
@@ -598,10 +639,42 @@ var d3Graph = function(timelineVizID, totalsVizID){
                       .text(function(d) { return d.name; });
                     }
                 }
-              
+              */
+                if ( parsedData[i].hasOwnProperty("waterTemp") ) {
+                    console.log("data has waterTemp key");
+                    yAxisLabel = "Degrees Celsius";
+                    graphTitle = "Water Temperature";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.waterTemp); });
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.waterTemp; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
-                //} 
-                if (parsedData[i].hasOwnProperty("pH")) {
+                } else if (parsedData[i].hasOwnProperty("airTemp")) {
+                    console.log("data has airTemp key");
+                    yAxisLabel = "Degrees Celsius";
+                    graphTitle = "Air Temperature";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.airTemp); });
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+
+                } else if (parsedData[i].hasOwnProperty("pH")) {
                     console.log("data has pH key");
                     yAxisLabel = "pH Level";
                     graphTitle = "Water pH Level";
@@ -619,7 +692,65 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateFormat = d3.time.format.utc("%B %d %Y");
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("Tds")) {
+                    console.log("data has Tds key");
+                    yAxisLabel = "Parts per Million";
+                    graphTitle = "Tds Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.Tds); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.Tds; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("Do")) {
+                    console.log("data has Do key");
+                    yAxisLabel = "mg/L";
+                    graphTitle = "Dissolved Oxygen Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.Do); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.Do; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("humidity")) {
+                    console.log("data has Humidity key");
+                    yAxisLabel = "Percent of water vapor to dry air";
+                    graphTitle = "Humidity Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.humidity); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.humidity; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 }
+                else {
+                    console.log("data has a different key");
+                }
+            }
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -668,7 +799,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .text(graphTitle); 
 
     }
-    */
+
 
     var makeTotalsViz = function(data) {
         console.log("MAKE TOTALS VIZ");
@@ -1050,17 +1181,46 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         var item = data.results.features[d];
                         //console.log(item);
 
-                        if (item["properties"].hasOwnProperty("AirTemp") && item["properties"].hasOwnProperty("WaterTemp") || item["properties"].hasOwnProperty("water temp")) {
-                            f = parseSensorTempData(item);
-                            parsedSensorTempData.push(f);
+                        if (item["properties"].hasOwnProperty("AirTemp")) {
+                            f = parseSensorAirData(item);
+                            parsedSensorAirData.push(f);
                         }
-                        if (item["properties"].hasOwnProperty("PH")) {
+                        if (item["properties"].hasOwnProperty("WaterTemp") || item["properties"].hasOwnProperty("water temp")) {
+                            f = parseSensorWaterData(item);
+                            parsedSensorWaterData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("PH") || item["properties"].hasOwnProperty("pH")) {
                             f = parseSensorPHData(item);
                             parsedSensorPHData.push(f);
                         }
+                        if (item["properties"].hasOwnProperty("Tds")) {
+                            f = parseSensorTdsData(item);
+                            parsedSensorTdsData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Do")) {
+                            f = parseSensorDoData(item);
+                            parsedSensorDoData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Humidity")) {
+                            f = parseSensorHumidityData(item);
+                            parsedSensorHumidityData.push(f)
+                        }
                     }
-                    makeTimeSeriesViz(parsedSensorTempData, feature_type);
+
+                    console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
+                    console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
+                    console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
+                    console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
+                    console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
+                    console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
+                    makeTimeSeriesViz(parsedSensorAirData, feature_type);
+                    makeTimeSeriesViz(parsedSensorWaterData, feature_type);
+                    makeTimeSeriesViz(parsedSensorHumidityData, feature_type);
                     makeTimeSeriesViz(parsedSensorPHData, feature_type);
+                    makeTimeSeriesViz(parsedSensorTdsData, feature_type);
+                    makeTimeSeriesViz(parsedSensorDoData, feature_type);
+
+
                 }
                 if (feature_type === "tweet") {
                     console.log("TWEET");
