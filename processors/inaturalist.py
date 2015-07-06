@@ -19,7 +19,7 @@ def post_inaturalist(feature):
     t_now = util.timestamp()
     if t_now - feature['properties']['t_utc'] < 60 * 60 * 12: 
         log.info("post_inaturalist")        
-        log.info("--> skipping too recent feature")
+        log.info("--> skipping too recent feature (%s)" % util.datestring(feature['properties']['t_utc'], config['local_tz']))
         return
     if t_now - feature['properties']['t_utc'] > 60 * 60 * 72: 
         # skipping too old of a feature
@@ -30,7 +30,7 @@ def post_inaturalist(feature):
     if 'geometry' not in feature or feature['geometry'] is None:
         if 'id' in feature:
             feature['_id'] = feature['id']
-        log.info("--> skipping sighting %s without geometry" % feature['_id'])
+        log.info("--> skipping sighting %s (%s) without geometry" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
         return
 
     # skip features without images
@@ -42,12 +42,12 @@ def post_inaturalist(feature):
             image_count += 1
     log.info("--> image_count %s" % image_count)
     if not image_count:
-        log.info("--> skipping sighting %s without photos" % feature['_id'])
+        log.info("--> skipping sighting %s (%s) without photos" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
         return 
 
     # skip test features
     if 'Member' in feature['properties'] and feature['properties']['Member'] == "Chaps":
-        log.info("--> skipping sighting %s from Chaps" % feature['_id'])
+        log.info("--> skipping sighting %s (%s) from Chaps" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
 
     payload = {
         'observation[species_guess]': feature['properties']['SpeciesName'],
