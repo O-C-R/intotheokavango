@@ -30,7 +30,7 @@ def post_inaturalist(feature):
     if 'geometry' not in feature or feature['geometry'] is None:
         if 'id' in feature:
             feature['_id'] = feature['id']
-        log.info("--> skipping sighting %s (%s) without geometry" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
+        log.info("--> skipping sighting %s (%s) without geometry" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz'])))
         return
 
     # skip features without images
@@ -42,12 +42,12 @@ def post_inaturalist(feature):
             image_count += 1
     log.info("--> image_count %s" % image_count)
     if not image_count:
-        log.info("--> skipping sighting %s (%s) without photos" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
+        log.info("--> skipping sighting %s (%s) without photos" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz'])))
         return 
 
     # skip test features
     if 'Member' in feature['properties'] and feature['properties']['Member'] == "Chaps":
-        log.info("--> skipping sighting %s (%s) from Chaps" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz']))
+        log.info("--> skipping sighting %s (%s) from Chaps" % (feature['_id'], util.datestring(feature['properties']['t_utc'], config['local_tz'])))
 
     payload = {
         'observation[species_guess]': feature['properties']['SpeciesName'],
