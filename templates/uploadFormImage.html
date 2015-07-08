@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>RiverFi Image Upload 1.1</title>
+
+<script src="/static/js/jquery-2.1.4.min.js"></script>
+<script src="/static/js/jquery.serializejson.min.js"></script>
+<script src="/static/js/jquery.mobile-1.4.3.min.js"></script>
+<link rel="stylesheet" href="/static/css/jquery.mobile-1.4.3.min.css">
+
+
+<script>
+
+$(document).ready(function() {
+
+    $('#add-button').on('click', function () {
+                var data = new FormData();
+                var image = $("#Photo").get(0).files;
+
+                var j = $('#upload').serializeJSON();
+                console.log(j);
+                j.ResourceURLs = [];
+
+                // Add the uploaded file content to the form data collection
+                data.append('ImageCount', image.length);
+                for (var i = 0; i < image.length; i++) {
+                    console.log("ADDING IMAGE " + image[i])
+                    data.append("image-" + i, image[i]);
+                    data.append("image-" + i + "-ResourceURL", image[i].name);
+                    j.ResourceURLs.push(image[i].name);
+                }
+
+                j.ImageType = 'Documentary';
+
+                var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
+                console.log(jsonBlob);
+
+                data.append("hasJSON", true);
+                data.append("json", jsonBlob, "metadata.json");
+                data.append("TeamMember", $("#TeamMember").val());
+
+
+                var myReader = new FileReader();
+                myReader.onload = function(event){
+                    console.log(myReader.result);
+                };
+                myReader.readAsText(jsonBlob);
+
+                // Make Ajax request with the contentType = false, and processDate = false
+                var ajaxRequest = $.ajax({
+                    type: "POST",
+                    url: "/upload",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                    }
+                });
+
+                ajaxRequest.done(function (xhr, textStatus) {
+                    console.log(textStatus);
+                    $('#message').html(textStatus);
+                    if (textStatus == 'success') {
+                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+                    }
+                });
+
+
+            });
+
+            $('#species-button').on('click', function () {
+                $('#speciesList').empty();
+                $('#species-button').text('Getting sightings from API...')
+                console.log("Try getting species");
+                //http://intotheokavango.org/api/features/?FeatureType=sighting&order=descending&SpeciesName=Tester+Bird
+                $.getJSON('http://intotheokavango.org/api/features/?Expedition=okavango_15&FeatureType=sighting&order=descending&speciesSearch=' + encodeURI($('#Species').val()), function(data) {
+                        var buttons = [];
+                        for (var i = 0; i < data.results.features.length; i++) {
+                            var f = data.results.features[i];
+                            buttons[i] = $('#speciesList').append('<div id="button' + i + '">' + f.properties.SpeciesName + " - " + f.properties.DateTime + '</div>');
+                            $('#button' + i).data('id',f.id ).click(function() {
+                                id = $(this).data('id');
+                                console.log($('#sightingID'));
+                                if (!$('#sightingID').length) {
+                                    $('#upload').append('<input type="text" name="SightingID" id="sightingID" label="Sighting ID">');
+                                }
+                                $('#sightingID').val(id);
+                            });
+
+                        }
+                        $('#species-button').text('Relink Species?')
+                })
+            });
+
+})
+
+
+	
+</script>
+
+</head>
+<body>
+<h2>Image Upload </h2>
+<form id="upload">
+
+    <label for="photo">Photo</label>
+    <input type="file" name="Photo" id="Photo" value="" multiple>
+
+    <label for="TeamMember">Team Member</label>
+    <input type="text" name="TeamMember" id="TeamMember" value="">
+
+    <label for="Notes">Notes</label>
+    <input type="text" name="Notes" id="Notes" value="">
+
+    <label for="Species">Species Name</label>
+    <input type="text" name="Species" id="Species" value="">
+
+</form>
+<div id='speciesList'>
+
+</div>
+<button class="ui-shadow ui-btn ui-corner-all" id="species-button">Link Species</button>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Images</button>
+<h3 id="message"></h3>
+</body>
+</html>

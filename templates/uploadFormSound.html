@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>RiverFi Sound Upload 1.1</title>
+
+<script src="/static/js/jquery-2.1.4.min.js"></script>
+<script src="/static/js/moment.js"></script>
+<script src="/static/js/jquery.serializejson.min.js"></script>
+<script src="/static/js/jquery.mobile-1.4.3.min.js"></script>
+<link rel="stylesheet" href="/static/css/jquery.mobile-1.4.3.min.css">
+
+
+<script>
+
+$(document).ready(function() {
+
+    $('#add-button').on('click', function () {
+                var data = new FormData();
+                var files = $("#File").get(0).files;
+
+                // Add the uploaded file content to the form data collection
+                data.append('ImageCount', files.length);
+                for (var i = 0; i < files.length; i++) {
+                    console.log("ADDING IMAGE " + files[i])
+                    data.append("image-" + i, files[i]);
+                    data.append("image-" + i + "-ResourceURL", files[i].name);
+                }
+
+                var j = $('#upload').serializeJSON();
+                j.ResourceURLs = [files[0].name];
+                j.SoundType = $('#SoundType').val();
+
+                var dateString = $('#date').val() + " , " + $('#time').val();
+                var date = moment().format();
+                j.t_utc = Math.floor((new Date(date)).getTime() / 1000);
+
+                //j.t_utc = Math.floor((new Date()).getTime() / 1000);
+
+                var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
+                console.log(jsonBlob);
+
+                data.append("hasJSON", true);
+                data.append("json", jsonBlob, "metadata.json");
+                data.append("TeamMember", $("#TeamMember").val());
+
+
+                var myReader = new FileReader();
+                myReader.onload = function(event){
+                    console.log(myReader.result);
+                };
+                myReader.readAsText(jsonBlob);
+
+                // Make Ajax request with the contentType = false, and processDate = false
+                var ajaxRequest = $.ajax({
+                    type: "POST",
+                    url: "/upload",
+                    contentType: false,
+                    processData: false,
+                    data: data,
+
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                    }
+                });
+
+                ajaxRequest.done(function (xhr, textStatus) {
+                    console.log(textStatus);
+                    $('#message').html(textStatus);
+                    if (textStatus == 'success') {
+                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+                    }
+                });
+
+
+            });
+
+})
+
+
+	
+</script>
+
+</head>
+<body>
+<h2>Sound Upload </h2>
+<form id="upload">
+
+    <label for="photo">File</label>
+    <input type="file" name="File" id="File" value="">
+
+    <label for="SoundType">Sound Type</label>
+    <input type="text" name="SoundType" id="SoundType" value="Field Recording">
+
+    <label for="TeamMember">Team Member</label>
+    <input type="text" name="TeamMember" id="TeamMember" value="">
+
+    <label for="Date">Date</label>
+    <input type="date" name="Date" id="date" value="">
+
+    <label for="Time">Time</label>
+    <input type="time" name="Time" id="time" value="">
+
+    <label for="Notes">Notes</label>
+    <input type="text" name="Notes" id="Notes" value="">
+
+</form>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sound</button>
+<div id="message"></div>
+</body>
+</html>
