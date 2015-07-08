@@ -60,7 +60,7 @@ $(document).ready(function() {
                 $('#message').text('Uploading...');
                 var ajaxRequest = $.ajax({
                     type: "POST",
-                    url: "/upload",
+                    url:"/ingest/sighting",
                     contentType: false,
                     processData: false,
                     data: data,
