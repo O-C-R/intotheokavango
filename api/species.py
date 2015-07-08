@@ -16,6 +16,7 @@ def assemble(self, search, limit, order, resolution):
     except Exception as e:
         return self.error(log.exc(e))
     species = results
-    total = returned = len(species)        
-    del search['properties.SpeciesName']
+    total = returned = len(species)       
+    if 'properties.SpeciesName' in search:
+        del search['properties.SpeciesName']
     return species, total, returned

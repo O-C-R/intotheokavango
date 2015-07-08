@@ -36,7 +36,12 @@ def parse(request):
         data['Member'] = data['TeamMember']
         del data['TeamMember']              
 
-    data['Title'] = strings.titlecase(data['Title'])
+    if 'Title' in data:
+        data['Title'] = strings.titlecase(data['Title'])
+    elif 'Notes' in data:
+        data['Title'] = strings.titlecase(data['Notes'])
+    else:
+        data['Title'] = "Audio from Into the Okavango"
     data['UploadPath'] = path.split('/')[-1]
     data['SoundCloudURL'] = None
 

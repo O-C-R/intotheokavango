@@ -382,8 +382,8 @@ def process_image(path, member=None, t_utc=None):
         data['Dimensions'] = width, height
         try:
             exif = {ExifTags.TAGS[k]: v for (k, v) in image._getexif().items() if k in ExifTags.TAGS}
-        except AttributeError:
-            log.warning("--> no EXIF data in image")            
+        except Exception as e:
+            log.warning("--> no EXIF data in image: %s" % e)            
             if 't_utc' not in data:
                 log.warning("--> substituting current time for t_utc")
                 data['t_utc'] = util.timestamp()
