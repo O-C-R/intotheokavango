@@ -29,7 +29,7 @@ def parse(request):
         # 1436477098,Lat,-18.111946,Long,21.665733,TDS,4.000,Sal,0.000,WatTemp,16.88,AirTemp,18.50,Hum,48.90
         tokens = content.split(',')
         t = util.delocalize_timestamp(strings.as_numeric(tokens[0]), config['local_tz'])        
-        data = {'t_utc': t, 'FeatureType': "sensor"}
+        data = {'t_utc': t, 'FeatureType': "sensor", 'CoreExpedition': False}
         tokens = tokens[1:]
         keys = tokens[0::2]
         values = tokens[1::2]
