@@ -194,7 +194,11 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     var parseSensorHumidityData = function(item) {
         var sensorData = {};
-        sensorData.humidity = item["properties"]["Humidity"];
+        if (item["properties"].hasOwnProperty("Humidity")) {
+            sensorData.humidity = item["properties"]["Humidity"];
+        } else if (item["properties"].hasOwnProperty("humidity")) {
+            sensorData.humidity = item["properties"]["humidity"];
+        }
         sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
 
         return sensorData;
@@ -1201,7 +1205,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                             f = parseSensorDoData(item);
                             parsedSensorDoData.push(f);
                         }
-                        if (item["properties"].hasOwnProperty("Humidity")) {
+                        if (item["properties"].hasOwnProperty("Humidity") || item["properties"].hasOwnProperty("humidity")) {
                             f = parseSensorHumidityData(item);
                             parsedSensorHumidityData.push(f)
                         }

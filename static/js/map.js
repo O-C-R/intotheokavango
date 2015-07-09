@@ -29,8 +29,8 @@ function initMap () {
 
 var geojsonMarkerOptions = {
     radius: 5,
-    fillColor: "#ff7800",
-    color: "#000",
+    fillColor: "#4BFF87",
+    color: "#fff",
     weight: 2,
     opacity: 1,
     fillOpacity: 0.8
@@ -70,6 +70,7 @@ function loadData () {
                 layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
             }
         }).addTo(map);
+        L.control.scale().addTo(map);
         map.fitBounds(featureGroup.getBounds());
     }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
 }
