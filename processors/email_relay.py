@@ -99,15 +99,15 @@ def main():
                                                         log.info("--> %s" % response)
                                                     except Exception as e:
                                                         log.error(log.exc(e))
-                                                try:
-                                                    beats = [strings.as_numeric(beat) for beat in data['sml']['DeviceLog']['R-R']['Data'].split()]
-                                                    d = {'Member': member, 't_utc': start_t, 'Beats': beats}
-                                                    url = "%s/ingest/ambit_hr" % config['url']
-                                                    log.info("Sending to %s..." % url)
-                                                    response = net.read(url, str(json.dumps(d)).encode('utf-8'))
-                                                    log.info("--> %s" % response)
-                                                except Exception as e:
-                                                    log.error(log.exc(e))                                                        
+                                            try:
+                                                beats = [strings.as_numeric(beat) for beat in data['sml']['DeviceLog']['R-R']['Data'].split()]
+                                                d = {'Member': member, 't_utc': start_t, 'Beats': beats}
+                                                url = "%s/ingest/ambit_hr" % config['url']
+                                                log.info("Sending to %s..." % url)
+                                                response = net.read(url, str(json.dumps(d)).encode('utf-8'))
+                                                log.info("--> %s" % response)
+                                            except Exception as e:
+                                                log.error(log.exc(e))                                                        
                                         except Exception as e:
                                             log.error("Parsing error: %s" % log.exc(e))
                                 else:
