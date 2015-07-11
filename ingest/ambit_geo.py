@@ -16,7 +16,7 @@ def parse(request):
             data['t_utc'] = t
             continue
         if key == "Longitude":
-            data['longitude'] =  math.degrees(float(sample['Longitude']))
+            data['longitude'] = math.degrees(float(sample['Longitude']))
             continue                       
         if key == "Latitude":
             data['latitude'] = math.degrees(float(sample['Latitude']))

@@ -77,7 +77,11 @@ def main():
                                                 member = serial_number
                                             log.info("Member: %s" % member)
                                             samples = data['sml']['DeviceLog']['Samples']['Sample']
-                                            for s, sample in enumerate(samples):            
+                                            start_t = None                                            
+                                            for s, sample in enumerate(samples):  
+                                                if s == 0:
+                                                    dt = util.parse_date(sample['UTC']) # these are marked UTC in the data
+                                                    start_t = util.timestamp(dt)                
                                                 sample['Member'] = member
                                                 if 'Satellites' in sample:  # ingest satellite location data                    
                                                     try:
@@ -87,7 +91,7 @@ def main():
                                                         log.info("--> %s" % response)                                                        
                                                     except Exception as e:
                                                         log.error(log.exc(e))
-                                                elif 'VerticalSpeed' in sample: # ingest energy data sample 
+                                                else: # ingest energy data sample 
                                                     try:
                                                         url = "%s/ingest/ambit" % config['url']
                                                         log.info("Sending to %s..." % url)
@@ -95,6 +99,15 @@ def main():
                                                         log.info("--> %s" % response)
                                                     except Exception as e:
                                                         log.error(log.exc(e))
+                                                try:
+                                                    beats = [strings.as_numeric(beat) for beat in data['sml']['DeviceLog']['R-R']['Data'].split()]
+                                                    d = {'Member': member, 't_utc': start_t, 'Beats': beats}
+                                                    url = "%s/ingest/ambit_hr" % config['url']
+                                                    log.info("Sending to %s..." % url)
+                                                    response = net.read(url, str(json.dumps(d)).encode('utf-8'))
+                                                    log.info("--> %s" % response)
+                                                except Exception as e:
+                                                    log.error(log.exc(e))                                                        
                                         except Exception as e:
                                             log.error("Parsing error: %s" % log.exc(e))
                                 else:
