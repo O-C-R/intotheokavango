@@ -12,9 +12,9 @@ def main():
         core_sat = config['satellites'][0]
         last_beacon = list(db.features.find({'properties.FeatureType': "beacon", 'properties.Satellite': {'$eq': core_sat}}).sort('properties.t_utc', -1).limit(1))[0]
         datetime = last_beacon['properties']['DateTime']
-        lat, lon = last_beacon['geometry']['coordinates']
-        text = "--> last reported beacon (%s) at: %f,%f" % (datetime, lat, lon)
-        log.info(text)
+        lon, lat = last_beacon['geometry']['coordinates']
+        text = "Time: %s\nLat,Lon: %f,%f" % (datetime, lat, lon)
+        log.info("--> last reported beacon (%s) at: %f,%f" % (datetime, lat, lon))
     except Exception as e:
         log.error("Could not get update: %s" % log.exc(e))
     try:
