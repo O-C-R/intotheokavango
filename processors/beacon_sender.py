@@ -4,7 +4,7 @@ import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, xmltodict, jso
 from housepy import config, log, util, strings, emailer, net
 from mongo import db
 
-EMAILS = "300234011091180@ast.globalalerting.com"
+EMAILS = "300234011091180@ast.globalalerting.com,brian.house@gmail.com"
 
 def main():
     log.info("beacon_sender...")
