@@ -8,8 +8,8 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
@@ -19,7 +19,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline;
 }
-article, aside, details, figcaption, figure, 
+article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;
 }
@@ -60,8 +60,8 @@ html{
 body{
   background-color:#04001A;
   color:#ffffff;
-  font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif; 
-  font-weight: 300; 
+  font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif;
+  font-weight: 300;
   font-style: normal;
   font-size: 16px;
   letter-spacing: 0.12em;
@@ -190,7 +190,7 @@ h3, h3.title{
       }
 
     #mapWorld div.leaflet-popup{
-      max-width: 400px; 
+      max-width: 400px;
     }
 
       #mapWorld div.leaflet-popup a.leaflet-popup-close-button{
@@ -232,8 +232,8 @@ h3, h3.title{
             vertical-align: top;
             margin:0;
             font-size: 13px;
-            font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif; 
-            font-weight: 300; 
+            font-family: 'Sentinel SSm A', 'Sentinel SSm B', 'Times New Roman', Times, serif;
+            font-weight: 300;
             font-style: normal;
             letter-spacing: 0.12em;
             line-height: 1.5em;
@@ -536,7 +536,7 @@ h3, h3.title{
       }
 
       #video #date{
-        padding: 0px 20px;        
+        padding: 0px 20px;
         display: block;
         height:20px;
         width:450px;
@@ -549,10 +549,10 @@ h3, h3.title{
         #video #date span{
           text-align: center;
           text-transform: center;
-          color: #4BFF87;     
+          color: #4BFF87;
           display: inline-block;
           vertical-align: middle;
-          margin-top:-18px; 
+          margin-top:-18px;
           text-transform: uppercase;
           position:absolute;
           left:-50%;
@@ -570,13 +570,13 @@ h3, h3.title{
           left:-50%;
         }
 
-      
+
 
     #aboutPage #introduction{
       width:82.8%;
       height:auto;
       padding:100px 8.6%;
-      overflow-x:hidden; 
+      overflow-x:hidden;
       position:relative;
     }
 
@@ -590,7 +590,7 @@ h3, h3.title{
         text-transform: uppercase;
         text-align: right;
         letter-spacing: 0.15em;
-        line-height: 1.32em; 
+        line-height: 1.32em;
         margin-top:-5px;
 
         font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
@@ -892,7 +892,7 @@ h3, h3.title{
             background-image: url("../img/iconPause.svg");
             cursor:pointer;
           }
-        
+
           #mapPage div.controls div.control-zoom{
             margin-left:auto;
             margin-right:auto;
@@ -1026,7 +1026,7 @@ h3, h3.title{
           }
 
           #mapPage div#feed div.post{
-            margin-bottom:70px;          
+            margin-bottom:70px;
           }
 
             #mapPage div#feed div.post.sound iframe{
@@ -1312,7 +1312,7 @@ h3, h3.title{
     }
 
     #query-button {
-      /*float: right;*/  
+      /*float: right;*/
       /*width: 106px;*/
       margin-top: 16px;
       margin-left: 8px;
@@ -1355,7 +1355,7 @@ h3, h3.title{
       letter-spacing: 0.12em;
       line-height: 1.98em;
       margin-bottom: 50px;
-    }  
+    }
 
     #api-documentation ul {
       font-size: 18px;
@@ -1389,9 +1389,11 @@ svg.wanderer{
   position:absolute;
 }
 
-svg path.leaflet-clickable{
+
+svg path.leaflet-clickable.path{
   pointer-events:none !important;
 }
+
 
 .memberMarker {
   font-family: 'Gotham A', 'Gotham B', Helvetica, Arial;
@@ -1432,16 +1434,16 @@ svg path.leaflet-clickable{
     position:relative;
     text-transform: uppercase;
     top:25%;
-    transition: font-size 0.1s; 
-    transition: top 0.1s; 
+    transition: font-size 0.1s;
+    transition: top 0.1s;
     color:#4BFF87;
   }
 
   .memberMarker:hover p, .memberMarker.focused p{
-    font-size: 9px; 
+    font-size: 9px;
     top:30%;
     color:#fff;
-   
+
   }
 
     .memberMarker span{
@@ -1532,4 +1534,3 @@ svg path.leaflet-clickable{
   }
 
 }
-

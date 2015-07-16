@@ -190,7 +190,7 @@ function Timeline(){
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 45 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 45 || (i%labelSkip != 0 && !milestones[i])){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -321,7 +321,7 @@ function Timeline(){
 
 	function cullMarkersByDay(){
 		// beacon path is not culled
-		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons'];
+		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons', 'instagrams'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){

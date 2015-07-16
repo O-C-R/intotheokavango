@@ -158,20 +158,122 @@ function PhotoPost(feature, m){
 
 
 	function animate(t){
-        if(marker){
+    if(marker){
 
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
+	}
+
+
+	function getLatLng(){
+		return latLng;
+	}
+
+
+	function setFeedPos(y, h){
+		feedPos = y;
+		height = h;
+	}
+
+
+	function getFeedPos(){
+		return{
+			feedPos: feedPos,
+			height: height,
+			index: i
+		};
+	}
+
+	function setVisible(v){
+		if(v != visible){
+			if(marker){
+				if(v) photoLayer.addLayer(marker);
+				else photoLayer.removeLayer(marker);
+				visible = v;
+			}
+		}
+	}
+
+	function getMember(){
+		return member;
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng,
+		getFeedPos: getFeedPos,
+		setFeedPos: setFeedPos,
+		marker: marker,
+		setVisible: setVisible,
+		getMember: getMember,
+		animate: animate
+	};
+}
+
+
+
+function InstagramPost(feature, m){
+	var feedPos = 0;
+	var height = 0;
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].instagram)*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	var photoUrl = feature.properties.ImageUrl;
+	var size = feature.properties.Dimensions;
+	var visible = true;
+	var marker = m;
+	var member = feature.properties.Member;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'instagram';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
+
+	function getData(){
+		return {
+			type: 'instagram',
+			date: date,
+			latLng: latLng,
+			photoUrl: photoUrl,
+			feedPos: feedPos,
+			size: size,
+			setFeedPos: setFeedPos,
+			height: height,
+		}
+	}
+
+
+	function animate(t){
+	    if(marker){
+	  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+	  			if(!popupVisible && !popupDelay) {
+	  				marker.openPopup();
+	  				setPopupEvent(marker);
+	  			}
+	  		} else {
+	  			if(popupVisible) {
+	  				marker.closePopup();
+	  			}
+	  			popupDelay = false;
+	  		}
+	    }
 	}
 
 
@@ -315,19 +417,20 @@ function TweetPost(feature, m){
 	}
 
 	function animate(t){
-        if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+    if(marker){
+    	if(!popupVisible) marker._popup._isForced = false;
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible && !marker._popup._isForced) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
 	}
 
 	return{
@@ -418,19 +521,19 @@ function BlogPost(feature, m){
 	}
 
 	function animate(t){
-        if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+    if(marker){
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
 	}
 
 	return{
@@ -518,4 +621,3 @@ function SoundPost(feature, m){
 		setVisible: setVisible,
 	};
 }
-

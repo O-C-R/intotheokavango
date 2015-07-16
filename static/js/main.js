@@ -4,17 +4,25 @@
 
 
 	Okavango 2015 front-end.
-	Please note I have been using the following javascript pattern: 
-	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
+	Please note I have been using the following javascript pattern:
+	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
 
 	TODOS
+
+	- revise night time pace when posts happen
+	- new label : "scroll to navigate through time"
+	- instagram
+	- gallery
+	- feature clustering
+	- feature loading
+	- better journal/map matching
+
 
 	- popup doesn't open to journal
 	- sometimes loading fails on map / journal
 	- complete instruction labels
 	- low resolution ambit-geo in free mode
 
-	- PM Joey
 	- videos
 	- redo layout for tweets on the map
 	- new milestones?
@@ -71,6 +79,7 @@ var loader;
 var pages = {};
 var mapWorld;
 var tweetLayer;
+var instagramLayer;
 var photoLayer;
 var sightingLayer;
 var beaconLayer;
@@ -97,7 +106,8 @@ var timeOffsets = {
 		'timezone': 4,
 		'query': -1,
 		'departure': 3,
-		'startDate':0
+		'startDate':0,
+		'instagram':0
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -107,7 +117,8 @@ var timeOffsets = {
 		'timezone': 4,
 		'query': 0,
 		'departure': 3,
-		'startDate':-1
+		'startDate':-1,
+		'instagram':-1
 	}
 }
 
@@ -138,8 +149,6 @@ document.addEventListener('DOMContentLoaded', function(){
 	  else d3.select('#statusScreen img').remove();
 	})();
 
-
-	
 	mapTLatLng = new L.LatLng(-12.811059,18.175099);
 	mapLatLng = new L.LatLng(-12.811059,18.175099);
 
@@ -155,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function(){
         touchZoom: false,
         dragging: false,
         keyboard: false,
-        minZoom: 0,                    
+        minZoom: 0,
         maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
@@ -164,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function(){
     initMapLabels(mapWorld);
 
     tweetLayer = new L.layerGroup().addTo(mapWorld);
+    instagramLayer = new L.layerGroup().addTo(mapWorld);
     photoLayer = new L.layerGroup().addTo(mapWorld);
     sightingLayer = new L.layerGroup().addTo(mapWorld);
     beaconLayer = new L.layerGroup().addTo(mapWorld);
@@ -175,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
 	    pages.about = AboutPage('about');
-	    pages.map = MapPage('map');    
+	    pages.map = MapPage('map');
 	    pages.journal = JournalPage('journal');
 	    pages.data = DataPage('data');
 	    pages.share = Page('share');
@@ -214,10 +224,10 @@ document.addEventListener('DOMContentLoaded', function(){
 				animate(new Date().getTime()-16);
 			});
 		});
-		
+
 	} else {
 		window.addEventListener('resize',resize);
-		resize();	
+		resize();
 		animate(new Date().getTime()-16);
 	}
 
@@ -232,11 +242,11 @@ document.addEventListener('DOMContentLoaded', function(){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
 
 				    timeline.update(frameRate);
-					
+
 					var date = timeline.getTimeCursor();
 
-					if(!timeline.getPaused() && frameCount&5 == 0){
-						console.log(frameCount);
+					// if(!timeline.getPaused() && frameCount%5 == 0){
+					if(frameCount%5 == 0){
 						var sightings = loader.getSightings();
 						if(sightings[date.day]){
 							var len = sightings[date.day].length;
@@ -250,6 +260,14 @@ document.addEventListener('DOMContentLoaded', function(){
 							var len = photos[date.day].length;
 							for(var i=0; i<len; i++){
 								photos[date.day][i].animate(date.current);
+							}
+						}
+
+						var instagrams = loader.getInstagrams();
+						if(instagrams[date.day]){
+							var len = instagrams[date.day].length;
+							for(var i=0; i<len; i++){
+								instagrams[date.day][i].animate(date.current);
 							}
 						}
 
@@ -269,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function(){
 							}
 						}
 					}
-					
+
 					for(m in loader.members){
 						var member = loader.members[m];
 						member.move(timeline.getTimeCursor(), {animate:false});
@@ -302,8 +320,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 				} else {
 					wanderer.wander();
-			    	var target = wanderer.update();
-			    	mapWorld.panTo(new L.LatLng(target.y,target.x), {animate:false});
+		    	var target = wanderer.update();
+		    	mapWorld.panTo(new L.LatLng(target.y,target.x), {animate:false});
 				}
 			}
 		}
@@ -311,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
 
 
-	function setLayoutInteractions(){	
+	function setLayoutInteractions(){
 
 		mapWorld.on('zoomend',function(e){
 			if(e.target._zoom < 15){
@@ -325,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					beaconPathLayer.addTo(mapWorld);
 				}
 			}
-		})		
+		})
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
@@ -346,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		    		resize();
 		    	});
 	    }
-	    
+
 	    var lastPlayMode;
 	    var r2;
 	    var drag = d3.behavior.drag()
@@ -395,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    		timeline.togglePause(lastPlayMode?'pause':'play');
 			    	}
 			    	d3.select(this).classed('dragged',false);
+
 			    }
 		    });
 
@@ -427,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
-		
+
 		window.addEventListener('resize',resize);
 		resize();
 
@@ -453,10 +472,6 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
-
-
-	
-
 });
 
 
@@ -510,5 +525,3 @@ function updateLoadingScreen(force){
 		}
 	}
 }
-
-
