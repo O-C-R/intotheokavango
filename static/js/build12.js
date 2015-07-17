@@ -4868,7 +4868,9 @@ function initMapLabels(map){
 	- feature clustering
 	- feature loading
 	- better journal/map matching
-
+	- 'focus to member button'
+	- start on map page
+	- 'learn more!' label on first connection
 
 	- popup doesn't open to journal
 	- sometimes loading fails on map / journal
@@ -5043,45 +5045,37 @@ document.addEventListener('DOMContentLoaded', function(){
 	    pages.share = Page('share');
 	    timeline = Timeline();
 		feed = Feed();
-	} else {
-		console.log('creating about');
-		pages.about = AboutPage('about');
-		pages.about.show();
 	}
+
     wanderer = Wanderer(mapWorld.getCenter());
 
-    if(d3.selectAll('#navigation li')[0].length > 3){
-		// pages.mapWorld.show();
-		pages.about.show();
-		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate,endDate){
-			timeline.setDates(dayCount,startDate);
-			loader.loadDay(timeline.getTimeCursor().day,function(day){
-				timeline.setTimeFrame();
-				feed.init(day);
-				timeline.init(day);
-				timeline.initGraphics();
-				timeline.initTimeCursor();
-				timeline.checkUnzoom(true);
-				isLoading = false;
-				updateLoadingScreen(false);
-				feed.jump(timeline.getTimeCursor());
-				if(loader.members['Steve']) loader.members['Steve'].focus();
-				else {
-					for(var k in loader.members){
-						loader.members[k].focus();
-						break;
-					}
+    pages.active = pages.map;
+	pages.map.show();
+	// pages.about.show();
+	setLayoutInteractions();
+	loader.getDayCount(function(dayCount,startDate,endDate){
+		timeline.setDates(dayCount,startDate);
+		loader.loadDay(timeline.getTimeCursor().day,function(day){
+			timeline.setTimeFrame();
+			feed.init(day);
+			timeline.init(day);
+			timeline.initGraphics();
+			timeline.initTimeCursor();
+			timeline.checkUnzoom(true);
+			isLoading = false;
+			updateLoadingScreen(false);
+			feed.jump(timeline.getTimeCursor());
+			if(loader.members['Steve']) loader.members['Steve'].focus();
+			else {
+				for(var k in loader.members){
+					loader.members[k].focus();
+					break;
 				}
-				animate(new Date().getTime()-16);
-			});
+			}
+			animate(new Date().getTime()-16);
 		});
+	});
 
-	} else {
-		window.addEventListener('resize',resize);
-		resize();
-		animate(new Date().getTime()-16);
-	}
 
 
 	function animate(lastFrameTime){
@@ -5335,6 +5329,7 @@ function teleportMap(){
 		// mapWorld.panTo(mapLatLng, {animate:false});
 	}
 }
+
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
