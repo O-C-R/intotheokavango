@@ -197,9 +197,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
     wanderer = Wanderer(mapWorld.getCenter());
 
+	// pages.about.show();
     pages.active = pages.map;
 	pages.map.show();
-	// pages.about.show();
 	setLayoutInteractions();
 	loader.getDayCount(function(dayCount,startDate,endDate){
 		timeline.setDates(dayCount,startDate);
