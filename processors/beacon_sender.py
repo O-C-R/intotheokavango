@@ -8,7 +8,7 @@ EMAILS = ",".join(config['geo_emails']) if config['geo_emails'] is not None else
 
 def main():
     log.info("beacon_sender...")
-    if not len(config['geo_emails']) or config['geo_emails'] is None:
+    if config['geo_emails'] is None or not len(config['geo_emails']):
         log.info("--> no emails")
         return
     try:
