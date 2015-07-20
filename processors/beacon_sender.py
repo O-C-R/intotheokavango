@@ -4,10 +4,13 @@ import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, xmltodict, jso
 from housepy import config, log, util, strings, emailer, net
 from mongo import db
 
-EMAILS = "300234011091180@ast.globalalerting.com,brian.house@gmail.com"
+EMAILS = ",".join(config['geo_emails']) if config['geo_emails'] is not None else None
 
 def main():
     log.info("beacon_sender...")
+    if config['geo_emails'] is None or not len(config['geo_emails']):
+        log.info("--> no emails")
+        return
     try:
         core_sat = config['satellites'][0]
         last_beacon = list(db.features.find({'properties.FeatureType': "beacon", 'properties.Satellite': {'$eq': core_sat}}).sort('properties.t_utc', -1).limit(1))[0]
