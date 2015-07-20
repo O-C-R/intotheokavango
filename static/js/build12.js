@@ -63,7 +63,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var parsedAmbitEnergy = [];
     var parsedAmbitSpeed = [];
     var speciesSightingsTotals = [];
-    var parsedSensorData = [];
+    var parsedSensorAirData = [];
+    var parsedSensorWaterData = [];
+    var parsedSensorPHData = [];
+    var parsedSensorTdsData = [];
+    var parsedSensorDoData = [];
+    var parsedSensorHumidityData = [];
     var parsedImageData = [];
     var parsedTweetData = [];
     var parsedBeaconData = [];
@@ -135,9 +140,16 @@ var d3Graph = function(timelineVizID, totalsVizID){
         return beaconData;
     }
 
-    var parseSensorData = function(item) {
+    var parseSensorAirData = function(item) {
         var sensorData = {};
         sensorData.airTemp = item["properties"]["AirTemp"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorWaterData = function(item) {
+        var sensorData = {};
         if (item["properties"].hasOwnProperty("water temp")) {
             sensorData.waterTemp = item["properties"]["water temp"];
         } else if (item["properties"].hasOwnProperty["WaterTemp"]) {
@@ -145,7 +157,48 @@ var d3Graph = function(timelineVizID, totalsVizID){
         } else {
             sensorData.waterTemp = item["properties"]["WaterTemp"];
         }
-        
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return sensorData;
+    }
+
+    var parseSensorPHData = function(item) {
+        var sensorData = {};
+
+        if (item["properties"].hasOwnProperty("pH")) {
+            sensorData.pH = item["properties"]["pH"];
+        } else if (item["properties"].hasOwnProperty("PH")) {
+            sensorData.pH = item["properties"]["PH"];
+        } else {
+            sensorData.pH = item["properties"]["pH"];
+        }
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+        return sensorData;
+    }
+
+    var parseSensorTdsData = function(item) {
+        var sensorData = {};
+
+        sensorData.Tds = item["properties"]["Tds"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorDoData = function(item) {
+        var sensorData = {};
+        sensorData.Do = item["properties"]["Do"];
+        sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
+
+        return sensorData;
+    }
+
+    var parseSensorHumidityData = function(item) {
+        var sensorData = {};
+        if (item["properties"].hasOwnProperty("Humidity")) {
+            sensorData.humidity = item["properties"]["Humidity"];
+        } else if (item["properties"].hasOwnProperty("humidity")) {
+            sensorData.humidity = item["properties"]["humidity"];
+        }
         sensorData.time = new Date(+item["properties"]["t_utc"] * 1000);
 
         return sensorData;
@@ -522,45 +575,186 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 .orient("left");
         }
 
-        if(feature_type === "sensor") {
-            yAxisLabel = "Degrees Celsius";
-            graphTitle = "Air and Water Temperature";
-            var color = d3.scale.ordinal()
-                .domain(["waterTemp", "airTemp"])
-                .range(["#4BFF87", "#686d9d"]);
-
+        if (feature_type === "sensor") {
             console.log("feature_type is sensor");
             console.log(parsedData);
-            color.domain(d3.keys(parsedData[0]).filter(function(key) { return key !== "time"; }));
+            
+            for (var i = 0; i < parsedData.length; i++) {
+             /*
+                if (parsedData[i].hasOwnProperty("waterTemp") && parsedData[i].hasOwnProperty("airTemp")) {
 
-            var line = d3.svg.line()
-                .x(function(d) { return xScale(d.date); })
-                .y(function(d) { return yScale(d.temperature); });
+                    //graph titles
+                    yAxisLabel = "Degrees Celsius";
+                    graphTitle = "Air and Water Temperature";
+                    
+                    var color = d3.scale.ordinal()
+                        .domain(["waterTemp", "airTemp"])
+                        .range(["#4BFF87", "#686d9d"]);
 
-            var temps = color.domain().map(function(name) {
-                return {
-                  name: name,
-                  values: parsedData.map(function(d) {
-                    return {date: d.time, temperature: +d[name]};
-                    })
-                };
-            });
+                    color.domain(d3.keys(parsedData[0]).filter(function(key) { return key !== "time"; }));
 
-            console.log(temps);
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.date); })
+                        .y(function(d) { return yScale(d.temperature); });
 
-            var dateRange = d3.extent(parsedData, function(d) { 
-                return d.time; 
-                });
-            xScale.domain(dateRange);
+                    //get waterTemp and airTemp data into values array
+                    var temps = color.domain().map(function(name) {
+                        return {
+                          name: name,
+                          values: parsedData.map(function(d) {
+                            return {date: d.time, temperature: +d[name]};
+                            })
+                        };
+                    });
 
-            yScale.domain([
-                d3.min(temps, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-                d3.max(temps, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
-            ]);
+                    //console.log(temps);
 
-            var dateFormat = d3.time.format.utc("%B %d %Y");
-            var timeFormat = d3.time.format.utc("%I:%M:%S");
-            xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                        });
+                    xScale.domain(dateRange);
+
+                    yScale.domain([
+                        d3.min(temps, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
+                        d3.max(temps, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+                    ]);
+
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+
+                    var temp = svg.selectAll(".temperature")
+                      .data(temps)
+                    .enter().append("g")
+                      .attr("class", "temperature");
+
+                    temp.append("path")
+                      .attr("class", "line")
+                      .attr("d", function(d) { return line(d.values); })
+                      .style("stroke", function(d) { return color(d.name); });
+
+                    temp.append("text")
+                      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+                      .attr("transform", function(d) { return "translate(" + xScale(d.value.date) + "," + yScale(d.value.temperature) + ")"; })
+                      .attr("x", 3)
+                      .attr("dy", ".35em")
+                      .attr("class", "label")
+                      .style("fill", "white")
+                      .text(function(d) { return d.name; });
+                    }
+                }
+              */
+                if ( parsedData[i].hasOwnProperty("waterTemp") ) {
+                    console.log("data has waterTemp key");
+                    yAxisLabel = "Degrees Celsius";
+                    graphTitle = "Water Temperature";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.waterTemp); });
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.waterTemp; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+
+                } else if (parsedData[i].hasOwnProperty("airTemp")) {
+                    console.log("data has airTemp key");
+                    yAxisLabel = "Degrees Celsius";
+                    graphTitle = "Air Temperature";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.airTemp); });
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+
+                } else if (parsedData[i].hasOwnProperty("pH")) {
+                    console.log("data has pH key");
+                    yAxisLabel = "pH Level";
+                    graphTitle = "Water pH Level";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.pH); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.pH; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("Tds")) {
+                    console.log("data has Tds key");
+                    yAxisLabel = "Parts per Million";
+                    graphTitle = "Tds Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.Tds); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.Tds; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("Do")) {
+                    console.log("data has Do key");
+                    yAxisLabel = "mg/L";
+                    graphTitle = "Dissolved Oxygen Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.Do); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.Do; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                } else if (parsedData[i].hasOwnProperty("humidity")) {
+                    console.log("data has Humidity key");
+                    yAxisLabel = "Percent of water vapor to dry air";
+                    graphTitle = "Humidity Levels";
+                    var line = d3.svg.line()
+                        .x(function(d) { return xScale(d.time); })
+                        .y(function(d) { return yScale(d.humidity); });
+
+                    var dateRange = d3.extent(parsedData, function(d) { 
+                        return d.time; 
+                    });
+                    console.log("dateRange: " + dateRange);
+
+                    xScale.domain(dateRange);
+                    yScale.domain(d3.extent(parsedData, function(d) { return d.humidity; }));
+                    var dateFormat = d3.time.format.utc("%B %d %Y");
+                    var timeFormat = d3.time.format.utc("%I:%M:%S");
+                    xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
+                }
+                else {
+                    console.log("data has a different key");
+                }
+            }
 
             xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -569,25 +763,6 @@ var d3Graph = function(timelineVizID, totalsVizID){
             yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
-
-            var temp = svg.selectAll(".temperature")
-              .data(temps)
-            .enter().append("g")
-              .attr("class", "temperature");
-
-            temp.append("path")
-              .attr("class", "line")
-              .attr("d", function(d) { return line(d.values); })
-              .style("stroke", function(d) { return color(d.name); });
-
-            temp.append("text")
-              .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-              .attr("transform", function(d) { return "translate(" + xScale(d.value.date) + "," + yScale(d.value.temperature) + ")"; })
-              .attr("x", 3)
-              .attr("dy", ".35em")
-              .attr("class", "label")
-              .style("fill", "white")
-              .text(function(d) { return d.name; });
         }
 
         svg.append("g")
@@ -629,20 +804,21 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     }
 
+
     var makeTotalsViz = function(data) {
         console.log("MAKE TOTALS VIZ");
 
         sortArrOfObjectsByParam(data, "total", false);
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
-            width = 800 - margin.left - margin.right,
+            width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
             height = barHeight * data.length,
-            left_width = 300;
+            left_width = 400;
 
         var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
-            .range([0, width - left_width]);
+            .range([0, width - (left_width + 80) ]);
             console.log(data);
             
         var yScale = d3.scale.ordinal()
@@ -650,11 +826,20 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 return d.type; 
                 console.log(d.type); //hmm it doesn't console anything
             })
-            .rangeBands([0, height]);
+            .rangeBands([60, height]);
+
         console.log(yScale.range());
         var svg = d3.select("#timelineViz").append("svg")
             .attr("width", width)
             .attr("height", height);
+
+        var title = svg.append("text")
+            .attr("x", 0)
+            .attr("y", 20)
+            .style("fill", "white")
+            .style("font-size", "18px")
+            .text("TOTAL SIGHTINGS");
+
         
         var bar = svg.selectAll("g")
                 .data(data)
@@ -665,22 +850,27 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .attr("x", left_width)
             .attr("y", yScale)
             .attr("width", function(d) { return xScale(d.total); })
+            .style("fill", "#4bff87")
             .attr("height", barHeight - 1);
 
         bar.append("text")
-            .attr("x", function(d) { return xScale(d.total) - 5 + left_width; })
+            .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
             .attr("text-anchor", "beginning")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.total; });
 
         bar.append("text")
-            .attr("x", left_width * 0.92)
+            .attr("x", left_width - 20)
             //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2)
+            .attr("y", barHeight / 2 + 60)
             .attr("dy", "0.35em")
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "end")
+            .attr("class", "label")
+              .style("fill", "white")
             .text(function(d) { return d.type; });
     }
 
@@ -772,6 +962,29 @@ var d3Graph = function(timelineVizID, totalsVizID){
         })
     }
 
+    var speciesCountObj = {};
+    var speciesCountArray = [];
+
+    var getSpeciesCount = function(sightings) {
+
+            for (var i = 0; i < sightings.length; ++i) {
+                if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
+                    speciesCountObj[sightings[i].properties.SpeciesName] = 0;
+                    console.log("doesn't have species property");
+                }
+                speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+            }
+            console.log(Object.keys(speciesCountObj));
+
+            for (s in speciesCountObj){
+                myObj = {};
+                myObj.species = s;
+                myObj.count  = speciesCountObj[s];
+                speciesCountArray.push(myObj);
+            }
+            console.log(speciesCountArray);
+        }
+
     //get the totals for all features, recursively - then draw a totals bar chart viz
     var getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
@@ -827,6 +1040,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 return error;
             } else {
                 console.log("Initial Data", data);
+                console.log("feature_type", feature_type);
 
                 //parse item differently based on feature_type
                 if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
@@ -943,6 +1157,25 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         //timelineVizDiv.fadeIn();
                         //totalsVizDiv.hide();
                         makeHistogramPlot(parsedSpeciesSighting, feature_type, speciesName);
+                    } else {
+
+                        getSpeciesCount(data.results.features);
+                        makeTotalsViz(speciesCountArray);
+                        // console.log("these are the species");
+                        // for(species in data.results) {
+                            
+                        //     var count = data.results[species];
+                        //     console.log(species + ": " + count);
+
+                        //     var sightingCount = {};
+                        //     sightingCount.type = species;
+                        //     sightingCount.total = count;
+                        //     speciesSightingsTotals.push(sightingCount);
+                        // }
+                        // console.log(speciesSightingsTotals);
+                        // //totalsVizDiv.fadeIn();
+                        // makeTotalsViz(speciesSightingsTotals);
+                        console.log("no species in query");
                     }
                 }
                 if (feature_type === "sensor") {
@@ -952,12 +1185,46 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         var item = data.results.features[d];
                         //console.log(item);
 
-                        if (item["properties"].hasOwnProperty("AirTemp") && item["properties"].hasOwnProperty("WaterTemp") || item["properties"].hasOwnProperty("water temp")) {
-                            f = parseSensorData(item);
-                            parsedSensorData.push(f);
+                        if (item["properties"].hasOwnProperty("AirTemp")) {
+                            f = parseSensorAirData(item);
+                            parsedSensorAirData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("WaterTemp") || item["properties"].hasOwnProperty("water temp")) {
+                            f = parseSensorWaterData(item);
+                            parsedSensorWaterData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("PH") || item["properties"].hasOwnProperty("pH")) {
+                            f = parseSensorPHData(item);
+                            parsedSensorPHData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Tds")) {
+                            f = parseSensorTdsData(item);
+                            parsedSensorTdsData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Do")) {
+                            f = parseSensorDoData(item);
+                            parsedSensorDoData.push(f);
+                        }
+                        if (item["properties"].hasOwnProperty("Humidity") || item["properties"].hasOwnProperty("humidity")) {
+                            f = parseSensorHumidityData(item);
+                            parsedSensorHumidityData.push(f)
                         }
                     }
-                    makeTimeSeriesViz(parsedSensorData, feature_type);
+
+                    console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
+                    console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
+                    console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
+                    console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
+                    console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
+                    console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
+                    makeTimeSeriesViz(parsedSensorAirData, feature_type);
+                    makeTimeSeriesViz(parsedSensorWaterData, feature_type);
+                    makeTimeSeriesViz(parsedSensorHumidityData, feature_type);
+                    makeTimeSeriesViz(parsedSensorPHData, feature_type);
+                    makeTimeSeriesViz(parsedSensorTdsData, feature_type);
+                    makeTimeSeriesViz(parsedSensorDoData, feature_type);
+
+
                 }
                 if (feature_type === "tweet") {
                     console.log("TWEET");
@@ -1994,6 +2261,10 @@ function Feed(){
 		for(var i=0; i<photos.length; i++){
 			if(photos[i].getMember() != null) newPosts.push(photos[i]);
 		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+		}
 		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
@@ -2046,7 +2317,7 @@ function Feed(){
 			        			jump();
 			        		})
 		        	}
-	        	} else if(d.type == 'photo'){
+	        	} else if(d.type == 'photo' || d.type == 'instagram'){
 		        	d3.select(this).select('div.photo')
 		        		.append('img')
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
@@ -2308,20 +2579,122 @@ function PhotoPost(feature, m){
 
 
 	function animate(t){
-        if(marker){
+    if(marker){
 
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
+	}
+
+
+	function getLatLng(){
+		return latLng;
+	}
+
+
+	function setFeedPos(y, h){
+		feedPos = y;
+		height = h;
+	}
+
+
+	function getFeedPos(){
+		return{
+			feedPos: feedPos,
+			height: height,
+			index: i
+		};
+	}
+
+	function setVisible(v){
+		if(v != visible){
+			if(marker){
+				if(v) photoLayer.addLayer(marker);
+				else photoLayer.removeLayer(marker);
+				visible = v;
+			}
+		}
+	}
+
+	function getMember(){
+		return member;
+	}
+
+	return{
+		getData: getData,
+		getLatLng: getLatLng,
+		getFeedPos: getFeedPos,
+		setFeedPos: setFeedPos,
+		marker: marker,
+		setVisible: setVisible,
+		getMember: getMember,
+		animate: animate
+	};
+}
+
+
+
+function InstagramPost(feature, m){
+	var feedPos = 0;
+	var height = 0;
+	var date = new Date(Math.round(parseFloat((feature.properties.t_utc+timeOffsets[expeditionYear].instagram)*1000)));
+	var latLng = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
+	var photoUrl = feature.properties.ImageUrl;
+	var size = feature.properties.Dimensions;
+	var visible = true;
+	var marker = m;
+	var member = feature.properties.Member;
+	var popupVisible = false;
+	var popupDelay = false;
+	var type = 'instagram';
+
+	if(marker){
+		marker.addEventListener('popupclose',function(){
+			popupVisible = false;
+			popupDelay = true;
+		})
+		marker.addEventListener('popupopen',function(){
+			popupVisible = true;
+		})
+	}
+
+	function getData(){
+		return {
+			type: 'instagram',
+			date: date,
+			latLng: latLng,
+			photoUrl: photoUrl,
+			feedPos: feedPos,
+			size: size,
+			setFeedPos: setFeedPos,
+			height: height,
+		}
+	}
+
+
+	function animate(t){
+	    if(marker){
+	  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+	  			if(!popupVisible && !popupDelay) {
+	  				marker.openPopup();
+	  				setPopupEvent(marker);
+	  			}
+	  		} else {
+	  			if(popupVisible) {
+	  				marker.closePopup();
+	  			}
+	  			popupDelay = false;
+	  		}
+	    }
 	}
 
 
@@ -2465,19 +2838,20 @@ function TweetPost(feature, m){
 	}
 
 	function animate(t){
-        if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+    if(marker){
+    	if(!popupVisible) marker._popup._isForced = false;
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible && !marker._popup._isForced) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
 	}
 
 	return{
@@ -2568,19 +2942,19 @@ function BlogPost(feature, m){
 	}
 
 	function animate(t){
-        if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
-    			if(!popupVisible && !popupDelay) {
-    				marker.openPopup();
-    				setPopupEvent(marker);
-    			}
-    		} else {
-    			if(popupVisible) {
-    				marker.closePopup();
-    			}
-    			popupDelay = false;
-    		}
-        }
+    if(marker){
+  		if(Math.abs(date.getTime()/1000-t)<1000 && pages.active.id == 'map'){
+  			if(!popupVisible && !popupDelay) {
+  				marker.openPopup();
+  				setPopupEvent(marker);
+  			}
+  		} else {
+  			if(popupVisible) {
+  				marker.closePopup();
+  			}
+  			popupDelay = false;
+  		}
+    }
 	}
 
 	return{
@@ -2668,7 +3042,6 @@ function SoundPost(feature, m){
 		setVisible: setVisible,
 	};
 }
-
 ;
 
 /*
@@ -2901,12 +3274,13 @@ function Loader(){
 	var loading = [];
 	var ambits = [];
 	var tweets = [];
+	var instagrams = [];
 	var photos = [];
 	var sightings = [];
 	var beacons = [];
 	var blogs = [];
 	var sounds = [];
-	var members = {};	
+	var members = {};
 	var loadedDays = [];
 
 
@@ -2937,7 +3311,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 7;
+		var toBeCompleted = 8;
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
@@ -2949,6 +3323,7 @@ function Loader(){
 
 		tweets[day] = [];
 		photos[day] = [];
+		instagrams[day] = [];
 		sightings[day] = [];
 		beacons[day] = [];
 		blogs[day] = [];
@@ -2957,6 +3332,7 @@ function Loader(){
 		loadPath(day, checkForCompletion);
 		loadTweets(day, checkForCompletion);
 		loadPhotos(day, checkForCompletion);
+		loadInstagrams(day, checkForCompletion);
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
@@ -2972,9 +3348,10 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=10'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;		
+			data = data.results;
 		    L.geoJson(data, {
 		        filter: function(feature, layer) {
+		        	if(!feature.properties.CoreExpedition) return false;
 			        return (feature.geometry.coordinates[0] != 0);
 			    },
 			    pointToLayer: function (feature, latLng) {
@@ -3014,7 +3391,7 @@ function Loader(){
 			activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
-			
+
 			for(m in members){
 				if (ambitCoords[m] && ambitCoords[m].length>0) {
 					var paths = [{
@@ -3032,16 +3409,17 @@ function Loader(){
 					    color: 'rgba('+c[0]+','+c[1]+','+c[2]+',1)',
 					    weight: 2.5,
 					    opacity: 0.6,
-					    'pointer-events': 'none !important'
+					    className: "path"
 					};
-					
+
 					var ambitPath = L.geoJson(paths, {	style:pathStyle	});
+					console.log(ambitPath);
 					ambitLayer.addLayer(ambitPath);
 		        }
 			}
 
 			callback();
-		});   
+		});
 	}
 
 
@@ -3068,7 +3446,7 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=tweet&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=30'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
+			data = data.results;
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	if(expeditionYear == '15') return (feature.geometry.coordinates[0] != 0 && feature.properties.Text.substring(0,2).toLowerCase() != 'rt' && feature.properties.Text.charAt(0) != '@');
@@ -3078,6 +3456,10 @@ function Loader(){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
                 		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.addEventListener('click',function(e){
+                			e.target._popup._isForced = true;
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3095,7 +3477,7 @@ function Loader(){
 		});
 	}
 
-	
+
 	function loadBlogPosts(day, callback){
 
 		var markerIcon = L.icon({
@@ -3116,7 +3498,7 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=blog&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&resolution=300';
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
+			data = data.results;
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	if(feature.geometry == null){
@@ -3129,6 +3511,9 @@ function Loader(){
                 	var title = feature.properties.Title;
                 	if(title){
                 		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3167,7 +3552,7 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=audio&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0';
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
+			data = data.results;
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	return feature.geometry != null && feature.properties.SoundCloudURL;
@@ -3214,7 +3599,7 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=image&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
+			data = data.results;
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	if(!feature.properties.Dimensions) return false;
@@ -3230,6 +3615,9 @@ function Loader(){
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
                 		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
                 	}
                 },
 		        pointToLayer: function (feature, latlng) {
@@ -3246,6 +3634,63 @@ function Loader(){
 		    callback();
 		});
 	}
+
+
+	function loadInstagrams(day, callback){
+
+		var markerIcon = L.icon({
+	        iconUrl: '../static/img/featureIconPhoto.png',
+	        shadowUrl: '../static/img/featureIconShadow.png',
+	        iconSize:     [30,30],
+	        shadowSize:   [30,30],
+	        iconAnchor:   [15,35],
+	        shadowAnchor: [15,35],
+	        popupAnchor:  [10,-30]
+	    });
+
+	    var markerOptions = {
+	        icon:markerIcon,
+	        iconSize:[30,30]
+	    };
+
+		var query = 'http://intotheokavango.org/api/features?FeatureType=instagram&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
+		d3.json(query, function(error, data) {
+			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
+			data = data.results;
+		    L.geoJson(data.features, {
+		        filter: function(feature, layer) {
+		          //   if(feature.properties.Member == null){
+			         //    var instagram = InstagramPost(feature);
+				        // if(instagram) instagrams[day].push(instagram);
+				        // return false;
+		          //   } else return true;
+		          if(feature.properties.Member == null) return false;
+		        },
+		        onEachFeature: function(feature, layer){
+                	var url = feature.properties.ImageUrl;
+                	var dimensions = feature.properties.Dimensions;
+                	if(url && dimensions){
+                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>');
+                		layer.addEventListener('click',function(e){
+                			if(e.target._popup._isOpen) timeline.togglePause('pause');
+                		})
+                	}
+                },
+		        pointToLayer: function (feature, latlng) {
+                    var scatterX = ((Math.random() * 2) - 1) * 0.00075;
+                    var scatterY = ((Math.random() * 2) - 1) * 0.00075;
+                    var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
+                    var marker = L.marker(latlng2, markerOptions);
+                    tweetLayer.addLayer(marker);
+                    var instagram = InstagramPost(feature, marker);
+			        if(instagram) instagrams[day].push(instagram);
+                    return marker;
+                }
+		    });
+		    callback();
+		});
+	}
+
 
 	function loadSightings(day, callback){
 
@@ -3264,8 +3709,8 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
-			
+			data = data.results;
+
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	if(!feature.properties.CoreExpedition) return false;
@@ -3277,7 +3722,7 @@ function Loader(){
                     var scatterY = ((Math.random() * 2) - 1) * 0.00075;
                     var latlng2 = L.latLng(latlng.lat + scatterY, latlng.lng + scatterX);
 			        var marker = L.circleMarker(latlng2, sightingOptions);
-		        	sightingLayer.addLayer(marker);			        
+		        	sightingLayer.addLayer(marker);
 			        var sighting = Sighting(feature, marker);
 		            if(sighting) sightings[day].push(sighting);
 		            var name = feature.properties.SpeciesName;
@@ -3289,7 +3734,7 @@ function Loader(){
 			    	var c = Math.sqrt(feature.properties["Count"]);
 			    	var so = {radius: 2 + (c * 2)};
 			    	if (feature.properties.SpeciesName.indexOf("quote.") != -1) {
-			 
+
 			    	} else {
 			    		var bn = feature.properties.SpeciesName;
 			    		if (colorMap[bn] == undefined) {
@@ -3345,8 +3790,8 @@ function Loader(){
 		var query = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(day+timeOffsets[expeditionYear].query)+'&limit=0&Satellite=TS091180'
 		d3.json(query, function(error, data) {
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;	
-			
+			data = data.results;
+
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
 		        	// set a minimum distance of 200m between each beacon
@@ -3355,7 +3800,7 @@ function Loader(){
 		        		var coords = [];
 		        		coords[0] = beacons[day][beacons[day].length-1].getLatLng();
 		        		coords[1] = new L.LatLng(feature.geometry.coordinates[0],feature.geometry.coordinates[1]);
-		        		if(coords[0].distanceTo(coords[1]) < 200) return false; 
+		        		if(coords[0].distanceTo(coords[1]) < 200) return false;
 					}
 		        	if(feature.geometry == 'null') return false;
 		        	if(feature.geometry.coordinates[0] == 0) return false;
@@ -3391,7 +3836,7 @@ function Loader(){
 				    noClip: true,
 				    'pointer-events': 'none !important'
 				};
-				
+
 				var beaconPath = L.geoJson(paths, {	style:pathStyle	});
 				beaconPathLayer.addLayer(beaconPath);
 	        }
@@ -3400,7 +3845,7 @@ function Loader(){
 		});
 
 
-		
+
 
 	}
 
@@ -3430,6 +3875,10 @@ function Loader(){
 		return sightings;
 	}
 
+	function getInstagrams(){
+		return instagrams;
+	}
+
 	function getFeatures(){
 		return {
 			sightings: sightings,
@@ -3437,7 +3886,8 @@ function Loader(){
 			photos: photos,
 			beacons: beacons,
 			blogs: blogs,
-			ambits: ambits
+			ambits: ambits,
+			instagrams: instagrams
 		}
 	}
 
@@ -3452,14 +3902,99 @@ function Loader(){
 		getSounds: getSounds,
 		getTweets: getTweets,
 		getPhotos: getPhotos,
+		getInstagrams: getInstagrams,
 		getLoading: getLoading,
 		getDayCount: getDayCount,
 		getLoadedDays: getLoadedDays,
 		getFeatures: getFeatures,
 		getSightings: getSightings,
-		expeditionYear: expeditionYear	
+		expeditionYear: expeditionYear
 	};
 }
+;/* global variables */
+var map;                     // the map object
+var center;
+var featureGroup;
+
+/* create the map */
+function initMap () {
+    console.log("center: " + center);
+    map = new L.map('map', {
+        layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
+        center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
+        //center: center,
+        zoomControl: true,
+        attributionControl: false,
+        doubleClickZoom: true,
+        scrollWheelZoom: true,
+        boxZoom: true,
+        touchZoom: false,
+        dragging: true,
+        keyboard: true,
+        zoom: 7,
+        minZoom: 1,                    
+        maxZoom: 20
+    });    
+
+    zoomLevel = map.getZoom();
+    //console.log("zoom level: " + zoomLevel); 
+}
+
+var geojsonMarkerOptions = {
+    radius: 5,
+    fillColor: "#4BFF87",
+    color: "#fff",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+/* load data file */
+function loadData () {
+    //console.log("loadData");
+    //console.log(path_to_data);
+    var url = "http://intotheokavango.org" + path_to_data;
+    //console.log(url);
+    $.getJSON(url, function(data) {
+        var featureCollection = data['results'];
+        //console.log(featureCollection);
+        var sightingsWithGeoLoc = [];
+        
+        for (d in featureCollection.features) {
+            var item = featureCollection.features[d];
+            if(item.geometry === null) {
+                //console.log("sighting has no geometry");
+            } else {
+                //console.log("sighting with geometry");
+                sightingsWithGeoLoc.push(item);
+            }
+        }
+        //console.log(sightingsWithGeoLoc);
+        filteredFeatureCollection = {};
+        filteredFeatureCollection.features = sightingsWithGeoLoc;
+        filteredFeatureCollection.type = "FeatureCollection";
+
+        featureGroup = L.geoJson(filteredFeatureCollection, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, geojsonMarkerOptions);
+                
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
+            }
+        }).addTo(map);
+        L.control.scale().addTo(map);
+        map.fitBounds(featureGroup.getBounds());
+    }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
+}
+
+
+/* executes on load */
+$(document).ready(function() {
+    console.log("LOADING MAP");
+    loadData();
+    initMap();
+});
 
 ;
 
@@ -3844,7 +4379,7 @@ function Timeline(){
 		d3.selectAll('#timeline g.day')
 			.each(function(d,i){
 				var h = parseInt(d3.select(this).attr('transform').split(',')[1]);
-				if(Math.abs(h - cursorY) < 45 || i%labelSkip != 0){
+				if(Math.abs(h - cursorY) < 45 || (i%labelSkip != 0 && !milestones[i])){
 					if(!d3.select(this).classed('hidden')) d3.select(this).classed('hidden',true);
 				} else {
 					if(d3.select(this).classed('hidden')) d3.select(this).classed('hidden',false);
@@ -3948,7 +4483,7 @@ function Timeline(){
 	}
 
 	function checkUnzoom(force, reset){
-		if(mapWorld.focusMember){
+		if(mapWorld.focusMember && pages.active.id == 'map'){
 			for(var i=0; i<unzoomedTime.length; i++){
 				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
 				if(u) break;
@@ -3975,7 +4510,7 @@ function Timeline(){
 
 	function cullMarkersByDay(){
 		// beacon path is not culled
-		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons'];
+		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons', 'instagrams'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
 			for(var i=0; i<f.length; i++){
@@ -4321,26 +4856,32 @@ function initMapLabels(map){
 
 
 	Okavango 2015 front-end.
-	Please note I have been using the following javascript pattern: 
-	http://radar.oreilly.com/2014/03/javascript-without-the-this.html	
+	Please note I have been using the following javascript pattern:
+	http://radar.oreilly.com/2014/03/javascript-without-the-this.html
 
 	TODOS
 
-	- PM Joey
+	- revise night time pace when posts happen
+	- new label : "scroll to navigate through time"
+	- instagram
+	- gallery
+	- feature clustering
+	- feature loading
+	- better journal/map matching
+	- 'focus to member button'
+	- start on map page
+	- 'learn more!' label on first connection
+
+	- popup doesn't open to journal
 	- sometimes loading fails on map / journal
-	- colors + pattern on ambit_geo path
 	- complete instruction labels
-	- check popup click
-	- video
+	- low resolution ambit-geo in free mode
+
 	- videos
 	- redo layout for tweets on the map
 	- new milestones?
-
-
-	- remove markers on journal
 	- instagram
 	- remove non-core members + unfocus
-	- navigate map in free mode
 	- trail ambit
 	- click on popup doesn't open them
 	- multiple medium posts
@@ -4392,6 +4933,7 @@ var loader;
 var pages = {};
 var mapWorld;
 var tweetLayer;
+var instagramLayer;
 var photoLayer;
 var sightingLayer;
 var beaconLayer;
@@ -4418,7 +4960,8 @@ var timeOffsets = {
 		'timezone': 4,
 		'query': -1,
 		'departure': 3,
-		'startDate':0
+		'startDate':0,
+		'instagram':0
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -4428,7 +4971,8 @@ var timeOffsets = {
 		'timezone': 4,
 		'query': 0,
 		'departure': 3,
-		'startDate':-1
+		'startDate':-1,
+		'instagram':-1
 	}
 }
 
@@ -4459,15 +5003,13 @@ document.addEventListener('DOMContentLoaded', function(){
 	  else d3.select('#statusScreen img').remove();
 	})();
 
-
-	
 	mapTLatLng = new L.LatLng(-12.811059,18.175099);
 	mapLatLng = new L.LatLng(-12.811059,18.175099);
 
     mapWorld = new L.map('mapWorld', {
         layers: new L.TileLayer('http://a.tiles.mapbox.com/v3/' + mapbox_username + '.map-' + mapbox_map_id + '/{z}/{x}/{y}.png'),
         zoomControl: false,
-        autoPan: true,
+        autoPan: false,
         center:mapLatLng,
         attributionControl: false,
         doubleClickZoom: false,
@@ -4476,7 +5018,7 @@ document.addEventListener('DOMContentLoaded', function(){
         touchZoom: false,
         dragging: false,
         keyboard: false,
-        minZoom: 0,                    
+        minZoom: 0,
         maxZoom: 17,
         zoom:17,
         scrollWheelZoom:false
@@ -4485,6 +5027,7 @@ document.addEventListener('DOMContentLoaded', function(){
     initMapLabels(mapWorld);
 
     tweetLayer = new L.layerGroup().addTo(mapWorld);
+    instagramLayer = new L.layerGroup().addTo(mapWorld);
     photoLayer = new L.layerGroup().addTo(mapWorld);
     sightingLayer = new L.layerGroup().addTo(mapWorld);
     beaconLayer = new L.layerGroup().addTo(mapWorld);
@@ -4496,45 +5039,43 @@ document.addEventListener('DOMContentLoaded', function(){
     if(d3.selectAll('#navigation li')[0].length > 3){
 	    loader = Loader();
 	    pages.about = AboutPage('about');
-	    pages.map = MapPage('map');    
+	    pages.map = MapPage('map');
 	    pages.journal = JournalPage('journal');
 	    pages.data = DataPage('data');
 	    pages.share = Page('share');
 	    timeline = Timeline();
 		feed = Feed();
-	} else {
-		console.log('creating about');
-		pages.about = AboutPage('about');
-		pages.about.show();
 	}
+
     wanderer = Wanderer(mapWorld.getCenter());
 
-    if(d3.selectAll('#navigation li')[0].length > 3){
-		// pages.mapWorld.show();
-		pages.about.show();
-		setLayoutInteractions();
-		loader.getDayCount(function(dayCount,startDate,endDate){
-			timeline.setDates(dayCount,startDate);
-			loader.loadDay(timeline.getTimeCursor().day,function(day){
-				timeline.setTimeFrame();
-				feed.init(day);
-				timeline.init(day);
-				timeline.initGraphics();
-				timeline.initTimeCursor();
-				timeline.checkUnzoom(true);
-				isLoading = false;
-				updateLoadingScreen(false);
-				feed.jump(timeline.getTimeCursor());
-				loader.members['Steve'].focus();
-				animate(new Date().getTime()-16);
-			});
+    pages.active = pages.map;
+	pages.map.show();
+	// pages.about.show();
+	setLayoutInteractions();
+	loader.getDayCount(function(dayCount,startDate,endDate){
+		timeline.setDates(dayCount,startDate);
+		loader.loadDay(timeline.getTimeCursor().day,function(day){
+			timeline.setTimeFrame();
+			feed.init(day);
+			timeline.init(day);
+			timeline.initGraphics();
+			timeline.initTimeCursor();
+			timeline.checkUnzoom(true);
+			isLoading = false;
+			updateLoadingScreen(false);
+			feed.jump(timeline.getTimeCursor());
+			if(loader.members['Steve']) loader.members['Steve'].focus();
+			else {
+				for(var k in loader.members){
+					loader.members[k].focus();
+					break;
+				}
+			}
+			animate(new Date().getTime()-16);
 		});
-		
-	} else {
-		window.addEventListener('resize',resize);
-		resize();	
-		animate(new Date().getTime()-16);
-	}
+	});
+
 
 
 	function animate(lastFrameTime){
@@ -4547,40 +5088,52 @@ document.addEventListener('DOMContentLoaded', function(){
 			    if(pages.active.id == 'map' || pages.active.id == 'journal'){
 
 				    timeline.update(frameRate);
-					
+
 					var date = timeline.getTimeCursor();
-					var sightings = loader.getSightings();
-					if(sightings[date.day]){
-						var len = sightings[date.day].length;
-						for(var i=0; i<len; i++){
-							sightings[date.day][i].animate(date.current);
+
+					// if(!timeline.getPaused() && frameCount%5 == 0){
+					if(frameCount%5 == 0){
+						var sightings = loader.getSightings();
+						if(sightings[date.day]){
+							var len = sightings[date.day].length;
+							for(var i=0; i<len; i++){
+								sightings[date.day][i].animate(date.current);
+							}
+						}
+
+						var photos = loader.getPhotos();
+						if(photos[date.day]){
+							var len = photos[date.day].length;
+							for(var i=0; i<len; i++){
+								photos[date.day][i].animate(date.current);
+							}
+						}
+
+						var instagrams = loader.getInstagrams();
+						if(instagrams[date.day]){
+							var len = instagrams[date.day].length;
+							for(var i=0; i<len; i++){
+								instagrams[date.day][i].animate(date.current);
+							}
+						}
+
+						var tweets = loader.getTweets();
+						if(tweets[date.day]){
+							var len = tweets[date.day].length;
+							for(var i=0; i<len; i++){
+								tweets[date.day][i].animate(date.current);
+							}
+						}
+
+						var blogs = loader.getBlogs();
+						if(blogs[date.day]){
+							var len = blogs[date.day].length;
+							for(var i=0; i<len; i++){
+								blogs[date.day][i].animate(date.current);
+							}
 						}
 					}
 
-					var photos = loader.getPhotos();
-					if(photos[date.day]){
-						var len = photos[date.day].length;
-						for(var i=0; i<len; i++){
-							photos[date.day][i].animate(date.current);
-						}
-					}
-
-					var tweets = loader.getTweets();
-					if(tweets[date.day]){
-						var len = tweets[date.day].length;
-						for(var i=0; i<len; i++){
-							tweets[date.day][i].animate(date.current);
-						}
-					}
-
-					var blogs = loader.getBlogs();
-					if(blogs[date.day]){
-						var len = blogs[date.day].length;
-						for(var i=0; i<len; i++){
-							blogs[date.day][i].animate(date.current);
-						}
-					}
-					
 					for(m in loader.members){
 						var member = loader.members[m];
 						member.move(timeline.getTimeCursor(), {animate:false});
@@ -4613,8 +5166,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
 				} else {
 					wanderer.wander();
-			    	var target = wanderer.update();
-			    	mapWorld.panTo(new L.LatLng(target.y,target.x), {animate:false});
+		    	var target = wanderer.update();
+		    	mapWorld.panTo(new L.LatLng(target.y,target.x), {animate:false});
 				}
 			}
 		}
@@ -4622,7 +5175,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	}
 
 
-	function setLayoutInteractions(){	
+	function setLayoutInteractions(){
 
 		mapWorld.on('zoomend',function(e){
 			if(e.target._zoom < 15){
@@ -4636,7 +5189,7 @@ document.addEventListener('DOMContentLoaded', function(){
 					beaconPathLayer.addTo(mapWorld);
 				}
 			}
-		})		
+		})
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
@@ -4657,7 +5210,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		    		resize();
 		    	});
 	    }
-	    
+
 	    var lastPlayMode;
 	    var r2;
 	    var drag = d3.behavior.drag()
@@ -4706,6 +5259,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			    		timeline.togglePause(lastPlayMode?'pause':'play');
 			    	}
 			    	d3.select(this).classed('dragged',false);
+
 			    }
 		    });
 
@@ -4738,7 +5292,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    		mapWorld.setZoom(Math.round(Math.constrain(mapWorld.getZoom()+1,5,17)));
 	    		d3.event.stopPropagation();
 	    	});
-		
+
 		window.addEventListener('resize',resize);
 		resize();
 
@@ -4764,10 +5318,6 @@ document.addEventListener('DOMContentLoaded', function(){
 		if(pages.active.id == 'journal') feed.jump(true);
 		if(timeline) timeline.resize();
 	}
-
-
-	
-
 });
 
 
@@ -4779,6 +5329,7 @@ function teleportMap(){
 		// mapWorld.panTo(mapLatLng, {animate:false});
 	}
 }
+
 
 function getBodyHeight(){
 	var containerHeight = d3.select('#mapPage').node().parentNode.parentNode.clientHeight;
@@ -4821,5 +5372,3 @@ function updateLoadingScreen(force){
 		}
 	}
 }
-
-

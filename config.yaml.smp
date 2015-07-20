@@ -75,3 +75,5 @@ youtube:
     client_secret: 
 
 members: 
+
+geo_emails: None

@@ -119,7 +119,7 @@ def verify_geometry(data):
     delete = []
     try:
         for p, value in properties.items():
-            if p.lower().strip() == 'longitude' or p.lower().strip() == 'lon' or p.lower().strip() == 'lng':
+            if p.lower().strip() == 'longitude' or p.lower().strip() == 'lon' or p.lower().strip() == 'lng' or p.lower().strip() == 'long':
                 lon = value
                 delete.append(p)
             elif p.lower().strip() == 'latitude' or p.lower().strip() == 'lat':    

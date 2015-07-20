@@ -36,6 +36,10 @@ function Feed(){
 		for(var i=0; i<photos.length; i++){
 			if(photos[i].getMember() != null) newPosts.push(photos[i]);
 		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+		}
 		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();
 		});
@@ -88,7 +92,7 @@ function Feed(){
 			        			jump();
 			        		})
 		        	}
-	        	} else if(d.type == 'photo'){
+	        	} else if(d.type == 'photo' || d.type == 'instagram'){
 		        	d3.select(this).select('div.photo')
 		        		.append('img')
 		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
