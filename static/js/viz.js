@@ -402,7 +402,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     }
 
-    var makeTimeSeriesViz = function(parsedData,feature_type) {
+    var makeTimeSeriesViz = function(parsedData, feature_type) {
         //TIMESERIES VIZ
 
         var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
@@ -768,73 +768,148 @@ var d3Graph = function(timelineVizID, totalsVizID){
     }
 
 
-    var makeTotalsViz = function(data) {
+    var makeTotalsViz = function(data, feature_type) {
         console.log("MAKE TOTALS VIZ");
-
-        sortArrOfObjectsByParam(data, "total", false);
+        console.log("feature_type: " + feature_type);
+        
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
             width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
-            height = barHeight * data.length,
+            height = barHeight * 1.5 * data.length,
             left_width = 400;
 
-        var xScale = d3.scale.linear()
+        var graphTitle = "";
+
+        if (feature_type === 'sighting') {
+            sortArrOfObjectsByParam(data, "count", false);
+            graphTitle = "TOTAL SIGHTINGS";
+
+            var xScale = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d.count; })])
+            .range([0, width - (left_width + 80) ]);
+
+            console.log(data);
+
+            var yScale = d3.scale.ordinal()
+            .domain(data, function(d) { 
+                return d.species; 
+                console.log(d.species); //hmm it doesn't console anything
+            })
+            .rangeBands([60, height]);
+
+            console.log(data);
+
+            console.log(yScale.range());
+            var svg = d3.select("#timelineViz").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var title = svg.append("text")
+                .attr("x", 0)
+                .attr("y", 20)
+                .style("fill", "white")
+                .style("font-size", "18px")
+                .text(graphTitle);
+
+            
+            var bar = svg.selectAll("g")
+                    .data(data)
+                .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+            bar.append("rect")
+                .attr("x", left_width)
+                .attr("y", yScale)
+                .attr("width", function(d) { return xScale(d.count); })
+                .style("fill", "#4bff87")
+                .attr("height", barHeight - 1);
+
+            bar.append("text")
+                .attr("x", function(d) { return xScale(d.count) + 5 + left_width; })
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "beginning")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.count; });
+
+            bar.append("text")
+                .attr("x", left_width - 20)
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "end")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.species; });
+
+        } else if (feature_type === 'None') {
+            sortArrOfObjectsByParam(data, "total", false);
+
+            graphTitle = "TOTAL FEATURES";
+
+            var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
             .range([0, width - (left_width + 80) ]);
             console.log(data);
-            
-        var yScale = d3.scale.ordinal()
+
+            var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
                 return d.type; 
                 console.log(d.type); //hmm it doesn't console anything
             })
             .rangeBands([60, height]);
 
-        console.log(yScale.range());
-        var svg = d3.select("#timelineViz").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+            console.log(data);
 
-        var title = svg.append("text")
-            .attr("x", 0)
-            .attr("y", 20)
-            .style("fill", "white")
-            .style("font-size", "18px")
-            .text("TOTAL SIGHTINGS");
+            console.log(yScale.range());
 
-        
-        var bar = svg.selectAll("g")
-                .data(data)
-            .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+            var svg = d3.select("#timelineViz").append("svg")
+                .attr("width", width)
+                .attr("height", height);
 
-        bar.append("rect")
-            .attr("x", left_width)
-            .attr("y", yScale)
-            .attr("width", function(d) { return xScale(d.total); })
-            .style("fill", "#4bff87")
-            .attr("height", barHeight - 1);
+            var title = svg.append("text")
+                .attr("x", 0)
+                .attr("y", 20)
+                .style("fill", "white")
+                .style("font-size", "18px")
+                .text(graphTitle);
 
-        bar.append("text")
-            .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
-            //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2 + 60)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "beginning")
-            .attr("class", "label")
-              .style("fill", "white")
-            .text(function(d) { return d.total; });
+            
+            var bar = svg.selectAll("g")
+                    .data(data)
+                .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
-        bar.append("text")
-            .attr("x", left_width - 20)
-            //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2 + 60)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "end")
-            .attr("class", "label")
-              .style("fill", "white")
-            .text(function(d) { return d.type; });
+            bar.append("rect")
+                .attr("x", left_width)
+                .attr("y", yScale)
+                .attr("width", function(d) { return xScale(d.total); })
+                .style("fill", "#4bff87")
+                .attr("height", barHeight - 1);
+
+            bar.append("text")
+                .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "beginning")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.total; });
+
+            bar.append("text")
+                .attr("x", left_width - 20)
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "end")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.type; });
+        }
     }
 
     var hist = [];
@@ -964,7 +1039,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             }
             else{
                 //totalsVizDiv.fadeIn();
-                makeTotalsViz(featuresCountArray);
+                makeTotalsViz(featuresCountArray, "None");
             }
         });
     }
@@ -1029,7 +1104,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     }
                     console.log(speciesSightingsTotals);
                     //totalsVizDiv.fadeIn();
-                    makeTotalsViz(speciesSightingsTotals);
+                    makeTotalsViz(speciesSightingsTotals, feature_type);
                 }
                 
                 if (feature_type === "ambit") {
@@ -1123,7 +1198,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     } else {
 
                         getSpeciesCount(data.results.features);
-                        makeTotalsViz(speciesCountArray);
+                        makeTotalsViz(speciesCountArray, feature_type);
                         // console.log("these are the species");
                         // for(species in data.results) {
                             
