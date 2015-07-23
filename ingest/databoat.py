@@ -25,7 +25,7 @@ def parse(request):
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))
         return None, "Unexpected format"   
-    return data
+    return True
 
 
 """
