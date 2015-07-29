@@ -3397,9 +3397,10 @@ function Page(i){
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
-		if(id != 'about') {
+		// if(id != 'about') {
 			// pauseVimeoPlayer();
-		}
+		// }
+		d3.select('body').style('overflow',id=='about'?'auto':'hidden');
 	}
 
 
@@ -3575,6 +3576,7 @@ function GalleryPage(){
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
+		console.log('WAT');
 		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
@@ -3586,6 +3588,7 @@ function GalleryPage(){
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
 		d3.select('#mapPage div.logos').classed('hidden',true);
 		updateLoadingScreen(false);
+		d3.select('body').style('overflow','hidden');
 	}
 
 
@@ -3593,6 +3596,7 @@ function GalleryPage(){
 		page.getNode().classed('hidden',true);
 		page.button.classed('active',false);
 		page.node.select('.controls').classed('hidden',false);
+		d3.select('body').style('overflow','auto');
 	}
 
 	return page;
@@ -5553,7 +5557,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
-	    		if(i<4){
+	    		if(i<5){
 		    		var btn = d3.select(this);
 		    		var t = btn.text().toLowerCase();
 		    		pages.active.hide();

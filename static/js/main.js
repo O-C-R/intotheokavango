@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
-	    		if(i<4){
+	    		if(i<5){
 		    		var btn = d3.select(this);
 		    		var t = btn.text().toLowerCase();
 		    		pages.active.hide();
