@@ -132,6 +132,11 @@ function PhotoPost(feature, m){
 	var popupDelay = false;
 	var type = 'photo';
 
+	var thumbnailSize = [
+		size[0]/10,
+		size[1]/10
+	]
+
 	if(marker){
 		marker.addEventListener('popupclose',function(){
 			popupVisible = false;
@@ -152,7 +157,8 @@ function PhotoPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
-			notes: notes
+			notes: notes,
+			thumbnailSize: thumbnailSize
 		}
 	}
 
@@ -236,6 +242,11 @@ function InstagramPost(feature, m){
 	var popupDelay = false;
 	var type = 'instagram';
 
+	var thumbnailSize = [
+		size[0]/10,
+		size[1]/10
+	]
+
 	if(marker){
 		marker.addEventListener('popupclose',function(){
 			popupVisible = false;
@@ -256,6 +267,7 @@ function InstagramPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
+			thumbnailSize: thumbnailSize
 		}
 	}
 

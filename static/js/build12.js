@@ -439,7 +439,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     }
 
-    var makeTimeSeriesViz = function(parsedData,feature_type) {
+    var makeTimeSeriesViz = function(parsedData, feature_type) {
         //TIMESERIES VIZ
 
         var margin = {top: 70.5, right: 30, bottom: 60, left: 50.5},
@@ -805,73 +805,148 @@ var d3Graph = function(timelineVizID, totalsVizID){
     }
 
 
-    var makeTotalsViz = function(data) {
+    var makeTotalsViz = function(data, feature_type) {
         console.log("MAKE TOTALS VIZ");
-
-        sortArrOfObjectsByParam(data, "total", false);
+        console.log("feature_type: " + feature_type);
+        
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
             width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
-            height = barHeight * data.length,
+            height = barHeight * 1.5 * data.length,
             left_width = 400;
 
-        var xScale = d3.scale.linear()
+        var graphTitle = "";
+
+        if (feature_type === 'sighting') {
+            sortArrOfObjectsByParam(data, "count", false);
+            graphTitle = "TOTAL SIGHTINGS";
+
+            var xScale = d3.scale.linear()
+            .domain([0, d3.max(data, function(d) { return d.count; })])
+            .range([0, width - (left_width + 80) ]);
+
+            console.log(data);
+
+            var yScale = d3.scale.ordinal()
+            .domain(data, function(d) { 
+                return d.species; 
+                console.log(d.species); //hmm it doesn't console anything
+            })
+            .rangeBands([60, height]);
+
+            console.log(data);
+
+            console.log(yScale.range());
+            var svg = d3.select("#timelineViz").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var title = svg.append("text")
+                .attr("x", 0)
+                .attr("y", 20)
+                .style("fill", "white")
+                .style("font-size", "18px")
+                .text(graphTitle);
+
+            
+            var bar = svg.selectAll("g")
+                    .data(data)
+                .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+            bar.append("rect")
+                .attr("x", left_width)
+                .attr("y", yScale)
+                .attr("width", function(d) { return xScale(d.count); })
+                .style("fill", "#4bff87")
+                .attr("height", barHeight - 1);
+
+            bar.append("text")
+                .attr("x", function(d) { return xScale(d.count) + 5 + left_width; })
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "beginning")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.count; });
+
+            bar.append("text")
+                .attr("x", left_width - 20)
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "end")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.species; });
+
+        } else if (feature_type === 'None') {
+            sortArrOfObjectsByParam(data, "total", false);
+
+            graphTitle = "TOTAL FEATURES";
+
+            var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
             .range([0, width - (left_width + 80) ]);
             console.log(data);
-            
-        var yScale = d3.scale.ordinal()
+
+            var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
                 return d.type; 
                 console.log(d.type); //hmm it doesn't console anything
             })
             .rangeBands([60, height]);
 
-        console.log(yScale.range());
-        var svg = d3.select("#timelineViz").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+            console.log(data);
 
-        var title = svg.append("text")
-            .attr("x", 0)
-            .attr("y", 20)
-            .style("fill", "white")
-            .style("font-size", "18px")
-            .text("TOTAL SIGHTINGS");
+            console.log(yScale.range());
 
-        
-        var bar = svg.selectAll("g")
-                .data(data)
-            .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+            var svg = d3.select("#timelineViz").append("svg")
+                .attr("width", width)
+                .attr("height", height);
 
-        bar.append("rect")
-            .attr("x", left_width)
-            .attr("y", yScale)
-            .attr("width", function(d) { return xScale(d.total); })
-            .style("fill", "#4bff87")
-            .attr("height", barHeight - 1);
+            var title = svg.append("text")
+                .attr("x", 0)
+                .attr("y", 20)
+                .style("fill", "white")
+                .style("font-size", "18px")
+                .text(graphTitle);
 
-        bar.append("text")
-            .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
-            //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2 + 60)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "beginning")
-            .attr("class", "label")
-              .style("fill", "white")
-            .text(function(d) { return d.total; });
+            
+            var bar = svg.selectAll("g")
+                    .data(data)
+                .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
-        bar.append("text")
-            .attr("x", left_width - 20)
-            //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
-            .attr("y", barHeight / 2 + 60)
-            .attr("dy", "0.35em")
-            .attr("text-anchor", "end")
-            .attr("class", "label")
-              .style("fill", "white")
-            .text(function(d) { return d.type; });
+            bar.append("rect")
+                .attr("x", left_width)
+                .attr("y", yScale)
+                .attr("width", function(d) { return xScale(d.total); })
+                .style("fill", "#4bff87")
+                .attr("height", barHeight - 1);
+
+            bar.append("text")
+                .attr("x", function(d) { return xScale(d.total) + 5 + left_width; })
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "beginning")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.total; });
+
+            bar.append("text")
+                .attr("x", left_width - 20)
+                //.attr("y", function(d) { return yScale(d) + yScale.rangeBand()/2; })
+                .attr("y", barHeight / 2 + 60)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "end")
+                .attr("class", "label")
+                  .style("fill", "white")
+                .text(function(d) { return d.type; });
+        }
     }
 
     var hist = [];
@@ -1001,7 +1076,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             }
             else{
                 //totalsVizDiv.fadeIn();
-                makeTotalsViz(featuresCountArray);
+                makeTotalsViz(featuresCountArray, "None");
             }
         });
     }
@@ -1066,7 +1141,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     }
                     console.log(speciesSightingsTotals);
                     //totalsVizDiv.fadeIn();
-                    makeTotalsViz(speciesSightingsTotals);
+                    makeTotalsViz(speciesSightingsTotals, feature_type);
                 }
                 
                 if (feature_type === "ambit") {
@@ -1160,7 +1235,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     } else {
 
                         getSpeciesCount(data.results.features);
-                        makeTotalsViz(speciesCountArray);
+                        makeTotalsViz(speciesCountArray, feature_type);
                         // console.log("these are the species");
                         // for(species in data.results) {
                             
@@ -2553,6 +2628,11 @@ function PhotoPost(feature, m){
 	var popupDelay = false;
 	var type = 'photo';
 
+	var thumbnailSize = [
+		size[0]/10,
+		size[1]/10
+	]
+
 	if(marker){
 		marker.addEventListener('popupclose',function(){
 			popupVisible = false;
@@ -2573,7 +2653,8 @@ function PhotoPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
-			notes: notes
+			notes: notes,
+			thumbnailSize: thumbnailSize
 		}
 	}
 
@@ -2657,6 +2738,11 @@ function InstagramPost(feature, m){
 	var popupDelay = false;
 	var type = 'instagram';
 
+	var thumbnailSize = [
+		size[0]/10,
+		size[1]/10
+	]
+
 	if(marker){
 		marker.addEventListener('popupclose',function(){
 			popupVisible = false;
@@ -2677,6 +2763,7 @@ function InstagramPost(feature, m){
 			size: size,
 			setFeedPos: setFeedPos,
 			height: height,
+			thumbnailSize: thumbnailSize
 		}
 	}
 
@@ -3045,6 +3132,220 @@ function SoundPost(feature, m){
 ;
 
 /*
+	Describes the journal page's feed.
+*/
+
+
+function Gallery(){
+
+	var node = d3.select('#gallery');
+	node.on('wheel', scroll);
+	var postsByDay = [];
+	var allPosts = [];
+	var posts;
+	var loading = false;
+	var focused = false;
+	var focusImg;
+
+	d3.select('#galleryFocus')
+	    .on('click', function(){
+	    	d3.select(this)
+	    		.transition()
+	    		.duration(150)
+	    		.style('opacity',0)
+	    		.each('end',function(){
+	    			d3.select(this)
+	    				.style('display','none');
+	    			d3.select('#galleryPage').classed('focused',false);
+	    			focused = false;
+	    		})
+	    });
+
+	d3.select('#galleryFocus img')
+	    .on('click', function(){
+	    	d3.event.stopPropagation();
+	    });
+
+	function init(day){
+		
+		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+		var newPosts = [];
+		var photos = loader.getPhotos()[day];
+		for(var i=0; i<photos.length; i++){
+			if(photos[i].getMember() != null) newPosts.push(photos[i]);
+		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+		}
+		newPosts.sort(function(a, b){
+			return b.getData().date.getTime() - a.getData().date.getTime();
+		});
+		postsByDay[day] = newPosts;
+		allPosts = allPosts.concat(newPosts);
+		allPosts.sort(function(a, b){
+			return b.getData().date.getTime() - a.getData().date.getTime();
+		});
+
+		posts = node.selectAll('div.post')
+	        .data(allPosts, function(d){ 
+	        	d = d.getData();
+	        	return d.date.getTime() + '-' + d.latLng.lat;
+	        })
+
+	    posts.enter()
+	        .append('div')
+	        .attr("class", function(d) { return ' post brick ' + d.getData().type; })
+	        .each(function(d,i){
+	        	d = d.getData();
+	        	var t = new Date(offsetTimezone(d.date.getTime()));
+	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this)
+	        		.append('img')
+	        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+	        		.attr('alt','Photo taken on ' + t)
+	        		.on('click',function(){startFocus(d.photoUrl)});
+
+	        	var that = this;
+	        	requestAnimationFrame(function(){
+	        		d3.select(that).classed('visible',true);
+	        	})
+	        });
+
+		posts.order();
+
+		resize(posts);
+		window.addEventListener("resize", function(){resize(posts)});
+
+	}
+
+	function startFocus(url){
+
+		d3.select('#galleryPage').classed('focused',true);
+
+		d3.select('#galleryFocus')
+			.style('display','block')
+			.style('margin-top',d3.select('#galleryPage').node().scrollTop +'px')
+
+		focusImg = new Image();
+		focusImg.onload = function(){
+			d3.select('#galleryFocus').select('img')
+				.attr('src','http://intotheokavango.org'+url);
+			resizeFocus();
+		}
+		focusImg.src = 'http://intotheokavango.org'+url;
+
+		requestAnimationFrame(function(){
+			d3.select('#galleryFocus')
+				.transition()
+				.duration(150)
+				.style('opacity',1)
+		});
+
+		focused = true;
+	}
+
+
+	function resize(bricks) {
+
+		var outerWidth = d3.select('body').node().clientWidth;
+
+		var masonic = d3.masonic()
+			.width(function(d) { 
+				var w = d.getData().size[0];
+				var h = d.getData().size[1];
+				if(w >= h){
+					w = outerWidth*0.0833*3;
+				} else {
+					w *= (outerWidth*0.0833*3)/h;
+					h = outerWidth*0.0833*3;
+				}
+				return w;
+			})
+			.height(function(d) { 
+				var w = d.getData().size[0];
+				var h = d.getData().size[1];
+				if(w >= h){
+					h *= (outerWidth*0.0833*3)/w;
+					w = outerWidth*0.0833*3;
+				} else {
+					h = outerWidth*0.0833*3;
+				}
+				return h;
+			})
+			.columnWidth(outerWidth*0.0833*3);
+
+		masonic
+			.outerWidth(outerWidth)
+			.reset();
+
+		bricks
+			.datum(masonic)
+			.style("width", function(d) { return d.width + "px"; })
+			.style("height", function(d) { return d.height + "px"; })
+			.style("left", function(d) { return d.x + "px"; })
+			.style("top", function(d) { return d.y + "px"; })
+			.datum(function(d) {
+				return d.data;
+			});
+		node.style("height", masonic.outerHeight() + "px");
+
+	}	
+
+
+	function resizeFocus(){
+
+		if(focused){
+			var focusImage = d3.select('#galleryFocus img');
+			var outerWidth = window.innerWidth;
+			outerWidth -= outerWidth*(0.0833*2);
+			var outerHeight = window.innerHeight -155;
+			var w = focusImg.width;
+			var h = focusImg.height;
+
+			if(w/outerWidth >= h/outerHeight){
+				var width = Math.min(w,outerWidth);
+				focusImage.style('width', width);
+			} else {
+				var height = Math.min(h,outerHeight);
+				focusImage.style('height', height +'px');
+			}
+		}
+
+	}
+
+
+
+	function scroll(){
+		var y = d3.select('#galleryPage').node().scrollTop;
+		var h = node.node().clientHeight;
+		if(y + window.innerHeight > h - 200 + 85 && !loading){
+			var photos = loader.getPhotos();
+			for(var i=photos.length-1; i>=0; i--){
+				if(!photos[i]){
+					loader.loadGallery(i,function(){
+						init(i);
+						loading = false;
+					});
+					break;
+				}
+			}
+			loading = true;
+		}
+	}
+
+	
+
+	return{
+		init: init,
+		resize: resize
+	};
+}
+
+;
+
+/*
 	Several classes handling website's pages and tabs/panes
 */
 
@@ -3077,7 +3378,6 @@ function AboutPage(){
 
 	return page;
 }
-
 
 
 
@@ -3263,6 +3563,41 @@ function PagePane(i){
 	};
 }
 
+
+
+
+function GalleryPage(){
+
+	// Extends Page
+	var page = Page('gallery');
+
+	page.id = 'gallery';
+	page.button = d3.select('#navigation li.' + page.id);
+
+	page.show = function(){
+		var lastActive = pages.active;
+		page.getNode().classed('hidden',false);
+		page.button.classed('active',true);
+		pages.active = this;
+		page.offsetHeader(page.id=='about');
+		if(timeline) timeline.togglePause('pause');
+		page.header.classed('dark',false);
+		page.node.select('.controls').classed('hidden',true);
+		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
+		d3.select('#mapPage div.logos').classed('hidden',true);
+		updateLoadingScreen(false);
+	}
+
+
+	page.hide = function(){
+		page.getNode().classed('hidden',true);
+		page.button.classed('active',false);
+		page.node.select('.controls').classed('hidden',false);
+	}
+
+	return page;
+}
+
 ;
 
 /*
@@ -3311,7 +3646,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 8;
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
@@ -3336,7 +3671,21 @@ function Loader(){
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
-		loadBeacons(day, checkForCompletion);
+		// loadBeacons(day, checkForCompletion);
+	}
+
+
+	function loadGallery(day, callback) {
+		var toBeCompleted = 2;
+		function checkForCompletion(){
+			toBeCompleted --;
+			if(toBeCompleted == 0) callback(day);
+		}
+
+		if(!photos[day] || photos[day].length == 0) photos[day] = [];
+		if(!instagrams[day] || instagrams[day].length == 0) instagrams[day] = [];
+		loadPhotos(day, checkForCompletion);
+		loadInstagrams(day, checkForCompletion);
 	}
 
 
@@ -3581,6 +3930,8 @@ function Loader(){
 
 	function loadPhotos(day, callback){
 
+		if(photos[day] && photos[day].length > 0) return callback(); 
+
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconPhoto.png',
 	        shadowUrl: '../static/img/featureIconShadow.png',
@@ -3637,6 +3988,8 @@ function Loader(){
 
 
 	function loadInstagrams(day, callback){
+
+		if(instagrams[day] && instagrams[day].length > 0) return callback(); 
 
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconPhoto.png',
@@ -3897,6 +4250,7 @@ function Loader(){
 
 	return {
 		loadDay: loadDay,
+		loadGallery: loadGallery,
 		members: members,
 		getBlogs: getBlogs,
 		getSounds: getSounds,
@@ -4509,7 +4863,6 @@ function Timeline(){
 	}
 
 	function cullMarkersByDay(){
-		// beacon path is not culled
 		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons', 'instagrams'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];
@@ -4861,6 +5214,7 @@ function initMapLabels(map){
 
 	TODOS
 
+	
 	- revise night time pace when posts happen
 	- new label : "scroll to navigate through time"
 	- instagram
@@ -4943,6 +5297,7 @@ var soundLayer;
 var ambitLayer;
 var timeline;
 var feed;
+var gallery;
 var wanderer;
 var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
@@ -5041,23 +5396,26 @@ document.addEventListener('DOMContentLoaded', function(){
 	    pages.about = AboutPage('about');
 	    pages.map = MapPage('map');
 	    pages.journal = JournalPage('journal');
+	    pages.gallery = Page('gallery');
 	    pages.data = DataPage('data');
 	    pages.share = Page('share');
 	    timeline = Timeline();
 		feed = Feed();
+		gallery = Gallery();
 	}
 
     wanderer = Wanderer(mapWorld.getCenter());
 
+	// pages.about.show();
     pages.active = pages.map;
 	pages.map.show();
-	// pages.about.show();
 	setLayoutInteractions();
 	loader.getDayCount(function(dayCount,startDate,endDate){
 		timeline.setDates(dayCount,startDate);
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
 			timeline.setTimeFrame();
 			feed.init(day);
+			gallery.init(day);
 			timeline.init(day);
 			timeline.initGraphics();
 			timeline.initTimeCursor();
@@ -5164,6 +5522,8 @@ document.addEventListener('DOMContentLoaded', function(){
 					d3.select('#mapWorld div#night').style('transform',matrix);
 					d3.select('#mapWorld div#night').style('-webkit-transform',matrix);
 
+				} else if(pages.active.id == 'gallery'){
+					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 				} else {
 					wanderer.wander();
 		    	var target = wanderer.update();
