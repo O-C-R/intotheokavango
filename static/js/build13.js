@@ -1030,24 +1030,47 @@ var d3Graph = function(timelineVizID, totalsVizID){
     //get the totals for all sightings, or species and counts - then draw a totals bar chart viz
     //first get the array of species names from the api
     var species = [];
-    var getSpeciesSightingsTotals = function() {
-        var speciesUrl = "http://intotheokavango.org/api/species";
-        d3.json(speciesUrl, function(error, data) {
+    // var getSpeciesSightingsTotals = function() {
+    //     var speciesUrl = "http://intotheokavango.org/api/species";
+    //     d3.json(speciesUrl, function(error, data) {
             
-        })
-    }
+    //     })
+    // }
 
     var speciesCountObj = {};
     var speciesCountArray = [];
 
     var getSpeciesCount = function(sightings) {
-
+        console.log(speciesCountObj);
             for (var i = 0; i < sightings.length; ++i) {
-                if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
-                    speciesCountObj[sightings[i].properties.SpeciesName] = 0;
-                    console.log("doesn't have species property");
-                }
-                speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+                // if(sightings[i].properties.SpeciesName === 'Reed Cormorant') {
+
+                    if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
+                        speciesCountObj[sightings[i].properties.SpeciesName] = sightings[i].properties.Count;
+                        //speciesCountObj[sightings[i].properties.SpeciesName] = 1;
+                        // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
+                        // console.log(sightings[i].properties.SpeciesName);
+                        // console.log(sightings[i].properties.Count);
+                        console.log("-----i is: " + i);
+                        console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
+                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // console.log("i: " + i);
+                        console.log(speciesCountObj);
+                    } else {
+                        speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+                        //speciesCountObj[sightings[i].properties.SpeciesName] += 1;
+                        // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
+                        // console.log(sightings[i].properties.SpeciesName);
+                        // console.log(sightings[i].properties.Count);
+                        console.log("-----i is: " + i);
+                        console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
+                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // console.log("i: " + i);
+                        console.log(speciesCountObj);
+                    } 
+                // }
+                
+                
             }
             console.log(Object.keys(speciesCountObj));
 
@@ -1057,6 +1080,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 myObj.count  = speciesCountObj[s];
                 speciesCountArray.push(myObj);
             }
+            console.log(speciesCountArray.length);
             console.log(speciesCountArray);
         }
 
@@ -4298,6 +4322,58 @@ function initMap () {
     //console.log("zoom level: " + zoomLevel); 
 }
 
+function initMapLabels(map) {
+    L.CircleMarker.include({
+        bindLabel: function (content, options) {
+            if (!this._label || this._label.options !== options) {
+                this._label = new L.Label(options, this);
+            }
+            if (!this.label || this.label.options !== options) {
+                this.label = new L.Label(options, this);
+            }
+            this._map = map;
+            this.label.setContent(content);
+            this._labelNoHide = options && options.noHide;
+            if (!this._showLabelAdded) {
+                if (this._labelNoHide) {
+                    this
+                        .on('remove', this.hideLabel, this)
+                        .on('move', this._moveLabel, this);
+                    this._showLabel({latlng: this.getLatLng()});
+                } else {
+                    this
+                        .on('mouseover', this._showLabel, this)
+                        .on('mousemove', this._moveLabel, this)
+                        .on('mouseout remove', this._hideLabel, this);
+                    if (L.Browser.touch) {
+                        this.on('click', this._showLabel, this);
+                    }
+                }
+                this._showLabelAdded = true;
+            }
+            return this;
+        },
+        unbindLabel: function() {
+            if (this._label) {
+                this._hideLabel();
+                this._label = null;
+                this._showLabelAdded = false;
+                if (this._labelNoHide) {
+                    this
+                        .off('remove', this._hideLabel, this)
+                        .off('move', this._moveLabel, this);
+                } else {
+                    this
+                        .off('mouseover', this._showLabel, this)
+                        .off('mousemove', this._moveLabel, this)
+                        .off('mouseout remove', this._hideLabel, this);
+                }
+            }
+            return this;
+        }
+    });
+}
+
 var geojsonMarkerOptions = {
     radius: 5,
     fillColor: "#4BFF87",
@@ -4343,6 +4419,7 @@ function loadData () {
         }).addTo(map);
         L.control.scale().addTo(map);
         map.fitBounds(featureGroup.getBounds());
+        initMapLabels(map);
     }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
 }
 
