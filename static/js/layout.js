@@ -36,7 +36,6 @@ function AboutPage(){
 
 
 
-
 function Page(i){
 
 	var id = i;
@@ -53,9 +52,10 @@ function Page(i){
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
-		if(id != 'about') {
+		// if(id != 'about') {
 			// pauseVimeoPlayer();
-		}
+		// }
+		d3.select('body').style('overflow',id=='about'?'auto':'hidden');
 	}
 
 
@@ -217,5 +217,43 @@ function PagePane(i){
 		show: show,
 		hide: hide
 	};
+}
+
+
+
+
+function GalleryPage(){
+
+	// Extends Page
+	var page = Page('gallery');
+
+	page.id = 'gallery';
+	page.button = d3.select('#navigation li.' + page.id);
+
+	page.show = function(){
+		console.log('WAT');
+		var lastActive = pages.active;
+		page.getNode().classed('hidden',false);
+		page.button.classed('active',true);
+		pages.active = this;
+		page.offsetHeader(page.id=='about');
+		if(timeline) timeline.togglePause('pause');
+		page.header.classed('dark',false);
+		page.node.select('.controls').classed('hidden',true);
+		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
+		d3.select('#mapPage div.logos').classed('hidden',true);
+		updateLoadingScreen(false);
+		d3.select('body').style('overflow','hidden');
+	}
+
+
+	page.hide = function(){
+		page.getNode().classed('hidden',true);
+		page.button.classed('active',false);
+		page.node.select('.controls').classed('hidden',false);
+		d3.select('body').style('overflow','auto');
+	}
+
+	return page;
 }
 

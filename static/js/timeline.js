@@ -320,7 +320,6 @@ function Timeline(){
 	}
 
 	function cullMarkersByDay(){
-		// beacon path is not culled
 		var features = ['sightings', 'tweets', 'photos', 'blogs', 'beacons', 'instagrams'];
 		for(var k=0; k<features.length; k++){
 			var f = loader.getFeatures()[features[k]];

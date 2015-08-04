@@ -14,20 +14,26 @@ def main():
     log.info("Updating features with a Member...")
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}, 'properties.Member': {'$ne': None}})
     for feature in features:
-        if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
-            continue
-        log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
-        feature = estimate_geometry(feature, db)
-        db.features.update({"_id" : feature['_id']}, feature)
+        try:
+            if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
+                continue
+            log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
+            feature = estimate_geometry(feature, db)
+            db.features.update({"_id" : feature['_id']}, feature)
+        except Exception as e:
+            log.error(log.exc(e))
 
     # for non-member data, just tag it to the beacons
     log.info("Updating features without a Member...")
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'beacon'}, 'properties.Member': {'$eq': None}})
     for feature in features:
-        if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
-            continue
-        log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
-        feature = estimate_geometry(feature, db)
-        db.features.update({"_id" : feature['_id']}, feature)
+        try:
+            if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
+                continue
+            log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
+            feature = estimate_geometry(feature, db)
+            db.features.update({"_id" : feature['_id']}, feature)
+        except Exception as e:
+            log.error(log.exc(e))
 
 main()

@@ -46,7 +46,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 8;
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
@@ -71,7 +71,21 @@ function Loader(){
 		loadSightings(day, checkForCompletion);
 		loadBlogPosts(day, checkForCompletion);
 		loadSoundPosts(day, checkForCompletion);
-		loadBeacons(day, checkForCompletion);
+		// loadBeacons(day, checkForCompletion);
+	}
+
+
+	function loadGallery(day, callback) {
+		var toBeCompleted = 2;
+		function checkForCompletion(){
+			toBeCompleted --;
+			if(toBeCompleted == 0) callback(day);
+		}
+
+		if(!photos[day] || photos[day].length == 0) photos[day] = [];
+		if(!instagrams[day] || instagrams[day].length == 0) instagrams[day] = [];
+		loadPhotos(day, checkForCompletion);
+		loadInstagrams(day, checkForCompletion);
 	}
 
 
@@ -316,6 +330,8 @@ function Loader(){
 
 	function loadPhotos(day, callback){
 
+		if(photos[day] && photos[day].length > 0) return callback(); 
+
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconPhoto.png',
 	        shadowUrl: '../static/img/featureIconShadow.png',
@@ -372,6 +388,8 @@ function Loader(){
 
 
 	function loadInstagrams(day, callback){
+
+		if(instagrams[day] && instagrams[day].length > 0) return callback(); 
 
 		var markerIcon = L.icon({
 	        iconUrl: '../static/img/featureIconPhoto.png',
@@ -632,6 +650,7 @@ function Loader(){
 
 	return {
 		loadDay: loadDay,
+		loadGallery: loadGallery,
 		members: members,
 		getBlogs: getBlogs,
 		getSounds: getSounds,

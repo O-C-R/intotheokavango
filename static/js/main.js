@@ -9,6 +9,7 @@
 
 	TODOS
 
+	
 	- revise night time pace when posts happen
 	- new label : "scroll to navigate through time"
 	- instagram
@@ -91,6 +92,7 @@ var soundLayer;
 var ambitLayer;
 var timeline;
 var feed;
+var gallery;
 var wanderer;
 var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
@@ -189,10 +191,12 @@ document.addEventListener('DOMContentLoaded', function(){
 	    pages.about = AboutPage('about');
 	    pages.map = MapPage('map');
 	    pages.journal = JournalPage('journal');
+	    pages.gallery = Page('gallery');
 	    pages.data = DataPage('data');
 	    pages.share = Page('share');
 	    timeline = Timeline();
 		feed = Feed();
+		gallery = Gallery();
 	}
 
     wanderer = Wanderer(mapWorld.getCenter());
@@ -206,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
 			timeline.setTimeFrame();
 			feed.init(day);
+			gallery.init(day);
 			timeline.init(day);
 			timeline.initGraphics();
 			timeline.initTimeCursor();
@@ -312,6 +317,8 @@ document.addEventListener('DOMContentLoaded', function(){
 					d3.select('#mapWorld div#night').style('transform',matrix);
 					d3.select('#mapWorld div#night').style('-webkit-transform',matrix);
 
+				} else if(pages.active.id == 'gallery'){
+					d3.select('#mapWorld div.scrollPane').node().scrollTop = 2000;
 				} else {
 					wanderer.wander();
 		    	var target = wanderer.update();
@@ -341,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
-	    		if(i<4){
+	    		if(i<5){
 		    		var btn = d3.select(this);
 		    		var t = btn.text().toLowerCase();
 		    		pages.active.hide();
