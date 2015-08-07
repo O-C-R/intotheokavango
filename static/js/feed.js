@@ -34,11 +34,13 @@ function Feed(){
 		newPosts = newPosts.concat(loader.getSounds()[day]);
 		var photos = loader.getPhotos()[day];
 		for(var i=0; i<photos.length; i++){
-			if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			newPosts.push(photos[i]);
 		}
 		var instagrams = loader.getInstagrams()[day];
 		for(var i=0; i<instagrams.length; i++){
-			if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			newPosts.push(instagrams[i]);
 		}
 		newPosts.sort(function(a, b){
 			return a.getData().date.getTime() - b.getData().date.getTime();

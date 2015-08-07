@@ -353,12 +353,14 @@ function Loader(){
 			data = data.results;
 		    L.geoJson(data.features, {
 		        filter: function(feature, layer) {
-		        	if(!feature.properties.Dimensions) return false;
-		            if(feature.properties.Member == null){
-			            var photo = PhotoPost(feature);
-				        if(photo) photos[day].push(photo);
-				        return false;
-		            } else return true;
+		        	// if(!feature.properties.Dimensions) return false;
+		          //   if(feature.properties.Member == null){
+			         //    var photo = PhotoPost(feature);
+				        // if(photo) photos[day].push(photo);
+				        // return false;
+		          //   } else return true;
+		         	// return true
+		         	return feature.properties.Dimensions
 		        },
 		        onEachFeature: function(feature, layer){
                 	var photoUrl = feature.properties.Url;
@@ -378,7 +380,9 @@ function Loader(){
 	                    var marker = L.marker(latlng2, markerOptions);
 	                    tweetLayer.addLayer(marker);
 	                    var photo = PhotoPost(feature, marker);
+	                    // console.log(day, 'AGA1')
 				        if(photo) photos[day].push(photo);
+	                    // console.log(day, 'AGA2', photos[day].length)
 	                    return marker;
                 }
 		    });

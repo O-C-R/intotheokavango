@@ -9,65 +9,16 @@
 
 	TODOS
 
-	
+	- sometimes loading fails on map / journal
+	- linkability	
 	- revise night time pace when posts happen
 	- new label : "scroll to navigate through time"
-	- instagram
-	- gallery
 	- feature clustering
-	- feature loading
 	- better journal/map matching
 	- 'focus to member button'
 	- start on map page
 	- 'learn more!' label on first connection
-
-	- popup doesn't open to journal
-	- sometimes loading fails on map / journal
-	- complete instruction labels
-	- low resolution ambit-geo in free mode
-
 	- videos
-	- redo layout for tweets on the map
-	- new milestones?
-	- instagram
-	- remove non-core members + unfocus
-	- trail ambit
-	- click on popup doesn't open them
-	- multiple medium posts
-	- sometimes the journal doesnt load neighboring days
-	- culling
-	- linkable features
-	- gallery page
-
-	- IE
-	- Firefox
-	- away marker
-	- label scroll for zoom vs time
-	- click on icons to open popups
-	- refine medium popup
-	- actual names for timeline labels
-	- remove link at the end of image tweets
-	- highlight pause button
-	- add video features
-	- live mode
-	- linkable features and pages
-	- sightings taxonomy color
-	- scroll map while hovering a marker
-	- test resolution query
-	- stacked features on map view
-	- clicking on popups should open journal on right time
-	- dim out zoom buttons when max zoom is reached
-	- togglePause highlight on map
-	- highlight journal in header nav on new contents
-	- transitions between pages
-	- fix trail in about page
-	- core features?
-	- add location to post meta + link
-	- API error handling
-	- scrollbar event for feed navigation?
-	- remove global functions/variables
-	- margin journal alignment with timeline + 35px
-	- dim out night sections of timeline
 
 */
 
