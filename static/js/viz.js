@@ -993,24 +993,47 @@ var d3Graph = function(timelineVizID, totalsVizID){
     //get the totals for all sightings, or species and counts - then draw a totals bar chart viz
     //first get the array of species names from the api
     var species = [];
-    var getSpeciesSightingsTotals = function() {
-        var speciesUrl = "http://intotheokavango.org/api/species";
-        d3.json(speciesUrl, function(error, data) {
+    // var getSpeciesSightingsTotals = function() {
+    //     var speciesUrl = "http://intotheokavango.org/api/species";
+    //     d3.json(speciesUrl, function(error, data) {
             
-        })
-    }
+    //     })
+    // }
 
     var speciesCountObj = {};
     var speciesCountArray = [];
 
     var getSpeciesCount = function(sightings) {
-
+        console.log(speciesCountObj);
             for (var i = 0; i < sightings.length; ++i) {
-                if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
-                    speciesCountObj[sightings[i].properties.SpeciesName] = 0;
-                    console.log("doesn't have species property");
-                }
-                speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+                // if(sightings[i].properties.SpeciesName === 'Reed Cormorant') {
+
+                    if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
+                        speciesCountObj[sightings[i].properties.SpeciesName] = sightings[i].properties.Count;
+                        //speciesCountObj[sightings[i].properties.SpeciesName] = 1;
+                        // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
+                        // console.log(sightings[i].properties.SpeciesName);
+                        // console.log(sightings[i].properties.Count);
+                        console.log("-----i is: " + i);
+                        console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
+                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // console.log("i: " + i);
+                        console.log(speciesCountObj);
+                    } else {
+                        speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+                        //speciesCountObj[sightings[i].properties.SpeciesName] += 1;
+                        // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
+                        // console.log(sightings[i].properties.SpeciesName);
+                        // console.log(sightings[i].properties.Count);
+                        console.log("-----i is: " + i);
+                        console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
+                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // console.log("i: " + i);
+                        console.log(speciesCountObj);
+                    } 
+                // }
+                
+                
             }
             console.log(Object.keys(speciesCountObj));
 
@@ -1020,6 +1043,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 myObj.count  = speciesCountObj[s];
                 speciesCountArray.push(myObj);
             }
+            console.log(speciesCountArray.length);
             console.log(speciesCountArray);
         }
 
