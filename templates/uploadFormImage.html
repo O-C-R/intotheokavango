@@ -15,6 +15,7 @@ $(document).ready(function() {
     $('#add-button').on('click', function () {
                 var data = new FormData();
                 var image = $("#Photo").get(0).files;
+                var progressElem = $('#progressCounter');
 
                 var j = $('#upload').serializeJSON();
                 console.log(j);

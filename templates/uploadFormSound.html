@@ -16,6 +16,7 @@ $(document).ready(function() {
     $('#add-button').on('click', function () {
                 var data = new FormData();
                 var files = $("#File").get(0).files;
+                var progressElem = $('#progressCounter');
 
                 // Add the uploaded file content to the form data collection
                 data.append('ImageCount', files.length);
