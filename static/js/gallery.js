@@ -42,11 +42,13 @@ function Gallery(){
 		var newPosts = [];
 		var photos = loader.getPhotos()[day];
 		for(var i=0; i<photos.length; i++){
-			if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			newPosts.push(photos[i]);
 		}
 		var instagrams = loader.getInstagrams()[day];
 		for(var i=0; i<instagrams.length; i++){
-			if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			newPosts.push(instagrams[i]);
 		}
 		newPosts.sort(function(a, b){
 			return b.getData().date.getTime() - a.getData().date.getTime();
@@ -86,6 +88,8 @@ function Gallery(){
 
 		resize(posts);
 		window.addEventListener("resize", function(){resize(posts)});
+
+		if(newPosts.length < 5) loadNewBatch();
 
 	}
 
@@ -190,18 +194,22 @@ function Gallery(){
 		var y = d3.select('#galleryPage').node().scrollTop;
 		var h = node.node().clientHeight;
 		if(y + window.innerHeight > h - 200 + 85 && !loading){
-			var photos = loader.getPhotos();
-			for(var i=photos.length-1; i>=0; i--){
-				if(!photos[i]){
-					loader.loadGallery(i,function(){
-						init(i);
-						loading = false;
-					});
-					break;
-				}
-			}
-			loading = true;
+			loadNewBatch();
 		}
+	}
+
+	function loadNewBatch(){
+		var photos = loader.getPhotos();
+		for(var i=photos.length-1; i>=0; i--){
+			if(!photos[i]){
+				loader.loadGallery(i,function(){
+					init(i);
+					loading = false;
+				});
+				break;
+			}
+		}
+		loading = true;
 	}
 
 	

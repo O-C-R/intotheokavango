@@ -9,7 +9,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['static/js/dummy_data.js','static/js/viz.js','static/js/dataPage.js','static/js/feed.js','static/js/features.js','static/js/gallery.js','static/js/layout.js','static/js/loader.js', 'static/js/map.js', 'static/js/members.js','static/js/timeline.js','static/js/wanderer.js','static/js/utils.js','static/js/main.js'],
-        dest: 'static/js/build13.js',
+        dest: 'static/js/build14.js',
       }
     },
     shell: {
