@@ -58,6 +58,18 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                    },
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                progressElem.html(Math.round(percentComplete * 100) + "%");
+                                //console.log("percent loaded: " + percentComplete);
+                            }
+                        }, false);
+
+                        return xhr;
                     }
                 });
 
@@ -125,6 +137,7 @@ $(document).ready(function() {
 </div>
 <button class="ui-shadow ui-btn ui-corner-all" id="species-button">Link Species</button>
 <button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Images</button>
+<div id="progressCounter"></div>
 <h3 id="message"></h3>
 </body>
 </html>

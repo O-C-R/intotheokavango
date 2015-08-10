@@ -62,6 +62,18 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                    },
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                progressElem.html(Math.round(percentComplete * 100) + "%");
+                                //console.log("percent loaded: " + percentComplete);
+                            }
+                        }, false);
+
+                        return xhr;
                     }
                 });
 
@@ -107,6 +119,7 @@ $(document).ready(function() {
 
 </form>
 <button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sound</button>
+<div id="progressCounter"></div>
 <div id="message"></div>
 </body>
 </html>
