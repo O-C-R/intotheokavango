@@ -1,22 +1,8 @@
 
 var d3Graph = function(timelineVizID, totalsVizID){
-    // if(timelineVizDiv){
 
-    // }
-    //console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
     var timelineVizDiv = d3.select("timelineVizID");
-    // var totalsVizDiv = d3.select("totalsVizID");
-    console.log("D3 GRAPH");
-    //console.log(totalsVizDiv);
-
-    // $("totalsViz").hide("slow", function() {
-    //     console.log("HIDING totalsVizDiv");
-    // });
-    // totalsVizDiv.style("opacity", 0);
-   // d3.select(totalsVizDiv).style("opacity", 0);
-    // console.log(totalsVizDiv);
-    // var public_path = 'http://dev.intotheokavango.org' + path_to_data;
-    // console.log(public_path);
+    //console.log("D3 GRAPH");
 
     var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
     var index = 0;    
@@ -52,7 +38,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var ambitData = {};
         ambitData.heartRate = item["properties"]["HR"] * 60; //convert beats per sec to beats per min
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
+        //console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
         return ambitData;
     }
 
@@ -61,7 +47,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var ambitData = {};
         ambitData.energy = item["properties"]["EnergyConsumption"];
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
+        //console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
         return ambitData;
     }
 
@@ -75,7 +61,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
         
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
+        //console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
         return ambitData;
     }
 
@@ -99,7 +85,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
 
         beaconData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
+        //console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
         return beaconData;
     }
 
@@ -203,9 +189,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
         height = 525 - margin.top - margin.bottom,
         left_width = 100;
         var bodywidth = $('body').width();
-        console.log("BODY WIDTH:" + bodywidth );
-        console.log("WIDTH: " + width);
-        console.log("TEST");
+        // console.log("BODY WIDTH:" + bodywidth );
+        // console.log("WIDTH: " + width);
+        // console.log("TEST");
 
         var dateRange = d3.extent(parsedData, function(d) { 
             return d.time; 
@@ -289,7 +275,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var interval = d3.time.day;
 
             var allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
-            console.log("Intervals ", allIntervals);
+            //console.log("Intervals ", allIntervals);
 
             binner.domain([allIntervals[0], allIntervals[allIntervals.length - 1]]);
             binner.range([0, allIntervals.length - 1]);
@@ -312,8 +298,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
             });
             // Here is the histogram.
-            console.log("Hist:", hist);
-            console.log("dateRange", dateRange);
+            // console.log("Hist:", hist);
+            // console.log("dateRange", dateRange);
 
             var combinedData = [];
             for (var i = 0; i < hist.length; i++) {
@@ -324,9 +310,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 combinedData.push(dataObj);
             }
 
-            console.log("combinedData");
-            console.log(combinedData);
-            console.log(combinedData.length);
+            // console.log("combinedData");
+            // console.log(combinedData);
+            // console.log(combinedData.length);
             
             var barWidth = 1;
 
@@ -414,7 +400,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var xAxisLabel = "";
         var graphTitle = "";
 
-        console.log(feature_type);
+        //console.log(feature_type);
 
         var parseDate = d3.time.format("%m %d").parse;
 
@@ -437,11 +423,11 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         if (feature_type === "ambit") {
-            console.log("feature_type is ambit");
-            console.log(parsedData);
+            // console.log("feature_type is ambit");
+            // console.log(parsedData);
             for (var i = 0; i < parsedData.length; i++) {
                 if (parsedData[i].hasOwnProperty("heartRate")) {
-                    console.log("data has heartRate key");
+                    //console.log("data has heartRate key");
                     yAxisLabel = "Beats per Minute";
                     graphTitle = "Heart Rate";
                     var line = d3.svg.line()
@@ -451,7 +437,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                    var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
@@ -459,7 +445,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("energy")) {
-                    console.log("data has energy key");
+                    //console.log("data has energy key");
                     yAxisLabel = "Average Calories Burned";
                     graphTitle = "Energy Consumption";
                     var line = d3.svg.line()
@@ -477,7 +463,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("speed")) {
-                    console.log("data has speed key");
+                    //console.log("data has speed key");
                     yAxisLabel = "Meters per Second";
                     graphTitle = "Speed";
                     var line = d3.svg.line()
@@ -487,7 +473,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
@@ -509,8 +495,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
         if (feature_type === "beacon") {
             yAxisLabel = "km/h";
             graphTitle = "Speed of Expedition";
-            console.log("feature_type is beacon");
-            console.log(parsedData);
+            // console.log("feature_type is beacon");
+            // console.log(parsedData);
             var line = d3.svg.line()
                         .x(function(d) { return xScale(d.time); })
                         .y(function(d) { return yScale(d.speed); });
@@ -518,12 +504,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
            var dateRange = d3.extent(parsedData, function(d) { 
                 return d.time; 
             });
-            console.log("dateRange: " + dateRange);
+            //console.log("dateRange: " + dateRange);
 
             xScale.domain(dateRange);
             yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
             var yDomain = d3.extent(parsedData, function(d) { return d.speed; });
-            console.log("yDomain: " + yDomain);
+            //console.log("yDomain: " + yDomain);
 
             var dateFormat = d3.time.format.utc("%B %d %Y");
             var timeFormat = d3.time.format.utc("%I:%M:%S");
@@ -539,8 +525,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
 
         if (feature_type === "sensor") {
-            console.log("feature_type is sensor");
-            console.log(parsedData);
+            // console.log("feature_type is sensor");
+            // console.log(parsedData);
             
             for (var i = 0; i < parsedData.length; i++) {
              /*
@@ -608,7 +594,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
               */
                 if ( parsedData[i].hasOwnProperty("waterTemp") ) {
-                    console.log("data has waterTemp key");
+                    //console.log("data has waterTemp key");
                     yAxisLabel = "Degrees Celsius";
                     graphTitle = "Water Temperature";
                     var line = d3.svg.line()
@@ -617,7 +603,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.waterTemp; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
@@ -625,7 +611,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
                 } else if (parsedData[i].hasOwnProperty("airTemp")) {
-                    console.log("data has airTemp key");
+                    //console.log("data has airTemp key");
                     yAxisLabel = "Degrees Celsius";
                     graphTitle = "Air Temperature";
                     var line = d3.svg.line()
@@ -634,7 +620,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
@@ -642,7 +628,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
                 } else if (parsedData[i].hasOwnProperty("pH")) {
-                    console.log("data has pH key");
+                    //console.log("data has pH key");
                     yAxisLabel = "pH Level";
                     graphTitle = "Water pH Level";
                     var line = d3.svg.line()
@@ -652,7 +638,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.pH; }));
@@ -660,7 +646,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("Tds")) {
-                    console.log("data has Tds key");
+                    //console.log("data has Tds key");
                     yAxisLabel = "Parts per Million";
                     graphTitle = "Tds Levels";
                     var line = d3.svg.line()
@@ -670,7 +656,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.Tds; }));
@@ -678,7 +664,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("Do")) {
-                    console.log("data has Do key");
+                    //console.log("data has Do key");
                     yAxisLabel = "mg/L";
                     graphTitle = "Dissolved Oxygen Levels";
                     var line = d3.svg.line()
@@ -688,7 +674,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.Do; }));
@@ -696,7 +682,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("humidity")) {
-                    console.log("data has Humidity key");
+                    //console.log("data has Humidity key");
                     yAxisLabel = "Percent of water vapor to dry air";
                     graphTitle = "Humidity Levels";
                     var line = d3.svg.line()
@@ -706,7 +692,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.humidity; }));
@@ -715,7 +701,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 }
                 else {
-                    console.log("data has a different key");
+                    //console.log("data has a different key");
                 }
             }
 
@@ -769,8 +755,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
 
     var makeTotalsViz = function(data, feature_type) {
-        console.log("MAKE TOTALS VIZ");
-        console.log("feature_type: " + feature_type);
+        // console.log("MAKE TOTALS VIZ");
+        // console.log("feature_type: " + feature_type);
         
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
@@ -789,7 +775,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .domain([0, d3.max(data, function(d) { return d.count; })])
             .range([0, width - (left_width + 80) ]);
 
-            console.log(data);
+            //console.log(data);
 
             var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
@@ -798,9 +784,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             })
             .rangeBands([60, height]);
 
-            console.log(data);
+            //console.log(data);
 
-            console.log(yScale.range());
+            //console.log(yScale.range());
             var svg = d3.select("#timelineViz").append("svg")
                 .attr("width", width)
                 .attr("height", height);
@@ -853,7 +839,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
             .range([0, width - (left_width + 80) ]);
-            console.log(data);
+            //console.log(data);
 
             var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
@@ -862,9 +848,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             })
             .rangeBands([60, height]);
 
-            console.log(data);
+            //console.log(data);
 
-            console.log(yScale.range());
+            //console.log(yScale.range());
 
             var svg = d3.select("#timelineViz").append("svg")
                 .attr("width", width)
@@ -916,7 +902,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     var makeBinnedData = function(parsedData) {
         dateRange = d3.extent(parsedData, function(d) { return d.time; });
-        console.log("dateRange: " + dateRange);
+        //console.log("dateRange: " + dateRange);
         //compute time bins
         var binner = d3.time.scale();
 
@@ -950,9 +936,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             }
         });
 
-        console.log("HIST filled");
-        console.log(hist);
-        console.log(hist.length);
+        // console.log("HIST filled");
+        // console.log(hist);
+        // console.log(hist.length);
     }
 
     var drawHistogram = function(array) {
@@ -966,7 +952,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
         var w = xScale(1);
 
-        console.log(d3.extent(array),yScale(1));
+        //console.log(d3.extent(array),yScale(1));
 
         bars.attr('x', function(d,i) { return xScale(i); })
             .attr('y', function(d) { return yScale(d); })
@@ -1004,7 +990,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var speciesCountArray = [];
 
     var getSpeciesCount = function(sightings) {
-        console.log(speciesCountObj);
+        //console.log(speciesCountObj);
             for (var i = 0; i < sightings.length; ++i) {
                 // if(sightings[i].properties.SpeciesName === 'Reed Cormorant') {
 
@@ -1014,28 +1000,28 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
-                        console.log("-----i is: " + i);
-                        console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
-                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // console.log("i: " + i);
-                        console.log(speciesCountObj);
+                        // console.log("-----i is: " + i);
+                        // console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
+                        // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // // console.log("i: " + i);
+                        // console.log(speciesCountObj);
                     } else {
                         speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
                         //speciesCountObj[sightings[i].properties.SpeciesName] += 1;
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
-                        console.log("-----i is: " + i);
-                        console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
-                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // console.log("i: " + i);
-                        console.log(speciesCountObj);
+                        // console.log("-----i is: " + i);
+                        // console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
+                        // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // // console.log("i: " + i);
+                        // console.log(speciesCountObj);
                     } 
                 // }
                 
                 
             }
-            console.log(Object.keys(speciesCountObj));
+            //console.log(Object.keys(speciesCountObj));
 
             for (s in speciesCountObj){
                 myObj = {};
@@ -1043,15 +1029,15 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 myObj.count  = speciesCountObj[s];
                 speciesCountArray.push(myObj);
             }
-            console.log(speciesCountArray.length);
-            console.log(speciesCountArray);
+            // console.log(speciesCountArray.length);
+            // console.log(speciesCountArray);
         }
 
     //get the totals for all features, recursively - then draw a totals bar chart viz
     var getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
-            console.log(featureType + " data");
+            //console.log(featureType + " data");
             var featuresCountObj = {};
             featuresCountObj.type = featureType;
             featuresCountObj.total = data.total;
@@ -1088,21 +1074,21 @@ var d3Graph = function(timelineVizID, totalsVizID){
         
         var url = "http://intotheokavango.org" + path_to_data;
         
-        console.log(url);
+        //console.log(url);
         //totalsVizDiv.hide();
         //timelineVizDiv.hide();
         //this.feature_type = feature_type;
         // console.log(this.feature_type);
         d3.json(url, function(error, data) {
 
-            console.log(feature_type);
+            //console.log(feature_type);
             if(error) {
-                console.error("Failed to load " + path_to_data   );
-                console.log(error);
+                // console.error("Failed to load " + path_to_data   );
+                // console.log(error);
                 return error;
             } else {
-                console.log("Initial Data", data);
-                console.log("feature_type", feature_type);
+                // console.log("Initial Data", data);
+                // console.log("feature_type", feature_type);
 
                 //parse item differently based on feature_type
                 if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
@@ -1111,28 +1097,28 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     //totalsVizDiv.show();
                     getFeatureTotalData(features[index])
 
-                    console.log("these are the features"); //do we need a viz for members or expeditions?
+                    //console.log("these are the features"); //do we need a viz for members or expeditions?
                 }
 
                 if(feature_type === "None" && path_to_data.indexOf("species") != -1 ) { //list of all species with totals
-                    console.log("these are the species");
+                    //console.log("these are the species");
                     for(species in data.results) {
                         
                         var count = data.results[species];
-                        console.log(species + ": " + count);
+                        //console.log(species + ": " + count);
 
                         var sightingCount = {};
                         sightingCount.type = species;
                         sightingCount.total = count;
                         speciesSightingsTotals.push(sightingCount);
                     }
-                    console.log(speciesSightingsTotals);
+                    //console.log(speciesSightingsTotals);
                     //totalsVizDiv.fadeIn();
                     makeTotalsViz(speciesSightingsTotals, feature_type);
                 }
                 
                 if (feature_type === "ambit") {
-                    console.log("AMBIT");
+                    //console.log("AMBIT");
                     //make heart rate viz or energy consumption viz - heart rate for now.
                     for (d in data.results.features) {
                         
@@ -1165,25 +1151,25 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
 
                 if (feature_type === "ambit_geo") {
-                    console.log("AMBIT_GEO");
+                    //console.log("AMBIT_GEO");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
-                        console.log(item);
+                        //console.log(item);
 
                     }
                 }
 
                 if (feature_type === "beacon") {
-                    console.log("BEACON");
+                    //console.log("BEACON");
 
                     for(d in data.results.features) {
                         var item = data.results.features[d];
-                        console.log(item);
+                        //console.log(item);
 
                         if(item["properties"].hasOwnProperty("Speed")) {
                             if(item["properties"]["Speed"].indexOf("Unknown") != -1) {
-                                console.log("Bad Beacon Data");
+                                //console.log("Bad Beacon Data");
                             } else {
                                 f = parseBeaconData(item);
                                 parsedBeaconData.push(f);
@@ -1195,7 +1181,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
                 if (feature_type === "sighting") {
                     //make sightings viz - totals of all the SpeciesNames sightings
-                    console.log("SIGHTING");
+                    //console.log("SIGHTING");
                     //if it only asks for sightings and not species??
 
                     if(path_to_data.indexOf("SpeciesName") != -1) { //if query asks for species name
@@ -1205,7 +1191,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         var speciesNameClean = speciesString[1].split("&");
                         //console.log("speciesNameClean: " + speciesNameClean[0]);
                         var speciesName = decodeURI(speciesNameClean[0]);
-                        console.log("speciesName: " + speciesName);
+                        //console.log("speciesName: " + speciesName);
                         //make species sightings timeline viz - SpeciesNames Counts over time
                         for (d in data.results.features) {
 
@@ -1237,11 +1223,11 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         // console.log(speciesSightingsTotals);
                         // //totalsVizDiv.fadeIn();
                         // makeTotalsViz(speciesSightingsTotals);
-                        console.log("no species in query");
+                        //console.log("no species in query");
                     }
                 }
                 if (feature_type === "sensor") {
-                    console.log("SENSOR");
+                    //console.log("SENSOR");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
@@ -1273,12 +1259,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         }
                     }
 
-                    console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
-                    console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
-                    console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
-                    console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
-                    console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
-                    console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
+                    // console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
+                    // console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
+                    // console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
+                    // console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
+                    // console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
+                    // console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
                     makeTimeSeriesViz(parsedSensorAirData, feature_type);
                     makeTimeSeriesViz(parsedSensorWaterData, feature_type);
                     makeTimeSeriesViz(parsedSensorHumidityData, feature_type);
@@ -1289,7 +1275,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
                 }
                 if (feature_type === "tweet") {
-                    console.log("TWEET");
+                    //console.log("TWEET");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
@@ -1298,7 +1284,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         parsedTweetData.push(f);
                     }
 
-                    console.log(parsedTweetData);
+                    //console.log(parsedTweetData);
                     var tweetType = "test";
                     makeHistogramPlot(parsedTweetData, feature_type, tweetType);
 
@@ -1306,7 +1292,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     //TO DO: figure out how many tweets to lay out? viz for tweets?
                 }
                 if (feature_type === "image") {
-                    console.log("IMAGE");
+                    //console.log("IMAGE");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];

@@ -5,7 +5,7 @@ var featureGroup;
 
 /* create the map */
 function initMap () {
-    console.log("center: " + center);
+    //console.log("center: " + center);
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
         center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
@@ -90,57 +90,67 @@ var geojsonMarkerOptions = {
 
 /* load data file */
 function loadData () {
-    //console.log("loadData");
-    //console.log(path_to_data);
-    var url = "http://intotheokavango.org" + path_to_data;
-    //console.log(url);
-    $.getJSON(url, function(data) {
-        var featureCollection = data['results'];
-        //console.log(featureCollection);
-        var sightingsWithGeoLoc = [];
-        
-        for (d in featureCollection.features) {
-            var item = featureCollection.features[d];
-            if(item.geometry === null) {
-                //console.log("sighting has no geometry");
-            } else {
-                //console.log("sighting with geometry");
-                sightingsWithGeoLoc.push(item);
-            }
-        }
-        //console.log(sightingsWithGeoLoc);
-        filteredFeatureCollection = {};
-        filteredFeatureCollection.features = sightingsWithGeoLoc;
-        filteredFeatureCollection.type = "FeatureCollection";
 
-        featureGroup = L.geoJson(filteredFeatureCollection, {
-            pointToLayer: function (feature, latlng) {
-                if (!feature.properties.SpeciesName) {
-                    var name = feature.properties.FeatureType;
+    //console.log("loadData");
+    try {
+        //console.log(path_to_data);
+
+        initMap();
+
+        var url = "http://intotheokavango.org" + path_to_data;
+        //console.log(url);
+        $.getJSON(url, function(data) {
+            var featureCollection = data['results'];
+            //console.log(featureCollection);
+            var sightingsWithGeoLoc = [];
+            
+            for (d in featureCollection.features) {
+                var item = featureCollection.features[d];
+                if(item.geometry === null) {
+                    //console.log("sighting has no geometry");
                 } else {
-                    var name = feature.properties.SpeciesName;
-                } 
-                var timestamp = feature.properties.t_utc;
-                var marker = L.circleMarker(latlng, geojsonMarkerOptions);
-                var coords = feature.geometry.coordinates;
-                return marker;
-            },
-            onEachFeature: function (feature, layer) {
-                if (!feature.properties.SpeciesName) {
-                    var name = feature.properties.FeatureType;
-                    layer.bindPopup("<h3>" + name + "</h3><p>" + feature['properties']['DateTime'] + "</p>");
-                } else {
-                    var name = feature.properties.SpeciesName;
-                    var count = feature.properties.Count;
-                    layer.bindPopup("<h3>" + name + "</h3><p>" + "Count: " + count + "</p><p>" + feature['properties']['DateTime'] + "</p>");
-                } 
-                
+                    //console.log("sighting with geometry");
+                    sightingsWithGeoLoc.push(item);
+                }
             }
-        }).addTo(map);
-        L.control.scale().addTo(map);
-        map.fitBounds(featureGroup.getBounds());
-        initMapLabels(map);
-    }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
+            //console.log(sightingsWithGeoLoc);
+            filteredFeatureCollection = {};
+            filteredFeatureCollection.features = sightingsWithGeoLoc;
+            filteredFeatureCollection.type = "FeatureCollection";
+
+            featureGroup = L.geoJson(filteredFeatureCollection, {
+                pointToLayer: function (feature, latlng) {
+                    if (!feature.properties.SpeciesName) {
+                        var name = feature.properties.FeatureType;
+                    } else {
+                        var name = feature.properties.SpeciesName;
+                    } 
+                    var timestamp = feature.properties.t_utc;
+                    var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+                    var coords = feature.geometry.coordinates;
+                    return marker;
+                },
+                onEachFeature: function (feature, layer) {
+                    if (!feature.properties.SpeciesName) {
+                        var name = feature.properties.FeatureType;
+                        layer.bindPopup("<h3>" + name + "</h3><p>" + feature['properties']['DateTime'] + "</p>");
+                    } else {
+                        var name = feature.properties.SpeciesName;
+                        var count = feature.properties.Count;
+                        layer.bindPopup("<h3>" + name + "</h3><p>" + "Count: " + count + "</p><p>" + feature['properties']['DateTime'] + "</p>");
+                    } 
+                    
+                }
+            }).addTo(map);
+            L.control.scale().addTo(map);
+            map.fitBounds(featureGroup.getBounds());
+            initMapLabels(map);
+        }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
+    } 
+    catch (e) {
+        // console.log(e);
+        // console.log("no path_to_data");
+    }
 }
 
 
@@ -148,6 +158,6 @@ function loadData () {
 $(document).ready(function() {
     //console.log("LOADING MAP");
     loadData();
-    initMap();
+    //initMap();
 });
 
