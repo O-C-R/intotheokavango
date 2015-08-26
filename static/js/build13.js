@@ -4422,11 +4422,26 @@ function loadData () {
 
         featureGroup = L.geoJson(filteredFeatureCollection, {
             pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, geojsonMarkerOptions);
-                
+                if (!feature.properties.SpeciesName) {
+                    var name = feature.properties.FeatureType;
+                } else {
+                    var name = feature.properties.SpeciesName;
+                } 
+                var timestamp = feature.properties.t_utc;
+                var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+                var coords = feature.geometry.coordinates;
+                return marker;
             },
             onEachFeature: function (feature, layer) {
-                layer.bindPopup("<span style=\"color: black;\">" + feature['properties']['FeatureType'] + "<br />" + feature['properties']['DateTime'] + "<br />" + feature['properties']['t_utc'] + "</span>");
+                if (!feature.properties.SpeciesName) {
+                    var name = feature.properties.FeatureType;
+                    layer.bindPopup("<h3>" + name + "</h3><p>" + feature['properties']['DateTime'] + "</p>");
+                } else {
+                    var name = feature.properties.SpeciesName;
+                    var count = feature.properties.Count;
+                    layer.bindPopup("<h3>" + name + "</h3><p>" + "Count: " + count + "</p><p>" + feature['properties']['DateTime'] + "</p>");
+                } 
+                
             }
         }).addTo(map);
         L.control.scale().addTo(map);
@@ -4438,7 +4453,7 @@ function loadData () {
 
 /* executes on load */
 $(document).ready(function() {
-    console.log("LOADING MAP");
+    //console.log("LOADING MAP");
     loadData();
     initMap();
 });

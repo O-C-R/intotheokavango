@@ -16,6 +16,7 @@ $(document).ready(function() {
     $('#add-button').on('click', function () {
                 var data = new FormData();
                 var files = $("#File").get(0).files;
+                var progressElem = $('#progressCounter');
 
                 // Add the uploaded file content to the form data collection
                 data.append('ImageCount', files.length);
@@ -62,6 +63,18 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                    },
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                progressElem.html(Math.round(percentComplete * 100) + "%");
+                                //console.log("percent loaded: " + percentComplete);
+                            }
+                        }, false);
+
+                        return xhr;
                     }
                 });
 
@@ -107,6 +120,7 @@ $(document).ready(function() {
 
 </form>
 <button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sound</button>
+<div id="progressCounter"></div>
 <div id="message"></div>
 </body>
 </html>

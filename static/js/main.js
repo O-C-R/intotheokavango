@@ -49,6 +49,7 @@ var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
 var mapLatLng;
 var mapTLatLng;
+var dataPageActive = false;
 
 var expeditionYear = '15';
 
@@ -305,6 +306,8 @@ document.addEventListener('DOMContentLoaded', function(){
 		    		pages.active.hide();
 		    		pages[t].show();
 		    		resize();
+		    	} else if (i === 3) {
+		    		dataPageActive = true;
 		    	}
 	    	});
 

@@ -9,7 +9,8 @@
 
 
 function DataPage(id){
-console.warn('DATA PAGE', id);
+    Ractive.DEBUG = false;
+    //console.warn('DATA PAGE', id);
     var ractive, page;
     /*  Extends Page in layout.js
         Which among others gives you access to the following methods:
@@ -24,12 +25,12 @@ console.warn('DATA PAGE', id);
     page.hide = hide;
 
     function show(){
-        console.warn('WE ARE SHOWING');
+        //console.warn('WE ARE SHOWING');
         page._show();
     }
 
     function hide(){
-        console.warn('WE ARE HIDING');
+        //console.warn('WE ARE HIDING');
         page._hide();
     }
 
@@ -241,8 +242,8 @@ console.warn('DATA PAGE', id);
                 });
 
                 self.observe('show', function(newValue, oldValue, event) {
-                    console.info('new value:', newValue);
-                    console.info('ul', self.ul);
+                    //console.info('new value:', newValue);
+                    //console.info('ul', self.ul);
                 });
 
             }
@@ -317,9 +318,9 @@ console.warn('DATA PAGE', id);
                             } else if (this.get('queryObj.filter') === 'features') {
                                 this.set('queryObj.featureType', 'FeatureType=' + item);
 
-                                console.log('QUERY SENSORTYPE: ' + this.get('queryObj.sensor'));
-                                console.log('QUERY IMAGETYPE: ' + this.get('queryObj.image'));
-                                console.log('QUERY SPECIES: ' + this.get('queryObj.species'));
+                                //console.log('QUERY SENSORTYPE: ' + this.get('queryObj.sensor'));
+                                //console.log('QUERY IMAGETYPE: ' + this.get('queryObj.image'));
+                                //console.log('QUERY SPECIES: ' + this.get('queryObj.species'));
                             }
 
                             break
@@ -347,7 +348,7 @@ console.warn('DATA PAGE', id);
                 //send new query on button press
                 this.on({
                     runQuery: function() {
-                        console.log(this.get('renderedURL'));
+                        //console.log(this.get('renderedURL'));
                         window.open(this.get('renderedURL'), '_blank');
                     }
                 });
@@ -364,7 +365,7 @@ console.warn('DATA PAGE', id);
                         var updatedUrl = "http://intotheokavango.org/api/features/viz";
                             //this.set('queryObj.output', "features/" + newValue);
                         this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Heart Rate Query");
+                        //console.log("Show Me Button : Heart Rate Query");
                     }
                 });
 
@@ -379,7 +380,7 @@ console.warn('DATA PAGE', id);
                         this.set('jsonChecked', false);
                         var updatedUrl = "http://intotheokavango.org/api/features/map";
                         this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Hippo Sighting Query");
+                        //console.log("Show Me Button : Hippo Sighting Query");
                     }
                 })
 
@@ -425,7 +426,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('expeditionDay', function(newValue, oldValue) {
-                    console.log('expeditionDay newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('expeditionDay newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.expeditionDay', 'expeditionDay=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -433,7 +434,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('startDate', function(newValue, oldValue) {
-                    console.log('startDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('startDate newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.startDate', 'startDate=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -441,7 +442,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('endDate', function(newValue, oldValue) {
-                    console.log('endDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('endDate newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.endDate', 'endDate=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -449,10 +450,10 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('queryTags.length', function(n, o, k) {
-                    console.log('array length', k, 'changed from', o, 'to', n);
+                    //console.log('array length', k, 'changed from', o, 'to', n);
 
                     if (n === 0) {
-                        console.log("array is empty, so reset apiUrl");
+                        //console.log("array is empty, so reset apiUrl");
                         this.set('apiUrl', "http://intotheokavango.org/api/features/");
                         this.set('dropDownDisplay', 'none');
                         this.set('dropDownGrandchild', 'none');
@@ -460,13 +461,13 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('queryTags.*', function(newValue, oldValue, event) {
-                    console.log(this.get('queryTags'));
-                    console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log(this.get('queryTags'));
+                    //console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
 
                 });
 
                 this.observe('queryObj.*', function(newValue, oldValue, keypath) {
-                    console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
+                    //console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
 
                     var tagArrayLength = this.get('queryTags.length');
 
@@ -480,7 +481,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -493,7 +494,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -506,7 +507,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -518,7 +519,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -530,7 +531,7 @@ console.warn('DATA PAGE', id);
 
                             if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -542,7 +543,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -562,7 +563,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -574,7 +575,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new member
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -587,7 +588,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new featureType
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     //this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -596,7 +597,7 @@ console.warn('DATA PAGE', id);
                                     //splice if old and new are the same
                                     for (var i = 0; i < tagArrayLength; i++) {
                                         var item = this.get('queryTags[' + i + ']');
-                                        console.log("ITEM: " + item);
+                                        //console.log("ITEM: " + item);
 
                                         //if array item is a FeatureType
                                         if (item.indexOf(splitNew[0]) > -1) {
@@ -604,13 +605,13 @@ console.warn('DATA PAGE', id);
                                             //before you splice remove the other element???
                                             for (var j = 0; j < tagArrayLength; j++) {
                                                 var item2 = this.get('queryTags[' + j + ']');
-                                                console.log("ITEM2: " + item2);
+                                                //console.log("ITEM2: " + item2);
 
                                                 if (item2 != undefined) {
                                                     if (item2.indexOf('SpeciesName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
-                                                        console.log('item: ' + item2 + ' is a subcategory');
+                                                        //console.log('item: ' + item2 + ' is a subcategory');
                                                         this.splice('queryTags', j, 1);
-                                                        console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
+                                                        //console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
                                                         var arrayState = this.get('queryTags');
                                                         //this.set('queryTags', arrayState);
                                                     }
@@ -618,13 +619,13 @@ console.warn('DATA PAGE', id);
 
                                             }
 
-                                            console.log("SPLICE THE NEW VALUE AT: " + item);
+                                            //console.log("SPLICE THE NEW VALUE AT: " + item);
                                             this.splice('queryTags', i, 1, newValue);
 
                                             break
                                         }
                                         if (i === tagArrayLength - 1) { //only push it if checked against whole array
-                                            console.log("PUSH " + newValue);
+                                            //console.log("PUSH " + newValue);
                                             this.push('queryTags', newValue);
                                         }
                                     }
@@ -640,7 +641,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -653,7 +654,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -666,7 +667,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -679,19 +680,19 @@ console.warn('DATA PAGE', id);
                 ///
             },
             addElement: function (arrayLength, splitValue, newVal) {
-                console.log("ARRAY HAS ELEMENTS");
+                //console.log("ARRAY HAS ELEMENTS");
                 //splice if old and new are the same
                 for (var i = 0; i < arrayLength; i++) {
                     var item = this.get('queryTags[' + i + ']');
-                    console.log("ITEM: " + item);
+                    //console.log("ITEM: " + item);
 
                     if (item.indexOf(splitValue) > -1) {
-                        console.log("SPLICE THE NEW VALUE AT: " + item);
+                        //console.log("SPLICE THE NEW VALUE AT: " + item);
                         this.splice('queryTags', i, 1, newVal);
                         return
                     }
                     if (i === arrayLength - 1) { //only push it if checked against whole array
-                        console.log("PUSH " + newVal);
+                        //console.log("PUSH " + newVal);
                         this.push('queryTags', newVal);
                     }
                 }
@@ -786,7 +787,7 @@ console.warn('DATA PAGE', id);
             template:"#d3-template",
             oninit:function(){
                 // d3Graph("#d3-content")
-                console.log("d3 ractive");
+                //console.log("d3 ractive");
                 d3Page.show();
                 d3Page.loadData("/api/features/?FeatureType=sighting&SpeciesName=African Jacana&limit=40", "sighting");
             },
@@ -838,21 +839,21 @@ console.warn('DATA PAGE', id);
     page.getSpeciesList = function() {
         d3.json("http://intotheokavango.org/api/species", function(error, data) {
             if(error) {
-                console.error("Failed to load " + url);
-                console.log(error);
+                //console.error("Failed to load " + url);
+                //console.log(error);
                 return error;
             } else {
                 for (species in data.results) {
                     var count = data.results[species];
                     //console.log(species + ": " + count);
                     if(species.indexOf("quote") != -1 || species.indexOf("test") != -1 || species.indexOf("Test") != -1) {
-                        console.log("not a species");
+                        //console.log("not a species");
                     } else {
                         speciesList.push(species);
                     }
                 }
                 speciesList.sort();
-                console.log(speciesList);
+                //console.log(speciesList);
             }
         });
         return speciesList;
@@ -889,7 +890,7 @@ console.warn('DATA PAGE', id);
     };
 
     page.loadRactive = function() {
-        console.warn("loading ractive!!!");
+        //console.warn("loading ractive!!!");
         ractive = new Ractive({
             el: '#data-content',
             // We could pass in a string, but for the sake of convenience
@@ -897,11 +898,11 @@ console.warn('DATA PAGE', id);
             // template: '#navTemplate',
             template: '#content-template',
             oninit:function(){
-                console.warn('ON INIT')
+                //console.warn('ON INIT')
                 this.setActive('overview');
             },
             setActive: function(id){
-                console.warn('ID', id);
+                //console.warn('ID', id);
                 this.set('section', id);
                 d3.select('#data-navigation li.documentation').classed('active', false);
                 d3.select('#data-navigation li.overview').classed('active', false);
@@ -930,9 +931,16 @@ console.warn('DATA PAGE', id);
 
 
     page.loadRactive();
-    page.getFeatureTotalData(features[index]);
-    page.getSpeciesList();
     
+    if(dataPageActive) {
+        
+        page.getFeatureTotalData(features[index]);
+        page.getSpeciesList();
+        console.log("dataPageActive is: " + dataPageActive);
+        //return page;
+    } else {
+        console.log("dataPageActive is: " + dataPageActive);
+    }
     
     // var D3View = Ractive.extend({
     //     el:'#d3-content',
