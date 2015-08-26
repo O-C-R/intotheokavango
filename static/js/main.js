@@ -63,7 +63,8 @@ var timeOffsets = {
 		'query': -1,
 		'departure': 3,
 		'startDate':0,
-		'instagram':0
+		'instagram':0,
+		'startDate': new Date('2014-08-17 00:00:00+00:00')
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -74,7 +75,8 @@ var timeOffsets = {
 		'query': 0,
 		'departure': 3,
 		'startDate':-1,
-		'instagram':-1
+		'instagram':-1,
+		'startDate': new Date('2015-05-16 00:00:00+00:00')
 	}
 }
 
@@ -153,12 +155,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
     wanderer = Wanderer(mapWorld.getCenter());
 
+
 	// pages.about.show();
     pages.active = pages.map;
 	pages.map.show();
 	setLayoutInteractions();
-	loader.getDayCount(function(dayCount,startDate,endDate){
-		timeline.setDates(dayCount,startDate);
+	loader.getDayCount(function(dayCount){
+		timeline.setDates(dayCount,timeOffsets[expeditionYear].startDate);
+
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
 			timeline.setTimeFrame();
 			feed.init(day);

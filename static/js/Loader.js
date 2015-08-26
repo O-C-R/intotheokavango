@@ -4,6 +4,7 @@
 	Loads all features day by day and stores them .
 */
 
+
 function Loader(){
 
 	var loading = [];
@@ -20,33 +21,21 @@ function Loader(){
 
 
 	function getDayCount(callback){
-		var query = 'http://intotheokavango.org/api/expeditions';
+		
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&order=-1&limit=1'
 		d3.json(query, function(error, data){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;
-			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			var len = data['okavango_'+expeditionYear].Days + 2;
-			var findLastDay = function(){
-				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
-				d3.json(query, function(error, data) {
-					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-					if(data.total == 0) {
-						len --;
-						findLastDay();
-					} else {
-						callback(len, d);
-					}
-				});
-			}
-			findLastDay();
-
+			var d = new Date(data.results.features[0].properties.t_utc*1000);
+			var len = Math.floor((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24));
+			callback(len);
 		});
+
 	}
 
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 7;
+		var toBeCompleted = 7; //7
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
