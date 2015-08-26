@@ -601,9 +601,6 @@ function Loader(){
 		    callback();
 		});
 
-
-
-
 	}
 
 
@@ -669,3 +666,6 @@ function Loader(){
 		expeditionYear: expeditionYear
 	};
 }
+
+
+
