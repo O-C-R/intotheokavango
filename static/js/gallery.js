@@ -37,59 +37,59 @@ function Gallery(){
 
 	function init(day){
 		
-		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		// var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
-		var newPosts = [];
-		var photos = loader.getPhotos()[day];
-		for(var i=0; i<photos.length; i++){
-			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
-			newPosts.push(photos[i]);
-		}
-		var instagrams = loader.getInstagrams()[day];
-		for(var i=0; i<instagrams.length; i++){
-			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
-			newPosts.push(instagrams[i]);
-		}
-		newPosts.sort(function(a, b){
-			return b.getData().date.getTime() - a.getData().date.getTime();
-		});
-		postsByDay[day] = newPosts;
-		allPosts = allPosts.concat(newPosts);
-		allPosts.sort(function(a, b){
-			return b.getData().date.getTime() - a.getData().date.getTime();
-		});
+		// var newPosts = [];
+		// var photos = loader.getPhotos()[day];
+		// for(var i=0; i<photos.length; i++){
+		// 	// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+		// 	newPosts.push(photos[i]);
+		// }
+		// var instagrams = loader.getInstagrams()[day];
+		// for(var i=0; i<instagrams.length; i++){
+		// 	// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+		// 	newPosts.push(instagrams[i]);
+		// }
+		// newPosts.sort(function(a, b){
+		// 	return b.getData().date.getTime() - a.getData().date.getTime();
+		// });
+		// postsByDay[day] = newPosts;
+		// allPosts = allPosts.concat(newPosts);
+		// allPosts.sort(function(a, b){
+		// 	return b.getData().date.getTime() - a.getData().date.getTime();
+		// });
 
-		posts = node.selectAll('div.post')
-	        .data(allPosts, function(d){ 
-	        	d = d.getData();
-	        	return d.date.getTime() + '-' + d.latLng.lat;
-	        })
+		// posts = node.selectAll('div.post')
+	 //        .data(allPosts, function(d){ 
+	 //        	d = d.getData();
+	 //        	return d.date.getTime() + '-' + d.latLng.lat;
+	 //        })
 
-	    posts.enter()
-	        .append('div')
-	        .attr("class", function(d) { return ' post brick ' + d.getData().type; })
-	        .each(function(d,i){
-	        	d = d.getData();
-	        	var t = new Date(offsetTimezone(d.date.getTime()));
-	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-	        	d3.select(this)
-	        		.append('img')
-	        		.attr('src','http://intotheokavango.org'+d.photoUrl)
-	        		.attr('alt','Photo taken on ' + t)
-	        		.on('click',function(){startFocus(d.photoUrl)});
+	 //    posts.enter()
+	 //        .append('div')
+	 //        .attr("class", function(d) { return ' post brick ' + d.getData().type; })
+	 //        .each(function(d,i){
+	 //        	d = d.getData();
+	 //        	var t = new Date(offsetTimezone(d.date.getTime()));
+	 //        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	 //        	d3.select(this)
+	 //        		.append('img')
+	 //        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+	 //        		.attr('alt','Photo taken on ' + t)
+	 //        		.on('click',function(){startFocus(d.photoUrl)});
 
-	        	var that = this;
-	        	requestAnimationFrame(function(){
-	        		d3.select(that).classed('visible',true);
-	        	})
-	        });
+	 //        	var that = this;
+	 //        	requestAnimationFrame(function(){
+	 //        		d3.select(that).classed('visible',true);
+	 //        	})
+	 //        });
 
-		posts.order();
+		// posts.order();
 
-		resize(posts);
-		window.addEventListener("resize", function(){resize(posts)});
+		// resize(posts);
+		// window.addEventListener("resize", function(){resize(posts)});
 
-		if(newPosts.length < 5) loadNewBatch();
+		// if(newPosts.length < 5) loadNewBatch();
 
 	}
 

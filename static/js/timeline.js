@@ -37,9 +37,9 @@ function Timeline(){
 	var cursorDate = new Date();
 
 	var isUnzoomedTime = false;
-	var unzoomedTime = [[1431948652,1432199688],
+	var unzoomedTime = [[1431948652, 1432199688],
 						[1433756474, 1433833065],
-						[1433848882,new Date().getTime()/1000]];
+						[1433848882, 1435031940]];
 
 	var milestones = {
 		0 : 'Menongue',
@@ -290,7 +290,9 @@ function Timeline(){
 			}
 		}
 		if(isNightTime != n) nightNode.classed('night',n);
+		// console.log('nighttime', n);
 		isNightTime = n;
+		// isNightTime = false;
 	}
 
 	function checkUnzoom(force, reset){

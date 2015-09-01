@@ -35,7 +35,7 @@ function Loader(){
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 7; //7
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
@@ -113,20 +113,17 @@ function Loader(){
 			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
-			var activityInterval = [0, 10000000000];
+			var activityInterval = [10000000000, 0];
 			for(m in members){
 				var member = members[m];
 				var pathQueue = member.getPathQueueByDay(day);
-				if(!pathQueue){
-					// member.fillEmptyPathQueue(day);
-				} else {
-					if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
-					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				if(pathQueue){
+					activityInterval[0] = Math.min(activityInterval[0],d3.min(pathQueue, function(d){return d.time}));
+					activityInterval[1] = Math.max(activityInterval[1],d3.max(pathQueue, function(d){return d.time}));
 				}
 			}
-			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
-			activityInterval[0]+=(10*60);
-			activityInterval[1]-=(10*60);
+			// activityInterval[0]+=(10*60);
+			// activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 
@@ -139,7 +136,6 @@ function Loader(){
 							"coordinates":ambitCoords[m]
 						}
 					}];
-
 					var c = members[m].getColor();
 
 					var pathStyle = {
@@ -477,11 +473,9 @@ function Loader(){
 			        return marker;
                 },
 			    style: function(feature) {
-			    	var c = Math.sqrt(feature.properties["Count"]);
+			    	var c = Math.sqrt(feature.properties["Count"]) || 0;
 			    	var so = {radius: 2 + (c * 2)};
-			    	if (feature.properties.SpeciesName.indexOf("quote.") != -1) {
-
-			    	} else {
+			    	if (feature.properties.SpeciesName.indexOf("quote.") == -1) {
 			    		var bn = feature.properties.SpeciesName;
 			    		if (colorMap[bn] == undefined) {
 			    			var c = new RColor().get(true);
