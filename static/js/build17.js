@@ -2341,113 +2341,113 @@ function Feed(){
 
 	function init(day){
 		
-		// var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		// var w = d3.select(node.node().parentNode).style('width');
-		// w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
+		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		var w = d3.select(node.node().parentNode).style('width');
+		w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
 
-		// // Definitely not optimized
-		// var newPosts = [];
-		// newPosts = newPosts.concat(loader.getTweets()[day]);
-		// newPosts = newPosts.concat(loader.getBlogs()[day]);
-		// newPosts = newPosts.concat(loader.getSounds()[day]);
-		// var photos = loader.getPhotos()[day];
-		// for(var i=0; i<photos.length; i++){
-		// 	// if(photos[i].getMember() != null) newPosts.push(photos[i]);
-		// 	newPosts.push(photos[i]);
-		// }
-		// var instagrams = loader.getInstagrams()[day];
-		// for(var i=0; i<instagrams.length; i++){
-		// 	// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
-		// 	newPosts.push(instagrams[i]);
-		// }
-		// newPosts.sort(function(a, b){
-		// 	return a.getData().date.getTime() - b.getData().date.getTime();
-		// });
-		// postsByDay[day] = newPosts;
-		// allPosts = allPosts.concat(newPosts);
-		// allPosts.sort(function(a, b){
-		// 	return a.getData().date.getTime() - b.getData().date.getTime();
-		// });
+		// Definitely not optimized
+		var newPosts = [];
+		newPosts = newPosts.concat(loader.getTweets()[day]);
+		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		newPosts = newPosts.concat(loader.getSounds()[day]);
+		var photos = loader.getPhotos()[day];
+		for(var i=0; i<photos.length; i++){
+			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			newPosts.push(photos[i]);
+		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			newPosts.push(instagrams[i]);
+		}
+		newPosts.sort(function(a, b){
+			return a.getData().date.getTime() - b.getData().date.getTime();
+		});
+		postsByDay[day] = newPosts;
+		allPosts = allPosts.concat(newPosts);
+		allPosts.sort(function(a, b){
+			return a.getData().date.getTime() - b.getData().date.getTime();
+		});
 
-		// posts = node.selectAll('div.post')
-	 //        .data(allPosts, function(d){ 
-	 //        	d = d.getData();
-	 //        	return d.date.getTime() + '-' + d.latLng.lat;
-	 //        })
+		posts = node.selectAll('div.post')
+	        .data(allPosts, function(d){ 
+	        	d = d.getData();
+	        	return d.date.getTime() + '-' + d.latLng.lat;
+	        })
 
-	 //    posts.enter()
-	 //        .append('div')
-	 //        .attr("class", function(d) { return ' post ' + d.getData().type; })
-	 //        .html(function(d){ return templates[d.getData().type] })
-	 //        .each(function(d,i){
-	 //        	d = d.getData();
-	 //        	var t = new Date(offsetTimezone(d.date.getTime()));
-	 //        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-	 //        	d3.select(this).select('div.meta div.timestamp')
-	 //        		.html(t);
+	    posts.enter()
+	        .append('div')
+	        .attr("class", function(d) { return ' post ' + d.getData().type; })
+	        .html(function(d){ return templates[d.getData().type] })
+	        .each(function(d,i){
+	        	d = d.getData();
+	        	var t = new Date(offsetTimezone(d.date.getTime()));
+	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this).select('div.meta div.timestamp')
+	        		.html(t);
 	        	
-	 //        	if(d.type == 'tweet'){
-		//         	d3.select(this).select('p.message')
-		//         		.html(function(){
-		//         			var urls = d.message.match(/http[^\s]*/gi);
-		//         			if(urls){
-		// 	        			for(var i=0; i<urls.length; i++){
-		// 	        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
-		// 	        			}
-		// 	        		}
-		// 	        		var handles = d.message.match(/@[^\s]*/gi);
-		//         			if(handles){
-		// 	        			for(var i=0; i<handles.length; i++){
-		// 	        				d.message = d.message.replace(handles[i],'<a href="http://twitter.com/'+handles[i].slice(1,handles[i].length-1)+'" target="_blank">'+handles[i]+'</a>');
-		// 	        			}
-		// 	        		}
-		//         			return d.message
-		//         		});
-		//         	if(d.photoUrl){
-		// 	        	d3.select(this).select('div.photo')
-		// 	        		.append('img')
-		// 	        		.attr('src',d.photoUrl)
-		// 	        		.attr('alt','Photo taken on ' + t)
-		// 	        		.on('load',function(){
-		// 	        			jump();
-		// 	        		})
-		//         	}
-	 //        	} else if(d.type == 'photo' || d.type == 'instagram'){
-		//         	d3.select(this).select('div.photo')
-		//         		.append('img')
-		//         		.attr('src','http://intotheokavango.org'+d.photoUrl)
-		//         		.attr('alt','Photo taken on ' + t)
+	        	if(d.type == 'tweet'){
+		        	d3.select(this).select('p.message')
+		        		.html(function(){
+		        			var urls = d.message.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
+			        			}
+			        		}
+			        		var handles = d.message.match(/@[^\s]*/gi);
+		        			if(handles){
+			        			for(var i=0; i<handles.length; i++){
+			        				d.message = d.message.replace(handles[i],'<a href="http://twitter.com/'+handles[i].slice(1,handles[i].length-1)+'" target="_blank">'+handles[i]+'</a>');
+			        			}
+			        		}
+		        			return d.message
+		        		});
+		        	if(d.photoUrl){
+			        	d3.select(this).select('div.photo')
+			        		.append('img')
+			        		.attr('src',d.photoUrl)
+			        		.attr('alt','Photo taken on ' + t)
+			        		.on('load',function(){
+			        			jump();
+			        		})
+		        	}
+	        	} else if(d.type == 'photo' || d.type == 'instagram'){
+		        	d3.select(this).select('div.photo')
+		        		.append('img')
+		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+		        		.attr('alt','Photo taken on ' + t)
 
-		//         	if(d.notes){
-		// 	        	d3.select(this).select('p.notes')
-		// 	        		.html(function(){
-		// 	        			var urls = d.notes.match(/http[^\s]*/gi);
-		// 	        			if(urls){
-		// 		        			for(var i=0; i<urls.length; i++){
-		// 		        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
-		// 		        			}
-		// 		        		}
-		// 	        			return d.notes
-		// 	        		})
-		//         	}
-		//         	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
-	 //        	} else if(d.type == 'blog'){
-		//         	d3.select(this).select('h3.title')
-		//         		.html(d.title);
-	 //        		d3.select(this).select('p.message')
-		//         		.html(function(){
-		//         			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
-		//         		});
-	 //        	} else if(d.type == 'sound'){
-	 //        		d3.select(this).select('p.notes')
-		//         		.html(d.notes);
-		//         	d3.select(this).select('div.text iframe')
-		//         		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
-	 //        	}
-	 //        });
+		        	if(d.notes){
+			        	d3.select(this).select('p.notes')
+			        		.html(function(){
+			        			var urls = d.notes.match(/http[^\s]*/gi);
+			        			if(urls){
+				        			for(var i=0; i<urls.length; i++){
+				        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+				        			}
+				        		}
+			        			return d.notes
+			        		})
+		        	}
+		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
+	        	} else if(d.type == 'blog'){
+		        	d3.select(this).select('h3.title')
+		        		.html(d.title);
+	        		d3.select(this).select('p.message')
+		        		.html(function(){
+		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
+		        		});
+	        	} else if(d.type == 'sound'){
+	        		d3.select(this).select('p.notes')
+		        		.html(d.notes);
+		        	d3.select(this).select('div.text iframe')
+		        		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
+	        	}
+	        });
 
-		// posts.order();
-		// jump();
+		posts.order();
+		jump();
 
 	}
 
@@ -2568,7 +2568,7 @@ function Sighting(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<600 && pages.active.id == 'map'){
+    		if(Math.abs(date.getTime()/1000-t)<450 && pages.active.id == 'map'){
     			if(!popupVisible) {
     				marker.showLabel();
     				popupVisible = true;
@@ -3188,59 +3188,59 @@ function Gallery(){
 
 	function init(day){
 		
-		// var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
-		// var newPosts = [];
-		// var photos = loader.getPhotos()[day];
-		// for(var i=0; i<photos.length; i++){
-		// 	// if(photos[i].getMember() != null) newPosts.push(photos[i]);
-		// 	newPosts.push(photos[i]);
-		// }
-		// var instagrams = loader.getInstagrams()[day];
-		// for(var i=0; i<instagrams.length; i++){
-		// 	// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
-		// 	newPosts.push(instagrams[i]);
-		// }
-		// newPosts.sort(function(a, b){
-		// 	return b.getData().date.getTime() - a.getData().date.getTime();
-		// });
-		// postsByDay[day] = newPosts;
-		// allPosts = allPosts.concat(newPosts);
-		// allPosts.sort(function(a, b){
-		// 	return b.getData().date.getTime() - a.getData().date.getTime();
-		// });
+		var newPosts = [];
+		var photos = loader.getPhotos()[day];
+		for(var i=0; i<photos.length; i++){
+			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			newPosts.push(photos[i]);
+		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			newPosts.push(instagrams[i]);
+		}
+		newPosts.sort(function(a, b){
+			return b.getData().date.getTime() - a.getData().date.getTime();
+		});
+		postsByDay[day] = newPosts;
+		allPosts = allPosts.concat(newPosts);
+		allPosts.sort(function(a, b){
+			return b.getData().date.getTime() - a.getData().date.getTime();
+		});
 
-		// posts = node.selectAll('div.post')
-	 //        .data(allPosts, function(d){ 
-	 //        	d = d.getData();
-	 //        	return d.date.getTime() + '-' + d.latLng.lat;
-	 //        })
+		posts = node.selectAll('div.post')
+	        .data(allPosts, function(d){ 
+	        	d = d.getData();
+	        	return d.date.getTime() + '-' + d.latLng.lat;
+	        })
 
-	 //    posts.enter()
-	 //        .append('div')
-	 //        .attr("class", function(d) { return ' post brick ' + d.getData().type; })
-	 //        .each(function(d,i){
-	 //        	d = d.getData();
-	 //        	var t = new Date(offsetTimezone(d.date.getTime()));
-	 //        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-	 //        	d3.select(this)
-	 //        		.append('img')
-	 //        		.attr('src','http://intotheokavango.org'+d.photoUrl)
-	 //        		.attr('alt','Photo taken on ' + t)
-	 //        		.on('click',function(){startFocus(d.photoUrl)});
+	    posts.enter()
+	        .append('div')
+	        .attr("class", function(d) { return ' post brick ' + d.getData().type; })
+	        .each(function(d,i){
+	        	d = d.getData();
+	        	var t = new Date(offsetTimezone(d.date.getTime()));
+	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this)
+	        		.append('img')
+	        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+	        		.attr('alt','Photo taken on ' + t)
+	        		.on('click',function(){startFocus(d.photoUrl)});
 
-	 //        	var that = this;
-	 //        	requestAnimationFrame(function(){
-	 //        		d3.select(that).classed('visible',true);
-	 //        	})
-	 //        });
+	        	var that = this;
+	        	requestAnimationFrame(function(){
+	        		d3.select(that).classed('visible',true);
+	        	})
+	        });
 
-		// posts.order();
+		posts.order();
 
-		// resize(posts);
-		// window.addEventListener("resize", function(){resize(posts)});
+		resize(posts);
+		window.addEventListener("resize", function(){resize(posts)});
 
-		// if(newPosts.length < 5) loadNewBatch();
+		if(newPosts.length < 5) loadNewBatch();
 
 	}
 
@@ -3421,7 +3421,6 @@ function Page(i){
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		// mapWorld.setZoom(id == 'journal' ? 15 : 17, {animate:false});
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
@@ -3492,7 +3491,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17, {animate:lastActive.id=='journal'});
+		mapWorld.setZoom(timeline.getUnzoomState(), {animate:lastActive.id=='journal'});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -3541,7 +3540,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		mapWorld.setZoom(15, {animate:lastActive.id=='map'});
+		mapWorld.setZoom(Math.min(15,timeline.getUnzoomState()||15), {animate:lastActive.id=='map'});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 
@@ -3604,7 +3603,6 @@ function GalleryPage(){
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
-		console.log('WAT');
 		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
@@ -3656,16 +3654,15 @@ function Loader(){
 		d3.json(query, function(error, data){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			var d = new Date(data.results.features[0].properties.t_utc*1000);
-			var len = Math.floor((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24));
+			var len = Math.ceil((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24)) + 1;
 			callback(len);
 		});
-
 	}
 
 
 	function loadDay(day, callback) {
 		console.log('loading data for day #' + day);
-		var toBeCompleted = 7; //7
+		var toBeCompleted = 7;
 		function checkForCompletion(){
 			toBeCompleted --;
 			if(toBeCompleted == 0) {
@@ -3743,20 +3740,17 @@ function Loader(){
 			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
-			var activityInterval = [0, 10000000000];
+			var activityInterval = [10000000000, 0];
 			for(m in members){
 				var member = members[m];
 				var pathQueue = member.getPathQueueByDay(day);
-				if(!pathQueue){
-					// member.fillEmptyPathQueue(day);
-				} else {
-					if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
-					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				if(pathQueue){
+					activityInterval[0] = Math.min(activityInterval[0],d3.min(pathQueue, function(d){return d.time}));
+					activityInterval[1] = Math.max(activityInterval[1],d3.max(pathQueue, function(d){return d.time}));
 				}
 			}
-			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
-			activityInterval[0]+=(10*60);
-			activityInterval[1]-=(10*60);
+			// activityInterval[0]+=(10*60);
+			// activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 
@@ -3769,7 +3763,6 @@ function Loader(){
 							"coordinates":ambitCoords[m]
 						}
 					}];
-
 					var c = members[m].getColor();
 
 					var pathStyle = {
@@ -3823,7 +3816,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
-                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			e.target._popup._isForced = true;
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
@@ -3878,7 +3871,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var title = feature.properties.Title;
                 	if(title){
-                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -3986,7 +3979,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -4046,7 +4039,7 @@ function Loader(){
                 	var url = feature.properties.ImageUrl;
                 	var dimensions = feature.properties.Dimensions;
                 	if(url && dimensions){
-                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>');
+                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -4107,11 +4100,9 @@ function Loader(){
 			        return marker;
                 },
 			    style: function(feature) {
-			    	var c = Math.sqrt(feature.properties["Count"]);
+			    	var c = Math.sqrt(feature.properties["Count"]) || 0;
 			    	var so = {radius: 2 + (c * 2)};
-			    	if (feature.properties.SpeciesName.indexOf("quote.") != -1) {
-
-			    	} else {
+			    	if (feature.properties.SpeciesName.indexOf("quote.") == -1) {
 			    		var bn = feature.properties.SpeciesName;
 			    		if (colorMap[bn] == undefined) {
 			    			var c = new RColor().get(true);
@@ -4661,7 +4652,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2.5;
+	var autoSpeed = 2.2;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -4681,9 +4672,11 @@ function Timeline(){
 	var cursorDate = new Date();
 
 	var isUnzoomedTime = false;
-	var unzoomedTime = [[1431948652,1432199688],
+	var maxUnzoom = 17;
+	var unzoomedTime = [[1431948652, 1432199688],
 						[1433756474, 1433833065],
-						[1433848882,new Date().getTime()/1000]];
+						[1433848882, 1435031940],
+						[1441887300, 1442494000]];
 
 	var milestones = {
 		0 : 'Menongue',
@@ -4934,25 +4927,28 @@ function Timeline(){
 			}
 		}
 		if(isNightTime != n) nightNode.classed('night',n);
+		// console.log('nighttime', n);
 		isNightTime = n;
+		// isNightTime = false;
 	}
 
 	function checkUnzoom(force, reset){
 		if(mapWorld.focusMember && pages.active.id == 'map'){
 			for(var i=0; i<unzoomedTime.length; i++){
 				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+				if(i==unzoomedTime.length-1) maxUnzoom = true;
 				if(u) break;
 			}
 			if(isUnzoomedTime != u || reset) {
-				mapWorld.setZoom(u?15:17, {animate:!force});
+				mapWorld.setZoom(!u?17:!maxUnzoom?15:13, {animate:!force});
 			}
 			isUnzoomedTime = u;
+			maxUnzoom = !u?17:!maxUnzoom?15:13;
 		}
 	}
 
 	function getUnzoomState(){
-		checkUnzoom();
-		return isUnzoomedTime;
+		return maxUnzoom;
 	}
 
 
@@ -5370,7 +5366,7 @@ var timeOffsets = {
 		'departure': 3,
 		'startDate':0,
 		'instagram':0,
-		'startDate': new Date('2014-08-17 00:00:00+00:00')
+		'startDate': new Date(1408233600000)
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -5382,7 +5378,7 @@ var timeOffsets = {
 		'departure': 3,
 		'startDate':-1,
 		'instagram':-1,
-		'startDate': new Date('2015-05-16 00:00:00+00:00')
+		'startDate': new Date(1431734400000)
 	}
 }
 
@@ -5480,8 +5476,11 @@ document.addEventListener('DOMContentLoaded', function(){
 			isLoading = false;
 			updateLoadingScreen(false);
 			feed.jump(timeline.getTimeCursor());
-			if(loader.members['Steve']) loader.members['Steve'].focus();
-			else {
+			if(loader.members['Steve']){
+				loader.members['Steve'].focus();
+				mapLatLng = loader.members['Steve'].getLatLng();
+				mapWorld.panTo(mapLatLng);
+			} else {
 				for(var k in loader.members){
 					loader.members[k].focus();
 					break;

@@ -26,10 +26,9 @@ function Loader(){
 		d3.json(query, function(error, data){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
 			var d = new Date(data.results.features[0].properties.t_utc*1000);
-			var len = Math.floor((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24));
+			var len = Math.ceil((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24)) + 1;
 			callback(len);
 		});
-
 	}
 
 
@@ -189,7 +188,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
-                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			e.target._popup._isForced = true;
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
@@ -244,7 +243,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var title = feature.properties.Title;
                 	if(title){
-                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -352,7 +351,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -412,7 +411,7 @@ function Loader(){
                 	var url = feature.properties.ImageUrl;
                 	var dimensions = feature.properties.Dimensions;
                 	if(url && dimensions){
-                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>');
+                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})

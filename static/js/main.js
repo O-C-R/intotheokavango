@@ -64,7 +64,7 @@ var timeOffsets = {
 		'departure': 3,
 		'startDate':0,
 		'instagram':0,
-		'startDate': new Date('2014-08-17 00:00:00+00:00')
+		'startDate': new Date(1408233600000)
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -76,7 +76,7 @@ var timeOffsets = {
 		'departure': 3,
 		'startDate':-1,
 		'instagram':-1,
-		'startDate': new Date('2015-05-16 00:00:00+00:00')
+		'startDate': new Date(1431734400000)
 	}
 }
 
@@ -174,8 +174,11 @@ document.addEventListener('DOMContentLoaded', function(){
 			isLoading = false;
 			updateLoadingScreen(false);
 			feed.jump(timeline.getTimeCursor());
-			if(loader.members['Steve']) loader.members['Steve'].focus();
-			else {
+			if(loader.members['Steve']){
+				loader.members['Steve'].focus();
+				mapLatLng = loader.members['Steve'].getLatLng();
+				mapWorld.panTo(mapLatLng);
+			} else {
 				for(var k in loader.members){
 					loader.members[k].focus();
 					break;

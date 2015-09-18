@@ -23,113 +23,113 @@ function Feed(){
 
 	function init(day){
 		
-		// var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		// var w = d3.select(node.node().parentNode).style('width');
-		// w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
+		var monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+		var w = d3.select(node.node().parentNode).style('width');
+		w = Math.round(parseFloat(w)/100*d3.select('body').node().clientWidth);
 
-		// // Definitely not optimized
-		// var newPosts = [];
-		// newPosts = newPosts.concat(loader.getTweets()[day]);
-		// newPosts = newPosts.concat(loader.getBlogs()[day]);
-		// newPosts = newPosts.concat(loader.getSounds()[day]);
-		// var photos = loader.getPhotos()[day];
-		// for(var i=0; i<photos.length; i++){
-		// 	// if(photos[i].getMember() != null) newPosts.push(photos[i]);
-		// 	newPosts.push(photos[i]);
-		// }
-		// var instagrams = loader.getInstagrams()[day];
-		// for(var i=0; i<instagrams.length; i++){
-		// 	// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
-		// 	newPosts.push(instagrams[i]);
-		// }
-		// newPosts.sort(function(a, b){
-		// 	return a.getData().date.getTime() - b.getData().date.getTime();
-		// });
-		// postsByDay[day] = newPosts;
-		// allPosts = allPosts.concat(newPosts);
-		// allPosts.sort(function(a, b){
-		// 	return a.getData().date.getTime() - b.getData().date.getTime();
-		// });
+		// Definitely not optimized
+		var newPosts = [];
+		newPosts = newPosts.concat(loader.getTweets()[day]);
+		newPosts = newPosts.concat(loader.getBlogs()[day]);
+		newPosts = newPosts.concat(loader.getSounds()[day]);
+		var photos = loader.getPhotos()[day];
+		for(var i=0; i<photos.length; i++){
+			// if(photos[i].getMember() != null) newPosts.push(photos[i]);
+			newPosts.push(photos[i]);
+		}
+		var instagrams = loader.getInstagrams()[day];
+		for(var i=0; i<instagrams.length; i++){
+			// if(instagrams[i].getMember() != null) newPosts.push(instagrams[i]);
+			newPosts.push(instagrams[i]);
+		}
+		newPosts.sort(function(a, b){
+			return a.getData().date.getTime() - b.getData().date.getTime();
+		});
+		postsByDay[day] = newPosts;
+		allPosts = allPosts.concat(newPosts);
+		allPosts.sort(function(a, b){
+			return a.getData().date.getTime() - b.getData().date.getTime();
+		});
 
-		// posts = node.selectAll('div.post')
-	 //        .data(allPosts, function(d){ 
-	 //        	d = d.getData();
-	 //        	return d.date.getTime() + '-' + d.latLng.lat;
-	 //        })
+		posts = node.selectAll('div.post')
+	        .data(allPosts, function(d){ 
+	        	d = d.getData();
+	        	return d.date.getTime() + '-' + d.latLng.lat;
+	        })
 
-	 //    posts.enter()
-	 //        .append('div')
-	 //        .attr("class", function(d) { return ' post ' + d.getData().type; })
-	 //        .html(function(d){ return templates[d.getData().type] })
-	 //        .each(function(d,i){
-	 //        	d = d.getData();
-	 //        	var t = new Date(offsetTimezone(d.date.getTime()));
-	 //        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
-	 //        	d3.select(this).select('div.meta div.timestamp')
-	 //        		.html(t);
+	    posts.enter()
+	        .append('div')
+	        .attr("class", function(d) { return ' post ' + d.getData().type; })
+	        .html(function(d){ return templates[d.getData().type] })
+	        .each(function(d,i){
+	        	d = d.getData();
+	        	var t = new Date(offsetTimezone(d.date.getTime()));
+	        	t = ((parseInt(t.getDate())) + monthNames[t.getMonth()] + ' ' + ((t.getHours()+'').length==1?'0':'') + t.getHours() + ':'+ ((t.getMinutes()+'').length==1?'0':'') +t.getMinutes());
+	        	d3.select(this).select('div.meta div.timestamp')
+	        		.html(t);
 	        	
-	 //        	if(d.type == 'tweet'){
-		//         	d3.select(this).select('p.message')
-		//         		.html(function(){
-		//         			var urls = d.message.match(/http[^\s]*/gi);
-		//         			if(urls){
-		// 	        			for(var i=0; i<urls.length; i++){
-		// 	        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
-		// 	        			}
-		// 	        		}
-		// 	        		var handles = d.message.match(/@[^\s]*/gi);
-		//         			if(handles){
-		// 	        			for(var i=0; i<handles.length; i++){
-		// 	        				d.message = d.message.replace(handles[i],'<a href="http://twitter.com/'+handles[i].slice(1,handles[i].length-1)+'" target="_blank">'+handles[i]+'</a>');
-		// 	        			}
-		// 	        		}
-		//         			return d.message
-		//         		});
-		//         	if(d.photoUrl){
-		// 	        	d3.select(this).select('div.photo')
-		// 	        		.append('img')
-		// 	        		.attr('src',d.photoUrl)
-		// 	        		.attr('alt','Photo taken on ' + t)
-		// 	        		.on('load',function(){
-		// 	        			jump();
-		// 	        		})
-		//         	}
-	 //        	} else if(d.type == 'photo' || d.type == 'instagram'){
-		//         	d3.select(this).select('div.photo')
-		//         		.append('img')
-		//         		.attr('src','http://intotheokavango.org'+d.photoUrl)
-		//         		.attr('alt','Photo taken on ' + t)
+	        	if(d.type == 'tweet'){
+		        	d3.select(this).select('p.message')
+		        		.html(function(){
+		        			var urls = d.message.match(/http[^\s]*/gi);
+		        			if(urls){
+			        			for(var i=0; i<urls.length; i++){
+			        				d.message = d.message.replace(urls[i],!d.photoUrl||i<urls.length-1?'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>':'');
+			        			}
+			        		}
+			        		var handles = d.message.match(/@[^\s]*/gi);
+		        			if(handles){
+			        			for(var i=0; i<handles.length; i++){
+			        				d.message = d.message.replace(handles[i],'<a href="http://twitter.com/'+handles[i].slice(1,handles[i].length-1)+'" target="_blank">'+handles[i]+'</a>');
+			        			}
+			        		}
+		        			return d.message
+		        		});
+		        	if(d.photoUrl){
+			        	d3.select(this).select('div.photo')
+			        		.append('img')
+			        		.attr('src',d.photoUrl)
+			        		.attr('alt','Photo taken on ' + t)
+			        		.on('load',function(){
+			        			jump();
+			        		})
+		        	}
+	        	} else if(d.type == 'photo' || d.type == 'instagram'){
+		        	d3.select(this).select('div.photo')
+		        		.append('img')
+		        		.attr('src','http://intotheokavango.org'+d.photoUrl)
+		        		.attr('alt','Photo taken on ' + t)
 
-		//         	if(d.notes){
-		// 	        	d3.select(this).select('p.notes')
-		// 	        		.html(function(){
-		// 	        			var urls = d.notes.match(/http[^\s]*/gi);
-		// 	        			if(urls){
-		// 		        			for(var i=0; i<urls.length; i++){
-		// 		        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
-		// 		        			}
-		// 		        		}
-		// 	        			return d.notes
-		// 	        		})
-		//         	}
-		//         	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
-	 //        	} else if(d.type == 'blog'){
-		//         	d3.select(this).select('h3.title')
-		//         		.html(d.title);
-	 //        		d3.select(this).select('p.message')
-		//         		.html(function(){
-		//         			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
-		//         		});
-	 //        	} else if(d.type == 'sound'){
-	 //        		d3.select(this).select('p.notes')
-		//         		.html(d.notes);
-		//         	d3.select(this).select('div.text iframe')
-		//         		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
-	 //        	}
-	 //        });
+		        	if(d.notes){
+			        	d3.select(this).select('p.notes')
+			        		.html(function(){
+			        			var urls = d.notes.match(/http[^\s]*/gi);
+			        			if(urls){
+				        			for(var i=0; i<urls.length; i++){
+				        				d.notes = d.notes.replace(urls[i],'<a href="'+urls[i]+'" target="_blank">'+urls[i]+'</a>');
+				        			}
+				        		}
+			        			return d.notes
+			        		})
+		        	}
+		        	if(d.size[0]<d.size[1]) d3.select(this).classed('vertical',true);
+	        	} else if(d.type == 'blog'){
+		        	d3.select(this).select('h3.title')
+		        		.html(d.title);
+	        		d3.select(this).select('p.message')
+		        		.html(function(){
+		        			return '"' + d.message + ' [...]"<br/><a href="'+d.url+'" target="_blank">Read the full article on Medium</a>'
+		        		});
+	        	} else if(d.type == 'sound'){
+	        		d3.select(this).select('p.notes')
+		        		.html(d.notes);
+		        	d3.select(this).select('div.text iframe')
+		        		.attr('src','https://w.soundcloud.com/player/?url='+d.url+'&color=4BFF87&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false');
+	        	}
+	        });
 
-		// posts.order();
-		// jump();
+		posts.order();
+		jump();
 
 	}
 
