@@ -1,38 +1,38 @@
 
 window.FEATURES_DATA = [{
     featureType: "ambit",
-    total: 13000,
+    total: 3363463,
     title: "Ambit Readings"
 }, {
     featureType: "ambit_geo",
-    total: 2111,
+    total: 210748,
     title: "Ambit-Geo Readings"
 }, {
     featureType: "audio",
-    total: 57,
+    total: 626,
     title: "Audio Recordings"
 }, {
     featureType: "beacon",
-    total: 141,
+    total: 13847,
     title: "Beacon Readings"
 }, {
     featureType: "blog",
-    total: 4,
+    total: 223,
     title: "Blog Posts"
 },{
     featureType: "image",
-    total: 842,
+    total: 4220,
     title: "Images"
 }, {
     featureType: "sensor",
-    total: 1931,
+    total: 18220,
     title: "Sensor Readings"
 }, {
     featureType: "sighting",
-    total: 413,
+    total: 24555,
     title: "Sightings"
 }, {
     featureType: "tweet",
-    total: 264,
+    total: 3017,
     title: "Tweets"
 }, ];

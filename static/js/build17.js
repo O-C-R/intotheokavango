@@ -1,39 +1,39 @@
 
 window.FEATURES_DATA = [{
     featureType: "ambit",
-    total: 13000,
+    total: 3363463,
     title: "Ambit Readings"
 }, {
     featureType: "ambit_geo",
-    total: 2111,
+    total: 210748,
     title: "Ambit-Geo Readings"
 }, {
     featureType: "audio",
-    total: 57,
+    total: 626,
     title: "Audio Recordings"
 }, {
     featureType: "beacon",
-    total: 141,
+    total: 13847,
     title: "Beacon Readings"
 }, {
     featureType: "blog",
-    total: 4,
+    total: 223,
     title: "Blog Posts"
 },{
     featureType: "image",
-    total: 842,
+    total: 4220,
     title: "Images"
 }, {
     featureType: "sensor",
-    total: 1931,
+    total: 18220,
     title: "Sensor Readings"
 }, {
     featureType: "sighting",
-    total: 413,
+    total: 24555,
     title: "Sightings"
 }, {
     featureType: "tweet",
-    total: 264,
+    total: 3017,
     title: "Tweets"
 }, ];;
 var d3Graph = function(timelineVizID, totalsVizID){
@@ -2288,16 +2288,8 @@ function DataPage(id){
 
 
     page.loadRactive();
-    
-    if(dataPageActive) {
-        
-        page.getFeatureTotalData(features[index]);
-        page.getSpeciesList();
-        console.log("dataPageActive is: " + dataPageActive);
-        //return page;
-    } else {
-        console.log("dataPageActive is: " + dataPageActive);
-    }
+    // page.getFeatureTotalData(features[index]);
+    // page.getSpeciesList();
     
     // var D3View = Ractive.extend({
     //     el:'#d3-content',
@@ -2313,8 +2305,11 @@ function DataPage(id){
     //     }
     // });
     //console.log(Object.keys(d3Page));
-    
+
+
+
     return page;
+
 }
 ;
 
@@ -5351,7 +5346,6 @@ var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
 var mapLatLng;
 var mapTLatLng;
-var dataPageActive = false;
 
 var expeditionYear = '15';
 
@@ -5453,6 +5447,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    timeline = Timeline();
 		feed = Feed();
 		gallery = Gallery();
+		dataPage = DataPage();
 	}
 
     wanderer = Wanderer(mapWorld.getCenter());
@@ -5610,13 +5605,15 @@ document.addEventListener('DOMContentLoaded', function(){
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
 	    		if(i<5){
+	    			//console.log("Page Nav i is: " + i);
 		    		var btn = d3.select(this);
 		    		var t = btn.text().toLowerCase();
 		    		pages.active.hide();
 		    		pages[t].show();
 		    		resize();
-		    	} else if (i === 3) {
-		    		dataPageActive = true;
+		    		if (i === 3) {
+		    			dataPage.getSpeciesList();
+		    		}
 		    	}
 	    	});
 

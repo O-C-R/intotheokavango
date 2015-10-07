@@ -931,16 +931,8 @@ function DataPage(id){
 
 
     page.loadRactive();
-    
-    if(dataPageActive) {
-        
-        page.getFeatureTotalData(features[index]);
-        page.getSpeciesList();
-        console.log("dataPageActive is: " + dataPageActive);
-        //return page;
-    } else {
-        console.log("dataPageActive is: " + dataPageActive);
-    }
+    // page.getFeatureTotalData(features[index]);
+    // page.getSpeciesList();
     
     // var D3View = Ractive.extend({
     //     el:'#d3-content',
@@ -956,6 +948,9 @@ function DataPage(id){
     //     }
     // });
     //console.log(Object.keys(d3Page));
-    
+
+
+
     return page;
+
 }

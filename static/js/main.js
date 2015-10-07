@@ -49,7 +49,6 @@ var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
 var mapLatLng;
 var mapTLatLng;
-var dataPageActive = false;
 
 var expeditionYear = '15';
 
@@ -151,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	    timeline = Timeline();
 		feed = Feed();
 		gallery = Gallery();
+		dataPage = DataPage();
 	}
 
     wanderer = Wanderer(mapWorld.getCenter());
@@ -308,13 +308,15 @@ document.addEventListener('DOMContentLoaded', function(){
 		d3.selectAll('#navigation li')
 	    	.on('click',function(d,i){
 	    		if(i<5){
+	    			//console.log("Page Nav i is: " + i);
 		    		var btn = d3.select(this);
 		    		var t = btn.text().toLowerCase();
 		    		pages.active.hide();
 		    		pages[t].show();
 		    		resize();
-		    	} else if (i === 3) {
-		    		dataPageActive = true;
+		    		if (i === 3) {
+		    			dataPage.getSpeciesList();
+		    		}
 		    	}
 	    	});
 
