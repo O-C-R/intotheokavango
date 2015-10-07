@@ -17,7 +17,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2.5;
+	var autoSpeed = 2.2;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -37,9 +37,11 @@ function Timeline(){
 	var cursorDate = new Date();
 
 	var isUnzoomedTime = false;
-	var unzoomedTime = [[1431948652,1432199688],
+	var maxUnzoom = 17;
+	var unzoomedTime = [[1431948652, 1432199688],
 						[1433756474, 1433833065],
-						[1433848882,new Date().getTime()/1000]];
+						[1433848882, 1435031940],
+						[1441887300, 1442494000]];
 
 	var milestones = {
 		0 : 'Menongue',
@@ -290,25 +292,28 @@ function Timeline(){
 			}
 		}
 		if(isNightTime != n) nightNode.classed('night',n);
+		// console.log('nighttime', n);
 		isNightTime = n;
+		// isNightTime = false;
 	}
 
 	function checkUnzoom(force, reset){
 		if(mapWorld.focusMember && pages.active.id == 'map'){
 			for(var i=0; i<unzoomedTime.length; i++){
 				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+				if(i==unzoomedTime.length-1) maxUnzoom = true;
 				if(u) break;
 			}
 			if(isUnzoomedTime != u || reset) {
-				mapWorld.setZoom(u?15:17, {animate:!force});
+				mapWorld.setZoom(!u?17:!maxUnzoom?15:13, {animate:!force});
 			}
 			isUnzoomedTime = u;
+			maxUnzoom = !u?17:!maxUnzoom?15:13;
 		}
 	}
 
 	function getUnzoomState(){
-		checkUnzoom();
-		return isUnzoomedTime;
+		return maxUnzoom;
 	}
 
 

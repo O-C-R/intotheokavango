@@ -222,6 +222,11 @@ h3, h3.title{
             transition:border-color 0.15s;
           }
 
+
+          #mapWorld div.leaflet-popup div.leaflet-popup-content-wrapper div.leaflet-popup-content img.photo{
+            width:100%;
+          }
+
           #mapWorld div.leaflet-popup div.leaflet-popup-content-wrapper:hover div.leaflet-popup-content img:not(.photo){
             border-color: #fff;
           }

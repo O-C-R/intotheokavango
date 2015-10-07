@@ -4,6 +4,7 @@
 	Loads all features day by day and stores them .
 */
 
+
 function Loader(){
 
 	var loading = [];
@@ -20,26 +21,13 @@ function Loader(){
 
 
 	function getDayCount(callback){
-		var query = 'http://intotheokavango.org/api/expeditions';
+		
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&order=-1&limit=1'
 		d3.json(query, function(error, data){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;
-			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			var len = data['okavango_'+expeditionYear].Days + 2;
-			var findLastDay = function(){
-				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
-				d3.json(query, function(error, data) {
-					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-					if(data.total == 0) {
-						len --;
-						findLastDay();
-					} else {
-						callback(len, d);
-					}
-				});
-			}
-			findLastDay();
-
+			var d = new Date(data.results.features[0].properties.t_utc*1000);
+			var len = Math.ceil((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24)) + 1;
+			callback(len);
 		});
 	}
 
@@ -124,20 +112,17 @@ function Loader(){
 			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
-			var activityInterval = [0, 10000000000];
+			var activityInterval = [10000000000, 0];
 			for(m in members){
 				var member = members[m];
 				var pathQueue = member.getPathQueueByDay(day);
-				if(!pathQueue){
-					// member.fillEmptyPathQueue(day);
-				} else {
-					if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
-					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				if(pathQueue){
+					activityInterval[0] = Math.min(activityInterval[0],d3.min(pathQueue, function(d){return d.time}));
+					activityInterval[1] = Math.max(activityInterval[1],d3.max(pathQueue, function(d){return d.time}));
 				}
 			}
-			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
-			activityInterval[0]+=(10*60);
-			activityInterval[1]-=(10*60);
+			// activityInterval[0]+=(10*60);
+			// activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 
@@ -150,7 +135,6 @@ function Loader(){
 							"coordinates":ambitCoords[m]
 						}
 					}];
-
 					var c = members[m].getColor();
 
 					var pathStyle = {
@@ -204,7 +188,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
-                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			e.target._popup._isForced = true;
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
@@ -259,7 +243,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var title = feature.properties.Title;
                 	if(title){
-                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -367,7 +351,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -427,7 +411,7 @@ function Loader(){
                 	var url = feature.properties.ImageUrl;
                 	var dimensions = feature.properties.Dimensions;
                 	if(url && dimensions){
-                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>');
+                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -488,11 +472,9 @@ function Loader(){
 			        return marker;
                 },
 			    style: function(feature) {
-			    	var c = Math.sqrt(feature.properties["Count"]);
+			    	var c = Math.sqrt(feature.properties["Count"]) || 0;
 			    	var so = {radius: 2 + (c * 2)};
-			    	if (feature.properties.SpeciesName.indexOf("quote.") != -1) {
-
-			    	} else {
+			    	if (feature.properties.SpeciesName.indexOf("quote.") == -1) {
 			    		var bn = feature.properties.SpeciesName;
 			    		if (colorMap[bn] == undefined) {
 			    			var c = new RColor().get(true);
@@ -601,9 +583,6 @@ function Loader(){
 		    callback();
 		});
 
-
-
-
 	}
 
 
@@ -669,3 +648,6 @@ function Loader(){
 		expeditionYear: expeditionYear
 	};
 }
+
+
+

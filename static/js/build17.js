@@ -37,23 +37,9 @@ window.FEATURES_DATA = [{
     title: "Tweets"
 }, ];;
 var d3Graph = function(timelineVizID, totalsVizID){
-    // if(timelineVizDiv){
 
-    // }
-    //console.log("divIDs: " + timelineVizID + ", " + totalsVizID);
     var timelineVizDiv = d3.select("timelineVizID");
-    // var totalsVizDiv = d3.select("totalsVizID");
-    console.log("D3 GRAPH");
-    //console.log(totalsVizDiv);
-
-    // $("totalsViz").hide("slow", function() {
-    //     console.log("HIDING totalsVizDiv");
-    // });
-    // totalsVizDiv.style("opacity", 0);
-   // d3.select(totalsVizDiv).style("opacity", 0);
-    // console.log(totalsVizDiv);
-    // var public_path = 'http://dev.intotheokavango.org' + path_to_data;
-    // console.log(public_path);
+    //console.log("D3 GRAPH");
 
     var features = ["ambit","ambit_geo","audio","beacon","image","sensor",'sighting','tweet'];
     var index = 0;    
@@ -89,7 +75,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var ambitData = {};
         ambitData.heartRate = item["properties"]["HR"] * 60; //convert beats per sec to beats per min
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
+        //console.log("HR: " + ambitData.time + ", " + ambitData.heartRate);
         return ambitData;
     }
 
@@ -98,7 +84,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var ambitData = {};
         ambitData.energy = item["properties"]["EnergyConsumption"];
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
+        //console.log("Energy: " + ambitData.time + ", " + ambitData.energy);
         return ambitData;
     }
 
@@ -112,7 +98,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
         
         ambitData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
+        //console.log("Speed: " + ambitData.time + ", " + ambitData.speed);
         return ambitData;
     }
 
@@ -136,7 +122,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
 
         beaconData.time = new Date(+item["properties"]["t_utc"] * 1000);
-        console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
+        //console.log("Speed: " + beaconData.time + ", " + beaconData.speed);
         return beaconData;
     }
 
@@ -240,9 +226,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
         height = 525 - margin.top - margin.bottom,
         left_width = 100;
         var bodywidth = $('body').width();
-        console.log("BODY WIDTH:" + bodywidth );
-        console.log("WIDTH: " + width);
-        console.log("TEST");
+        // console.log("BODY WIDTH:" + bodywidth );
+        // console.log("WIDTH: " + width);
+        // console.log("TEST");
 
         var dateRange = d3.extent(parsedData, function(d) { 
             return d.time; 
@@ -326,7 +312,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var interval = d3.time.day;
 
             var allIntervals = interval.range(interval.floor(dateRange[0]), interval.ceil(dateRange[1]));
-            console.log("Intervals ", allIntervals);
+            //console.log("Intervals ", allIntervals);
 
             binner.domain([allIntervals[0], allIntervals[allIntervals.length - 1]]);
             binner.range([0, allIntervals.length - 1]);
@@ -349,8 +335,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
             });
             // Here is the histogram.
-            console.log("Hist:", hist);
-            console.log("dateRange", dateRange);
+            // console.log("Hist:", hist);
+            // console.log("dateRange", dateRange);
 
             var combinedData = [];
             for (var i = 0; i < hist.length; i++) {
@@ -361,9 +347,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 combinedData.push(dataObj);
             }
 
-            console.log("combinedData");
-            console.log(combinedData);
-            console.log(combinedData.length);
+            // console.log("combinedData");
+            // console.log(combinedData);
+            // console.log(combinedData.length);
             
             var barWidth = 1;
 
@@ -451,7 +437,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
         var xAxisLabel = "";
         var graphTitle = "";
 
-        console.log(feature_type);
+        //console.log(feature_type);
 
         var parseDate = d3.time.format("%m %d").parse;
 
@@ -474,11 +460,11 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         if (feature_type === "ambit") {
-            console.log("feature_type is ambit");
-            console.log(parsedData);
+            // console.log("feature_type is ambit");
+            // console.log(parsedData);
             for (var i = 0; i < parsedData.length; i++) {
                 if (parsedData[i].hasOwnProperty("heartRate")) {
-                    console.log("data has heartRate key");
+                    //console.log("data has heartRate key");
                     yAxisLabel = "Beats per Minute";
                     graphTitle = "Heart Rate";
                     var line = d3.svg.line()
@@ -488,7 +474,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                    var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.heartRate; }));
@@ -496,7 +482,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("energy")) {
-                    console.log("data has energy key");
+                    //console.log("data has energy key");
                     yAxisLabel = "Average Calories Burned";
                     graphTitle = "Energy Consumption";
                     var line = d3.svg.line()
@@ -514,7 +500,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("speed")) {
-                    console.log("data has speed key");
+                    //console.log("data has speed key");
                     yAxisLabel = "Meters per Second";
                     graphTitle = "Speed";
                     var line = d3.svg.line()
@@ -524,7 +510,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
@@ -546,8 +532,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
         if (feature_type === "beacon") {
             yAxisLabel = "km/h";
             graphTitle = "Speed of Expedition";
-            console.log("feature_type is beacon");
-            console.log(parsedData);
+            // console.log("feature_type is beacon");
+            // console.log(parsedData);
             var line = d3.svg.line()
                         .x(function(d) { return xScale(d.time); })
                         .y(function(d) { return yScale(d.speed); });
@@ -555,12 +541,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
            var dateRange = d3.extent(parsedData, function(d) { 
                 return d.time; 
             });
-            console.log("dateRange: " + dateRange);
+            //console.log("dateRange: " + dateRange);
 
             xScale.domain(dateRange);
             yScale.domain(d3.extent(parsedData, function(d) { return d.speed; }));
             var yDomain = d3.extent(parsedData, function(d) { return d.speed; });
-            console.log("yDomain: " + yDomain);
+            //console.log("yDomain: " + yDomain);
 
             var dateFormat = d3.time.format.utc("%B %d %Y");
             var timeFormat = d3.time.format.utc("%I:%M:%S");
@@ -576,8 +562,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
         }
 
         if (feature_type === "sensor") {
-            console.log("feature_type is sensor");
-            console.log(parsedData);
+            // console.log("feature_type is sensor");
+            // console.log(parsedData);
             
             for (var i = 0; i < parsedData.length; i++) {
              /*
@@ -645,7 +631,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
               */
                 if ( parsedData[i].hasOwnProperty("waterTemp") ) {
-                    console.log("data has waterTemp key");
+                    //console.log("data has waterTemp key");
                     yAxisLabel = "Degrees Celsius";
                     graphTitle = "Water Temperature";
                     var line = d3.svg.line()
@@ -654,7 +640,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.waterTemp; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
@@ -662,7 +648,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
                 } else if (parsedData[i].hasOwnProperty("airTemp")) {
-                    console.log("data has airTemp key");
+                    //console.log("data has airTemp key");
                     yAxisLabel = "Degrees Celsius";
                     graphTitle = "Air Temperature";
                     var line = d3.svg.line()
@@ -671,7 +657,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.airTemp; }));
                     var dateFormat = d3.time.format.utc("%B %d %Y");
@@ -679,7 +665,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
 
                 } else if (parsedData[i].hasOwnProperty("pH")) {
-                    console.log("data has pH key");
+                    //console.log("data has pH key");
                     yAxisLabel = "pH Level";
                     graphTitle = "Water pH Level";
                     var line = d3.svg.line()
@@ -689,7 +675,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.pH; }));
@@ -697,7 +683,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("Tds")) {
-                    console.log("data has Tds key");
+                    //console.log("data has Tds key");
                     yAxisLabel = "Parts per Million";
                     graphTitle = "Tds Levels";
                     var line = d3.svg.line()
@@ -707,7 +693,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.Tds; }));
@@ -715,7 +701,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("Do")) {
-                    console.log("data has Do key");
+                    //console.log("data has Do key");
                     yAxisLabel = "mg/L";
                     graphTitle = "Dissolved Oxygen Levels";
                     var line = d3.svg.line()
@@ -725,7 +711,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.Do; }));
@@ -733,7 +719,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var timeFormat = d3.time.format.utc("%I:%M:%S");
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 } else if (parsedData[i].hasOwnProperty("humidity")) {
-                    console.log("data has Humidity key");
+                    //console.log("data has Humidity key");
                     yAxisLabel = "Percent of water vapor to dry air";
                     graphTitle = "Humidity Levels";
                     var line = d3.svg.line()
@@ -743,7 +729,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     var dateRange = d3.extent(parsedData, function(d) { 
                         return d.time; 
                     });
-                    console.log("dateRange: " + dateRange);
+                    //console.log("dateRange: " + dateRange);
 
                     xScale.domain(dateRange);
                     yScale.domain(d3.extent(parsedData, function(d) { return d.humidity; }));
@@ -752,7 +738,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     xAxisLabel = dateFormat(dateRange[0]) + ", " + timeFormat(dateRange[0]) + " - " + dateFormat(dateRange[1]) + ", " + timeFormat(dateRange[1]);
                 }
                 else {
-                    console.log("data has a different key");
+                    //console.log("data has a different key");
                 }
             }
 
@@ -806,8 +792,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
 
     var makeTotalsViz = function(data, feature_type) {
-        console.log("MAKE TOTALS VIZ");
-        console.log("feature_type: " + feature_type);
+        // console.log("MAKE TOTALS VIZ");
+        // console.log("feature_type: " + feature_type);
         
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
@@ -826,7 +812,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             .domain([0, d3.max(data, function(d) { return d.count; })])
             .range([0, width - (left_width + 80) ]);
 
-            console.log(data);
+            //console.log(data);
 
             var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
@@ -835,9 +821,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             })
             .rangeBands([60, height]);
 
-            console.log(data);
+            //console.log(data);
 
-            console.log(yScale.range());
+            //console.log(yScale.range());
             var svg = d3.select("#timelineViz").append("svg")
                 .attr("width", width)
                 .attr("height", height);
@@ -890,7 +876,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
             var xScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.total; })])
             .range([0, width - (left_width + 80) ]);
-            console.log(data);
+            //console.log(data);
 
             var yScale = d3.scale.ordinal()
             .domain(data, function(d) { 
@@ -899,9 +885,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             })
             .rangeBands([60, height]);
 
-            console.log(data);
+            //console.log(data);
 
-            console.log(yScale.range());
+            //console.log(yScale.range());
 
             var svg = d3.select("#timelineViz").append("svg")
                 .attr("width", width)
@@ -953,7 +939,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
     var makeBinnedData = function(parsedData) {
         dateRange = d3.extent(parsedData, function(d) { return d.time; });
-        console.log("dateRange: " + dateRange);
+        //console.log("dateRange: " + dateRange);
         //compute time bins
         var binner = d3.time.scale();
 
@@ -987,9 +973,9 @@ var d3Graph = function(timelineVizID, totalsVizID){
             }
         });
 
-        console.log("HIST filled");
-        console.log(hist);
-        console.log(hist.length);
+        // console.log("HIST filled");
+        // console.log(hist);
+        // console.log(hist.length);
     }
 
     var drawHistogram = function(array) {
@@ -1003,7 +989,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
         var w = xScale(1);
 
-        console.log(d3.extent(array),yScale(1));
+        //console.log(d3.extent(array),yScale(1));
 
         bars.attr('x', function(d,i) { return xScale(i); })
             .attr('y', function(d) { return yScale(d); })
@@ -1041,7 +1027,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var speciesCountArray = [];
 
     var getSpeciesCount = function(sightings) {
-        console.log(speciesCountObj);
+        //console.log(speciesCountObj);
             for (var i = 0; i < sightings.length; ++i) {
                 // if(sightings[i].properties.SpeciesName === 'Reed Cormorant') {
 
@@ -1051,28 +1037,28 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
-                        console.log("-----i is: " + i);
-                        console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
-                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // console.log("i: " + i);
-                        console.log(speciesCountObj);
+                        // console.log("-----i is: " + i);
+                        // console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
+                        // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // // console.log("i: " + i);
+                        // console.log(speciesCountObj);
                     } else {
                         speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
                         //speciesCountObj[sightings[i].properties.SpeciesName] += 1;
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
-                        console.log("-----i is: " + i);
-                        console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
-                        console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // console.log("i: " + i);
-                        console.log(speciesCountObj);
+                        // console.log("-----i is: " + i);
+                        // console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
+                        // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
+                        // // console.log("i: " + i);
+                        // console.log(speciesCountObj);
                     } 
                 // }
                 
                 
             }
-            console.log(Object.keys(speciesCountObj));
+            //console.log(Object.keys(speciesCountObj));
 
             for (s in speciesCountObj){
                 myObj = {};
@@ -1080,15 +1066,15 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 myObj.count  = speciesCountObj[s];
                 speciesCountArray.push(myObj);
             }
-            console.log(speciesCountArray.length);
-            console.log(speciesCountArray);
+            // console.log(speciesCountArray.length);
+            // console.log(speciesCountArray);
         }
 
     //get the totals for all features, recursively - then draw a totals bar chart viz
     var getFeatureTotalData = function(featureType) {
         var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
-            console.log(featureType + " data");
+            //console.log(featureType + " data");
             var featuresCountObj = {};
             featuresCountObj.type = featureType;
             featuresCountObj.total = data.total;
@@ -1125,21 +1111,21 @@ var d3Graph = function(timelineVizID, totalsVizID){
         
         var url = "http://intotheokavango.org" + path_to_data;
         
-        console.log(url);
+        //console.log(url);
         //totalsVizDiv.hide();
         //timelineVizDiv.hide();
         //this.feature_type = feature_type;
         // console.log(this.feature_type);
         d3.json(url, function(error, data) {
 
-            console.log(feature_type);
+            //console.log(feature_type);
             if(error) {
-                console.error("Failed to load " + path_to_data   );
-                console.log(error);
+                // console.error("Failed to load " + path_to_data   );
+                // console.log(error);
                 return error;
             } else {
-                console.log("Initial Data", data);
-                console.log("feature_type", feature_type);
+                // console.log("Initial Data", data);
+                // console.log("feature_type", feature_type);
 
                 //parse item differently based on feature_type
                 if (feature_type === "None" && path_to_data.indexOf("features") != -1 ) { //top level features
@@ -1148,28 +1134,28 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     //totalsVizDiv.show();
                     getFeatureTotalData(features[index])
 
-                    console.log("these are the features"); //do we need a viz for members or expeditions?
+                    //console.log("these are the features"); //do we need a viz for members or expeditions?
                 }
 
                 if(feature_type === "None" && path_to_data.indexOf("species") != -1 ) { //list of all species with totals
-                    console.log("these are the species");
+                    //console.log("these are the species");
                     for(species in data.results) {
                         
                         var count = data.results[species];
-                        console.log(species + ": " + count);
+                        //console.log(species + ": " + count);
 
                         var sightingCount = {};
                         sightingCount.type = species;
                         sightingCount.total = count;
                         speciesSightingsTotals.push(sightingCount);
                     }
-                    console.log(speciesSightingsTotals);
+                    //console.log(speciesSightingsTotals);
                     //totalsVizDiv.fadeIn();
                     makeTotalsViz(speciesSightingsTotals, feature_type);
                 }
                 
                 if (feature_type === "ambit") {
-                    console.log("AMBIT");
+                    //console.log("AMBIT");
                     //make heart rate viz or energy consumption viz - heart rate for now.
                     for (d in data.results.features) {
                         
@@ -1202,25 +1188,25 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 }
 
                 if (feature_type === "ambit_geo") {
-                    console.log("AMBIT_GEO");
+                    //console.log("AMBIT_GEO");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
-                        console.log(item);
+                        //console.log(item);
 
                     }
                 }
 
                 if (feature_type === "beacon") {
-                    console.log("BEACON");
+                    //console.log("BEACON");
 
                     for(d in data.results.features) {
                         var item = data.results.features[d];
-                        console.log(item);
+                        //console.log(item);
 
                         if(item["properties"].hasOwnProperty("Speed")) {
                             if(item["properties"]["Speed"].indexOf("Unknown") != -1) {
-                                console.log("Bad Beacon Data");
+                                //console.log("Bad Beacon Data");
                             } else {
                                 f = parseBeaconData(item);
                                 parsedBeaconData.push(f);
@@ -1232,7 +1218,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
                 if (feature_type === "sighting") {
                     //make sightings viz - totals of all the SpeciesNames sightings
-                    console.log("SIGHTING");
+                    //console.log("SIGHTING");
                     //if it only asks for sightings and not species??
 
                     if(path_to_data.indexOf("SpeciesName") != -1) { //if query asks for species name
@@ -1242,7 +1228,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         var speciesNameClean = speciesString[1].split("&");
                         //console.log("speciesNameClean: " + speciesNameClean[0]);
                         var speciesName = decodeURI(speciesNameClean[0]);
-                        console.log("speciesName: " + speciesName);
+                        //console.log("speciesName: " + speciesName);
                         //make species sightings timeline viz - SpeciesNames Counts over time
                         for (d in data.results.features) {
 
@@ -1274,11 +1260,11 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         // console.log(speciesSightingsTotals);
                         // //totalsVizDiv.fadeIn();
                         // makeTotalsViz(speciesSightingsTotals);
-                        console.log("no species in query");
+                        //console.log("no species in query");
                     }
                 }
                 if (feature_type === "sensor") {
-                    console.log("SENSOR");
+                    //console.log("SENSOR");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
@@ -1310,12 +1296,12 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         }
                     }
 
-                    console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
-                    console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
-                    console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
-                    console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
-                    console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
-                    console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
+                    // console.log("parsedSensorAirData size: " + parsedSensorAirData.length);
+                    // console.log("parsedSensorPHData size: " + parsedSensorPHData.length);
+                    // console.log("parsedSensorWaterData size: " + parsedSensorWaterData.length);
+                    // console.log("parsedSensorTdsData size: " + parsedSensorTdsData.length);
+                    // console.log("parsedSensorDoData size: " + parsedSensorDoData.length);
+                    // console.log("parsedSensorHumidityData size: " + parsedSensorHumidityData.length);
                     makeTimeSeriesViz(parsedSensorAirData, feature_type);
                     makeTimeSeriesViz(parsedSensorWaterData, feature_type);
                     makeTimeSeriesViz(parsedSensorHumidityData, feature_type);
@@ -1326,7 +1312,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
                 }
                 if (feature_type === "tweet") {
-                    console.log("TWEET");
+                    //console.log("TWEET");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
@@ -1335,7 +1321,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                         parsedTweetData.push(f);
                     }
 
-                    console.log(parsedTweetData);
+                    //console.log(parsedTweetData);
                     var tweetType = "test";
                     makeHistogramPlot(parsedTweetData, feature_type, tweetType);
 
@@ -1343,7 +1329,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                     //TO DO: figure out how many tweets to lay out? viz for tweets?
                 }
                 if (feature_type === "image") {
-                    console.log("IMAGE");
+                    //console.log("IMAGE");
 
                     for (d in data.results.features) {
                         var item = data.results.features[d];
@@ -1380,7 +1366,8 @@ var d3Graph = function(timelineVizID, totalsVizID){
 
 
 function DataPage(id){
-console.warn('DATA PAGE', id);
+    Ractive.DEBUG = false;
+    //console.warn('DATA PAGE', id);
     var ractive, page;
     /*  Extends Page in layout.js
         Which among others gives you access to the following methods:
@@ -1395,12 +1382,12 @@ console.warn('DATA PAGE', id);
     page.hide = hide;
 
     function show(){
-        console.warn('WE ARE SHOWING');
+        //console.warn('WE ARE SHOWING');
         page._show();
     }
 
     function hide(){
-        console.warn('WE ARE HIDING');
+        //console.warn('WE ARE HIDING');
         page._hide();
     }
 
@@ -1612,8 +1599,8 @@ console.warn('DATA PAGE', id);
                 });
 
                 self.observe('show', function(newValue, oldValue, event) {
-                    console.info('new value:', newValue);
-                    console.info('ul', self.ul);
+                    //console.info('new value:', newValue);
+                    //console.info('ul', self.ul);
                 });
 
             }
@@ -1688,9 +1675,9 @@ console.warn('DATA PAGE', id);
                             } else if (this.get('queryObj.filter') === 'features') {
                                 this.set('queryObj.featureType', 'FeatureType=' + item);
 
-                                console.log('QUERY SENSORTYPE: ' + this.get('queryObj.sensor'));
-                                console.log('QUERY IMAGETYPE: ' + this.get('queryObj.image'));
-                                console.log('QUERY SPECIES: ' + this.get('queryObj.species'));
+                                //console.log('QUERY SENSORTYPE: ' + this.get('queryObj.sensor'));
+                                //console.log('QUERY IMAGETYPE: ' + this.get('queryObj.image'));
+                                //console.log('QUERY SPECIES: ' + this.get('queryObj.species'));
                             }
 
                             break
@@ -1718,7 +1705,7 @@ console.warn('DATA PAGE', id);
                 //send new query on button press
                 this.on({
                     runQuery: function() {
-                        console.log(this.get('renderedURL'));
+                        //console.log(this.get('renderedURL'));
                         window.open(this.get('renderedURL'), '_blank');
                     }
                 });
@@ -1735,7 +1722,7 @@ console.warn('DATA PAGE', id);
                         var updatedUrl = "http://intotheokavango.org/api/features/viz";
                             //this.set('queryObj.output', "features/" + newValue);
                         this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Heart Rate Query");
+                        //console.log("Show Me Button : Heart Rate Query");
                     }
                 });
 
@@ -1750,7 +1737,7 @@ console.warn('DATA PAGE', id);
                         this.set('jsonChecked', false);
                         var updatedUrl = "http://intotheokavango.org/api/features/map";
                         this.set('apiUrl', updatedUrl);
-                        console.log("Show Me Button : Hippo Sighting Query");
+                        //console.log("Show Me Button : Hippo Sighting Query");
                     }
                 })
 
@@ -1796,7 +1783,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('expeditionDay', function(newValue, oldValue) {
-                    console.log('expeditionDay newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('expeditionDay newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.expeditionDay', 'expeditionDay=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -1804,7 +1791,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('startDate', function(newValue, oldValue) {
-                    console.log('startDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('startDate newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.startDate', 'startDate=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -1812,7 +1799,7 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('endDate', function(newValue, oldValue) {
-                    console.log('endDate newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log('endDate newValue: ' + newValue + ', oldValue: ' + oldValue);
                     if (oldValue != undefined && newValue != undefined) {
                         this.set('queryObj.endDate', 'endDate=' + newValue);
                         //console.log(this.get('query')); //try and make query string
@@ -1820,10 +1807,10 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('queryTags.length', function(n, o, k) {
-                    console.log('array length', k, 'changed from', o, 'to', n);
+                    //console.log('array length', k, 'changed from', o, 'to', n);
 
                     if (n === 0) {
-                        console.log("array is empty, so reset apiUrl");
+                        //console.log("array is empty, so reset apiUrl");
                         this.set('apiUrl', "http://intotheokavango.org/api/features/");
                         this.set('dropDownDisplay', 'none');
                         this.set('dropDownGrandchild', 'none');
@@ -1831,13 +1818,13 @@ console.warn('DATA PAGE', id);
                 });
 
                 this.observe('queryTags.*', function(newValue, oldValue, event) {
-                    console.log(this.get('queryTags'));
-                    console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
+                    //console.log(this.get('queryTags'));
+                    //console.log('queryTags newValue: ' + newValue + ', oldValue: ' + oldValue);
 
                 });
 
                 this.observe('queryObj.*', function(newValue, oldValue, keypath) {
-                    console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
+                    //console.log('object key', keypath, 'changed from', oldValue, 'to', newValue);
 
                     var tagArrayLength = this.get('queryTags.length');
 
@@ -1851,7 +1838,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1864,7 +1851,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1877,7 +1864,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1889,7 +1876,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1901,7 +1888,7 @@ console.warn('DATA PAGE', id);
 
                             if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1913,7 +1900,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1933,7 +1920,7 @@ console.warn('DATA PAGE', id);
 
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1945,7 +1932,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new member
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1958,7 +1945,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new featureType
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     //this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -1967,7 +1954,7 @@ console.warn('DATA PAGE', id);
                                     //splice if old and new are the same
                                     for (var i = 0; i < tagArrayLength; i++) {
                                         var item = this.get('queryTags[' + i + ']');
-                                        console.log("ITEM: " + item);
+                                        //console.log("ITEM: " + item);
 
                                         //if array item is a FeatureType
                                         if (item.indexOf(splitNew[0]) > -1) {
@@ -1975,13 +1962,13 @@ console.warn('DATA PAGE', id);
                                             //before you splice remove the other element???
                                             for (var j = 0; j < tagArrayLength; j++) {
                                                 var item2 = this.get('queryTags[' + j + ']');
-                                                console.log("ITEM2: " + item2);
+                                                //console.log("ITEM2: " + item2);
 
                                                 if (item2 != undefined) {
                                                     if (item2.indexOf('SpeciesName') > -1 || item2.indexOf('SensorType') > -1 || item2.indexOf('ImageType') > -1) {
-                                                        console.log('item: ' + item2 + ' is a subcategory');
+                                                        //console.log('item: ' + item2 + ' is a subcategory');
                                                         this.splice('queryTags', j, 1);
-                                                        console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
+                                                        //console.log('STATE OF THE ARRAY: ' + this.get('queryTags'));
                                                         var arrayState = this.get('queryTags');
                                                         //this.set('queryTags', arrayState);
                                                     }
@@ -1989,13 +1976,13 @@ console.warn('DATA PAGE', id);
 
                                             }
 
-                                            console.log("SPLICE THE NEW VALUE AT: " + item);
+                                            //console.log("SPLICE THE NEW VALUE AT: " + item);
                                             this.splice('queryTags', i, 1, newValue);
 
                                             break
                                         }
                                         if (i === tagArrayLength - 1) { //only push it if checked against whole array
-                                            console.log("PUSH " + newValue);
+                                            //console.log("PUSH " + newValue);
                                             this.push('queryTags', newValue);
                                         }
                                     }
@@ -2011,7 +1998,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -2024,7 +2011,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -2037,7 +2024,7 @@ console.warn('DATA PAGE', id);
                                 //iterate through array, either splice or push new sensor
                                 if (this.get('queryTags.length') === 0) {
                                     this.push('queryTags', newValue);
-                                    console.log("PUSH : " + newValue);
+                                    //console.log("PUSH : " + newValue);
                                 } else {
 
                                     this.addElement(tagArrayLength, splitNew[0], newValue);
@@ -2050,19 +2037,19 @@ console.warn('DATA PAGE', id);
                 ///
             },
             addElement: function (arrayLength, splitValue, newVal) {
-                console.log("ARRAY HAS ELEMENTS");
+                //console.log("ARRAY HAS ELEMENTS");
                 //splice if old and new are the same
                 for (var i = 0; i < arrayLength; i++) {
                     var item = this.get('queryTags[' + i + ']');
-                    console.log("ITEM: " + item);
+                    //console.log("ITEM: " + item);
 
                     if (item.indexOf(splitValue) > -1) {
-                        console.log("SPLICE THE NEW VALUE AT: " + item);
+                        //console.log("SPLICE THE NEW VALUE AT: " + item);
                         this.splice('queryTags', i, 1, newVal);
                         return
                     }
                     if (i === arrayLength - 1) { //only push it if checked against whole array
-                        console.log("PUSH " + newVal);
+                        //console.log("PUSH " + newVal);
                         this.push('queryTags', newVal);
                     }
                 }
@@ -2157,7 +2144,7 @@ console.warn('DATA PAGE', id);
             template:"#d3-template",
             oninit:function(){
                 // d3Graph("#d3-content")
-                console.log("d3 ractive");
+                //console.log("d3 ractive");
                 d3Page.show();
                 d3Page.loadData("/api/features/?FeatureType=sighting&SpeciesName=African Jacana&limit=40", "sighting");
             },
@@ -2209,21 +2196,21 @@ console.warn('DATA PAGE', id);
     page.getSpeciesList = function() {
         d3.json("http://intotheokavango.org/api/species", function(error, data) {
             if(error) {
-                console.error("Failed to load " + url);
-                console.log(error);
+                //console.error("Failed to load " + url);
+                //console.log(error);
                 return error;
             } else {
                 for (species in data.results) {
                     var count = data.results[species];
                     //console.log(species + ": " + count);
                     if(species.indexOf("quote") != -1 || species.indexOf("test") != -1 || species.indexOf("Test") != -1) {
-                        console.log("not a species");
+                        //console.log("not a species");
                     } else {
                         speciesList.push(species);
                     }
                 }
                 speciesList.sort();
-                console.log(speciesList);
+                //console.log(speciesList);
             }
         });
         return speciesList;
@@ -2260,7 +2247,7 @@ console.warn('DATA PAGE', id);
     };
 
     page.loadRactive = function() {
-        console.warn("loading ractive!!!");
+        //console.warn("loading ractive!!!");
         ractive = new Ractive({
             el: '#data-content',
             // We could pass in a string, but for the sake of convenience
@@ -2268,11 +2255,11 @@ console.warn('DATA PAGE', id);
             // template: '#navTemplate',
             template: '#content-template',
             oninit:function(){
-                console.warn('ON INIT')
+                //console.warn('ON INIT')
                 this.setActive('overview');
             },
             setActive: function(id){
-                console.warn('ID', id);
+                //console.warn('ID', id);
                 this.set('section', id);
                 d3.select('#data-navigation li.documentation').classed('active', false);
                 d3.select('#data-navigation li.overview').classed('active', false);
@@ -2301,9 +2288,16 @@ console.warn('DATA PAGE', id);
 
 
     page.loadRactive();
-    page.getFeatureTotalData(features[index]);
-    page.getSpeciesList();
     
+    if(dataPageActive) {
+        
+        page.getFeatureTotalData(features[index]);
+        page.getSpeciesList();
+        console.log("dataPageActive is: " + dataPageActive);
+        //return page;
+    } else {
+        console.log("dataPageActive is: " + dataPageActive);
+    }
     
     // var D3View = Ractive.extend({
     //     el:'#d3-content',
@@ -2574,7 +2568,7 @@ function Sighting(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<600 && pages.active.id == 'map'){
+    		if(Math.abs(date.getTime()/1000-t)<450 && pages.active.id == 'map'){
     			if(!popupVisible) {
     				marker.showLabel();
     				popupVisible = true;
@@ -3427,7 +3421,6 @@ function Page(i){
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		// mapWorld.setZoom(id == 'journal' ? 15 : 17, {animate:false});
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
@@ -3498,7 +3491,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17, {animate:lastActive.id=='journal'});
+		mapWorld.setZoom(timeline.getUnzoomState(), {animate:lastActive.id=='journal'});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -3547,7 +3540,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		mapWorld.setZoom(15, {animate:lastActive.id=='map'});
+		mapWorld.setZoom(Math.min(15,timeline.getUnzoomState()||15), {animate:lastActive.id=='map'});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 
@@ -3610,7 +3603,6 @@ function GalleryPage(){
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
-		console.log('WAT');
 		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);
@@ -3640,6 +3632,7 @@ function GalleryPage(){
 	Loads all features day by day and stores them .
 */
 
+
 function Loader(){
 
 	var loading = [];
@@ -3656,26 +3649,13 @@ function Loader(){
 
 
 	function getDayCount(callback){
-		var query = 'http://intotheokavango.org/api/expeditions';
+		
+		var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&order=-1&limit=1'
 		d3.json(query, function(error, data){
 			if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-			data = data.results;
-			var d = data['okavango_'+expeditionYear].StartDate.split(' ')[0];
-			var len = data['okavango_'+expeditionYear].Days + 2;
-			var findLastDay = function(){
-				var query = 'http://intotheokavango.org/api/features?FeatureType=ambit_geo&Expedition=okavango_'+expeditionYear+'&expeditionDay='+(len-1)+'&limit=10';
-				d3.json(query, function(error, data) {
-					if(error) return console.log("Failed to load " + query + ": " + error.statusText);
-					if(data.total == 0) {
-						len --;
-						findLastDay();
-					} else {
-						callback(len, d);
-					}
-				});
-			}
-			findLastDay();
-
+			var d = new Date(data.results.features[0].properties.t_utc*1000);
+			var len = Math.ceil((d.getTime() - timeOffsets[expeditionYear].startDate.getTime()) / (1000*60*60*24)) + 1;
+			callback(len);
 		});
 	}
 
@@ -3760,20 +3740,17 @@ function Loader(){
 			        members[name].addAmbitGeo(day, latLng, time, core);
 			    }
 			});
-			var activityInterval = [0, 10000000000];
+			var activityInterval = [10000000000, 0];
 			for(m in members){
 				var member = members[m];
 				var pathQueue = member.getPathQueueByDay(day);
-				if(!pathQueue){
-					// member.fillEmptyPathQueue(day);
-				} else {
-					if(activityInterval[0] < pathQueue[0].time) activityInterval[0] = pathQueue[0].time;
-					if(activityInterval[1] > pathQueue[pathQueue.length-1].time) activityInterval[1] = pathQueue[pathQueue.length-1].time;
+				if(pathQueue){
+					activityInterval[0] = Math.min(activityInterval[0],d3.min(pathQueue, function(d){return d.time}));
+					activityInterval[1] = Math.max(activityInterval[1],d3.max(pathQueue, function(d){return d.time}));
 				}
 			}
-			if(activityInterval[0]==0 && activityInterval[1]==10000000000) activityInterval = [10000000000,0];
-			activityInterval[0]+=(10*60);
-			activityInterval[1]-=(10*60);
+			// activityInterval[0]+=(10*60);
+			// activityInterval[1]-=(10*60);
 			for(m in members) members[m].initPathQueue();
 			timeline.setNightTime(day, activityInterval);
 
@@ -3786,7 +3763,6 @@ function Loader(){
 							"coordinates":ambitCoords[m]
 						}
 					}];
-
 					var c = members[m].getColor();
 
 					var pathStyle = {
@@ -3840,7 +3816,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var message = expeditionYear == '15' ? feature.properties.Text : feature.properties.Tweet.text
                 	if(message){
-                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>');
+                		layer.bindPopup('<img src="static/img/iconTweet.svg"/><p class="message">'+message+'</p>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			e.target._popup._isForced = true;
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
@@ -3895,7 +3871,7 @@ function Loader(){
 		        onEachFeature: function(feature, layer){
                 	var title = feature.properties.Title;
                 	if(title){
-                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>');
+                		layer.bindPopup('<img src="static/img/mediumIcon.svg"/><h3 class="title">'+title+'</h3>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -4003,7 +3979,7 @@ function Loader(){
                 	var dimensions = feature.properties.Dimensions;
                 	if(photoUrl && dimensions){
                 		var horizontal = dimensions[0]>dimensions[1];
-                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>');
+                		layer.bindPopup('<img class="photo" src="'+photoUrl+'" '+(horizontal?'width="400px"':'height="200px"')+'/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -4063,7 +4039,7 @@ function Loader(){
                 	var url = feature.properties.ImageUrl;
                 	var dimensions = feature.properties.Dimensions;
                 	if(url && dimensions){
-                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>');
+                		layer.bindPopup('<img class="instagram" src="'+photoUrl+'" width="400px"/>',{autoPan:false});
                 		layer.addEventListener('click',function(e){
                 			if(e.target._popup._isOpen) timeline.togglePause('pause');
                 		})
@@ -4124,11 +4100,9 @@ function Loader(){
 			        return marker;
                 },
 			    style: function(feature) {
-			    	var c = Math.sqrt(feature.properties["Count"]);
+			    	var c = Math.sqrt(feature.properties["Count"]) || 0;
 			    	var so = {radius: 2 + (c * 2)};
-			    	if (feature.properties.SpeciesName.indexOf("quote.") != -1) {
-
-			    	} else {
+			    	if (feature.properties.SpeciesName.indexOf("quote.") == -1) {
 			    		var bn = feature.properties.SpeciesName;
 			    		if (colorMap[bn] == undefined) {
 			    			var c = new RColor().get(true);
@@ -4237,9 +4211,6 @@ function Loader(){
 		    callback();
 		});
 
-
-
-
 	}
 
 
@@ -4305,6 +4276,9 @@ function Loader(){
 		expeditionYear: expeditionYear
 	};
 }
+
+
+
 ;/* global variables */
 var map;                     // the map object
 var center;
@@ -4312,7 +4286,7 @@ var featureGroup;
 
 /* create the map */
 function initMap () {
-    console.log("center: " + center);
+    //console.log("center: " + center);
     map = new L.map('map', {
         layers: new L.TileLayer("http://a.tiles.mapbox.com/v3/" + mapbox_username + ".map-" + mapbox_map_id + "/{z}/{x}/{y}.png"),
         center: new L.LatLng(-19.003049, 22.414856), //was -17.003049, 20.414856; Menongue is -14.645009, 17.674752
@@ -4397,57 +4371,67 @@ var geojsonMarkerOptions = {
 
 /* load data file */
 function loadData () {
-    //console.log("loadData");
-    //console.log(path_to_data);
-    var url = "http://intotheokavango.org" + path_to_data;
-    //console.log(url);
-    $.getJSON(url, function(data) {
-        var featureCollection = data['results'];
-        //console.log(featureCollection);
-        var sightingsWithGeoLoc = [];
-        
-        for (d in featureCollection.features) {
-            var item = featureCollection.features[d];
-            if(item.geometry === null) {
-                //console.log("sighting has no geometry");
-            } else {
-                //console.log("sighting with geometry");
-                sightingsWithGeoLoc.push(item);
-            }
-        }
-        //console.log(sightingsWithGeoLoc);
-        filteredFeatureCollection = {};
-        filteredFeatureCollection.features = sightingsWithGeoLoc;
-        filteredFeatureCollection.type = "FeatureCollection";
 
-        featureGroup = L.geoJson(filteredFeatureCollection, {
-            pointToLayer: function (feature, latlng) {
-                if (!feature.properties.SpeciesName) {
-                    var name = feature.properties.FeatureType;
+    //console.log("loadData");
+    try {
+        //console.log(path_to_data);
+
+        initMap();
+
+        var url = "http://intotheokavango.org" + path_to_data;
+        //console.log(url);
+        $.getJSON(url, function(data) {
+            var featureCollection = data['results'];
+            //console.log(featureCollection);
+            var sightingsWithGeoLoc = [];
+            
+            for (d in featureCollection.features) {
+                var item = featureCollection.features[d];
+                if(item.geometry === null) {
+                    //console.log("sighting has no geometry");
                 } else {
-                    var name = feature.properties.SpeciesName;
-                } 
-                var timestamp = feature.properties.t_utc;
-                var marker = L.circleMarker(latlng, geojsonMarkerOptions);
-                var coords = feature.geometry.coordinates;
-                return marker;
-            },
-            onEachFeature: function (feature, layer) {
-                if (!feature.properties.SpeciesName) {
-                    var name = feature.properties.FeatureType;
-                    layer.bindPopup("<h3>" + name + "</h3><p>" + feature['properties']['DateTime'] + "</p>");
-                } else {
-                    var name = feature.properties.SpeciesName;
-                    var count = feature.properties.Count;
-                    layer.bindPopup("<h3>" + name + "</h3><p>" + "Count: " + count + "</p><p>" + feature['properties']['DateTime'] + "</p>");
-                } 
-                
+                    //console.log("sighting with geometry");
+                    sightingsWithGeoLoc.push(item);
+                }
             }
-        }).addTo(map);
-        L.control.scale().addTo(map);
-        map.fitBounds(featureGroup.getBounds());
-        initMapLabels(map);
-    }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
+            //console.log(sightingsWithGeoLoc);
+            filteredFeatureCollection = {};
+            filteredFeatureCollection.features = sightingsWithGeoLoc;
+            filteredFeatureCollection.type = "FeatureCollection";
+
+            featureGroup = L.geoJson(filteredFeatureCollection, {
+                pointToLayer: function (feature, latlng) {
+                    if (!feature.properties.SpeciesName) {
+                        var name = feature.properties.FeatureType;
+                    } else {
+                        var name = feature.properties.SpeciesName;
+                    } 
+                    var timestamp = feature.properties.t_utc;
+                    var marker = L.circleMarker(latlng, geojsonMarkerOptions);
+                    var coords = feature.geometry.coordinates;
+                    return marker;
+                },
+                onEachFeature: function (feature, layer) {
+                    if (!feature.properties.SpeciesName) {
+                        var name = feature.properties.FeatureType;
+                        layer.bindPopup("<h3>" + name + "</h3><p>" + feature['properties']['DateTime'] + "</p>");
+                    } else {
+                        var name = feature.properties.SpeciesName;
+                        var count = feature.properties.Count;
+                        layer.bindPopup("<h3>" + name + "</h3><p>" + "Count: " + count + "</p><p>" + feature['properties']['DateTime'] + "</p>");
+                    } 
+                    
+                }
+            }).addTo(map);
+            L.control.scale().addTo(map);
+            map.fitBounds(featureGroup.getBounds());
+            initMapLabels(map);
+        }).error(function(e) { console.log("Failed to load " + path_to_data + ": " + e.statusText); });  
+    } 
+    catch (e) {
+        // console.log(e);
+        // console.log("no path_to_data");
+    }
 }
 
 
@@ -4455,7 +4439,7 @@ function loadData () {
 $(document).ready(function() {
     //console.log("LOADING MAP");
     loadData();
-    initMap();
+    //initMap();
 });
 
 ;
@@ -4668,7 +4652,7 @@ function Timeline(){
 	var timeCursor = -1;
 	var prevTimeCursor = -1;
 
-	var autoSpeed = 2.5;
+	var autoSpeed = 2.2;
 	var speed = autoSpeed;
 	var tSpeed = autoSpeed;
 	var wheelDelta = 0;
@@ -4688,9 +4672,11 @@ function Timeline(){
 	var cursorDate = new Date();
 
 	var isUnzoomedTime = false;
-	var unzoomedTime = [[1431948652,1432199688],
+	var maxUnzoom = 17;
+	var unzoomedTime = [[1431948652, 1432199688],
 						[1433756474, 1433833065],
-						[1433848882,new Date().getTime()/1000]];
+						[1433848882, 1435031940],
+						[1441887300, 1442494000]];
 
 	var milestones = {
 		0 : 'Menongue',
@@ -4941,25 +4927,28 @@ function Timeline(){
 			}
 		}
 		if(isNightTime != n) nightNode.classed('night',n);
+		// console.log('nighttime', n);
 		isNightTime = n;
+		// isNightTime = false;
 	}
 
 	function checkUnzoom(force, reset){
 		if(mapWorld.focusMember && pages.active.id == 'map'){
 			for(var i=0; i<unzoomedTime.length; i++){
 				var u = timeCursor >= unzoomedTime[i][0] && timeCursor < unzoomedTime[i][1];
+				if(i==unzoomedTime.length-1) maxUnzoom = true;
 				if(u) break;
 			}
 			if(isUnzoomedTime != u || reset) {
-				mapWorld.setZoom(u?15:17, {animate:!force});
+				mapWorld.setZoom(!u?17:!maxUnzoom?15:13, {animate:!force});
 			}
 			isUnzoomedTime = u;
+			maxUnzoom = !u?17:!maxUnzoom?15:13;
 		}
 	}
 
 	function getUnzoomState(){
-		checkUnzoom();
-		return isUnzoomedTime;
+		return maxUnzoom;
 	}
 
 
@@ -5362,6 +5351,7 @@ var mouseOffset = L.point(0, 0);
 var mapOffset = L.point(0, 0);
 var mapLatLng;
 var mapTLatLng;
+var dataPageActive = false;
 
 var expeditionYear = '15';
 
@@ -5375,7 +5365,8 @@ var timeOffsets = {
 		'query': -1,
 		'departure': 3,
 		'startDate':0,
-		'instagram':0
+		'instagram':0,
+		'startDate': new Date(1408233600000)
 	},
 	'15':{
 		'timeAmbit': 0,
@@ -5386,7 +5377,8 @@ var timeOffsets = {
 		'query': 0,
 		'departure': 3,
 		'startDate':-1,
-		'instagram':-1
+		'instagram':-1,
+		'startDate': new Date(1431734400000)
 	}
 }
 
@@ -5465,12 +5457,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
     wanderer = Wanderer(mapWorld.getCenter());
 
+
 	// pages.about.show();
     pages.active = pages.map;
 	pages.map.show();
 	setLayoutInteractions();
-	loader.getDayCount(function(dayCount,startDate,endDate){
-		timeline.setDates(dayCount,startDate);
+	loader.getDayCount(function(dayCount){
+		timeline.setDates(dayCount,timeOffsets[expeditionYear].startDate);
+
 		loader.loadDay(timeline.getTimeCursor().day,function(day){
 			timeline.setTimeFrame();
 			feed.init(day);
@@ -5482,8 +5476,11 @@ document.addEventListener('DOMContentLoaded', function(){
 			isLoading = false;
 			updateLoadingScreen(false);
 			feed.jump(timeline.getTimeCursor());
-			if(loader.members['Steve']) loader.members['Steve'].focus();
-			else {
+			if(loader.members['Steve']){
+				loader.members['Steve'].focus();
+				mapLatLng = loader.members['Steve'].getLatLng();
+				mapWorld.panTo(mapLatLng);
+			} else {
 				for(var k in loader.members){
 					loader.members[k].focus();
 					break;
@@ -5618,6 +5615,8 @@ document.addEventListener('DOMContentLoaded', function(){
 		    		pages.active.hide();
 		    		pages[t].show();
 		    		resize();
+		    	} else if (i === 3) {
+		    		dataPageActive = true;
 		    	}
 	    	});
 

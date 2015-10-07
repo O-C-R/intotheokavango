@@ -48,7 +48,6 @@ function Page(i){
 		button.classed('active',true);
 		pages.active = this;
 		offsetHeader(id=='about' || id=='data');
-		// mapWorld.setZoom(id == 'journal' ? 15 : 17, {animate:false});
 		header.classed('dark',false);
 		d3.select('#night').style('display',(id != 'journal' && id != 'map' ? 'none':'block'));
 		updateLoadingScreen(true);
@@ -119,7 +118,7 @@ function MapPage(){
 			if(lastActive.id != 'journal') timeline.togglePause('pause');
 			setTimeout(function(){timeline.togglePause('resume');},lastActive.id == 'journal' ? 1000 : 2000);
 		}
-		mapWorld.setZoom(timeline.getUnzoomState() ? 15 : 17, {animate:lastActive.id=='journal'});
+		mapWorld.setZoom(timeline.getUnzoomState(), {animate:lastActive.id=='journal'});
 		page.header.classed('dark',true);
 		d3.select('#contentContainer').classed('map',true);
 		d3.select('#night').style('display',(page.id != 'journal' && page.id != 'map' ? 'none':'block'));
@@ -168,7 +167,7 @@ function JournalPage(){
 			page.panes[i].show();
 		}
 		if(timeline) timeline.togglePause('pause');
-		mapWorld.setZoom(15, {animate:lastActive.id=='map'});
+		mapWorld.setZoom(Math.min(15,timeline.getUnzoomState()||15), {animate:lastActive.id=='map'});
 		feed.jump(timeline.getTimeCursor());
 		page.header.classed('dark',false);
 
@@ -231,7 +230,6 @@ function GalleryPage(){
 	page.button = d3.select('#navigation li.' + page.id);
 
 	page.show = function(){
-		console.log('WAT');
 		var lastActive = pages.active;
 		page.getNode().classed('hidden',false);
 		page.button.classed('active',true);

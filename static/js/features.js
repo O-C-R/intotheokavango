@@ -52,7 +52,7 @@ function Sighting(feature, m){
 
 	function animate(t){
         if(marker){
-    		if(Math.abs(date.getTime()/1000-t)<600 && pages.active.id == 'map'){
+    		if(Math.abs(date.getTime()/1000-t)<450 && pages.active.id == 'map'){
     			if(!popupVisible) {
     				marker.showLabel();
     				popupVisible = true;
