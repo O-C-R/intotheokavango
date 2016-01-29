@@ -12,8 +12,8 @@ def parse(request):
 
     data = {'FeatureType': "beacon"}
     try:
-        content = content['messageList']['message'][0]
         print(content)
+        content = content['messageList']['message'][0]
         data['latitude'] = float(content['latitude'])
         data['longitude'] = float(content['longitude'])
         data['t_utc'] = int(content['timeInGMTSecond'])
@@ -22,6 +22,9 @@ def parse(request):
         data['ID'] = content['id']
         data['MessageType'] = content['messageType']
         data['MessageDetail'] = content['messageDetail']
+        if 'TRACK' not in data['MessageType']:
+            log.warning("Received %s: %s" % (data['MessageType'], data['MessageDetail']))
+            data = {}
     except Exception as e:
         log.error(log.exc(e))
         log.error(content)
