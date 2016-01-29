@@ -8,11 +8,12 @@ def parse(request):
     if content is None:
         return content, "Could not parse"
 
-    print(request.headers)
+    # print(request.headers)
 
     data = {'FeatureType': "beacon"}
     try:
         content = content['messageList']['message'][0]
+        print(content)
         data['latitude'] = float(content['latitude'])
         data['longitude'] = float(content['longitude'])
         data['t_utc'] = int(content['timeInGMTSecond'])
