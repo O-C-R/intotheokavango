@@ -1,4 +1,4 @@
-import importlib, os, json, tornado, json, shutil, uuid, os, zipfile
+import importlib, os, json, tornado, json, shutil, uuid, os, zipfile, xmltodict
 from PIL import ExifTags, Image
 from housepy import config, log, server, util, strings
 from housepy.server import Application
@@ -310,6 +310,15 @@ def ingest_json_body(request):
         log.error(log.exc(e))
         return None
     return data      
+
+def ingest_xml_body(request):
+    """Generic method for ingesting an XML in the body of the post"""
+    try:
+        data = xmltodict.parse(str(request.body, encoding='utf-8'))
+    except Exception as e:
+        log.error(log.exc(e))
+        return None
+    return data   
 
 def ingest_plain_body(request):
     """Generic method for ingesting the body of the post"""

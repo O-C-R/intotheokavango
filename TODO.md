@@ -1,8 +1,10 @@
-### test
-- are sightings without images being pushed? or are the images not being added?
+### new / okavango_16
 
-### new
-- add SensorType (FeatureSubType) to SMS sensors
+triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
+
+ambit is the only thing via email now. can we eliminate that?
+
+update mongo / fix altitude issue
 
 
 ### server

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, xmltodict, json, shutil, urllib, math, subprocess
+import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, json, shutil, urllib, math, subprocess
 from housepy import config, log, util, strings, emailer, net
 from mongo import db
 
