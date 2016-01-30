@@ -1,0 +1,106 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+
+<script>
+    $(document).ready(function() {
+        // console.log('ready');
+        $('#setCore').mousedown(function () {
+            console.log("click");
+            var data = {};
+            {% for member in dbmembers %}
+            data['{{ member.Name }}'] = $("#{{ member.Name }}").is(':checked');
+            {% endfor %}
+            var ajaxRequest = $.ajax({
+                type: "POST",
+                url: "/setCore",
+                data: data,
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    console.log(data);
+                    alert(xhr.responseText);
+                }
+            });
+            ajaxRequest.done(function (xhr, textStatus) {
+                alert(textStatus);
+                document.location.reload();
+            });
+        });    
+
+        $('.member_team').change(function() {
+            var team = $(this).val();
+            var member = $(this).attr('id');            
+            if (team == "new") {
+                var teamName = prompt("Enter the name of " + member + "'s new team:", "");
+                $.ajax({
+                    type: "POST",
+                    url: "/teams",
+                    data: {new_team: teamName, member: member},
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                        alert(xhr.responseText);
+                    }
+                }).done(function (xhr, textStatus) {
+                    // alert(textStatus);
+                    document.location.reload();
+                });
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/teams",
+                    data: {team: team, member: member},
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
+                        console.log(data);
+                        alert(xhr.responseText);
+                    }
+                }).done(function (xhr, textStatus) {
+                    // alert(textStatus);
+                    document.location.reload();
+                });                
+            }
+        });
+
+    })
+
+
+</script>
+
+{% endblock head %}
+
+{% block body %}
+<div id="textarea" style="padding:30px">
+<h2>TEAMS</h2>
+<br />
+<form style="padding-bottom:20px">
+<table>
+    {% for member in dbmembers %}
+    <tr>
+        <td><a href="/teams/{{ member.Name }}">{{ member.Name }}</a></td>
+        <td><select class="member_team" id="{{ member.Name }}"> 
+        <!-- onchange="makeNew('{{ member.Name }}');"> -->
+            <option value="NONE">NONE</option>
+            {% for team in dbteams %}
+                {% if team == member.Team %}
+                    <option value="{{ team }}" selected="selected">{{ team }}</option>
+                {% else %}
+                    <option value="{{ team }}">{{ team }}</option>
+                {% endif %}
+            {% endfor %}
+            <option value="new">-- NEW --</option>            
+        </select></td>
+    </tr>
+    {% endfor %}
+</table>
+</form>
+<div>
+
+{% endblock body %}

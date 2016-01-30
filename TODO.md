@@ -1,14 +1,15 @@
 ### new / okavango_16
 
 triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
-
 ambit is the only thing via email now. can we eliminate that?
-
 update mongo / fix altitude issue
+retro-fix core->team
+
+all server updates and upgrades
 
 
 ### server
-- make github private
+- make github private?
 
 ### improvements
 - caching

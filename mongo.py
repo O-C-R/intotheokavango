@@ -19,10 +19,12 @@ def make_indexes():
       db.features.create_index("properties.SpeciesName")
       db.features.create_index([("properties.SpeciesName", "text")])
       db.features.create_index("properties.CoreExpedition")
+      db.features.create_index("properties.Team")
       db.features.create_index([("geometry", GEOSPHERE)])
       db.members.create_index("Name")
       db.members.create_index("t_utc")
       db.members.create_index("Core")
+      db.members.create_index("Team")
   except Exception as e:
       log.error(log.exc(e))
 
