@@ -75,7 +75,7 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
     if not feature:
         return False, "Missing t_utc"
     feature = verify_expedition(feature)
-    feature = tag_core(feature)        
+    feature = tag_team(feature)        
     feature = verify_geometry(feature)
     if feature['geometry'] is None:
         feature = estimate_geometry(feature, db)         
@@ -236,6 +236,10 @@ def verify_t(data):
 
 def verify_expedition(data):
     """Verify we have an Expedition and Member property"""
+    try:
+        db = Application.instance.db
+    except AttributeError:
+        from mongo import db        
     for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member']:
         if wrong in data['properties']:
             if 'Member' not in data['properties']:
@@ -252,57 +256,80 @@ def verify_expedition(data):
             data['properties']['Member'] = None
         else:
             data['properties']['Member'] = data['properties']['Member'].strip().split(' ')[0]
-    if 'Team' not in data['properties']:
-        data['properties']['Team'] = None
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'oe') # sorry Goetz
         try:
-            db = Application.instance.db
-            member_l = list(db.members.find({'Name': data['properties']['Member']}).sort('t_utc', -1).limit(1))
-            if not len(member_l):
-                db.members.insert({'Name': data['properties']['Member'], 'Team': None, 'Core': False, 't_utc': util.timestamp()})
-            else:
-                member = member_l[0]
-                data['properties']['Team'] = member['Team'] if 'Team' in member else None
+            if not db.members.find({'Name': data['properties']['Member']}).count():
+                db.members.insert({'Name': data['properties']['Member'], 'Team': None, 'Core': False, 't_utc': data['properties']['t_utc']})
         except Exception as e:
             log.error(log.exc(e))
-
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
 
     return data
 
-def tag_core(data):
-    if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
-        return data
+# def tag_core(data):
+#     if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
+#         return data
+#     try:
+#         db = Application.instance.db
+#     except AttributeError:
+#         from mongo import db    
+#     try:
+#         member = data['properties']['Member']
+#         if member is None:
+#             core_sat = config['satellites'][0]
+#             if 'Satellite' in data['properties']:
+#                 core = data['properties']['Satellite'] == core_sat
+#                 log.info("--> satellite, core is %s" % core)
+#             else:
+#                 log.info("--> null Member, core is True")
+#                 core = True
+#         else:
+#             t = data['properties']['t_utc']   
+#             try:
+#                 core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
+#                 log.info("--> core is %s" % core)
+#             except IndexError:
+#                 log.info("--> no core entry at time %s" % t)
+#                 core = False
+#         data['properties']['CoreExpedition'] = core
+#         return data
+#     except Exception as e:
+#         log.error(log.exc(e))
+#         return data
+
+def tag_team(data):
     try:
         db = Application.instance.db
     except AttributeError:
         from mongo import db    
     try:
         member = data['properties']['Member']
+        t = data['properties']['t_utc']           
         if member is None:
-            core_sat = config['satellites'][0]
             if 'Satellite' in data['properties']:
-                core = data['properties']['Satellite'] == core_sat
-                log.info("--> satellite, core is %s" % core)
+                # team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
+                
+                # list(db.teams.find({'Satellite': data['properties']['Satellite']}))
+
+                ##
+                log.info("--> satellite, team is %s" % team)
             else:
-                log.info("--> null Member, core is True")
-                core = True
+                log.info("--> no information for team")
         else:
-            t = data['properties']['t_utc']   
             try:
-                core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
-                log.info("--> core is %s" % core)
+                team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
+                log.info("--> team is %s" % team)
             except IndexError:
-                log.info("--> no core entry at time %s" % t)
-                core = False
-        data['properties']['CoreExpedition'] = core
+                log.info("--> no team entry at time %s" % t)
+                team = None
+        data['properties']['Team'] = team
         return data
     except Exception as e:
         log.error(log.exc(e))
-        return data
+        return data    
 
 def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""

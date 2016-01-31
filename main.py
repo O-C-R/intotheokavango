@@ -21,26 +21,26 @@ class Home(server.Handler):
         return self.render("index2.html")
 
 
-class Core(server.Handler):
+# class Core(server.Handler):
 
-    def get(self, page=None):
-        log.info("Core.get")
-        self.set_header("Access-Control-Allow-Origin", "*")
-        if page is None or not len(page):
-            members = []
-            for member in config['members']:
-                result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
-                if not len(result) or 'Core' not in result[0]:
-                    core = False
-                else:
-                    core = result[0]['Core']
-                members.append({'Name': member, 'Core': core})
-            return self.render("core.html", dbmembers=members)
-        else:
-            coretags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
-            for c, coretag in enumerate(coretags):
-                coretags[c] = util.datestring(coretag['t_utc'], config['local_tz']), coretag['Core'] if 'Core' in coretag else False
-            return self.render("core_member.html", member=page, coretags=coretags)
+#     def get(self, page=None):
+#         log.info("Core.get")
+#         self.set_header("Access-Control-Allow-Origin", "*")
+#         if page is None or not len(page):
+#             members = []
+#             for member in config['members']:
+#                 result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
+#                 if not len(result) or 'Core' not in result[0]:
+#                     core = False
+#                 else:
+#                     core = result[0]['Core']
+#                 members.append({'Name': member, 'Core': core})
+#             return self.render("core.html", dbmembers=members)
+#         else:
+#             coretags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
+#             for c, coretag in enumerate(coretags):
+#                 coretags[c] = util.datestring(coretag['t_utc'], config['local_tz']), coretag['Core'] if 'Core' in coretag else False
+#             return self.render("core_member.html", member=page, coretags=coretags)
 
     def post(self, nop=None):
         log.info("Core.post")
@@ -62,15 +62,19 @@ class Teams(server.Handler):
         log.info("Teams.get")
         self.set_header("Access-Control-Allow-Origin", "*")
         members = []        
+        satellites = config['satellites']        
         if page is None or not len(page):
-            satellites = config['satellites']
             teams = [team for team in self.db.teams.find().sort('Name') if 'Name' in team and len(team['Name'])]
-            print(teams)
             for member in [name for name in self.db.members.find().sort('Name').distinct('Name') if len(name)]:
                 result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
                 team = None if not len(result) or 'Team' not in result[0] else result[0]['Team']
                 members.append({'Name': member, 'Team': team})
             return self.render("teams.html", dbmembers=members, dbteams=teams, satellites=satellites)
+        elif page in satellites:
+            teamtags = list(self.db.satellites.find({'Name': page}).sort([('t_utc', ASCENDING)]))
+            for t, teamtag in enumerate(teamtags):
+                teamtags[t] = util.datestring(teamtag['t_utc'], config['local_tz']), teamtag['Team'] if 'Team' in teamtag else None
+            return self.render("team_satellite.html", satellite=page, teamtags=teamtags)
         else:
             teamtags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
@@ -123,11 +127,12 @@ class Teams(server.Handler):
         if satellite is not None and team is not None:
             log.info("Changing team %s to satellite %s" % (team, satellite))
             try:
+                self.db.teams.update({'Satellite': satellite}, {'$set': {'Satellite': None}})
                 if team == "NONE":
-                    log.debug("--> removing satellite")
-                    self.db.teams.update({'Satellite': satellite}, {'$set': {'Satellite': None}})
+                    team = None
                 else:
                     self.db.teams.update({'Name': team}, {'$set': {'Satellite': satellite}})
+                self.db.satellites.insert({'Name': satellite, 'Team': team, 'Core': False, 't_utc': t})                    
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad format")
@@ -147,7 +152,7 @@ class Teams(server.Handler):
 
 handlers = [
     (r"/teams/?([^/]*)", Teams),
-    (r"/setCore/?([^/]*)", Core),
+    # (r"/setCore/?([^/]*)", Core),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
     (r"/?([^/]*)", Home),    

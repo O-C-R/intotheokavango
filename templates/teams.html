@@ -109,7 +109,6 @@
                         <option value="{{ team.Name }}">{{ team.Name }}</option>
                     {% endif %}
                 {% endfor %}
-                <option value="new">-- NEW --</option>            
             </select>
         </td>
     </tr>    
@@ -122,19 +121,17 @@
 <table>
 {% for satellite in satellites %}
 <tr>
-    <td>{{ satellite }}</td>
+    <td><a href="/teams/{{ satellite }}">{{ satellite }}</a></td>
     <td>
         <select class="satellite_team" id="{{ satellite }}"> 
             <option value="NONE">NONE</option>
             {% for team in dbteams %}
-                {{ team }}{{ team.Satellite }}
                 {% if team.Satellite == satellite %}
                     <option value="{{ team.Name }}" selected="selected">{{ team.Name }}</option>
                 {% else %}
                     <option value="{{ team.Name }}">{{ team.Name }}</option>
                 {% endif %}
             {% endfor %}
-            <option value="new">-- NEW --</option>                        
         </select>
     </td>
 </tr>    
