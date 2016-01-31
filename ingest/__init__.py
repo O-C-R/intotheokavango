@@ -103,7 +103,7 @@ def verify_geojson(data):
         data = {'type': data['type'], 'geometry': data['geometry'], 'properties': data['properties']}                
         for key, value in data['properties'].items():
             fixed_key = strings.camelcase(key) if key != 't_utc' else key
-            fixed_key = "pH" if (fixed_key == "Ph" or fixed_key == "PH") else fixed_key
+            fixed_key = "pH" if (fixed_key == "Ph" or fixed_key == "PH") else fixed_key  ## hack
             data['properties'][fixed_key] = strings.as_numeric(value)
             if key != fixed_key:                
                 del data['properties'][key]
@@ -247,23 +247,30 @@ def verify_expedition(data):
             del data['properties'][wrong]
     if 'Member' not in data['properties']:
         data['properties']['Member'] = None
-
     if data['properties']['Member'] is not None:
         if data['properties']['Member'].lower() == "null" or data['properties']['Member'].lower() == "none" or len(data['properties']['Member'].strip()) == 0:
             data['properties']['Member'] = None
         else:
             data['properties']['Member'] = data['properties']['Member'].strip().split(' ')[0]
+    if 'Team' not in data['properties']:
+        data['properties']['Team'] = None
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'oe') # sorry Goetz
         try:
             db = Application.instance.db
-            if not db.members.find({'Name': data['properties']['Member']}).count():
+            member_l = list(db.members.find({'Name': data['properties']['Member']}).sort('t_utc', -1).limit(1))
+            if not len(member_l):
                 db.members.insert({'Name': data['properties']['Member'], 'Team': None, 'Core': False, 't_utc': util.timestamp()})
+            else:
+                member = member_l[0]
+                data['properties']['Team'] = member['Team'] if 'Team' in member else None
         except Exception as e:
             log.error(log.exc(e))
+
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
+
     return data
 
 def tag_core(data):
