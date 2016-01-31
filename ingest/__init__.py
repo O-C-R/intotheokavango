@@ -310,14 +310,15 @@ def tag_team(data):
         t = data['properties']['t_utc']           
         if member is None:
             if 'Satellite' in data['properties']:
-                # team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
-                
-                # list(db.teams.find({'Satellite': data['properties']['Satellite']}))
-
-                ##
-                log.info("--> satellite, team is %s" % team)
+                satellite = data['properties']['Satellite']
+                try:
+                    team = list(db.satellites.find({'Name': satellite, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
+                    log.info("--> team is %s" % team)
+                except IndexError:
+                    log.info("--> no team entry at time %s" % t)
+                    team = None
             else:
-                log.info("--> no information for team")
+                log.info("--> no info for team")
         else:
             try:
                 team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
