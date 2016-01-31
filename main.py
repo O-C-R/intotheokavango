@@ -63,15 +63,14 @@ class Teams(server.Handler):
         self.set_header("Access-Control-Allow-Origin", "*")
         members = []        
         if page is None or not len(page):
-            teams = list(self.db.teams.find().sort('Name').distinct('Name'))
-            for member in list(self.db.members.find().sort('Name').distinct('Name')):
+            satellites = config['satellites']
+            teams = [team for team in self.db.teams.find().sort('Name') if 'Name' in team and len(team['Name'])]
+            print(teams)
+            for member in [name for name in self.db.members.find().sort('Name').distinct('Name') if len(name)]:
                 result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
-                if not len(result) or 'Team' not in result[0]:
-                    team = None
-                else:
-                    team = result[0]['Team']
+                team = None if not len(result) or 'Team' not in result[0] else result[0]['Team']
                 members.append({'Name': member, 'Team': team})
-            return self.render("teams.html", dbmembers=members, dbteams=teams)
+            return self.render("teams.html", dbmembers=members, dbteams=teams, satellites=satellites)
         else:
             teamtags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
@@ -83,15 +82,32 @@ class Teams(server.Handler):
         new_team = self.get_argument('new_team', None)
         member = self.get_argument('member', None)
         team = self.get_argument('team', None)
+        satellite = self.get_argument('satellite', None)
         log.debug("new_team %s" % new_team)
         log.debug("member %s" % member)
         log.debug("team %s" % team)
+        log.debug("satellite %s" % satellite)
         t = util.timestamp()            
+        if satellite is not None and team is not None:
+            log.info("Changing team %s to satellite %s" % (team, satellite))
+            try:
+                if team == "NONE":
+                    log.debug("--> removing satellite")
+                    self.db.teams.update({'Satellite': satellite}, {'$set': {'Satellite': None}})
+                else:
+                    self.db.teams.update({'Name': team}, {'$set': {'Satellite': satellite}})
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad format")
+            return self.text("OK")
         if new_team is not None:
             team = strings.camelcase(new_team.strip())
             log.info("Creating new team %s" % team)
             try:
-                self.db.teams.insert({'Name': team, 't_utc': t})
+                if not self.db.teams.find({'Name': team}).count():
+                    self.db.teams.insert({'Name': team, 't_utc': t})
+                else:
+                    log.info("--> already exists")
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad format")
@@ -106,16 +122,6 @@ class Teams(server.Handler):
                 return self.error("Bad format")
             return self.text("OK")
         return self.error("Something wasn't right")
-
-        # try:
-        #     for member, status in self.request.arguments.items():
-        #         status = True if status[0].decode('utf-8') == "true" else False
-        #         t = util.timestamp()
-        #         log.debug("%s %s %s" % (member, status, t))
-        #         self.db.members.insert({'Name': member, 'Core': status, 't_utc': t})
-        # except Exception as e:
-        #     self.error(log.exc(e))
-        #     return self.error("Bad format")
         
 
 handlers = [

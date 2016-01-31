@@ -5,30 +5,6 @@
 
 <script>
     $(document).ready(function() {
-        // console.log('ready');
-        $('#setCore').mousedown(function () {
-            console.log("click");
-            var data = {};
-            {% for member in dbmembers %}
-            data['{{ member.Name }}'] = $("#{{ member.Name }}").is(':checked');
-            {% endfor %}
-            var ajaxRequest = $.ajax({
-                type: "POST",
-                url: "/setCore",
-                data: data,
-                error: function (xhr, status, error) {
-                    console.log(xhr);
-                    console.log(status);
-                    console.log(error);
-                    console.log(data);
-                    alert(xhr.responseText);
-                }
-            });
-            ajaxRequest.done(function (xhr, textStatus) {
-                alert(textStatus);
-                document.location.reload();
-            });
-        });    
 
         $('.member_team').change(function() {
             var team = $(this).val();
@@ -69,6 +45,26 @@
             }
         });
 
+        $('.satellite_team').change(function() {
+            var team = $(this).val();
+            var satellite = $(this).attr('id');            
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {team: team, satellite: satellite},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    console.log(data);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                document.location.reload();
+            });                
+        });
+
     })
 
 
@@ -80,19 +76,17 @@
 <div id="textarea" style="padding:30px">
 <h2>TEAMS</h2>
 <br />
-<form style="padding-bottom:20px">
 <table>
     {% for member in dbmembers %}
     <tr>
         <td><a href="/teams/{{ member.Name }}">{{ member.Name }}</a></td>
         <td><select class="member_team" id="{{ member.Name }}"> 
-        <!-- onchange="makeNew('{{ member.Name }}');"> -->
             <option value="NONE">NONE</option>
             {% for team in dbteams %}
-                {% if team == member.Team %}
-                    <option value="{{ team }}" selected="selected">{{ team }}</option>
+                {% if team.Name == member.Team %}
+                    <option value="{{ team.Name }}" selected="selected">{{ team.Name }}</option>
                 {% else %}
-                    <option value="{{ team }}">{{ team }}</option>
+                    <option value="{{ team.Name }}">{{ team.Name }}</option>
                 {% endif %}
             {% endfor %}
             <option value="new">-- NEW --</option>            
@@ -100,7 +94,30 @@
     </tr>
     {% endfor %}
 </table>
-</form>
+<br />
+<br />
+<h2>SATELLITES</h2>
+<br />
+<table>
+{% for satellite in satellites %}
+<tr>
+    <td>{{ satellite }}</td>
+    <td>
+        <select class="satellite_team" id="{{ satellite }}"> 
+            <option value="NONE">NONE</option>
+            {% for team in dbteams %}
+                {{ team }}{{ team.Satellite }}
+                {% if team.Satellite == satellite %}
+                    <option value="{{ team.Name }}" selected="selected">{{ team.Name }}</option>
+                {% else %}
+                    <option value="{{ team.Name }}">{{ team.Name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </td>
+</tr>    
+{% endfor %}
+</table>
 <div>
 
 {% endblock body %}

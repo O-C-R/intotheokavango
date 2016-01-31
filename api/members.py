@@ -12,6 +12,7 @@ def assemble(self, search, limit, order, resolution):
             for expedition in expeditions:
                 feature_types = list(self.db.features.find({'properties.Member': member, 'properties.Expedition': expedition}).distinct('properties.FeatureType'))
                 members[member][expedition] = feature_types
+            ## should probably have teams here too
     except Exception as e:
         return self.error(log.exc(e))
     total = returned = len(members)        
