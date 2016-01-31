@@ -256,7 +256,12 @@ def verify_expedition(data):
     if data['properties']['Member'] is not None:
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'oe') # sorry Goetz
-        #
+        try:
+            db = Application.instance.db
+            if not db.members.find({'Name': data['properties']['Member']}).count():
+                db.members.insert({'Name': data['properties']['Member'], 'Team': None, 'Core': False, 't_utc': util.timestamp()})
+        except Exception as e:
+            log.error(log.exc(e))
     if 'Expedition' not in data['properties']:
         data['properties']['Expedition'] = config['expedition']
     return data
