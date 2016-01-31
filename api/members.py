@@ -8,7 +8,7 @@ def assemble(self, search, limit, order, resolution):
         results = self.db.features.find(search).distinct('properties.Member')
         for member in results:
             expeditions = list(self.db.features.find({'properties.Member': member}).distinct('properties.Expedition'))
-            members[member] = expedition
+            members[member] = expeditions
             ## should probably have teams here too
     except Exception as e:
         return self.error(log.exc(e))
