@@ -80,14 +80,46 @@ class Teams(server.Handler):
     def post(self, nop=None):
         log.info("Team.post")
         new_team = self.get_argument('new_team', None)
+        new_member = self.get_argument('new_member', None)
         member = self.get_argument('member', None)
         team = self.get_argument('team', None)
         satellite = self.get_argument('satellite', None)
         log.debug("new_team %s" % new_team)
+        log.debug("new_member %s" % new_team)
         log.debug("member %s" % member)
         log.debug("team %s" % team)
         log.debug("satellite %s" % satellite)
-        t = util.timestamp()            
+        t = util.timestamp()      
+        if new_member is not None:
+            # borrowed from ingest code
+            if new_member.lower() == "null" or new_member.lower() == "none" or len(new_member.strip()) == 0:
+                new_member = None
+            else:
+                new_member = new_member.strip().split(' ')[0]
+            if new_member is not None:
+                new_member = new_member.title() if len(new_member) > 2 else new_member.upper()
+                new_member = new_member.replace('\u00f6', 'oe') # sorry Goetz
+            try:
+                if not self.db.members.find({'Name': new_member}).count():
+                    self.db.members.insert({'Name': new_member, 'Team': None, 'Core': False, 't_utc': t})
+                else:
+                    log.info("--> already exists")
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad format")                    
+            return self.text("OK")
+        if new_team is not None:
+            team = strings.camelcase(new_team.strip())
+            log.info("Creating new team %s" % team)
+            try:
+                if not self.db.teams.find({'Name': team}).count():
+                    self.db.teams.insert({'Name': team, 't_utc': t})
+                else:
+                    log.info("--> already exists")
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad format")    
+            return self.text("OK")
         if satellite is not None and team is not None:
             log.info("Changing team %s to satellite %s" % (team, satellite))
             try:
@@ -100,17 +132,6 @@ class Teams(server.Handler):
                 log.error(log.exc(e))
                 return self.error("Bad format")
             return self.text("OK")
-        if new_team is not None:
-            team = strings.camelcase(new_team.strip())
-            log.info("Creating new team %s" % team)
-            try:
-                if not self.db.teams.find({'Name': team}).count():
-                    self.db.teams.insert({'Name': team, 't_utc': t})
-                else:
-                    log.info("--> already exists")
-            except Exception as e:
-                log.error(log.exc(e))
-                return self.error("Bad format")
         if member is not None and team is not None:
             log.info("Changing %s to team %s" % (member, team))
             if team == "NONE":

@@ -13,6 +13,8 @@ right now:
 - users are created implicitly through content creation. should allow explicit creation.
 - need team deletion / reassignment
 
+right now, the list of people in the teams/members is grandfathered in from the config/core. so there's no way to create new members. To reconcile it, create members on ingest, and allow manual. 
+
 
 ### server
 - make github private?

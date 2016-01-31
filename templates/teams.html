@@ -5,49 +5,69 @@
 
 <script>
     $(document).ready(function() {
+        
+        $('#new_member_btn').mousedown(function() {
+            var member = $('#new_member').val();
+            if (!member.length) return;
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {new_member: member},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                alert("OK");
+                document.location.reload();
+            });            
+        });
+
+        $('#new_team_btn').mousedown(function() {
+            var team = $('#new_team').val();
+            if (!team.length) return;
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {new_team: team},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                alert("OK");                
+                document.location.reload();
+            });            
+        });
 
         $('.member_team').change(function() {
             var team = $(this).val();
             var member = $(this).attr('id');            
-            if (team == "new") {
-                var teamName = prompt("Enter the name of " + member + "'s new team:", "");
-                $.ajax({
-                    type: "POST",
-                    url: "/teams",
-                    data: {new_team: teamName, member: member},
-                    error: function (xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status);
-                        console.log(error);
-                        console.log(data);
-                        alert(xhr.responseText);
-                    }
-                }).done(function (xhr, textStatus) {
-                    // alert(textStatus);
-                    document.location.reload();
-                });
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "/teams",
-                    data: {team: team, member: member},
-                    error: function (xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status);
-                        console.log(error);
-                        console.log(data);
-                        alert(xhr.responseText);
-                    }
-                }).done(function (xhr, textStatus) {
-                    // alert(textStatus);
-                    document.location.reload();
-                });                
-            }
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {team: team, member: member},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                document.location.reload();
+            });                
         });
 
         $('.satellite_team').change(function() {
             var team = $(this).val();
-            var satellite = $(this).attr('id');            
+            var satellite = $(this).attr('id');     
             $.ajax({
                 type: "POST",
                 url: "/teams",
@@ -56,7 +76,6 @@
                     console.log(xhr);
                     console.log(status);
                     console.log(error);
-                    console.log(data);
                     alert(xhr.responseText);
                 }
             }).done(function (xhr, textStatus) {
@@ -80,18 +99,20 @@
     {% for member in dbmembers %}
     <tr>
         <td><a href="/teams/{{ member.Name }}">{{ member.Name }}</a></td>
-        <td><select class="member_team" id="{{ member.Name }}"> 
-            <option value="NONE">NONE</option>
-            {% for team in dbteams %}
-                {% if team.Name == member.Team %}
-                    <option value="{{ team.Name }}" selected="selected">{{ team.Name }}</option>
-                {% else %}
-                    <option value="{{ team.Name }}">{{ team.Name }}</option>
-                {% endif %}
-            {% endfor %}
-            <option value="new">-- NEW --</option>            
-        </select></td>
-    </tr>
+        <td>
+            <select class="member_team" id="{{ member.Name }}"> 
+                <option value="NONE">NONE</option>
+                {% for team in dbteams %}
+                    {% if team.Name == member.Team %}
+                        <option value="{{ team.Name }}" selected="selected">{{ team.Name }}</option>
+                    {% else %}
+                        <option value="{{ team.Name }}">{{ team.Name }}</option>
+                    {% endif %}
+                {% endfor %}
+                <option value="new">-- NEW --</option>            
+            </select>
+        </td>
+    </tr>    
     {% endfor %}
 </table>
 <br />
@@ -113,11 +134,21 @@
                     <option value="{{ team.Name }}">{{ team.Name }}</option>
                 {% endif %}
             {% endfor %}
+            <option value="new">-- NEW --</option>                        
         </select>
     </td>
 </tr>    
 {% endfor %}
 </table>
+<br />
+<br />
+NEW MEMBER<br /><input type="text" id="new_member" size="15" /><input id="new_member_btn" type="button" value="Create" />
+<br />
+<br />
+<br />
+NEW TEAM<br /><input type="text" id="new_team" size="15" /><input id="new_team_btn" type="button" value="Create" />
+<br />
+<br />
 <div>
 
 {% endblock body %}
