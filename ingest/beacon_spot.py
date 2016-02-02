@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 from ingest import ingest_xml_body
 from housepy import config, log, strings, util, net
 
@@ -12,7 +13,9 @@ def parse(request):
 
     data = {'FeatureType': "beacon"}
     try:
-        content = content['messageList']['message'][0]
+        content = content['messageList']['message']
+        if type(content) is not OrderedDict:
+            content = content[0]
         data['latitude'] = float(content['latitude'])
         data['longitude'] = float(content['longitude'])
         data['t_utc'] = int(content['timeInGMTSecond'])
