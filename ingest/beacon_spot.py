@@ -24,6 +24,8 @@ def parse(request):
         data['ID'] = content['id']
         data['MessageType'] = content['messageType']
         data['MessageDetail'] = content['messageDetail']
+        data['batteryState'] = None if 'batteryState' not in content else content['batteryState']
+        data['mode'] = None if 'mode' not in content else content['mode']
     except Exception as e:
         log.error(log.exc(e))
         log.error(content)
