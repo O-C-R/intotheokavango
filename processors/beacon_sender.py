@@ -18,7 +18,7 @@ def main():
             datetime = last_beacon['properties']['DateTime']
             lon, lat = last_beacon['geometry']['coordinates']
             satellite = last_beacon['properties']['Satellite']
-            google = "https://www.google.com/maps/@%s,%s,15z" % (latitude, longitude)
+            google = "https://www.google.com/maps/@%s,%s,15z" % (lat, lon)
             text.append("%s\n%s\n%f,%f\n%s" % (satellite, datetime, lat, lon, google))
             log.info("--> last reported beacon (%s on %s) at: %f,%f" % (satellite, datetime, lat, lon))
         except Exception as e:
@@ -26,7 +26,7 @@ def main():
     try:
         log.info("Emailing to %s..." % EMAILS)
         text = "\n\n".join(text)
-        emailer.send(EMAILS, "Core beacon location", text)
+        emailer.send(EMAILS, "OWP beacon report", text)
     except Exception as e:
         log.error("Could not email: %s" % log.exc(e))
 
