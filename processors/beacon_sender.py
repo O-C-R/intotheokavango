@@ -18,7 +18,7 @@ def main():
             datetime = last_beacon['properties']['DateTime']
             lon, lat = last_beacon['geometry']['coordinates']
             satellite = last_beacon['properties']['Satellite']
-            google = "https://www.google.com/maps/@%s,%s,15z" % (lat, lon)
+            google = "https://www.google.com/maps/place/%s,%s" % (lat, lon)
             text.append("%s\n%s\n%f,%f\n%s" % (satellite, datetime, lat, lon, google))
             log.info("--> last reported beacon (%s on %s) at: %f,%f" % (satellite, datetime, lat, lon))
         except Exception as e:
