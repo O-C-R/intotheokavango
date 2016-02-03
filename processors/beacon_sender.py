@@ -12,16 +12,16 @@ def main():
         log.info("--> no emails")
         return
     text = []
-    try:
-        for satellite in config['satellites']:
+    for satellite in config['satellites']:
+        try:
             last_beacon = list(db.features.find({'properties.FeatureType': "beacon", 'properties.Satellite': {'$eq': satellite}}).sort('properties.t_utc', -1).limit(1))[0]
             datetime = last_beacon['properties']['DateTime']
             lon, lat = last_beacon['geometry']['coordinates']
             satellite = last_beacon['properties']['Satellite']
             text.append("%s\n%s\n%f,%f" % (satellite, datetime, lat, lon))
             log.info("--> last reported beacon (%s on %s) at: %f,%f" % (satellite, datetime, lat, lon))
-    except Exception as e:
-        log.error("Could not get update: %s" % log.exc(e))
+        except Exception as e:
+            log.error("Could not get update: %s" % log.exc(e))
     try:
         log.info("Emailing to %s..." % EMAILS)
         text = "\n\n".join(text)
