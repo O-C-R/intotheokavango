@@ -324,7 +324,7 @@ def tag_team(data):
             try:
                 team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
                 log.info("--> team is %s" % team)
-            except IndexError:
+            except (IndexError, KeyError):
                 log.info("--> no team entry at time %s" % t)
                 team = None
         data['properties']['Team'] = team
