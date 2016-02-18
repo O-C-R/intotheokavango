@@ -257,6 +257,7 @@ def verify_expedition(data):
         else:
             data['properties']['Member'] = data['properties']['Member'].strip().split(' ')[0]
     if data['properties']['Member'] is not None:
+        data['properties']['Member'] = strings.depunctuate(data['properties']['Member'])[:15]        
         data['properties']['Member'] = data['properties']['Member'].title() if len(data['properties']['Member']) > 2 else data['properties']['Member'].upper()
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'oe') # sorry Goetz
         try:

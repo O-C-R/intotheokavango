@@ -42,18 +42,18 @@ class Home(server.Handler):
 #                 coretags[c] = util.datestring(coretag['t_utc'], config['local_tz']), coretag['Core'] if 'Core' in coretag else False
 #             return self.render("core_member.html", member=page, coretags=coretags)
 
-    def post(self, nop=None):
-        log.info("Core.post")
-        try:
-            for member, status in self.request.arguments.items():
-                status = True if status[0].decode('utf-8') == "true" else False
-                t = util.timestamp()
-                log.debug("%s %s %s" % (member, status, t))
-                self.db.members.insert({'Name': member, 'Core': status, 't_utc': t})
-        except Exception as e:
-            self.error(log.exc(e))
-            return self.error("Bad format")
-        return self.text("OK")
+    # def post(self, nop=None):
+    #     log.info("Core.post")
+    #     try:
+    #         for member, status in self.request.arguments.items():
+    #             status = True if status[0].decode('utf-8') == "true" else False
+    #             t = util.timestamp()
+    #             log.debug("%s %s %s" % (member, status, t))
+    #             self.db.members.insert({'Name': member, 'Core': status, 't_utc': t})
+    #     except Exception as e:
+    #         self.error(log.exc(e))
+    #         return self.error("Bad format")
+    #     return self.text("OK")
 
 
 class Teams(server.Handler):
