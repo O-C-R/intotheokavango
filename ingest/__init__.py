@@ -319,6 +319,7 @@ def tag_team(data):
                     team = None
             else:
                 log.info("--> no info for team")
+                team = None
         else:
             try:
                 team = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Team']
