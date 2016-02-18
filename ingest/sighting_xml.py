@@ -42,6 +42,9 @@ def parse(request):
     if 'SpeciesNameOther' in feature:
         feature['SpeciesName'] = strings.titlecase(feature['SpeciesNameOther'])    
         del feature['SpeciesNameOther']
+    if 'Species' in feature:
+        feature['SpeciesName'] = strings.titlecase(feature['Species'])    
+        del feature['Species']
     elif 'SpeciesName' not in feature:
         log.error("Missing SpeciesName")
         return None, "Missing SpeciesName"

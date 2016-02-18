@@ -10,6 +10,9 @@
 
 the api itself is pretty ok. ingest 
 
+ambit assignments need to be in an interface.
+basically, we're making a backend.
+
 
 ### server
 - make github private?
