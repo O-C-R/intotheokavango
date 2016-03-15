@@ -995,26 +995,33 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 // if(sightings[i].properties.SpeciesName === 'Reed Cormorant') {
 
                     if (!speciesCountObj.hasOwnProperty(sightings[i].properties.SpeciesName)) {
+                        //total species based on count field
                         speciesCountObj[sightings[i].properties.SpeciesName] = sightings[i].properties.Count;
+                        //total species based on number of sightings entries (server currently does this)
                         //speciesCountObj[sightings[i].properties.SpeciesName] = 1;
+                        
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
                         // console.log("-----i is: " + i);
                         // console.log("NEW SPECIES: " + sightings[i].properties.SpeciesName);
                         // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // // console.log("i: " + i);
+                        // console.log("i: " + i);
                         // console.log(speciesCountObj);
                     } else {
+                        //total species based on count field
                         speciesCountObj[sightings[i].properties.SpeciesName] += sightings[i].properties.Count;
+                        
+                        //total species based on number of sightings entries (server currently does this)
                         //speciesCountObj[sightings[i].properties.SpeciesName] += 1;
+
                         // console.log(speciesCountObj[sightings[i].properties.SpeciesName]);
                         // console.log(sightings[i].properties.SpeciesName);
                         // console.log(sightings[i].properties.Count);
                         // console.log("-----i is: " + i);
                         // console.log("EXISTING SPECIES: " + sightings[i].properties.SpeciesName);
                         // console.log("SIGHTING COUNT: " + sightings[i].properties.Count);
-                        // // console.log("i: " + i);
+                        // console.log("i: " + i);
                         // console.log(speciesCountObj);
                     } 
                 // }
@@ -1030,7 +1037,7 @@ var d3Graph = function(timelineVizID, totalsVizID){
                 speciesCountArray.push(myObj);
             }
             // console.log(speciesCountArray.length);
-            // console.log(speciesCountArray);
+            //console.log(speciesCountArray);
         }
 
     //get the totals for all features, recursively - then draw a totals bar chart viz
