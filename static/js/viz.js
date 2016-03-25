@@ -757,12 +757,13 @@ var d3Graph = function(timelineVizID, totalsVizID){
     var makeTotalsViz = function(data, feature_type) {
         // console.log("MAKE TOTALS VIZ");
         // console.log("feature_type: " + feature_type);
+        // console.log(data);
         
 
         var margin = {top: 20.5, right: 30, bottom: 30, left: 40.5},
             width = ($('body').width()*0.9) - margin.left - margin.right,
             barHeight = 20,
-            height = barHeight * 1.5 * data.length,
+            height = (barHeight * 1.5 * data.length) + margin.top,
             left_width = 400;
 
         var graphTitle = "";
