@@ -18,9 +18,10 @@ def main():
             datetime = last_beacon['properties']['DateTime']
             lon, lat = last_beacon['geometry']['coordinates']
             satellite = last_beacon['properties']['Satellite']
+            team = list(db.satellites.find({'Name': satellite}).sort('t_utc', -1).limit(1))[0]['Team']
             google = "https://www.google.com/maps/place/%s,%s" % (lat, lon)
-            text.append("%s\n%s\n%f,%f\n%s" % (satellite, datetime, lat, lon, google))
-            log.info("--> last reported beacon (%s on %s) at: %f,%f" % (satellite, datetime, lat, lon))
+            text.append("%s: %s\n%s\n%f,%f\n%s" % (satellite, team, datetime, lat, lon, google))
+            log.info("--> last reported beacon (%s: \"%s\" on %s) at: %f,%f" % (satellite, team, datetime, lat, lon))
         except Exception as e:
             log.error("Could not get update: %s" % log.exc(e))
     try:
