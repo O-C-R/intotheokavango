@@ -358,7 +358,7 @@ def ingest_json_file(request):
 
 def ingest_json_body(request):
     """Generic method for ingesting a JSON in the body of the post"""
-    log.info(request.body)
+    # log.debug(request.body)
     try:
         data = json.loads(str(request.body, encoding='utf-8'))
     except Exception as e:
