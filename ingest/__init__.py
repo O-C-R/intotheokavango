@@ -221,8 +221,10 @@ def estimate_geometry(data, db):
             p = (t - t1) / (t2 - t1)
             data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
             data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
-            if len(data['geometry']['coordinates']) > 2:
+            try:
                 data['geometry']['coordinates'][2] = (closest_before['geometry']['coordinates'][2] * (1 - p)) + (closest_after['geometry']['coordinates'][2] * p)            
+            except:
+                data['geometry']['coordinates'][2] = None
         log.debug(data['geometry']['coordinates'])
 
         log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
