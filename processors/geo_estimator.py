@@ -15,8 +15,8 @@ def main():
     features = db.features.find({'properties.Expedition': config['expedition'], 'properties.EstimatedGeometry': {'$exists': True, '$ne': 'ambit_geo'}, 'properties.Member': {'$ne': None}})
     for feature in features:
         try:
-            if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
-                continue
+            # if t - feature['properties']['t_utc'] > 60 * 60 * 48: ## after 48 hours, don't worry about it
+            #     continue
             log.info("Updating geometry for %s %s (currently from %s)..." % (feature['properties']['FeatureType'], feature['_id'], feature['properties']['EstimatedGeometry']))
             feature = estimate_geometry(feature, db)
             db.features.update({"_id" : feature['_id']}, feature)

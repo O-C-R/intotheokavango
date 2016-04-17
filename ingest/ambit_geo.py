@@ -28,4 +28,5 @@ def parse(request):
             continue                            
         data[key] = strings.as_numeric(value) 
 
+    log.debug(data)
     return data
