@@ -17,3 +17,6 @@ pi_code/okanode/server.log
 pi_code/okanode/error.log
 node_modules/**
 todos.webloc
+mongo_test.py
+detritus
+processors/disabled/*

@@ -135,11 +135,12 @@ def verify_geometry(data):
                 del properties[p]
             data['properties'] = properties    
 
-        ### temporarily ditch altitude prior to mongo 3.2.0
-        if 'geometry' in data and data['geometry'] is not None:
-            if len(data['geometry']['coordinates']) == 3:
-                data['properties']['Altitude'] = data['geometry']['coordinates'][2]
-            data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
+        # ### temporarily ditch altitude prior to mongo 3.2.0
+        # ##### now running 3.2.5        
+        # if 'geometry' in data and data['geometry'] is not None:
+        #     if len(data['geometry']['coordinates']) == 3:
+        #         data['properties']['Altitude'] = data['geometry']['coordinates'][2]
+        #     data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
 
     except Exception as e:
         log.error("Error parsing coordinates: %s" % log.exc(e))
@@ -167,25 +168,28 @@ def estimate_geometry(data, db):
             except IndexError:
                 pass
 
-        # core?
-        if 'CoreExpedition' in data['properties']:
-            core = data['properties']['CoreExpedition']
-        else:   # there should never be an else
-            log.warning("--> no CoreExpedition for estimator")
-            core = False
-        log.info("--> core is %s" % core)
+        # # core?   # eliminate, bh16
+        # if 'CoreExpedition' in data['properties']:
+        #     core = data['properties']['CoreExpedition']
+        # else:   # there should never be an else
+        #     log.warning("--> no CoreExpedition for estimator")
+        #     core = False
+        # log.info("--> core is %s" % core)
 
         # find geodata from the nearest beacon
         # but only do it if there is no Member (always core, unless overridden), or the Member is/was core at that point
         core_sat = config['satellites'][0] # first satellite is core expedition
         beacon_closest_before = None
         beacon_closest_after = None
-        if core and not feature_type == "ambit":  ## don't let ambit readings pop to beacons
-            try:
-                beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
-                beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
-            except IndexError:
-                pass
+
+        # bh16 temporarily ignoring satellites
+        #
+        # if core and not feature_type == "ambit":  ## don't let ambit readings pop to beacons
+        #     try:
+        #         beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
+        #         beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
+        #     except IndexError:
+        #         pass
 
         # pick the best ones
         if member_closest_before is not None and beacon_closest_before is not None:
@@ -217,9 +221,9 @@ def estimate_geometry(data, db):
             p = (t - t1) / (t2 - t1)
             data['geometry']['coordinates'][0] = (closest_before['geometry']['coordinates'][0] * (1 - p)) + (closest_after['geometry']['coordinates'][0] * p)
             data['geometry']['coordinates'][1] = (closest_before['geometry']['coordinates'][1] * (1 - p)) + (closest_after['geometry']['coordinates'][1] * p)
+            if len(data['geometry']['coordinates']) > 2:
+                data['geometry']['coordinates'][2] = (closest_before['geometry']['coordinates'][2] * (1 - p)) + (closest_after['geometry']['coordinates'][2] * p)            
         # log.debug(data['geometry']['coordinates'])
-
-        ## ignoring altitude
 
         log.info("--> derived from %s" % data['properties']['EstimatedGeometry'])
 
@@ -270,6 +274,8 @@ def verify_expedition(data):
 
     return data
 
+# bh16 geting rid of core functionality
+#
 # def tag_core(data):
 #     if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
 #         return data
