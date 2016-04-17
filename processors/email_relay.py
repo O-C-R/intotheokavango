@@ -69,12 +69,14 @@ def main():
                                             log.info("Parsing...")
                                             data = xmltodict.parse(content)
                                             # log.debug(json.dumps(data, indent=4))
-                                            serial_number = data['sml']['DeviceLog']['Device']['SerialNumber']
+                                            serial_number = str(data['sml']['DeviceLog']['Device']['SerialNumber'])
                                             try:
                                                 member = config['ambits'][serial_number]
-                                            except:
+                                            except KeyError:
                                                 log.warning("Ambit serial number not linked to a Member")
-                                                member = serial_number
+                                                log.debug(serial_number)
+                                                log.debug(config['ambits'])
+                                                continue
                                             log.info("Member: %s" % member)
                                             samples = data['sml']['DeviceLog']['Samples']['Sample']
                                             start_t = None                                            

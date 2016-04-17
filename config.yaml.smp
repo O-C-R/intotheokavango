@@ -49,7 +49,7 @@ twitter:
     accounts:
     hashtag: okavango15
     
-ambits:
+ambits: # these have to be strings
     B9460B5124000E00: Brian
 
 soundcloud:
