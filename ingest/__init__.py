@@ -216,6 +216,8 @@ def estimate_geometry(data, db):
 
         # average the times and positions: this is naive calculation not taking projection into account
         data['geometry'] = closest_before['geometry'] # make sure the fields are there (if theres an error it will default to this assignment)
+        if len(data['geometry']['coordinates']) == 2:  # add altitude if it's missing
+            data['geometry']['coordinates'].append(None)
         data['properties']['EstimatedGeometry'] = closest_before['properties']['FeatureType']   # note what we used
 
         t1 = closest_before['properties']['t_utc']
