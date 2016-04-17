@@ -166,8 +166,8 @@ def estimate_geometry(data, db):
             try:
                 # member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))[0]
                 # member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))[0]
-                member_closest_before = list(db.features.find({'properties.Member': member, 'FeatureType': "ambit_geo", 'properties.t_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
-                member_closest_after =  list(db.features.find({'properties.Member': member, 'FeatureType': "ambit_geo", 'properties.t_utc': {'$gte': t}}).sort('properties.t_utc', 1).limit(1))[0]
+                member_closest_before = list(db.features.find({'properties.Member': member, 'properties.FeatureType': "ambit_geo", 'properties.t_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
+                member_closest_after =  list(db.features.find({'properties.Member': member, 'properties.FeatureType': "ambit_geo", 'properties.t_utc': {'$gte': t}}).sort('properties.t_utc', 1).limit(1))[0]
             except IndexError:
                 pass
 
