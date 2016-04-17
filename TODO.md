@@ -17,6 +17,11 @@ basically, we're making a backend.
 - migrate altitude into the geojson point for old data
 
 
+
+### issues
+- are geo sources other than beacons generalizable?
+
+
 ### admin
 - ambit is an assignable "geo-source"
 - delete and reassign members

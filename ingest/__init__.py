@@ -157,14 +157,17 @@ def estimate_geometry(data, db):
     try:
 
         # find geodata from this Member
+        ## bh16 restrict this to ambit_geo. why wasnt it before?
         member_closest_before = None
         member_closest_after = None
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)
             try:
-                member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))[0]
-                member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))[0]
+                # member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))[0]
+                # member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))[0]
+                member_closest_before = list(db.features.find({'properties.Member': member, 'FeatureType': "ambit_geo", 'properties.t_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
+                member_closest_after =  list(db.features.find({'properties.Member': member, 'FeatureType': "ambit_geo", 'properties.t_utc': {'$gte': t}}).sort('properties.t_utc', 1).limit(1))[0]
             except IndexError:
                 pass
 

@@ -28,5 +28,9 @@ def parse(request):
             continue                            
         data[key] = strings.as_numeric(value) 
 
-    log.debug(data)
+    try:
+        log.debug(data['longitude'], data['latitude'], data['altitude'])
+    except:
+        log.error("MISSING GEO")
+
     return data
