@@ -1,5 +1,7 @@
-### new / okavango_16
+### current patching
+- need to reingest all ambit
 
+### new / okavango_16
 - all server updates and upgrades
 - triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
 - ambit is the only thing via email now. can we eliminate that for consistency?
@@ -12,6 +14,11 @@ the api itself is pretty ok. ingest
 
 ambit assignments need to be in an interface.
 basically, we're making a backend.
+
+### admin
+- ambit is an assignable "geo-source"
+- delete and reassign members
+
 
 
 ### server
