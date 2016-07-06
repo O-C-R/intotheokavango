@@ -24,6 +24,8 @@ def parse(request):
         if 'Date___Time' in data:
             dt = util.parse_date(data['Date___Time'])
             del data['Date___Time']
+        if 'Current_Location' in data:
+            data['Location'] = data['Current_Location']            
         if 'Location' in data:
             feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
             feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
@@ -39,16 +41,16 @@ def parse(request):
 
     # purge blanks
     feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
-    if 'SpeciesNameOther' in feature:
+    if 'SpeciesNameOther' in feature and len(feature['SpeciesNameOther'].strip()):
         feature['SpeciesName'] = strings.titlecase(feature['SpeciesNameOther'])    
         del feature['SpeciesNameOther']
-    if 'Species' in feature:
-        feature['SpeciesName'] = strings.titlecase(feature['Species'])    
+    if 'Species' in feature and len(feature['Species'].strip()):
+        feature['SpeciesName'] = strings.titlecase(feature['Species'].strip())    
         del feature['Species']
-    if 'Species_Name' in feature:
+    if 'Species_Name' in feature and len(feature['Species_Name'].strip()):
         feature['SpeciesName'] = strings.titlecase(feature['Species_Name'])    
         del feature['Species_Name']
-    if 'SpeciesName' not in feature:
+    if 'SpeciesName' not in feature and len(feature['Species_Name'].strip()):
         log.error("Missing SpeciesName")
         return None, "Missing SpeciesName"
     else:
