@@ -120,7 +120,8 @@ class Teams(server.Handler):
             try:
                 result = self.db.features.update({'properties.Member': reassign_member}, {'$set': {'properties.Member': target}}, multi=True)
                 log.debug(result)
-                self.db.members.remove({'Member': reassign_member})
+                self.db.members.remove({'Name': reassign_member})
+                log.debug(result)
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error(e)  
