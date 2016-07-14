@@ -1,5 +1,10 @@
 ### new / okavango_16
 
+- get rid of explicit members in the config, but include admin to fix/delete names
+- team deletion / reassignment
+- ambit assignments need to be in an interface.
+
+
 Search upgrades:
 - polygon search
 - "nots"
@@ -13,13 +18,8 @@ Interface:
 - rebuild uploader (with Eric) -- sightings with photo attachment
 - temporal scaling (experimental)
 
-
-- retro-fix core->team, purge core stuff, including from config
+Server:
 - triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
-- get rid of explicit members in the config, but include admin to fix/delete names
-- team deletion / reassignment
-- ambit assignments need to be in an interface.
-
 
 
 ### issues
