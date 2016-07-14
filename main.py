@@ -21,41 +21,6 @@ class Home(server.Handler):
         return self.render("index2.html")
 
 
-# class Core(server.Handler):
-
-#     def get(self, page=None):
-#         log.info("Core.get")
-#         self.set_header("Access-Control-Allow-Origin", "*")
-#         if page is None or not len(page):
-#             members = []
-#             for member in config['members']:
-#                 result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
-#                 if not len(result) or 'Core' not in result[0]:
-#                     core = False
-#                 else:
-#                     core = result[0]['Core']
-#                 members.append({'Name': member, 'Core': core})
-#             return self.render("core.html", dbmembers=members)
-#         else:
-#             coretags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
-#             for c, coretag in enumerate(coretags):
-#                 coretags[c] = util.datestring(coretag['t_utc'], config['local_tz']), coretag['Core'] if 'Core' in coretag else False
-#             return self.render("core_member.html", member=page, coretags=coretags)
-
-    # def post(self, nop=None):
-    #     log.info("Core.post")
-    #     try:
-    #         for member, status in self.request.arguments.items():
-    #             status = True if status[0].decode('utf-8') == "true" else False
-    #             t = util.timestamp()
-    #             log.debug("%s %s %s" % (member, status, t))
-    #             self.db.members.insert({'Name': member, 'Core': status, 't_utc': t})
-    #     except Exception as e:
-    #         self.error(log.exc(e))
-    #         return self.error("Bad format")
-    #     return self.text("OK")
-
-
 class Teams(server.Handler):
 
     def get(self, page=None):
@@ -105,7 +70,7 @@ class Teams(server.Handler):
                 new_member = new_member.replace('\u00f6', 'oe') # sorry Goetz
             try:
                 if not self.db.members.find({'Name': new_member}).count():
-                    self.db.members.insert({'Name': new_member, 'Team': None, 'Core': False, 't_utc': t})
+                    self.db.members.insert({'Name': new_member, 'Team': None, 't_utc': t})
                 else:
                     log.info("--> already exists")
             except Exception as e:
@@ -132,7 +97,7 @@ class Teams(server.Handler):
                     team = None
                 else:
                     self.db.teams.update({'Name': team}, {'$set': {'Satellite': satellite}})
-                self.db.satellites.insert({'Name': satellite, 'Team': team, 'Core': False, 't_utc': t})                    
+                self.db.satellites.insert({'Name': satellite, 'Team': team, 't_utc': t})                    
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad format")
@@ -142,7 +107,7 @@ class Teams(server.Handler):
             if team == "NONE":
                 team = None
             try:
-                self.db.members.insert({'Name': member, 'Team': team, 'Core': False, 't_utc': t})
+                self.db.members.insert({'Name': member, 'Team': team, 't_utc': t})
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad format")
@@ -152,7 +117,6 @@ class Teams(server.Handler):
 
 handlers = [
     (r"/teams/?([^/]*)", Teams),
-    # (r"/setCore/?([^/]*)", Core),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
     (r"/?([^/]*)", Home),    

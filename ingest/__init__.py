@@ -258,7 +258,7 @@ def verify_expedition(data):
         data['properties']['Member'] = data['properties']['Member'].replace('\u00f6', 'oe') # sorry Goetz
         try:
             if not db.members.find({'Name': data['properties']['Member']}).count():
-                db.members.insert({'Name': data['properties']['Member'], 'Team': None, 'Core': False, 't_utc': data['properties']['t_utc']})
+                db.members.insert({'Name': data['properties']['Member'], 'Team': None, 't_utc': data['properties']['t_utc']})
         except Exception as e:
             log.error(log.exc(e))
     if 'Expedition' not in data['properties']:
