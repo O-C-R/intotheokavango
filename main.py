@@ -44,7 +44,8 @@ class Teams(server.Handler):
             teamtags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
                 teamtags[t] = util.datestring(teamtag['t_utc'], config['local_tz']), teamtag['Team'] if 'Team' in teamtag else None
-            return self.render("team_member.html", member=page, teamtags=teamtags)
+            members = [name for name in self.db.members.find().sort('Name').distinct('Name') if len(name)]
+            return self.render("team_member.html", member=page, teamtags=teamtags, members=members)
 
     def post(self, nop=None):
         log.info("Team.post")
@@ -53,6 +54,8 @@ class Teams(server.Handler):
         member = self.get_argument('member', None)
         team = self.get_argument('team', None)
         satellite = self.get_argument('satellite', None)
+        reassign_member = self.get_argument('reassign_member', None)
+        target = self.get_argument('target', None)
         log.debug("new_team %s" % new_team)
         log.debug("new_member %s" % new_team)
         log.debug("member %s" % member)
@@ -112,6 +115,15 @@ class Teams(server.Handler):
                 log.error(log.exc(e))
                 return self.error("Bad format")
             return self.text("OK")
+        if reassign_member is not None and target is not None:
+            log.info("Reassigning %s to %s" % (reassign_member, target))            
+            try:
+                result = self.db.features.update({'properties.Member': reassign_member}, {'$set': {'properties.Member': target}}, multi=True)
+                self.db.members.remove({'Member': reassign_member})
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error(e)  
+            return self.text("OK")              
         return self.error("Something wasn't right")
         
 

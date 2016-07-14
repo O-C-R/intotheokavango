@@ -3,6 +3,31 @@
 
 <link rel="stylesheet" type="text/css" href="/static/css/api.css" />
 
+<script>
+    $(document).ready(function() {
+        $('#reassign_btn').mousedown(function() {
+            var member = "{{ member }}";
+            var target = $("#reassign_target").val();
+            if (target == "NONE") return
+            if (!confirm("Really delete " + member + " and reassign all her/his features to " + target + "? This cannot be undone.")) return
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {reassign_member: member, target: target},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                document.location = "/teams";
+            });            
+        });
+    });
+</script>
+
 {% endblock head %}
 
 {% block body %}
@@ -16,8 +41,16 @@
 
 <br />
 <br />
-Delete and reassign<br />
-
+Delete {{ member }} and reassign to 
+<select id="reassign_target"> 
+    <option value="NONE">NONE</option>
+{% for m in members %}
+    {% if m != member %}
+        <option value="{{ m }}">{{ m }}</option>
+    {% endif %}
+{% endfor %}
+</select>
+<input id="reassign_btn" type="button" value="Go" />
 
 <div>
 

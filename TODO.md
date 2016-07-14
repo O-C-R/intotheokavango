@@ -1,6 +1,5 @@
 ### new / okavango_16
 
-- member deletion / reassignment
 - ambit assignments need to be in an interface.
 
 Search upgrades:
