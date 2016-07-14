@@ -134,22 +134,14 @@ def verify_geometry(data):
             for p in delete:
                 del properties[p]
             data['properties'] = properties    
-
-        # ### temporarily ditch altitude prior to mongo 3.2.0
-        # ##### now running 3.2.5        
-        # if 'geometry' in data and data['geometry'] is not None:
-        #     if len(data['geometry']['coordinates']) == 3:
-        #         data['properties']['Altitude'] = data['geometry']['coordinates'][2]
-        #     data['geometry']['coordinates'] = data['geometry']['coordinates'][:2] 
-
     except Exception as e:
         log.error("Error parsing coordinates: %s" % log.exc(e))
     return data
 
 def estimate_geometry(data, db):
     """Estimate the location of a geotagged object for a new feature that's missing it"""
-    """For data tagged to a Member, find something else that's geotagged with that Member, best case ambit_geo, worst case take the beacon if they are core, otherwise fail"""
-    """For non-member data, just tag it to the beacon"""
+    """For data tagged to a Member, find something else that's geotagged with that Member (like an ambit_geo), or from the Team (like a beacon)"""
+    """If the times are too distant (1 days) dont use them"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     feature_type = data['properties']['FeatureType']
@@ -157,57 +149,49 @@ def estimate_geometry(data, db):
     try:
 
         # find geodata from this Member
-        ## bh16 restrict this to ambit_geo. why wasnt it before?
         member_closest_before = None
         member_closest_after = None
         if 'Member' in data['properties'] and data['properties']['Member'] is not None:
             member = data['properties']['Member']
             log.info("--> member is %s" % member)
             try:
-                # member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', -1).limit(1))[0]
-                # member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': {'$exists': False}}).sort('properties.t_utc', 1).limit(1))[0]
-                member_closest_before = list(db.features.find({'properties.Member': member, 'properties.FeatureType': "ambit_geo", 'properties.t_utc': {'$lte': t}}).sort('properties.t_utc', -1).limit(1))[0]
-                member_closest_after =  list(db.features.find({'properties.Member': member, 'properties.FeatureType': "ambit_geo", 'properties.t_utc': {'$gte': t}}).sort('properties.t_utc', 1).limit(1))[0]
+                member_closest_before = list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': None}).sort('properties.t_utc', -1).limit(1))[0]
+                member_closest_after =  list(db.features.find({'properties.Member': member, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': None}).sort('properties.t_utc', 1).limit(1))[0]
             except IndexError:
                 pass
 
-        # # core?   # eliminate, bh16
-        # if 'CoreExpedition' in data['properties']:
-        #     core = data['properties']['CoreExpedition']
-        # else:   # there should never be an else
-        #     log.warning("--> no CoreExpedition for estimator")
-        #     core = False
-        # log.info("--> core is %s" % core)
-
-        # find geodata from the nearest beacon
-        # but only do it if there is no Member (always core, unless overridden), or the Member is/was core at that point
-        core_sat = config['satellites'][0] # first satellite is core expedition
-        beacon_closest_before = None
-        beacon_closest_after = None
-
-        # bh16 temporarily ignoring satellites
-        #
-        # if core and not feature_type == "ambit":  ## don't let ambit readings pop to beacons
-        #     try:
-        #         beacon_closest_before = list(db.features.find({'$or': [{'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$lte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', -1).limit(1))[0]
-        #         beacon_closest_after = list(db.features.find({'$or': [{'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$exists': False}}, {'properties.t_utc': {'$gte': t}, 'properties.FeatureType': 'beacon', 'properties.Satellite': {'$eq': core_sat}}]}).sort('properties.t_utc', 1).limit(1))[0]
-        #     except IndexError:
-        #         pass
+        # find geodata from this Team
+        team_closest_before = None
+        team_closest_after = None
+        if 'Team' in data['properties'] and data['properties']['Team'] is not None:
+            team = data['properties']['Team']
+            log.info("--> team is %s" % team)
+            try:
+                team_closest_before = list(db.features.find({'properties.Team': team, 'geometry': {'$ne': None}, 'properties.t_utc': {'$lte': t}, 'properties.EstimatedGeometry': None}).sort('properties.t_utc', -1).limit(1))[0]
+                team_closest_after =  list(db.features.find({'properties.Team': team, 'geometry': {'$ne': None}, 'properties.t_utc': {'$gte': t}, 'properties.EstimatedGeometry': None}).sort('properties.t_utc', 1).limit(1))[0]
+            except IndexError:
+                pass                
 
         # pick the best ones
-        if member_closest_before is not None and beacon_closest_before is not None:
-            closest_before = beacon_closest_before if beacon_closest_before['properties']['t_utc'] > member_closest_before['properties']['t_utc'] else member_closest_before
+        if member_closest_before is not None and team_closest_before is not None:
+            closest_before = team_closest_before if team_closest_before['properties']['t_utc'] > member_closest_before['properties']['t_utc'] else member_closest_before
         elif member_closest_before is not None:
             closest_before = member_closest_before
         else:
-            closest_before = beacon_closest_before
+            closest_before = team_closest_before
 
-        if member_closest_after is not None and beacon_closest_after is not None:
-            closest_after = beacon_closest_after if beacon_closest_after['properties']['t_utc'] < member_closest_after['properties']['t_utc'] else member_closest_after
+        if member_closest_after is not None and team_closest_after is not None:
+            closest_after = team_closest_after if team_closest_after['properties']['t_utc'] < member_closest_after['properties']['t_utc'] else member_closest_after
         elif member_closest_after is not None:
             closest_after = member_closest_after
         else:
-            closest_after = beacon_closest_after
+            closest_after = team_closest_after
+
+        # throw it out if it's older than two days
+        if t - closest_before['properties']['t_utc'] > (2 * 86400): 
+            closest_before = None
+        if closest_after['properties']['t_utc'] - t > (2 * 86400):
+            closest_after = None
 
         if closest_before is None or closest_after is None:
             data['properties']['EstimatedGeometry'] = None
@@ -237,6 +221,7 @@ def estimate_geometry(data, db):
     except Exception as e:
         log.error(log.exc(e))
     return data
+
 
 def verify_t(data):
     """Verify or reformat temporal data -- t_utc is expected from all parse methods"""
@@ -281,38 +266,6 @@ def verify_expedition(data):
 
     return data
 
-# bh16 geting rid of core functionality
-#
-# def tag_core(data):
-#     if 'CoreExpedition' in data['properties']:  # let modules override this by presetting
-#         return data
-#     try:
-#         db = Application.instance.db
-#     except AttributeError:
-#         from mongo import db    
-#     try:
-#         member = data['properties']['Member']
-#         if member is None:
-#             core_sat = config['satellites'][0]
-#             if 'Satellite' in data['properties']:
-#                 core = data['properties']['Satellite'] == core_sat
-#                 log.info("--> satellite, core is %s" % core)
-#             else:
-#                 log.info("--> null Member, core is True")
-#                 core = True
-#         else:
-#             t = data['properties']['t_utc']   
-#             try:
-#                 core = list(db.members.find({'Name': member, 't_utc': {'$lte': t}}).sort('t_utc', -1).limit(1))[0]['Core']
-#                 log.info("--> core is %s" % core)
-#             except IndexError:
-#                 log.info("--> no core entry at time %s" % t)
-#                 core = False
-#         data['properties']['CoreExpedition'] = core
-#         return data
-#     except Exception as e:
-#         log.error(log.exc(e))
-#         return data
 
 def tag_team(data):
     try:

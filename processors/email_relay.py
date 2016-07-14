@@ -94,16 +94,13 @@ def main():
                                                     except Exception as e:
                                                         log.error(log.exc(e))
                                                 else: # ingest energy data sample 
-                                                    ## bh16
-                                                    # this data is not interesting, and mucks up the estimating
-                                                    continue
-                                                    # try:
-                                                    #     url = "%s/ingest/ambit" % config['url']
-                                                    #     log.info("Sending to %s..." % url)
-                                                    #     response = net.read(url, str(json.dumps(sample)).encode('utf-8'))
-                                                    #     log.info("--> %s" % response)
-                                                    # except Exception as e:
-                                                    #     log.error(log.exc(e))
+                                                    try:
+                                                        url = "%s/ingest/ambit" % config['url']
+                                                        log.info("Sending to %s..." % url)
+                                                        response = net.read(url, str(json.dumps(sample)).encode('utf-8'))
+                                                        log.info("--> %s" % response)
+                                                    except Exception as e:
+                                                        log.error(log.exc(e))
                                             try:
                                                 beats = [strings.as_numeric(beat) for beat in data['sml']['DeviceLog']['R-R']['Data'].split()]
                                                 d = {'Member': member, 't_utc': start_t, 'Beats': beats}

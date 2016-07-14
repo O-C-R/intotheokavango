@@ -5,9 +5,6 @@ Search upgrades:
 - "nots"
 - comma-delineated multiple-options for queries
 
-DB upgrades:
-- migrate altitude into the geojson point for old data
-
 Data munging:
 - great Egret error? on Slack
 - missing geometry: http://intotheokavango.org/api/features?FeatureType=sighting&member=Paul
@@ -26,12 +23,10 @@ Interface:
 
 
 ### issues
-- are geo sources other than beacons generalizable?
+- things that arent members or teams and wont be geotagged:
+    intotheokavango twitter, 
 
 
-### admin
-- ambit is an assignable "geo-source"
-- delete and reassign members
 
 
 
