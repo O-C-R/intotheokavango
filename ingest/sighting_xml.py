@@ -25,11 +25,17 @@ def parse(request):
             dt = util.parse_date(data['Date___Time'])
             del data['Date___Time']
         if 'Current_Location' in data:
-            data['Location'] = data['Current_Location']            
+            data['Location'] = data['Current_Location']  
+        if 'LocationQuestion' in data:
+            data['Location'] = data['LocationQuestion']                    
         if 'Location' in data:
-            feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
-            feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
-            del data['Location']
+            try:
+                feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
+                feature['Longitude'] = data['Location'].split(',')[1].replace("long=", '').strip()
+                feature['Altitude'] = data['Location'].split(',')[2].replace("alt=", '').strip()
+                del data['Location']
+            except Exception as e:
+                log.error(log.exc(e))
         feature['t_utc'] = util.timestamp(dt)
         for key, value in data.items():
             if 'Image' in key:

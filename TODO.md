@@ -1,9 +1,7 @@
 ### new / okavango_16
 
-- get rid of explicit members in the config, but include admin to fix/delete names
-- team deletion / reassignment
+- member deletion / reassignment
 - ambit assignments need to be in an interface.
-
 
 Search upgrades:
 - polygon search
@@ -24,14 +22,8 @@ Server:
 
 ### issues
 - things that arent members or teams and wont be geotagged:
-    intotheokavango twitter, 
+    intotheokavango twitter
 
 
-
-
-
-### improvements
-- caching
+### needed improvements
 - async for soundcloud and twilio
-- geo_estimation broken for non-ambit wearers who arent core
-- purging ambits
