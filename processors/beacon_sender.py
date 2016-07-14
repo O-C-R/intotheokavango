@@ -16,7 +16,7 @@ def main():
         try:
             last_beacon = list(db.features.find({'properties.FeatureType': "beacon", 'properties.Satellite': {'$eq': satellite}}).sort('properties.t_utc', -1).limit(1))[0]
             datetime = last_beacon['properties']['DateTime']
-            lon, lat = last_beacon['geometry']['coordinates']
+            lon, lat = last_beacon['geometry']['coordinates'][0], last_beacon['geometry']['coordinates'][1]
             satellite = last_beacon['properties']['Satellite']
             team = list(db.satellites.find({'Name': satellite}).sort('t_utc', -1).limit(1))[0]['Team']
             if team is None:
