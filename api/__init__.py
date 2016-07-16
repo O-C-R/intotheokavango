@@ -92,10 +92,9 @@ class Api(server.Handler):
 
         # special parsing for polygonal region
         # expecting an arbitrary polygon
-        # (rough) chief's island: 22.832500,-19.143822,23.271261,-19.517674,23.257528,-19.579792,22.741369,-19.1812599
+        # (rough) mombo: 22.731580,-19.186571,22.716444,-19.227478,22.766600,-19.295694,22.827821,-19.319120,22.874635,-19.336678,22.948241,-19.282060,22.747431,-19.132026
         region = self.get_argument('region', None)
         if region is not None:
-            log.debug('check')
             try:
                 cs = [float(coord) for coord in region.split(',') if len(coord)]
                 coords = list(zip(cs[::2], cs[1::2]))
