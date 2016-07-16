@@ -2,10 +2,6 @@
 
 - ambit assignments need to be in an interface.
 
-Data munging:
-- great Egret error? on Slack
-- missing geometry: http://intotheokavango.org/api/features?FeatureType=sighting&member=Paul
-
 Interface:
 - rebuild uploader (with Eric) -- sightings with photo attachment
 - temporal scaling (experimental)
