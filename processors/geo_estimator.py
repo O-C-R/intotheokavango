@@ -4,6 +4,8 @@ from housepy import config, log, util, strings
 from ingest import estimate_geometry
 from mongo import db
 
+# the only time this needs to run is after an email ingest that includes ambits
+
 def main():    
     log.info("geo_estimator...")
 
