@@ -76,7 +76,7 @@ class Api(server.Handler):
                 log.error(log.exc(e))
                 return self.error("Bad dates")          
 
-        # special parsing for location
+        # special parsing for rectangular location
         # expecting bounds (upper left (NW), lower right (SE)): lon_1,lat_1,lon_2,lat_2
         # oka: 20,-17,26,-22 nyc: -75,41,-71,40
         geo_bounds = self.get_argument('geoBounds', None)
@@ -85,6 +85,22 @@ class Api(server.Handler):
                 lon_1, lat_1, lon_2, lat_2 = [float(coord) for coord in geo_bounds.split(',')]
                 log.debug("geo_bounds %f,%f %f,%f" % (lon_1, lat_1, lon_2, lat_2))
                 search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [[ [lon_1, lat_1], [lon_2, lat_1], [lon_2, lat_2], [lon_1, lat_2], [lon_1, lat_1] ]]}}}
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad geometry")
+
+        # special parsing for polygonal region
+        # expecting an arbitrary polygon
+        # (rough) chief's island: -19.143822,22.832500,-19.517674,23.271261,-19.579792,23.257528,-19.1812599,22.741369
+        region = self.get_argument('region', None)
+        if region is not None:
+            try:
+                cs = [float(coord) for coord in region.split(',')]
+                coords = list(zip(cs[::2], cs[1::2]))
+                if coords[0] != coords[-1]:
+                    coords.append(coords[0])
+                log.debug("region %s" % (coords))
+                search['geometry'] = {'$geoWithin': {'$geometry': {'type': "Polygon", 'coordinates': [coords]}}}
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad geometry")
@@ -130,7 +146,7 @@ class Api(server.Handler):
                     item = {'$exists': True} if item == '*' else item
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' and param != '$text' else param): value for (param, value) in search.items() if param not in ['geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
+            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' and param != '$text' else param): value for (param, value) in search.items() if param not in ['region', 'geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")

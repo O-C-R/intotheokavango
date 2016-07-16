@@ -2,11 +2,6 @@
 
 - ambit assignments need to be in an interface.
 
-Search upgrades:
-- polygon search
-- "nots"
-- comma-delineated multiple-options for queries
-
 Data munging:
 - great Egret error? on Slack
 - missing geometry: http://intotheokavango.org/api/features?FeatureType=sighting&member=Paul
@@ -26,3 +21,7 @@ Server:
 
 ### needed improvements
 - async for soundcloud and twilio
+
+
+### GBIF
+http://www.gbif.org/developer/summary
