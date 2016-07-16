@@ -14,6 +14,7 @@ from pymongo import ASCENDING, DESCENDING
     - Member (eg Jer)
     - startDate and endDate (endDate is one day later if omitted and startDate is present)
     - geoBounds (upper left (NW), lower right (SE): lon_1,lat_1,lon_2,lat_2. So Okavango is something like 20,-17,26,-22
+    - region (arbitrary polygon)
 
     Can also do expeditionDay=N for the 24 hour period N days after the expedition start date specified in the config
 
@@ -91,11 +92,12 @@ class Api(server.Handler):
 
         # special parsing for polygonal region
         # expecting an arbitrary polygon
-        # (rough) chief's island: -19.143822,22.832500,-19.517674,23.271261,-19.579792,23.257528,-19.1812599,22.741369
+        # (rough) chief's island: 22.832500,-19.143822,23.271261,-19.517674,23.257528,-19.579792,22.741369,-19.1812599
         region = self.get_argument('region', None)
         if region is not None:
+            log.debug('check')
             try:
-                cs = [float(coord) for coord in region.split(',')]
+                cs = [float(coord) for coord in region.split(',') if len(coord)]
                 coords = list(zip(cs[::2], cs[1::2]))
                 if coords[0] != coords[-1]:
                     coords.append(coords[0])
