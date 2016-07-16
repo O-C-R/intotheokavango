@@ -2,6 +2,7 @@
 
 import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, xmltodict, json, shutil, urllib, math, subprocess
 from housepy import config, log, util, strings, emailer, net
+from mongo import db
 
 def main():    
     log.info("Checking email...")
@@ -71,11 +72,11 @@ def main():
                                             # log.debug(json.dumps(data, indent=4))
                                             serial_number = str(data['sml']['DeviceLog']['Device']['SerialNumber'])
                                             try:
-                                                member = config['ambits'][serial_number]
-                                            except KeyError:
-                                                log.warning("Ambit serial number not linked to a Member")
-                                                log.debug(serial_number)
-                                                log.debug(config['ambits'])
+                                                member = list(db.ambits.find({'Serial': serial_number}).sort([('t_utc', DESCENDING)]).limit(1))[0]['Member']
+                                                if member is None or member == "NONE" or not len(member):
+                                                    raise KeyError
+                                            except (IndexError, KeyError):
+                                                log.warning("Ambit serial number not linked to a Member: %s" % serial_number)
                                                 continue
                                             log.info("Member: %s" % member)
                                             samples = data['sml']['DeviceLog']['Samples']['Sample']

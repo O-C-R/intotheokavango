@@ -84,6 +84,25 @@
             });                
         });
 
+        $('.ambit_member').change(function() {
+            var member = $(this).val();
+            var ambit = $(this).attr('id');     
+            $.ajax({
+                type: "POST",
+                url: "/teams",
+                data: {ambit: ambit, member: member},
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
+                    alert(xhr.responseText);
+                }
+            }).done(function (xhr, textStatus) {
+                // alert(textStatus);
+                document.location.reload();
+            });                
+        });
+
     })
 
 
@@ -135,6 +154,29 @@
         </select>
     </td>
 </tr>    
+{% endfor %}
+</table>
+<br />
+<br />
+<h2>AMBITS</h2>
+<br />
+<table>
+{% for ambit in dbambits %}
+<tr>
+    <td><span style="font-family: monospace;"><a href="/teams/{{ ambit.Serial }}">{{ ambit.Serial }}</a></span></td>
+    <td>
+        <select class="ambit_member" id="{{ ambit.Serial }}"> 
+            <option value="NONE">NONE</option>
+            {% for member in dbmembers %}
+                {% if member.Name == ambit.Member %}
+                    <option value="{{ member.Name }}" selected="selected">{{ member.Name }}</option>
+                {% else %}
+                    <option value="{{ member.Name }}">{{ member.Name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </td>
+</tr>
 {% endfor %}
 </table>
 <br />

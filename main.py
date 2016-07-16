@@ -27,19 +27,28 @@ class Teams(server.Handler):
         log.info("Teams.get")
         self.set_header("Access-Control-Allow-Origin", "*")
         members = []        
-        satellites = config['satellites']        
+        satellites = config['satellites']   
+        ambits = config['ambits'].copy()   
         if page is None or not len(page):
             teams = [team for team in self.db.teams.find().sort('Name') if 'Name' in team and len(team['Name'])]
             for member in [name for name in self.db.members.find().sort('Name').distinct('Name') if len(name)]:
                 result = list(self.db.members.find({'Name': member}).sort([('t_utc', DESCENDING)]).limit(1))
                 team = None if not len(result) or 'Team' not in result[0] else result[0]['Team']
                 members.append({'Name': member, 'Team': team})
-            return self.render("teams.html", dbmembers=members, dbteams=teams, satellites=satellites)
+            for a, ambit in enumerate(ambits):
+                result = list(self.db.ambits.find({'Serial': ambit}).sort([('t_utc', DESCENDING)]).limit(1))
+                ambits[a] = {'Serial': ambit} if not len(result) or 'Serial' not in result[0] else result[0]
+            return self.render("teams.html", dbmembers=members, dbteams=teams, satellites=satellites, dbambits=ambits)
         elif page in satellites:
             teamtags = list(self.db.satellites.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
                 teamtags[t] = util.datestring(teamtag['t_utc'], config['local_tz']), teamtag['Team'] if 'Team' in teamtag else None
             return self.render("team_satellite.html", satellite=page, teamtags=teamtags)
+        elif page in ambits:
+            ambittags = list(self.db.ambits.find({'Serial': page}).sort([('t_utc', ASCENDING)]))
+            for a, ambittag in enumerate(ambittags):
+                ambittags[a] = util.datestring(ambittag['t_utc'], config['local_tz']), ambittag['Member']
+            return self.render("team_ambit.html", ambit=page, ambittags=ambittags)            
         else:
             teamtags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
@@ -54,6 +63,7 @@ class Teams(server.Handler):
         member = self.get_argument('member', None)
         team = self.get_argument('team', None)
         satellite = self.get_argument('satellite', None)
+        ambit = self.get_argument('ambit', None)        
         reassign_member = self.get_argument('reassign_member', None)
         target = self.get_argument('target', None)
         log.debug("new_team %s" % new_team)
@@ -115,6 +125,16 @@ class Teams(server.Handler):
                 log.error(log.exc(e))
                 return self.error("Bad format")
             return self.text("OK")
+        if member is not None and ambit is not None:
+            log.info("Assigning ambit %s to member %s" % (ambit, member))
+            if ambit == "NONE":
+                ambit = None
+            try:
+                self.db.ambits.insert({'Serial': ambit, 'Member': member, 't_utc': t})
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad format")
+            return self.text("OK")            
         if reassign_member is not None and target is not None:
             log.info("Reassigning %s to %s" % (reassign_member, target))            
             try:

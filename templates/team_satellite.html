@@ -1,0 +1,19 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+
+{% endblock head %}
+
+{% block body %}
+<div id="textarea" style="padding:30px">
+<h2>Team times for {{ satellite }}</h2>
+<br />
+
+{% for teamtag in teamtags %}
+{{ teamtag[0] }} {{ teamtag[1] }}<br />
+{% endfor %}
+
+<div>
+
+{% endblock body %}

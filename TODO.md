@@ -1,13 +1,15 @@
 ### new / okavango_16
 
-- ambit assignments need to be in an interface.
-
 Interface:
 - rebuild uploader (with Eric) -- sightings with photo attachment
 - temporal scaling (experimental)
 
 Server:
 - triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
+
+processors -> crons
+processors are now beanstalk triggered: inaturalist, audio, twilio?
+
 
 
 ### issues

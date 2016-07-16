@@ -1,0 +1,19 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+
+{% endblock head %}
+
+{% block body %}
+<div id="textarea" style="padding:30px">
+<h2>Member times for {{ ambit }}</h2>
+<br />
+
+{% for ambittag in ambittags %}
+{{ ambittag[0] }} {{ ambittag[1] }}<br />
+{% endfor %}
+
+<div>
+
+{% endblock body %}
