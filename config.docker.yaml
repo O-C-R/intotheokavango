@@ -1,0 +1,83 @@
+url: http://localhost:7777
+
+local_tz: "Africa/Johannesburg"    # will convert from this into UTC for incoming data and API requests
+
+expedition: okavango_15
+
+start_date: 
+    okavango_14:
+    okavango_15:
+
+server:
+    port: 7777
+
+mongo:
+    host: mongo
+    port: 27017
+    database: okavango
+
+email:
+    imap:
+        server: mail.webfaction.com
+        username: 
+        password: 
+    smtp:
+        name: Okavango API Project
+        address: okavango@o-c-r.org
+        server: smtp.webfaction.com
+        port: 587
+        username: 
+        password:          
+
+allowed_senders:
+
+satellites:
+    - TS090180
+    - TS091180
+
+twitter:
+    main:
+        app_key: 
+        app_secret: 
+        oauth_token: 
+        oauth_token_secret: 
+    data:
+        app_key: 
+        app_secret: 
+        oauth_token: 
+        oauth_token_secret: 
+    accounts:
+    hashtag: okavango15
+    
+ambits: # these have to be strings
+    B9460B5124000E00: Brian
+
+soundcloud:
+    client_id: 
+    client_secret: 
+    email: 
+    password: 
+
+twilio:
+    account_sid: 
+    auth_token: 
+    number: 
+
+iNaturalist:
+    app_id:
+    app_secret:
+    username:
+    password:
+    project_id:
+
+youtube:
+    client_id: 
+    client_secret: 
+
+geo_emails: None
+
+beanstalk:
+    address: 0.0.0.0
+    port: 11238
+    bin: /usr/local/bin/beanstalkd
+    pid: /Users/house/Projects/okavango/run/beanstalkd.pid
