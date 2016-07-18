@@ -1,0 +1,21 @@
+version: '2'
+services:
+  nginx:
+    image: nginx
+    ports:
+     - "3000:80"
+    volumes:
+      - ./nginx.docker.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/intotheokavango/static:ro
+    depends_on:
+      - web
+  web:
+    build: .
+    ports:
+     - "7777:7777"
+    volumes:
+     - ./config.docker.yaml:/usr/src/app/config.yaml:ro
+    depends_on:
+     - mongo
+  mongo:
+    image: mongo
