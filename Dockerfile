@@ -13,5 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
 
+VOLUME /usr/src/app/uploads
+
 EXPOSE 3000
 CMD ["./main.py", "3000"]
