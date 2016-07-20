@@ -190,7 +190,7 @@ def estimate_geometry(data, db):
         # throw it out if it's older than two days
         if closest_before is not None and t - closest_before['properties']['t_utc'] > (2 * 86400): 
             closest_before = None
-        if closeset_after is not None and closest_after['properties']['t_utc'] - t > (2 * 86400):
+        if closest_after is not None and closest_after['properties']['t_utc'] - t > (2 * 86400):
             closest_after = None
 
         if closest_before is None or closest_after is None:
