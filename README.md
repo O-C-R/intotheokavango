@@ -22,7 +22,7 @@ yo, make sure the server is on top of the time:
     tzselect
     sudo apt-get install ntp
 
-Check it: `sudo ntpq -p`    
+Check it: `timedatectl` and `sudo ntpq -p`
 
 ###### nginx
     sudo service nginx start

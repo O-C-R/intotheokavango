@@ -2,9 +2,10 @@
 
 import soundcloud, os, random, sys, time, json, io, tempfile
 from housepy import config, log, util
+from housepy.jobs import Jobs
 from mongo import db
 
-def main():
+def main(job):      ## kind of retrofitting the task queue -- we're not passing anything, just triggering the upload
 
     settings = config['soundcloud']
     try:
@@ -43,4 +44,5 @@ def upload(client, path, title):
     log.info("--> success: %s" % soundcloud_url)
     return soundcloud_url
 
-main()
+
+Jobs().process(main, tube="ingest_audio")

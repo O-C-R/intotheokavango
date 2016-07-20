@@ -26,8 +26,13 @@ def parse(request):
             del data['Date___Time']
         if 'Current_Location' in data:
             data['Location'] = data['Current_Location']  
+            del data['Current_Location']
         if 'LocationQuestion' in data:
             data['Location'] = data['LocationQuestion']                    
+            del data['LocationQuestion']
+        if 'GPSLocation' in data:
+            data['Location'] = data['GPSLocation']                    
+            del data['GPSLocation']
         if 'Location' in data:
             try:
                 feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
