@@ -141,7 +141,7 @@ def verify_geometry(data):
 def estimate_geometry(data, db):
     """Estimate the location of a geotagged object for a new feature that's missing it"""
     """For data tagged to a Member, find something else that's geotagged with that Member (like an ambit_geo), or from the Team (like a beacon)"""
-    """If the times are too distant (1 days) dont use them"""
+    """If the times are too distant (2 days) dont use them"""
     log.info("Estimating geometry...")
     t = data['properties']['t_utc']
     feature_type = data['properties']['FeatureType']
@@ -188,9 +188,9 @@ def estimate_geometry(data, db):
             closest_after = team_closest_after
 
         # throw it out if it's older than two days
-        if t - closest_before['properties']['t_utc'] > (2 * 86400): 
+        if closest_before is not None and t - closest_before['properties']['t_utc'] > (2 * 86400): 
             closest_before = None
-        if closest_after['properties']['t_utc'] - t > (2 * 86400):
+        if closeset_after is not None and closest_after['properties']['t_utc'] - t > (2 * 86400):
             closest_after = None
 
         if closest_before is None or closest_after is None:
