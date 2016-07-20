@@ -1,5 +1,7 @@
 ### new / okavango_16
 
+audio uploader is currently half-done
+
 Interface:
 - rebuild uploader (with Eric) -- sightings with photo attachment
 - temporal scaling (experimental)
