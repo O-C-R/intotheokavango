@@ -16,6 +16,9 @@ def parse(request):
             try:
                 with open(path) as f:
                     data = json.loads(f.read())
+                    if type(data) != dict:
+                        log.error("JSON needs to be a dict of key/value pairs")
+                        raise Exception
             except Exception as e:
                 log.error(log.exc(e))
                 return None, "Could not parse JSON"
