@@ -1,28 +1,18 @@
-<html>
-<head>
-<title>RiverFi Species Observation Upload 1.1</title>
+{% extends "page.html" %}
+{% block head %}
 
-<script src="/static/js/jquery-2.1.4.min.js"></script>
-<script src="/static/js/moment.js"></script>
-<script src="/static/js/jquery.serializejson.min.js"></script>
-<script src="/static/js/jquery.mobile-1.4.3.min.js"></script>
-<link rel="stylesheet" href="/static/css/jquery.mobile-1.4.3.min.css">
-
+{% include "upload/_head.html" %}
 
 <script>
 
 $(document).ready(function() {
 
-    $('#test-button').on('click', function () {
-        //console.log($('#date').val().replace('-16', '-15') + " , " + $('#time').val());
-    });
-
     $('#add-button').on('click', function () {
+        console.log('click');
                 var data = new FormData();
                 var files = $("#File").get(0).files;
-
-                var j = $('#upload').serializeJSON();
-                j.ResourceURLs = [];
+                if (files.length == 0) return;
+                var progressElem = $('#progressCounter');
 
                 // Add the uploaded file content to the form data collection
                 data.append('ImageCount', files.length);
@@ -30,11 +20,11 @@ $(document).ready(function() {
                     console.log("ADDING IMAGE " + files[i])
                     data.append("image-" + i, files[i]);
                     data.append("image-" + i + "-ResourceURL", files[i].name);
-                    j.ResourceURLs.push(files[i].name);
                 }
 
-                //j.ResourceURL = [files[0].name];
-                j.ImageType = "Species";
+                var j = $('#upload').serializeJSON();
+                j.ResourceURLs = [files[0].name];
+                j.SoundType = $('#SoundType').val();
 
                 var dateString = $('#date').val() + " , " + $('#time').val();
                 var date = moment().format();
@@ -57,10 +47,9 @@ $(document).ready(function() {
                 myReader.readAsText(jsonBlob);
 
                 // Make Ajax request with the contentType = false, and processDate = false
-                $('#message').text('Uploading...');
                 var ajaxRequest = $.ajax({
                     type: "POST",
-                    url:"/ingest/sighting",
+                    url: "/ingest/audio",
                     contentType: false,
                     processData: false,
                     data: data,
@@ -70,6 +59,19 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                        $('#message').html(xhr['responseText']);                        
+                    },
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                progressElem.html(Math.round(percentComplete * 100) + "%");
+                                //console.log("percent loaded: " + percentComplete);
+                            }
+                        }, false);
+
+                        return xhr;
                     }
                 });
 
@@ -87,41 +89,49 @@ $(document).ready(function() {
 })
 
 
-    
+	
 </script>
 
-</head>
-<body>
-<h2>Species Upload </h2>
+{% endblock head %}
+
+{% block body %}
+
+<div id="content">
+
+<h2>Upload audio</h2>
 <form id="upload">
 
-    <label for="SpeciesName">Species Name</label>
-    <input type="text" name="SpeciesName" id="SpeciesName" value="">
-
-    <label for="Count">Count</label>
-    <input type="number" name="Count" id="Count" value="">
-
-    <label for="SpecimenID">Specimen ID</label>
-    <input type="text" name="SpecimenID" id="SpecimenID" value="None">
-
     <label for="photo">File</label>
-    <input type="file" name="File" id="File" value="" multiple>
+    <input type="file" name="File" id="File" value="">
 
-    <label for="TeamMember">Team Member</label>
+    <label for="SoundType">Sound type</label>
+    <input type="text" name="SoundType" id="SoundType" value="Field Recording">
+
+    <label for="TeamMember">Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
 
-    <label for="date">Date</label>
+    <label for="Date">Date</label>
     <input type="date" name="Date" id="date" value="">
 
-    <label for="time">Time</label>
+    <label for="Time">Time</label>
     <input type="time" name="Time" id="time" value="">
 
     <label for="Notes">Notes</label>
     <input type="text" name="Notes" id="Notes" value="">
 
 </form>
-<!--button class="ui-shadow ui-btn ui-corner-all" id="test-button">Test</button-->
-<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Sighting</button>
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload</button>
+<div id="progressCounter"></div>
 <div id="message"></div>
-</body>
-</html>
+
+</div>
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+{% endblock body %}

@@ -1,0 +1,31 @@
+{% extends "page.html" %}
+{% block head %}
+
+{% include "upload/_head.html" %}
+
+<script>
+
+$(document).ready(function() {
+
+})
+
+
+    
+</script>
+
+{% endblock head %}
+
+{% block body %}
+
+<div id="content">
+<br />
+<br />
+<form id="upload">
+
+    <a href="/upload/sighting" class="ui-shadow ui-btn ui-corner-all" id="sighting-button">Sighting</a>
+    <a href="/upload/image" class="ui-shadow ui-btn ui-corner-all" id="image-button">Image</a>
+    <a href="/upload/audio" class="ui-shadow ui-btn ui-corner-all" id="audio-button">Audio</a>
+
+</div>
+
+{% endblock body %}

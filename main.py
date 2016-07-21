@@ -21,10 +21,23 @@ class Home(server.Handler):
         return self.render("index2.html")
 
 
-class Teams(server.Handler):
+class Upload(server.Handler):
 
     def get(self, page=None):
-        log.info("Teams.get")
+        self.set_header("Access-Control-Allow-Origin", "*")
+        if len(page):
+            try:
+                return self.render("upload/%s.html" % page)
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.not_found()        
+        return self.render("upload/home.html")
+
+
+class Admin(server.Handler):
+
+    def get(self, page=None):
+        log.info("Admin.get")
         self.set_header("Access-Control-Allow-Origin", "*")
         members = []        
         satellites = config['satellites']   
@@ -38,26 +51,26 @@ class Teams(server.Handler):
             for a, ambit in enumerate(ambits):
                 result = list(self.db.ambits.find({'Serial': ambit}).sort([('t_utc', DESCENDING)]).limit(1))
                 ambits[a] = {'Serial': ambit} if not len(result) or 'Serial' not in result[0] else result[0]
-            return self.render("teams.html", dbmembers=members, dbteams=teams, satellites=satellites, dbambits=ambits)
+            return self.render("admin/home.html", dbmembers=members, dbteams=teams, satellites=satellites, dbambits=ambits)
         elif page in satellites:
             teamtags = list(self.db.satellites.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
                 teamtags[t] = util.datestring(teamtag['t_utc'], config['local_tz']), teamtag['Team'] if 'Team' in teamtag else None
-            return self.render("team_satellite.html", satellite=page, teamtags=teamtags)
+            return self.render("admin/satellite.html", satellite=page, teamtags=teamtags)
         elif page in ambits:
             ambittags = list(self.db.ambits.find({'Serial': page}).sort([('t_utc', ASCENDING)]))
             for a, ambittag in enumerate(ambittags):
                 ambittags[a] = util.datestring(ambittag['t_utc'], config['local_tz']), ambittag['Member']
-            return self.render("team_ambit.html", ambit=page, ambittags=ambittags)            
+            return self.render("admin/ambit.html", ambit=page, ambittags=ambittags)            
         else:
             teamtags = list(self.db.members.find({'Name': page}).sort([('t_utc', ASCENDING)]))
             for t, teamtag in enumerate(teamtags):
                 teamtags[t] = util.datestring(teamtag['t_utc'], config['local_tz']), teamtag['Team'] if 'Team' in teamtag else None
             members = [name for name in self.db.members.find().sort('Name').distinct('Name') if len(name)]
-            return self.render("team_member.html", member=page, teamtags=teamtags, members=members)
+            return self.render("admin/member.html", member=page, teamtags=teamtags, members=members)
 
     def post(self, nop=None):
-        log.info("Team.post")
+        log.info("Admin.post")
         new_team = self.get_argument('new_team', None)
         new_member = self.get_argument('new_member', None)
         member = self.get_argument('member', None)
@@ -150,7 +163,8 @@ class Teams(server.Handler):
         
 
 handlers = [
-    (r"/teams/?([^/]*)", Teams),
+    (r"/admin/?([^/]*)", Admin),
+    (r"/upload/?([^/]*)", Upload),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
     (r"/?([^/]*)", Home),    

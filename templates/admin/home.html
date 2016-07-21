@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 {% block head %}
 
-<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/admin.css" />
 
 <script>
     $(document).ready(function() {
@@ -11,7 +11,7 @@
             if (!member.length) return;
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {new_member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -31,7 +31,7 @@
             if (!team.length) return;
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {new_team: team},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -51,7 +51,7 @@
             var member = $(this).attr('id');            
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {team: team, member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -70,7 +70,7 @@
             var satellite = $(this).attr('id');     
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {team: team, satellite: satellite},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -89,7 +89,7 @@
             var ambit = $(this).attr('id');     
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {ambit: ambit, member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -117,7 +117,7 @@
 <table>
     {% for member in dbmembers %}
     <tr>
-        <td><a href="/teams/{{ member.Name }}">{{ member.Name }}</a></td>
+        <td><a href="/admin/{{ member.Name }}">{{ member.Name }}</a></td>
         <td>
             <select class="member_team" id="{{ member.Name }}"> 
                 <option value="NONE">NONE</option>
@@ -140,7 +140,7 @@
 <table>
 {% for satellite in satellites %}
 <tr>
-    <td><a href="/teams/{{ satellite }}">{{ satellite }}</a></td>
+    <td><a href="/admin/{{ satellite }}">{{ satellite }}</a></td>
     <td>
         <select class="satellite_team" id="{{ satellite }}"> 
             <option value="NONE">NONE</option>
@@ -163,7 +163,7 @@
 <table>
 {% for ambit in dbambits %}
 <tr>
-    <td><span style="font-family: monospace;"><a href="/teams/{{ ambit.Serial }}">{{ ambit.Serial }}</a></span></td>
+    <td><span style="font-family: monospace;"><a href="/admin/{{ ambit.Serial }}">{{ ambit.Serial }}</a></span></td>
     <td>
         <select class="ambit_member" id="{{ ambit.Serial }}"> 
             <option value="NONE">NONE</option>

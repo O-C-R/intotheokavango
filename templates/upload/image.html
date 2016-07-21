@@ -1,12 +1,7 @@
-<html>
-<head>
-<title>RiverFi Image Upload 1.1</title>
+{% extends "page.html" %}
+{% block head %}
 
-<script src="/static/js/jquery-2.1.4.min.js"></script>
-<script src="/static/js/jquery.serializejson.min.js"></script>
-<script src="/static/js/jquery.mobile-1.4.3.min.js"></script>
-<link rel="stylesheet" href="/static/css/jquery.mobile-1.4.3.min.css">
-
+{% include "upload/_head.html" %}
 
 <script>
 
@@ -59,6 +54,7 @@ $(document).ready(function() {
                         console.log(status);
                         console.log(error);
                         console.log(data);
+                        $('#message').html(xhr['responseText']);
                     },
                     xhr: function() {
                         var xhr = new window.XMLHttpRequest();
@@ -87,25 +83,20 @@ $(document).ready(function() {
 
             $('#species-button').on('click', function () {
                 $('#speciesList').empty();
-                $('#species-button').text('Getting sightings from API...')
+                // $('#species-button').text('Getting sightings from API...')
                 console.log("Try getting species");
-                //http://intotheokavango.org/api/features/?FeatureType=sighting&order=descending&SpeciesName=Tester+Bird
-                $.getJSON('http://intotheokavango.org/api/features/?Expedition=okavango_15&FeatureType=sighting&order=descending&speciesSearch=' + encodeURI($('#Species').val()), function(data) {
+                $.getJSON('/api/features/?Expedition={{ expedition }}&FeatureType=sighting&order=descending&limit=20&speciesSearch=' + encodeURI($('#Species').val()), function(data) {
                         var buttons = [];
                         for (var i = 0; i < data.results.features.length; i++) {
                             var f = data.results.features[i];
-                            buttons[i] = $('#speciesList').append('<div id="button' + i + '">' + f.properties.SpeciesName + " - " + f.properties.DateTime + '</div>');
+                            buttons[i] = $('#speciesList').append('<div id="button' + i + '" class="ui-shadow ui-btn ui-corner-all" style="font-weight: normal; text-align: left;">' + f.properties.SpeciesName + " sighted by " + f.properties.Member + " at " + f.properties.DateTime + '</div>');
                             $('#button' + i).data('id',f.id ).click(function() {
                                 id = $(this).data('id');
                                 console.log($('#sightingID'));
-                                if (!$('#sightingID').length) {
-                                    $('#upload').append('<input type="text" name="SightingID" id="sightingID" label="Sighting ID">');
-                                }
-                                $('#sightingID').val(id);
+                                $('#SightingID').val(id);
                             });
 
                         }
-                        $('#species-button').text('Relink Species?')
                 })
             });
 
@@ -115,30 +106,52 @@ $(document).ready(function() {
 	
 </script>
 
-</head>
-<body>
-<h2>Image Upload </h2>
+{% endblock head %}
+
+{% block body %}
+
+<div id="content">
+
+<h2>Upload an image</h2>
 <form id="upload">
 
     <label for="photo">Photo</label>
     <input type="file" name="Photo" id="Photo" value="" multiple>
 
-    <label for="TeamMember">Team Member</label>
+    <label for="TeamMember">Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
 
     <label for="Notes">Notes</label>
     <input type="text" name="Notes" id="Notes" value="">
 
-    <label for="Species">Species Name</label>
-    <input type="text" name="Species" id="Species" value="">
+    <label for="Notes">SightingID</label>
+    <input type="text" name="SightingID" id="SightingID" value="">
 
 </form>
+<br />
+<div style="border: 1px solid #ccc; padding: 10px;">
+Find SightingID<br />
+<br />
+<label for="Species">Species </label>
+<input type="text" name="Species" id="Species" value="">    
+<button class="ui-shadow ui-btn ui-corner-all" id="species-button">Search</button>
 <div id='speciesList'>
 
 </div>
-<button class="ui-shadow ui-btn ui-corner-all" id="species-button">Link Species</button>
-<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload Images</button>
+</div>
+<br />
+<button class="ui-shadow ui-btn ui-corner-all" id="add-button">Upload</button>
 <div id="progressCounter"></div>
-<h3 id="message"></h3>
-</body>
-</html>
+<div id="message"></div>
+
+</div>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+
+{% endblock body %}

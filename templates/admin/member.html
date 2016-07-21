@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 {% block head %}
 
-<link rel="stylesheet" type="text/css" href="/static/css/api.css" />
+<link rel="stylesheet" type="text/css" href="/static/css/admin.css" />
 
 <script>
     $(document).ready(function() {
@@ -12,7 +12,7 @@
             if (!confirm("Really delete " + member + " and reassign all her/his features to " + target + "? This cannot be undone.")) return
             $.ajax({
                 type: "POST",
-                url: "/teams",
+                url: "/admin",
                 data: {reassign_member: member, target: target},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -22,7 +22,7 @@
                 }
             }).done(function (xhr, textStatus) {
                 // alert(textStatus);
-                document.location = "/teams";
+                document.location = "/admin";
             });            
         });
     });
