@@ -15,67 +15,77 @@ def parse(request):
         if path[-4:] == "json":
             try:
                 with open(path) as f:
-                    data = json.loads(f.read())
-                    if type(data) != dict:
-                        log.error("JSON needs to be a dict of key/value pairs")
-                        raise Exception
+                    datas = json.loads(f.read())
             except Exception as e:
                 log.error(log.exc(e))
                 return None, "Could not parse JSON"
             break
-    if data is None:
+    if datas is None:
         return None, "No data"
         
-    # make corrections
-    # Bird Name should be SpeciesName    
-    for key, item in data.items():
-        modkey = key.strip().lower().replace(' ', '')
-        if modkey == "birdname":
-            data['SpeciesName'] = item
-            del data[key] 
-    if 'TeamMember' in data:
-        data['Member'] = data['TeamMember']
-        del data['TeamMember']          
+    if type(datas) == dict:
+        datas = [datas]
 
-    # purge blanks
-    data = {key: value for (key, value) in data.items() if type(value) != str or len(value.strip())}
-    if 'SpeciesName' not in data:
-        log.error("Missing SpeciesName")
-        return None, "Missing SpeciesName"
-    data['SpeciesName'] = strings.titlecase(data['SpeciesName'])       
+    for data in datas:
 
-    if 'Count' not in data and 'count' not in data:
-        data['Count'] = 1
-    log.debug(json.dumps(data, indent=4))
-    data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+        # make corrections
+        # Bird Name should be SpeciesName    
+        for key, item in data.items():
+            modkey = key.strip().lower().replace(' ', '')
+            if modkey == "birdname":
+                data['SpeciesName'] = item
+                del data[key] 
+        if 'TeamMember' in data:
+            data['Member'] = data['TeamMember']
+            del data['TeamMember']          
+
+        # purge blanks
+        data = {key: value for (key, value) in data.items() if type(value) != str or len(value.strip())}
+        if 'SpeciesName' not in data:
+            log.error("Missing SpeciesName")
+            return None, "Missing SpeciesName"
+        data['SpeciesName'] = strings.titlecase(data['SpeciesName'])       
+
+        if 'Count' not in data and 'count' not in data:
+            data['Count'] = 1
+        log.debug(json.dumps(data, indent=4))
+        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
 
 
-    # process the image
-    images = []
-    for path in paths:
-        if path[-4:] != "json":
-            log.info("Inserting image... %s" % path.split('/')[-1])
-            image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
-            if image_data is None:
-                log.info("--> no image data")
-                continue            
-            success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype
-            if not success:
-                log.error(value)
-            if 'Member' in image_data:
-                del image_data['Member']
-            images.append(image_data)
-            log.info("--> image added")
-    data['Images'] = images
+        # process the image
+        images = []
+        for path in paths:
+            if path[-4:] != "json":
+                log.info("Inserting image... %s" % path.split('/')[-1])
+                image_data = process_image(path, data['Member'] if 'Member' in data else None, data['t_utc'] if 't_utc' in data else None)
+                if image_data is None:
+                    log.info("--> no image data")
+                    continue            
+                success, value = ingest_data("image", image_data.copy())   # make a second request for the image featuretype
+                if not success:
+                    log.error(value)
+                if 'Member' in image_data:
+                    del image_data['Member']
+                images.append(image_data)
+                log.info("--> image added")
+        data['Images'] = images
 
-    # use image data to assign a timestamp to the sighting
-    if 'getImageTimestamp' in data and data['getImageTimestamp'] == True and len(data['Images']) and 't_utc' in data['Images'][0]:
-        data['t_utc'] = data['Images'][0]['t_utc']
-        log.info("--> replaced sighting t_utc with image data")
-    if 'getImageTimestamp' in data:
-        del data['getImageTimestamp']
+        # use image data to assign a timestamp to the sighting
+        if 'getImageTimestamp' in data and data['getImageTimestamp'] == True and len(data['Images']) and 't_utc' in data['Images'][0]:
+            data['t_utc'] = data['Images'][0]['t_utc']
+            log.info("--> replaced sighting t_utc with image data")
+        if 'getImageTimestamp' in data:
+            del data['getImageTimestamp']
 
-    return data
+        if 'ResourceURLs' in data:
+            del data['ResourceURLs']
+
+        success, value = ingest_data("sighting", data)
+        if not success:
+            return None, value
+
+
+    return True
 
 
 def get_taxonomy(name):

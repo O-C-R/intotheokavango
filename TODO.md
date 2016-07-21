@@ -1,13 +1,11 @@
 ### new / okavango_16
 
-audio uploader is currently half-done
-
-Interface:
-- rebuild uploader (with Eric) -- sightings with photo attachment
-- temporal scaling (experimental)
+data editor?
 
 Server:
 - triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
+
+audio uploader is currently half-done
 
 processors -> crons
 processors are now beanstalk triggered: inaturalist, audio, twilio?
