@@ -1,15 +1,6 @@
-### new / okavango_16
+### new
 
-data editor?
-
-Server:
-- triggered rather than cron'ed ingest -- ie, use beanstalk like you should have
-
-audio uploader is currently half-done
-
-processors -> crons
-processors are now beanstalk triggered: inaturalist, audio, twilio?
-
+data editor
 
 
 ### issues
@@ -18,7 +9,7 @@ processors are now beanstalk triggered: inaturalist, audio, twilio?
 
 
 ### needed improvements
-- async for soundcloud and twilio
+- async/beanstalk for soundcloud and twilio
 
 
 ### GBIF
