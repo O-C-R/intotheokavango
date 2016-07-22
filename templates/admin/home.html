@@ -103,6 +103,10 @@
             });                
         });
 
+        $('#edit').click(function() {
+            document.location.href = "/edit/" + $('#feature_id').val();
+        });
+
     })
 
 
@@ -188,6 +192,10 @@ NEW MEMBER<br /><input type="text" id="new_member" size="15" /><input id="new_me
 NEW TEAM<br /><input type="text" id="new_team" size="15" /><input id="new_team_btn" type="button" value="Create" />
 <br />
 <br />
+<br />
+
+EDIT FEATURE<br />_id: <input type="text" id="feature_id" size="15" /><input id="edit" type="button" value="Edit" />
+
 <div>
 
 {% endblock body %}

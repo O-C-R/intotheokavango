@@ -4,7 +4,7 @@ import os, sys, yaml, json
 from housepy import config, log, server, util, process, strings
 from ingest import Ingest
 from api import Api
-from mongo import ObjectId
+from mongo import ObjectId, DESCENDING, ASCENDING
 
 process.secure_pid(os.path.abspath(os.path.join(os.path.dirname(__file__), "run")), sys.argv[1])
 
@@ -170,19 +170,34 @@ class Edit(server.Handler):
         self.set_header("Access-Control-Allow-Origin", "*")
         if feature_id is None or not len(feature_id):
             return self.error("Missing feature_id")
-        feature = self.db.features.find_one({'_id': ObjectId(feature_id)})
-        if feature is None:
+        try:
+            feature = self.db.features.find_one({'_id': ObjectId(feature_id)})
+            if feature is None:
+                raise Exception
+        except:
             return self.error("feature_id (%s) not found" % feature_id)
+        del feature['_id']
         try:
             safe_feature = json.loads(json.dumps(feature, indent=4, default=lambda obj: str(obj)))
             yml = yaml.safe_dump(safe_feature)            
         except Exception as e:
             return self.error(log.exc(e))
-        return self.text(yml)
+        return self.render("admin/edit.html", yml=yml, feature_id=feature_id)
 
 
-    def post(self, nop=None):
+    def post(self, feature_id=None):
         log.info("Edit.post")
+        try:
+            feature = yaml.load(self.get_argument("feature", None))
+            json.dumps(feature, indent=4)
+        except Exception as e:
+            log.error(log.exc(e))
+            return self.error(e)
+        try:
+            result = self.db.features.update({'_id': ObjectId(feature_id)}, feature)
+        except Exception as e:
+            log.error(e)
+        return self.text(result)
 
 
 handlers = [

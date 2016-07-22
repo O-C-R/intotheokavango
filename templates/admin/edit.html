@@ -1,0 +1,71 @@
+{% extends "page.html" %}
+{% block head %}
+
+<link rel="stylesheet" type="text/css" href="/static/css/admin.css" />
+<style type="text/css">
+textarea {
+    position: relative;
+    float: left;
+    margin: 20px;
+    padding: 10px;
+    width: 800px;
+    height: 500px;
+    font-size: 14px;
+    font-family: monoco, courier, monospace;    
+}
+
+textarea:focus {
+    outline: 0px;
+    outline: none;
+}
+
+input {
+    margin-top: 20px;
+}
+</style>
+
+<script>
+
+$(document).ready(function() {
+
+    $('#save').click(function() {
+        var feature = $('#feature').val();
+        console.log(feature);
+        if (!feature.length) return;
+        $.ajax({
+            type: "POST",
+            url: "/edit/{{ feature_id }}",
+            data: {feature: feature},
+            error: function (xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                alert(xhr.responseText);
+                alert(error);
+            }
+        }).done(function (xhr, textStatus) {
+            alert(textStatus);
+            document.location.reload();
+        });            
+    });
+
+    $('#view').click(function() {
+        document.location.href = "/api/features?id={{ feature_id }}";
+    });    
+
+});
+
+</script>
+
+{% endblock head %}
+
+{% block body %}
+
+<textarea id="feature">
+{{ yml }}
+</textarea>
+
+<input type="button" id="save" value="Save" /><br />
+<input type="button" id="view" value="View" />
+
+{% endblock body %}
