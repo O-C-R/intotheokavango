@@ -1,8 +1,3 @@
-### new
-
-data editor
-
-
 ### issues
 - things that arent members or teams and wont be geotagged:
     intotheokavango twitter

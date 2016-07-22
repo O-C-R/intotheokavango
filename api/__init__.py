@@ -1,6 +1,6 @@
 import geojson, datetime, pytz, json, os, importlib, datetime
 from housepy import server, config, log, util, strings
-from pymongo import ASCENDING, DESCENDING
+from mongo import ASCENDING, DESCENDING, ObjectId
 
 """
     Basically, it's like this: /api/<view>/<output>?<query>
@@ -60,6 +60,15 @@ class Api(server.Handler):
 
         # time to build our search filter
         search = {}
+
+        # special parsing for id
+        feature_id = self.get_argument('id', None)
+        if feature_id is not None:
+            try:
+                search['_id'] = ObjectId(feature_id)
+            except Exception as e:
+                log.error(log.exc(e))
+                return self.error("Bad dates")          
 
         # special parsing for startDate and endDate
         start_string = self.get_argument('startDate', None) 
@@ -147,7 +156,8 @@ class Api(server.Handler):
                     item = {'$exists': True} if item == '*' else item
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {('properties.%s' % (strings.camelcase(param) if param != 't_utc' else 't_utc') if param != 'geometry' and param != '$text' else param): value for (param, value) in search.items() if param not in ['region', 'geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
+            search = {  ('properties.%s' % (strings.camelcase(param) if param != 't_utc' and param != '_id' else param) if param != 'geometry' and param != '$text' and param != '_id' else param): value for (param, value) in search.items() if param not in ['id', 'region', 'geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
+            print(search)
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
