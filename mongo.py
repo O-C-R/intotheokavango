@@ -2,6 +2,7 @@
 
 from housepy import config, log
 from pymongo import MongoClient, GEOSPHERE, ASCENDING, DESCENDING
+from bson.objectid import ObjectId
 
 mongo = config['mongo']
 client = MongoClient(mongo['host'], mongo['port'])

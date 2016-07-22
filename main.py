@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import os, sys
+import os, sys, yaml, json
 from housepy import config, log, server, util, process, strings
-from pymongo import ASCENDING, DESCENDING
 from ingest import Ingest
 from api import Api
+from mongo import ObjectId
 
 process.secure_pid(os.path.abspath(os.path.join(os.path.dirname(__file__), "run")), sys.argv[1])
 
@@ -162,7 +162,31 @@ class Admin(server.Handler):
         return self.error("Something wasn't right")
         
 
+
+class Edit(server.Handler):
+
+    def get(self, feature_id=None):
+        log.info("Edit.get")
+        self.set_header("Access-Control-Allow-Origin", "*")
+        if feature_id is None or not len(feature_id):
+            return self.error("Missing feature_id")
+        feature = self.db.features.find_one({'_id': ObjectId(feature_id)})
+        if feature is None:
+            return self.error("feature_id (%s) not found" % feature_id)
+        try:
+            safe_feature = json.loads(json.dumps(feature, indent=4, default=lambda obj: str(obj)))
+            yml = yaml.safe_dump(safe_feature)            
+        except Exception as e:
+            return self.error(log.exc(e))
+        return self.text(yml)
+
+
+    def post(self, nop=None):
+        log.info("Edit.post")
+
+
 handlers = [
+    (r"/edit/?([^/]*)", Edit),
     (r"/admin/?([^/]*)", Admin),
     (r"/upload/?([^/]*)", Upload),
     (r"/api/?([^/]*)/?([^/]*)", Api),
