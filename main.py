@@ -18,7 +18,7 @@ class Home(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.not_found()        
-        return self.render("index2.html")
+        return self.render("index3.html")
 
 
 class Upload(server.Handler):
