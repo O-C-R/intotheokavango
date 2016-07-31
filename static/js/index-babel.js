@@ -117,14 +117,14 @@ var Content = React.createClass({
     return React.createElement(
       'div',
       { id: 'content', style: height },
-      React.createElement(LightBox, { active: true }),
+      React.createElement(LightBox, null),
       React.createElement(Timeline, null),
       React.createElement(
         'div',
         { id: 'pageContainer' },
         React.createElement(MapPage, null),
-        React.createElement(JournalPage, { active: true }),
-        React.createElement(DataPage, null),
+        React.createElement(JournalPage, null),
+        React.createElement(DataPage, { active: true }),
         React.createElement(AboutPage, null),
         React.createElement(SharePage, null)
       )
@@ -137,46 +137,45 @@ var LightBox = React.createClass({
 
 
   render: function render() {
+
+    var height = { height: window.innerHeight - 200 };
+
+    var post = {
+      'key': 1,
+      'type': 'tweet',
+      'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ultricies facilisis ipsum, non sagittis velit venenatis gravida.',
+      'date': Date.now(),
+      'location': [0, 0],
+      'link': 'http://www.google.com',
+      'image': 'static/img/photo.png'
+    };
+
+    var meta = {
+      'type': post.type,
+      'date': post.date,
+      'location': post.location,
+      'link': post.link
+    };
+
+    console.log(post.content, meta);
+
     if (this.props.active) {
       return React.createElement(
         'div',
         { id: 'lightBox' },
         React.createElement(
-          Post,
-          { format: 'lightbox' },
-          'content'
-        ),
-        React.createElement(LightboxControls, { close: true, share: true, permaLink: true })
+          'div',
+          { className: 'contentWrapper', style: height },
+          React.createElement(
+            Post,
+            { format: 'lightBox', meta: meta },
+            post.image
+          )
+        )
       );
     } else {
       return null;
     }
-  }
-});
-
-var LightboxControls = React.createClass({
-  displayName: 'LightboxControls',
-
-  render: function render() {
-    return React.createElement(
-      'div',
-      null,
-      this.props.close ? React.createElement(
-        'div',
-        null,
-        'close'
-      ) : null,
-      this.props.share ? React.createElement(
-        'div',
-        null,
-        'share 18'
-      ) : null,
-      this.props.permaLink ? React.createElement(
-        'div',
-        null,
-        'permaLink'
-      ) : null
-    );
   }
 });
 
@@ -341,12 +340,16 @@ var JournalPage = React.createClass({
     }];
 
     var className = 'page ' + (this.props.active ? 'active' : 'inactive');
-    return React.createElement(
-      'div',
-      { className: className, id: 'journalPage' },
-      React.createElement(ControlPanel, { year: true, date: true, layout: true }),
-      React.createElement(Feed, { posts: posts })
-    );
+    if (this.props.active) {
+      return React.createElement(
+        'div',
+        { className: className, id: 'journalPage' },
+        React.createElement(ControlPanel, { year: true, date: true, layout: true }),
+        React.createElement(Feed, { posts: posts })
+      );
+    } else {
+      return null;
+    }
   }
 });
 
@@ -386,6 +389,7 @@ var Post = React.createClass({
 
     var self = this;
     var metaTypes = ['date'];
+
     if (self.props.meta.location) metaTypes.push('location');
     if (self.props.meta.link) metaTypes.push('link');
 
@@ -402,7 +406,7 @@ var Post = React.createClass({
             null,
             s
           );
-        } else {
+        } else if (self.props.format == 'full') {
           return React.createElement('img', { width: '16', height: '16', key: i });
         }
       }();
@@ -442,6 +446,47 @@ var Post = React.createClass({
               React.createElement('img', { width: '16', height: '16' })
             ),
             React.createElement('div', { className: 'separator' })
+          )
+        )
+      );
+    }
+
+    if (self.props.format === 'lightBox') {
+      return React.createElement(
+        'div',
+        { className: 'post lightBox' },
+        React.createElement(
+          'div',
+          { className: 'type' },
+          React.createElement('img', { width: '16', height: '16' }),
+          React.createElement(
+            'div',
+            { className: 'meta' },
+            meta
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: 'content' },
+          React.createElement('img', { src: self.props.children.toString() })
+        ),
+        React.createElement(
+          'div',
+          { className: 'actions' },
+          React.createElement(
+            'div',
+            { className: 'close' },
+            React.createElement('img', { width: '16', height: '16' })
+          ),
+          React.createElement(
+            'div',
+            { className: 'share' },
+            React.createElement('img', { width: '16', height: '16' })
+          ),
+          React.createElement(
+            'div',
+            { className: 'permaLink' },
+            React.createElement('img', { width: '16', height: '16' })
           )
         )
       );
@@ -737,9 +782,9 @@ var DataPage = React.createClass({
       return React.createElement(
         'h3',
         { key: section.key },
-        section.id,
+        section.key,
         ' - ',
-        section.content
+        section.title
       );
     });
 
@@ -750,7 +795,9 @@ var DataPage = React.createClass({
         React.createElement(
           'h2',
           null,
-          'aga'
+          section.key,
+          ' - ',
+          section.title
         ),
         section.content
       );
@@ -779,7 +826,7 @@ var DataPageIndex = React.createClass({
   render: function render() {
     return React.createElement(
       'div',
-      null,
+      { id: 'APIIndex' },
       this.props.children
     );
   }

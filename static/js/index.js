@@ -73,12 +73,12 @@ var Content = React.createClass({
 
     return (
       <div id="content" style={height}>
-        <LightBox active/>
+        <LightBox/>
         <Timeline/>
         <div id="pageContainer">
           <MapPage/>
-          <JournalPage active/>
-          <DataPage/>
+          <JournalPage/>
+          <DataPage active/>
           <AboutPage/>
           <SharePage/>
         </div>
@@ -90,11 +90,36 @@ var Content = React.createClass({
 var LightBox = React.createClass({
 
   render: function(){
+
+    var height = {height: window.innerHeight-200}
+
+    var post = {
+      'key':1,
+      'type':'tweet',
+      'content':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ultricies facilisis ipsum, non sagittis velit venenatis gravida.', 
+      'date': Date.now(),
+      'location': [0,0],
+      'link': 'http://www.google.com',
+      'image': 'static/img/photo.png'
+    }
+
+    var meta = {
+      'type':post.type,
+      'date':post.date,
+      'location':post.location,
+      'link':post.link
+    }
+
+    console.log(post.content, meta )
+
     if(this.props.active){
       return(
         <div id="lightBox">
-          <Post format="lightbox">content</Post>
-          <LightboxControls close share permaLink/>
+          <div className="contentWrapper" style={height}>
+            <Post format="lightBox" meta={meta}>
+              {post.image}
+            </Post>
+          </div>
         </div>
       )
     } else {
@@ -104,17 +129,7 @@ var LightBox = React.createClass({
 })
 
 
-var LightboxControls = React.createClass({
-  render: function(){
-    return (
-      <div>
-        {this.props.close?(<div>close</div>):null}
-        {this.props.share?(<div>share 18</div>):null}
-        {this.props.permaLink?(<div>permaLink</div>):null}
-      </div>
-    )
-  }
-})
+
 
 
 var Timeline = React.createClass({
@@ -280,12 +295,16 @@ var JournalPage = React.createClass({
 
 
     var className = 'page ' + (this.props.active?'active':'inactive')
-    return (
-      <div  className={className}  id="journalPage">
-        <ControlPanel year date layout/>
-        <Feed posts={posts}/>
-      </div>
-    )
+    if(this.props.active){
+      return (
+        <div  className={className}  id="journalPage">
+          <ControlPanel year date layout/>
+          <Feed posts={posts}/>
+        </div>
+      )
+    } else {
+      return null
+    }
   }
 })
 
@@ -324,6 +343,7 @@ var Post = React.createClass({
 
     var self = this
     var metaTypes = ['date']
+
     if(self.props.meta.location) metaTypes.push('location')
     if(self.props.meta.link) metaTypes.push('link')
     
@@ -337,7 +357,7 @@ var Post = React.createClass({
           var da = d.getDate()
           var s = mo + '/' + da
           return (<p>{s}</p>)
-        } else {
+        } else if(self.props.format == 'full') {
           return (<img width="16" height="16" key={i}/>)
         }
       })()
@@ -361,6 +381,27 @@ var Post = React.createClass({
               <div className="share"><img width="16" height="16" /></div>
               <div className="separator"></div>
             </div>
+          </div>
+        </div>
+      )
+    }
+
+    if(self.props.format === 'lightBox'){
+      return (
+        <div className="post lightBox">
+          <div className="type">
+            <img width="16" height="16"/>
+            <div className="meta">
+              {meta}
+            </div>
+          </div>
+          <div className="content">
+            <img src={self.props.children.toString()}/>
+          </div>
+          <div className="actions">
+            <div className="close"><img width="16" height="16" /></div>
+            <div className="share"><img width="16" height="16" /></div>
+            <div className="permaLink"><img width="16" height="16" /></div>
           </div>
         </div>
       )
@@ -551,13 +592,13 @@ var DataPage = React.createClass({
     ]
 
     var index = sections.map(function(section){
-      return <h3 key={section.key}>{section.id} - {section.content}</h3>
+      return <h3 key={section.key}>{section.key} - {section.title}</h3>
     })
 
     var content = sections.map(function(section){
       return (
         <div key={section.key}>
-          <h2>aga</h2>
+          <h2>{section.key} - {section.title}</h2>
           {section.content}
         </div>
       )
@@ -579,7 +620,7 @@ var DataPage = React.createClass({
 var DataPageIndex = React.createClass({
   render: function(){
     return (
-      <div>
+      <div id="APIIndex">
         {this.props.children}
       </div>
     )
