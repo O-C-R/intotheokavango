@@ -4,6 +4,30 @@
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ';
 const MAPBOX_STYLE = 'mapbox://styles/iaaaan/cioxda1tz000cbnm13jtwhl8q';
 
+var initialState = {
+  'currentPage' : 'map'
+}
+
+var reducer = function(state = initialState, action){
+  switch(action.type){
+    case 'NAV-MAP':
+      state.currentPage = 'map'
+      break
+    case 'NAV-JOURNAL':
+      state.currentPage = 'journal'
+      break
+    case 'NAV-DATA':
+      state.currentPage = 'data'
+      break
+    case 'NAV-ABOUT':
+      state.currentPage = 'about'  
+      break
+  }
+  return state
+}
+
+const store = createStore(reducer)
+
 var Okavango = React.createClass({
   render: function(){
     return (
@@ -12,6 +36,42 @@ var Okavango = React.createClass({
         <Navigation/>
         <Content/>
       </div>
+    )
+  }
+})
+
+
+
+var Navigation = React.createClass({
+  render: function(){
+
+    var currentPage = store.getState().currentPage
+
+    return (
+      <div id="header">
+        <div id="navigation">
+          <ul>
+            <NavigationItem active={currentPage == 'map'} >Map</NavigationItem>
+            <NavigationItem active={currentPage == 'journal'} >Journal</NavigationItem>
+            <NavigationItem active={currentPage == 'data'} >Data</NavigationItem>
+            <NavigationItem active={currentPage == 'about'} >About</NavigationItem>
+            <NavigationItem active={currentPage == 'share'} >Share</NavigationItem>
+          </ul>
+        </div>
+        <h1>INTO THE OKAVANGO</h1>
+      </div>
+    )
+  }
+})
+
+var NavigationItem = React.createClass({
+  onClick: function(e){
+    store.dispatch({type:'NAV-'+e.target.textContent.toUpperCase()})
+  },
+  render: function(){
+    var className = this.props.active?'active':'inactive'
+    return (
+      <li className={className} onClick={this.onClick}><a href="#">{this.props.children.toString()}</a></li>
     )
   }
 })
@@ -36,33 +96,6 @@ var Map = React.createClass({
 })
 
 
-var Navigation = React.createClass({
-  render: function(){
-    return (
-      <div id="header">
-        <div id="navigation">
-          <ul>
-            <NavigationItem>Map</NavigationItem>
-            <NavigationItem>Journal</NavigationItem>
-            <NavigationItem>Data</NavigationItem>
-            <NavigationItem active>About</NavigationItem>
-            <NavigationItem>Share</NavigationItem>
-          </ul>
-        </div>
-        <h1>INTO THE OKAVANGO</h1>
-      </div>
-    )
-  }
-})
-
-var NavigationItem = React.createClass({
-  render: function(){
-    var className = this.props.active?'active':'inactive'
-    return (
-      <li className={className}><a href="#">{this.props.children.toString()}</a></li>
-    )
-  }
-})
 
 
 var Content = React.createClass({
@@ -70,16 +103,17 @@ var Content = React.createClass({
   render: function(){
 
     var height = {height: window.innerHeight-100}
-
+    var currentPage = store.getState().currentPage
+ 
     return (
       <div id="content" style={height}>
         <LightBox/>
         <Timeline/>
         <div id="pageContainer">
-          <MapPage/>
-          <JournalPage/>
-          <DataPage active/>
-          <AboutPage/>
+          <MapPage active={currentPage == 'map'}/>
+          <JournalPage active={currentPage == 'journal'}/>
+          <DataPage active={currentPage == 'data'}/>
+          <AboutPage active={currentPage == 'about'}/>
           <SharePage/>
         </div>
       </div>
@@ -109,8 +143,6 @@ var LightBox = React.createClass({
       'location':post.location,
       'link':post.link
     }
-
-    console.log(post.content, meta )
 
     if(this.props.active){
       return(
@@ -583,7 +615,7 @@ var DataPage = React.createClass({
       {'key':1, 'title':'Overview', 'content':
         (<p>Lorem ipsum dolor sit amet</p>)
       },
-      {'key':2, 'title':'API exploration tool', 'content':
+      {'key':2, 'title':'Explore', 'content':
         (<APIExplorer/>)
       },
       {'key':3, 'title':'Documentation', 'content':
@@ -697,39 +729,13 @@ var SharePage = React.createClass({
 
 
 
-// console.log('aga1')
 
-// var Navigation = React.createClass({
-//   render: function(){
-//     return (<p></p>)
-//   }
-// })
-
-
-// var MapPage = React.createClass({
-//   render: function(){
-//     return (<p></p>)
-//   }
-// })
-
-// var JournalPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
-
-// var DataPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
-
-// var AboutPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
-
+////////
+////////
+////////
+////////
+////////
+////////
 
 
 var CommentList = React.createClass({
@@ -882,8 +888,13 @@ window.onclick = function(event) {
 }
 
 
-ReactDOM.render(
-  // <CommentBox url="/api/comments" pollInterval={2000} />,
-  <Okavango/>,
-  document.getElementById('okavango')
-);
+var render = function(){
+  ReactDOM.render(
+    // <CommentBox url="/api/comments" pollInterval={2000} />,
+    <Okavango/>,
+    document.getElementById('okavango')
+  );
+}
+
+store.subscribe(render)
+render()

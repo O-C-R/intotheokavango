@@ -118,7 +118,7 @@ ul{
       }
       
         #navigation li{
-          width:6.8%;
+          width:6.2%;
           height:100px;
           margin-left:2%;
           position:relative;
@@ -247,7 +247,7 @@ ul{
 
         .controlPanel{
           position:absolute;
-          width:15%;
+          overflow-x:visible; 
         }
 
           .yearSelector{}
@@ -270,9 +270,6 @@ ul{
            ul.buttonRow li{
             display: inline-block;
             vertical-align: top;
-            width:19%;
-            height:22px;
-            padding:8px 0;
             border-right:1px solid white;
             text-align: center;
             background-color: rgba(4,0,26,0.3);
@@ -290,6 +287,7 @@ ul{
              ul.buttonRow li img{
               display:inline-block;
               vertical-align: middle;
+              padding:8px;
             }
 
           .selector{
@@ -297,22 +295,24 @@ ul{
           }
 
           .selector .column{
-            width:42%;
             display: inline-block;
             vertical-align: top;
-            margin-right:15%;
+            margin-right:32px;
           }
 
 
             .selector svg.column{
               margin:0;
               background-color: blue;
-              height:40px;
+              height:34px;
+              width:64px;
               vertical-align: middle;
             }
 
           .selector ul.buttonRow li{
-            width:49%;
+            padding:0;
+            height:auto;
+            width:auto;
           }
 
         #feed{

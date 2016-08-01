@@ -4,6 +4,33 @@
 var MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ';
 var MAPBOX_STYLE = 'mapbox://styles/iaaaan/cioxda1tz000cbnm13jtwhl8q';
 
+var initialState = {
+  'currentPage': 'map'
+};
+
+var reducer = function reducer() {
+  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'NAV-MAP':
+      state.currentPage = 'map';
+      break;
+    case 'NAV-JOURNAL':
+      state.currentPage = 'journal';
+      break;
+    case 'NAV-DATA':
+      state.currentPage = 'data';
+      break;
+    case 'NAV-ABOUT':
+      state.currentPage = 'about';
+      break;
+  }
+  return state;
+};
+
+var store = createStore(reducer);
+
 var Okavango = React.createClass({
   displayName: 'Okavango',
 
@@ -14,6 +41,78 @@ var Okavango = React.createClass({
       React.createElement(Map, null),
       React.createElement(Navigation, null),
       React.createElement(Content, null)
+    );
+  }
+});
+
+var Navigation = React.createClass({
+  displayName: 'Navigation',
+
+  render: function render() {
+
+    var currentPage = store.getState().currentPage;
+
+    return React.createElement(
+      'div',
+      { id: 'header' },
+      React.createElement(
+        'div',
+        { id: 'navigation' },
+        React.createElement(
+          'ul',
+          null,
+          React.createElement(
+            NavigationItem,
+            { active: currentPage == 'map' },
+            'Map'
+          ),
+          React.createElement(
+            NavigationItem,
+            { active: currentPage == 'journal' },
+            'Journal'
+          ),
+          React.createElement(
+            NavigationItem,
+            { active: currentPage == 'data' },
+            'Data'
+          ),
+          React.createElement(
+            NavigationItem,
+            { active: currentPage == 'about' },
+            'About'
+          ),
+          React.createElement(
+            NavigationItem,
+            { active: currentPage == 'share' },
+            'Share'
+          )
+        )
+      ),
+      React.createElement(
+        'h1',
+        null,
+        'INTO THE OKAVANGO'
+      )
+    );
+  }
+});
+
+var NavigationItem = React.createClass({
+  displayName: 'NavigationItem',
+
+  onClick: function onClick(e) {
+    store.dispatch({ type: 'NAV-' + e.target.textContent.toUpperCase() });
+  },
+  render: function render() {
+    var className = this.props.active ? 'active' : 'inactive';
+    return React.createElement(
+      'li',
+      { className: className, onClick: this.onClick },
+      React.createElement(
+        'a',
+        { href: '#' },
+        this.props.children.toString()
+      )
     );
   }
 });
@@ -40,72 +139,6 @@ var Map = React.createClass({
   }
 });
 
-var Navigation = React.createClass({
-  displayName: 'Navigation',
-
-  render: function render() {
-    return React.createElement(
-      'div',
-      { id: 'header' },
-      React.createElement(
-        'div',
-        { id: 'navigation' },
-        React.createElement(
-          'ul',
-          null,
-          React.createElement(
-            NavigationItem,
-            null,
-            'Map'
-          ),
-          React.createElement(
-            NavigationItem,
-            null,
-            'Journal'
-          ),
-          React.createElement(
-            NavigationItem,
-            null,
-            'Data'
-          ),
-          React.createElement(
-            NavigationItem,
-            { active: true },
-            'About'
-          ),
-          React.createElement(
-            NavigationItem,
-            null,
-            'Share'
-          )
-        )
-      ),
-      React.createElement(
-        'h1',
-        null,
-        'INTO THE OKAVANGO'
-      )
-    );
-  }
-});
-
-var NavigationItem = React.createClass({
-  displayName: 'NavigationItem',
-
-  render: function render() {
-    var className = this.props.active ? 'active' : 'inactive';
-    return React.createElement(
-      'li',
-      { className: className },
-      React.createElement(
-        'a',
-        { href: '#' },
-        this.props.children.toString()
-      )
-    );
-  }
-});
-
 var Content = React.createClass({
   displayName: 'Content',
 
@@ -113,6 +146,7 @@ var Content = React.createClass({
   render: function render() {
 
     var height = { height: window.innerHeight - 100 };
+    var currentPage = store.getState().currentPage;
 
     return React.createElement(
       'div',
@@ -122,10 +156,10 @@ var Content = React.createClass({
       React.createElement(
         'div',
         { id: 'pageContainer' },
-        React.createElement(MapPage, null),
-        React.createElement(JournalPage, null),
-        React.createElement(DataPage, { active: true }),
-        React.createElement(AboutPage, null),
+        React.createElement(MapPage, { active: currentPage == 'map' }),
+        React.createElement(JournalPage, { active: currentPage == 'journal' }),
+        React.createElement(DataPage, { active: currentPage == 'data' }),
+        React.createElement(AboutPage, { active: currentPage == 'about' }),
         React.createElement(SharePage, null)
       )
     );
@@ -156,8 +190,6 @@ var LightBox = React.createClass({
       'location': post.location,
       'link': post.link
     };
-
-    console.log(post.content, meta);
 
     if (this.props.active) {
       return React.createElement(
@@ -770,7 +802,7 @@ var DataPage = React.createClass({
         null,
         'Lorem ipsum dolor sit amet'
       )
-    }, { 'key': 2, 'title': 'API exploration tool', 'content': React.createElement(APIExplorer, null)
+    }, { 'key': 2, 'title': 'Explore', 'content': React.createElement(APIExplorer, null)
     }, { 'key': 3, 'title': 'Documentation', 'content': React.createElement(
         'p',
         null,
@@ -922,38 +954,12 @@ var SharePage = React.createClass({
   }
 });
 
-// console.log('aga1')
-
-// var Navigation = React.createClass({
-//   render: function(){
-//     return (<p></p>)
-//   }
-// })
-
-
-// var MapPage = React.createClass({
-//   render: function(){
-//     return (<p></p>)
-//   }
-// })
-
-// var JournalPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
-
-// var DataPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
-
-// var AboutPage = React.createClass({
-//   render: function(){
-//     return (<p></p>) 
-//   }
-// })
+////////
+////////
+////////
+////////
+////////
+////////
 
 
 var CommentList = React.createClass({
@@ -1116,8 +1122,13 @@ window.onclick = function (event) {
   }
 };
 
-ReactDOM.render(
-// <CommentBox url="/api/comments" pollInterval={2000} />,
-React.createElement(Okavango, null), document.getElementById('okavango'));
+var render = function render() {
+  ReactDOM.render(
+  // <CommentBox url="/api/comments" pollInterval={2000} />,
+  React.createElement(Okavango, null), document.getElementById('okavango'));
+};
+
+store.subscribe(render);
+render();
 
 },{}]},{},[1]);
