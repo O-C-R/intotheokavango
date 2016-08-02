@@ -1,6 +1,5 @@
 
 import { connect } from 'react-redux'
-// import Navigation from '../components/Navigation'
 import Content from '../components/Content'
 import { changeCurrentPage } from '../actions'
 

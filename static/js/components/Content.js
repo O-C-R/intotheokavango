@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react'
+
 import LightBox from './LightBox'
 import Timeline from './Timeline'
+
 import MapPage from './MapPage'
-// import MapPageContainer from '../containers/MapPageContainer'
 import JournalPage from './JournalPage'
 import DataPage from './DataPage'
 import AboutPage from './AboutPage'
@@ -17,22 +18,22 @@ const Content = ({currentPage, onNavClick}) => {
   const page = () => {
     switch(currentPage){
       case 'map':
-        return (<MapPage active="true"/>)
+        return (<MapPage active/>)
         break
       case 'journal':
-        return (<JournalPage active="true"/>)
+        return (<JournalPage active/>)
         break
       case 'data':
-        return (<DataPage active="true"/>)
+        return (<DataPage active/>)
         break
       case 'about':
-        return (<AboutPage active="true"/>)
+        return (<AboutPage active/>)
         break
       case 'share':
-        return (<SharePage active="true"/>)
+        return (<SharePage active/>)
         break
       default:
-        return (<MapPage active="true"/>)
+        return (<MapPage active/>)
         break
     }
   }

@@ -1,11 +1,15 @@
 
 import React, {PropTypes} from 'react'
 
-const LayoutSelector = ({onLayoutChange}) => {
+const LayoutSelector = ({mode, onLayoutChange}) => {
   var types = ['rows','grid']
+
   var buttons = types.map(function(s,i){
+
+    var className = 'layoutButton ' + (s === mode ?'active':'inactive')
+
     return (
-      <li className="layoutButton" key={i} onClick={onLayoutChange}>
+      <li className={className} key={i} onClick={()=>onLayoutChange(s)}>
         <img width="16" height="16"/>
       </li>
     )
@@ -22,7 +26,8 @@ const LayoutSelector = ({onLayoutChange}) => {
 }
 
 LayoutSelector.propTypes = {
-  onLayoutChange: PropTypes.func.isRequired
+  onLayoutChange: PropTypes.func.isRequired,
+  mode: PropTypes.string.isRequired
 }
 
 export default LayoutSelector

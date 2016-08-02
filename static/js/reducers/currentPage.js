@@ -1,5 +1,6 @@
 
 
+
 const currentPage = (state = 'map', action) => {
   switch (action.type) {
     case 'NAV':

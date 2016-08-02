@@ -1,7 +1,7 @@
 
 import React, {PropTypes} from 'react'
-import ControlPanel from './ControlPanel'
 import NotificationPanel from './NotificationPanel'
+import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
 const MapPage = ({active}) => {
 
@@ -15,7 +15,7 @@ const MapPage = ({active}) => {
   var year = 2016
   return (
     <div className={className} id="mapPage">
-      <ControlPanel year={year} date={date} playback focus zoom/>
+      <ControlPanelContainer/>
       <NotificationPanel notifications={notifications}/>
     </div>
   )

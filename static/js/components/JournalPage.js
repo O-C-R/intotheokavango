@@ -1,7 +1,7 @@
 
 import React, {PropTypes} from 'react'
-import ControlPanel from './ControlPanel'
 import Feed from './Feed'
+import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
 const JournalPage = ({active}) => {
   var posts = [
@@ -100,7 +100,7 @@ const JournalPage = ({active}) => {
   if(active){
     return (
       <div  className={className}  id="journalPage">
-        <ControlPanel year date layout/>
+        <ControlPanelContainer/>
         <Feed posts={posts}/>
       </div>
     )

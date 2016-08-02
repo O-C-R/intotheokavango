@@ -12,6 +12,10 @@
     think of loading strategy
 
   DATA LOADING
+  
+    load entirety of beacon path and map it to timeline
+    all other features are loaded based on location
+
     get dates of expedition to draw timeline
     get last records 
     start 24h earlier
@@ -33,6 +37,9 @@ let store = createStore(okavangoApp)
        
 
 var render = function(){
+  
+  console.log('rendering', store.getState())
+
   ReactDOM.render(
     (
       <Provider store={store}>

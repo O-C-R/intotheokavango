@@ -8,28 +8,32 @@ import ZoomSelector from './ZoomSelector'
 import LayoutSelector from './LayoutSelector'
 
 
-const ControlPanel = ({year, date, playback, focus, zoom, layout, onYearChange, onDateChange, onPlaybackChange, onFocusChange, onZoomChange, onLayoutChange}) => (
-  <div className="controlPanel">
-    {year?<YearSelector year={year} onClick={onYearChange}/>:null}
-    {date?<DateSelector date={date} onClick={onDateChange}/>:null}
-    {playback?<PlaybackSelector forward onClick={onPlaybackChange}/>:null}
-    {focus?<FocusSelector onClick={onFocusChange}/>:null}
-    {zoom?<ZoomSelector onClick={onZoomChange}/>:null}
-    {layout?<LayoutSelector onClick={onLayoutChange}/>:null}
-  </div>
-)
+const ControlPanel = ({currentPage, expedition, date, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange}) => {
+  
+  return (
+    <div className="controlPanel">
+      <YearSelector expedition={expedition} onYearChange={onYearChange}/>
+      <DateSelector date={date} />
+      {currentPage === 'map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/>:null}
+      {currentPage === 'map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/>:null}
+      {currentPage === 'map' ? <ZoomSelector onZoomChange={onZoomChange}/>:null}
+      {currentPage === 'journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/>:null}
+    </div>
+  )
+}
 
 ControlPanel.propTypes = {
-  year: PropTypes.number.isRequired,
+  expedition: PropTypes.string.isRequired,
   date: PropTypes.object.isRequired,
   playback: PropTypes.string.isRequired,
-  focus: PropTypes.string.isRequired,
+  mainFocus: PropTypes.string.isRequired,
+  secondaryFocus: PropTypes.string.isRequired,
   zoom: PropTypes.number.isRequired,
   layout: PropTypes.string.isRequired,
   onYearChange: PropTypes.func.isRequired,
-  onDateChange: PropTypes.func.isRequired,
   onPlaybackChange: PropTypes.func.isRequired,
-  onFocusChange: PropTypes.func.isRequired,
+  onMainFocusChange: PropTypes.func.isRequired,
+  onSecondaryFocusChange: PropTypes.func.isRequired,
   onZoomChange: PropTypes.func.isRequired,
   onLayoutChange: PropTypes.func.isRequired,
 }

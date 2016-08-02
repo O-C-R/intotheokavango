@@ -1,31 +1,30 @@
 
 import React, {PropTypes} from 'react'
 
-const FocusSelector = ({onFocusChange}) => {
+const FocusSelector = ({mainFocus, secondaryFocus, onMainFocusChange, onSecondaryFocusChange}) => {
 
-  var toggleDropdown = () => {
-    document.getElementById("FocusSelectorOptions").classList.toggle("show");
+  var toggleDropdown = (i) => {
+    document.getElementById("FocusSelector"+i+"Options").classList.toggle("show");
   }
 
   return (
     <div className="focusSelector">
       <p>Focus on:</p>
       <div className="dropdown">
-        <button onClick={toggleDropdown} className="dropbtn">Explorers</button>
-        <div id="FocusSelectorOptions" className="dropdown-content">
-          <a href="#" onClick={onFocusChange}>2016</a>
-          <a href="#" onClick={onFocusChange}>2015</a>
-          <a href="#" onClick={onFocusChange}>2014</a>
-          <a href="#" onClick={onFocusChange}>2013</a>
+        <button onClick={()=>toggleDropdown(1)} className="dropbtn">{mainFocus}</button>
+        <div id="FocusSelector1Options" className="dropdown-content">
+          <a href="#" onClick={()=>onMainFocusChange("explorers")}>Explorers</a>
+          <a href="#" onClick={()=>onMainFocusChange("sensors")}>Sensors</a>
+          <a href="#" onClick={()=>onMainFocusChange("animals")}>Animals</a>
         </div>
       </div>
       <div className="dropdown">
-        <button onClick={toggleDropdown} className="dropbtn">Steve</button>
-        <div id="FocusSelectorOptions" className="dropdown-content">
-          <a href="#" onClick={onFocusChange}>2016</a>
-          <a href="#" onClick={onFocusChange}>2015</a>
-          <a href="#" onClick={onFocusChange}>2014</a>
-          <a href="#" onClick={onFocusChange}>2013</a>
+        <button onClick={()=>toggleDropdown(2)} className="dropbtn">{secondaryFocus}</button>
+        <div id="FocusSelector2Options" className="dropdown-content">
+          <a href="#" onClick={()=>onSecondaryFocusChange("steve")}>Steve</a>
+          <a href="#" onClick={()=>onSecondaryFocusChange("jer")}>Jer</a>
+          <a href="#" onClick={()=>onSecondaryFocusChange("shah")}>Shah</a>
+          <a href="#" onClick={()=>onSecondaryFocusChange("chris")}>Chris</a>
         </div>
       </div>
     </div>
@@ -33,7 +32,10 @@ const FocusSelector = ({onFocusChange}) => {
 }
 
 FocusSelector.propTypes = {
-  onFocusChange: PropTypes.func.isRequired
+  mainFocus: PropTypes.string.isRequired,
+  secondaryFocus: PropTypes.string.isRequired,
+  onMainFocusChange: PropTypes.func.isRequired,
+  onSecondaryFocusChange: PropTypes.func.isRequired
 }
 
 export default FocusSelector
