@@ -11,18 +11,18 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     watch: {
       browserify: {
-        files: ['./static/js/index.js'],
+        files: ['./static/js/index.js','./static/js/containers/*.js','./static/js/components/*.js'],
         tasks: ['browserify:index']
       }
     },
     browserify: {
-      imports: {
-        src: ['./static/js/imports.js'],
-        dest: './static/js/imports-babel.js',
-        options: {
-            transform: [['babelify', {presets: ['es2015'], 'plugins': ['transform-react-jsx']}]]
-        }, 
-      },
+      // imports: {
+      //   src: ['./static/js/imports.js'],
+      //   dest: './static/js/imports-babel.js',
+      //   options: {
+      //       transform: [['babelify', {presets: ['es2015'], 'plugins': ['transform-react-jsx']}]]
+      //   }, 
+      // },
       index: {
         options: {
             transform: [['babelify', {presets: ['es2015'], 'plugins': ['transform-react-jsx']}]]
@@ -40,6 +40,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');  
   grunt.loadNpmTasks('grunt-browserify');
 
-  grunt.registerTask('default', ['browserify:imports','browserify:index','watch']);
+  // grunt.registerTask('default', ['browserify:imports','browserify:index','watch']);
+  grunt.registerTask('default', ['browserify:index','watch']);
 
 };
