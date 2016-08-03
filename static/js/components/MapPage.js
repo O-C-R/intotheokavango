@@ -5,6 +5,7 @@ import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
 const MapPage = () => {
 
+
   var notifications = [
     {type:'twitter',content:'lorem ipsum dolor sit amet',key:1},
     {type:'twitter',content:'lorem ipsum dolor sit amet',key:2}
@@ -14,7 +15,7 @@ const MapPage = () => {
   var year = 2016
   return (
     <div className='page' id="mapPage">
-      <ControlPanelContainer/>
+      <ControlPanelContainer pathName={location.pathname}/>
       <NotificationPanel notifications={notifications}/>
     </div>
   )

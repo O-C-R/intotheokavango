@@ -13,7 +13,7 @@ const Okavango = ({children}) => {
   return (
     <div id="root">
       <MapBox/>
-      <Navigation currentPage="map"/>
+      <Navigation pathName={location.pathname}/>
       <div id="content" style={height}>
         <LightBox active={false}/>
         {children}

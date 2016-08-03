@@ -11,7 +11,8 @@ const mapStateToProps = (state, ownProps) => {
     mainFocus: state.control.mainFocus,
     secondaryFocus: state.control.secondaryFocus,
     zoom: state.control.zoom,
-    layout: state.control.layout
+    layout: state.control.layout,
+    pathName: ownProps.pathName
   }
 }
 

@@ -1,16 +1,17 @@
 import React, { PropTypes } from 'react'
 import NavigationItem from './NavigationItem'
 
-const Navigation = ({currentPage}) => {
+const Navigation = ({pathName}) => {
+
   return(
     <div id="header">
       <div id="navigation">
         <ul>
-          <NavigationItem active={currentPage == 'map'}>Map</NavigationItem>
-          <NavigationItem active={currentPage == 'journal'}>Journal</NavigationItem>
-          <NavigationItem active={currentPage == 'data'}>Data</NavigationItem>
-          <NavigationItem active={currentPage == 'about'}>About</NavigationItem>
-          <NavigationItem active={currentPage == 'share'}>Share</NavigationItem>
+          <NavigationItem active={pathName === '/' || pathName === '/map'}>Map</NavigationItem>
+          <NavigationItem active={pathName === '/journal'}>Journal</NavigationItem>
+          <NavigationItem active={pathName === '/data'}>Data</NavigationItem>
+          <NavigationItem active={pathName === '/about'}>About</NavigationItem>
+          <NavigationItem active={pathName === '/share'}>Share</NavigationItem>
         </ul>
       </div>
       <h1>INTO THE OKAVANGO</h1>
@@ -19,7 +20,7 @@ const Navigation = ({currentPage}) => {
 }
 
 Navigation.propTypes = {
-  currentPage: PropTypes.string.isRequired,
+  pathName: PropTypes.string.isRequired
 }
 
 export default Navigation

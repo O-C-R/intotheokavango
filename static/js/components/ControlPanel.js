@@ -1,4 +1,5 @@
 
+
 import React, {PropTypes} from 'react'
 import YearSelector from './YearSelector'
 import DateSelector from './DateSelector'
@@ -8,21 +9,22 @@ import ZoomSelector from './ZoomSelector'
 import LayoutSelector from './LayoutSelector'
 
 
-const ControlPanel = ({currentPage, expedition, date, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange}) => {
+const ControlPanel = ({pathName, expedition, date, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange}) => {
   
   return (
     <div className="controlPanel">
       <YearSelector expedition={expedition} onYearChange={onYearChange}/>
       <DateSelector date={date} />
-      {currentPage === 'map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/>:null}
-      {currentPage === 'map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/>:null}
-      {currentPage === 'map' ? <ZoomSelector onZoomChange={onZoomChange}/>:null}
-      {currentPage === 'journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/>:null}
+      {pathName === '/map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/>:null}
+      {pathName === '/map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/>:null}
+      {pathName === '/map' ? <ZoomSelector onZoomChange={onZoomChange}/>:null}
+      {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/>:null}
     </div>
   )
 }
 
 ControlPanel.propTypes = {
+  pathName: PropTypes.string.isRequired,
   expedition: PropTypes.string.isRequired,
   date: PropTypes.object.isRequired,
   playback: PropTypes.string.isRequired,

@@ -31,7 +31,7 @@ import { createStore } from 'redux';
 import Okavango from './components/Okavango'
 import { Provider } from 'react-redux'
 import okavangoApp from './reducers'
-import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router'
+import { Router, Route, IndexRoute, Link, browserHistory, Redirect } from 'react-router'
 
 import MapPage from './components/MapPage'
 import JournalPage from './components/JournalPage'

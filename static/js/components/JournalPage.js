@@ -97,7 +97,7 @@ const JournalPage = () => {
 
   return (
     <div  className='page' id="journalPage">
-      <ControlPanelContainer/>
+      <ControlPanelContainer pathName={location.pathname}/>
       <Feed posts={posts}/>
     </div>
   )
