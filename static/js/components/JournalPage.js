@@ -3,7 +3,7 @@ import React, {PropTypes} from 'react'
 import Feed from './Feed'
 import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
-const JournalPage = ({active}) => {
+const JournalPage = () => {
   var posts = [
     {
       'key':1,
@@ -95,22 +95,16 @@ const JournalPage = ({active}) => {
     }
   ]
 
-
-  var className = 'page ' + (active?'active':'inactive')
-  if(active){
-    return (
-      <div  className={className}  id="journalPage">
-        <ControlPanelContainer/>
-        <Feed posts={posts}/>
-      </div>
-    )
-  } else {
-    return null
-  }
+  return (
+    <div  className='page' id="journalPage">
+      <ControlPanelContainer/>
+      <Feed posts={posts}/>
+    </div>
+  )
 }
 
 JournalPage.propTypes = {
-  active : PropTypes.bool.isRequired
+  // active : PropTypes.bool.isRequired
 }
 
 export default JournalPage

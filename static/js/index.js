@@ -31,6 +31,13 @@ import { createStore } from 'redux';
 import Okavango from './components/Okavango'
 import { Provider } from 'react-redux'
 import okavangoApp from './reducers'
+import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router'
+
+import MapPage from './components/MapPage'
+import JournalPage from './components/JournalPage'
+import DataPage from './components/DataPage'
+import AboutPage from './components/AboutPage'
+import SharePage from './components/SharePage'
 
 
 let store = createStore(okavangoApp)
@@ -43,7 +50,16 @@ var render = function(){
   ReactDOM.render(
     (
       <Provider store={store}>
-        <Okavango/>
+        <Router history={browserHistory}>
+          <Route path="/" component={Okavango}>
+            <IndexRoute component={MapPage}/>
+            <Route path="map" component={MapPage}/>
+            <Route path="journal" component={JournalPage}/>
+            <Route path="data" component={DataPage}/>
+            <Route path="about" component={AboutPage}/>
+            <Route path="share" component={SharePage}/>
+          </Route>
+        </Router>
       </Provider>
     ),
     document.getElementById('okavango')

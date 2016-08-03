@@ -1,10 +1,9 @@
 
 import React, {PropTypes} from 'react'
 
-const AboutPage = ({active}) => {
-  var className = 'page ' + (active?'active':'inactive')
+const AboutPage = () => {
   return (
-    <div  className={className}  id="aboutPage">
+    <div  className='page'  id="aboutPage">
 
       <div className="pageWrapper">
         <video></video>
@@ -47,7 +46,7 @@ const AboutPage = ({active}) => {
 }
 
 AboutPage.propTypes = {
-  active: PropTypes.bool.isRequired
+  // active: PropTypes.bool.isRequired
 }
 
 export default AboutPage

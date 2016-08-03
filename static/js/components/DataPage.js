@@ -3,9 +3,7 @@ import React, {PropTypes} from 'react'
 import DataPageIndex from './DataPageIndex'
 import APIExplorer from './APIExplorer'
 
-const DataPage = ({active}) => {
-
-  var className = 'page ' + (active?'active':'inactive')
+const DataPage = () => {
 
   var sections = [
     {'key':1, 'title':'Overview', 'content':
@@ -33,7 +31,7 @@ const DataPage = ({active}) => {
   })
 
   return (
-    <div  className={className}  id="dataPage">
+    <div  className='page'  id="dataPage">
       <DataPageIndex>
         {index}
       </DataPageIndex>
@@ -45,7 +43,7 @@ const DataPage = ({active}) => {
 }
 
 DataPage.propTypes = {
-  active: PropTypes.bool.isRequired
+  // active: PropTypes.bool.isRequired
 }
 
 export default DataPage

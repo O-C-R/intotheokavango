@@ -12,9 +12,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    onNavClick: (target) => {
-      dispatch({'type':'NAV', 'target':target})
-    }
+    // onNavClick: (target) => {
+    //   dispatch({'type':'NAV', 'target':target})
+    // }
   }
 }
 

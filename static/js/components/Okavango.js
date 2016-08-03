@@ -1,13 +1,23 @@
 import React, { PropTypes } from 'react'
 import MapBox from './MapBox'
-import CurrentPage from '../containers/CurrentPage'
+
+import LightBox from './LightBox'
+import Timeline from './Timeline'
+import Navigation from './Navigation'
 
 
-const Okavango = () => {
+const Okavango = ({children}) => {
+
+  var height = {height: window.innerHeight-100}
+
   return (
     <div id="root">
       <MapBox/>
-      <CurrentPage/>
+      <Navigation currentPage="map"/>
+      <div id="content" style={height}>
+        <LightBox active={false}/>
+        {children}
+      </div>
     </div>
   )
 }
