@@ -16,7 +16,10 @@ const Okavango = ({children}) => {
       <Navigation pathName={location.pathname}/>
       <div id="content" style={height}>
         <LightBox active={false}/>
-        {children}
+        <Timeline/>
+        <div id="pageContainer">
+          {children}
+        </div>
       </div>
     </div>
   )
