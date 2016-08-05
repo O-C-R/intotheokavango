@@ -1,6 +1,4 @@
 
-
-
 const control = (
     state = {
       expedition: 'okavango_15',

@@ -5,21 +5,21 @@ import ControlPanel from '../components/ControlPanel'
 const mapStateToProps = (state, ownProps) => {
   return {
     currentPage: state.currentPage,
-    expedition: state.control.expedition,
+    expeditionID:state.expeditions.currentExpedition,
+    expeditions:state.expeditions.expeditions,
     date: state.control.date,
     playback: state.control.playback,
     mainFocus: state.control.mainFocus,
     secondaryFocus: state.control.secondaryFocus,
     zoom: state.control.zoom,
     layout: state.control.layout,
-    pathName: ownProps.pathName
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => { 
   return {
     onYearChange: (value) => {
-      dispatch({'type':'CONTROL', 'target':'expedition', 'value':value})
+      dispatch({'type':'SET-EXPEDITION', 'value':value.k})
     },
     onPlaybackChange: (value) => {
       dispatch({'type':'CONTROL', 'target':'playback', 'value':value})

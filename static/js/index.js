@@ -22,13 +22,25 @@
     load features through tiling 
     ask multiple features at once
 
+QUESTIONS
+    dates of expeditions
+    teams and core
+    querying through space boundaries
+    inventory of sensors and media types
+
+    TEAM : river main
+
+    can I query all features
+    
+
 */
 
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore } from 'redux';
-import Okavango from './components/Okavango'
+import OkavangoContainer from './containers/OkavangoContainer'
+// import Okavango from './components/Okavango'
 import { Provider } from 'react-redux'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
@@ -42,8 +54,8 @@ import SharePage from './components/SharePage'
 
 let store = createStore(okavangoApp)
 
-var routes = (
-  <Route path="/" component={Okavango}>
+const routes = (
+  <Route path="/" component={OkavangoContainer}>
     <IndexRoute component={MapPage}/>
     <Route path="map" component={MapPage}/>
     <Route path="journal" component={JournalPage}/>
@@ -66,26 +78,24 @@ var render = function(){
 }
 
 store.subscribe(render)
-render()
 
+d3.json('http://intotheokavango.org/api/expeditions', function(err,res){
+  if(err) throw('error loading expeditions', err)
+  var data = res.results
+  var currentExpedition
+  var mostRecentDate = new Date(0)
 
-// d3.json('http://intotheokavango.org/api/expeditions', function(err,res){
-//   if(err) throw('error loading expeditions', err)
-//   var data = res.results
+  for(var k in data){
+    var expedition = data[k]
+    expedition.StartDate = new Date(expedition.StartDate)
+    if(expedition.StartDate.getTime() + expedition.Days*(1000*3600*24) > mostRecentDate.getTime()){
+      mostRecentDate = new Date(expedition.StartDate.getTime() + expedition.Days*(1000*3600*24))
+      currentExpedition = k
+    }
+  }
 
-//   var expeditions = Object.keys(data).map(function (k) {
-//     var expedition = data[k];
-//     var value = {
-//       id:k, 
-//       days:expedition.Days, 
-//       startDate: new Date(expedition.StartDate)
-//     }
-//     return value
-//   })
-
-  // store.dispatch({type: 'INIT-EXPEDITIONS',expeditions: expeditions})
-  
-// })
+  store.dispatch({type: 'INIT-EXPEDITIONS',expeditions: data, currentExpedition: currentExpedition})
+})
 
 
 

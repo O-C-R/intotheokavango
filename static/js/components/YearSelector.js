@@ -1,20 +1,23 @@
 
 import React, {PropTypes} from 'react'
 
-const YearSelector = ({expedition, onYearChange}) => {
+const YearSelector = ({expeditionID, expeditions, onYearChange}) => {
 
   var toggleDropdown = () => {
     document.getElementById("YearSelectorDropdown").classList.toggle("show")
   }
 
+  var currentExpeditionName = expeditions[expeditionID].Name
+  var expeditionList = Object.keys(expeditions).map(function (k,i) {
+    var expedition = expeditions[k];
+    return <a href="#" onClick={()=>onYearChange({k})} key={i}>{expedition.Name}</a>
+  })
+
   return (
     <div className="dropdown yearSelector">
-      <button onClick={toggleDropdown} className="dropbtn">{expedition}</button>
+      <button onClick={toggleDropdown} className="dropbtn">{currentExpeditionName}</button>
       <div id="YearSelectorDropdown" className="dropdown-content">
-        <a href="#" onClick={()=>onYearChange('okavango_16')}>okavango_16</a>
-        <a href="#" onClick={()=>onYearChange('okavango_15')}>okavango_15</a>
-        <a href="#" onClick={()=>onYearChange('okavango_14')}>okavango_14</a>
-        <a href="#" onClick={()=>onYearChange('okavango_13')}>okavango_13</a>
+        {expeditionList}
       </div>
     </div>
   )
@@ -22,7 +25,8 @@ const YearSelector = ({expedition, onYearChange}) => {
 
 YearSelector.propTypes = {
   onYearChange: PropTypes.func.isRequired,
-  expedition: PropTypes.string.isRequired
+  expeditionID: PropTypes.string.isRequired,
+  expeditions: PropTypes.object.isRequired
 }
 
 export default YearSelector
