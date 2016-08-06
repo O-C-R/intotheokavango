@@ -2,14 +2,17 @@
 import React, {PropTypes} from 'react'
 import * as d3 from 'd3'
 
-const Timeline = ({expedition, currentDate}) => {
+const Timeline = ({expedition}) => {
+
+  if (!expedition) return <svg id="timeline"></svg>
+
   var height = window.innerHeight - 72
   var width = window.innerWidth * 0.02
   var padding = 2
-  var dayCount = expedition.Days + 1
+  var dayCount = expedition.dayCount + 1
   var data = []
 
-  var startDate = expedition.StartDate
+  var startDate = expedition.start
 
   for (var i = 0; i < dayCount; i++) {
     var d = new Date(startDate.getTime() + i * (1000 * 3600 * 24))
@@ -33,13 +36,12 @@ const Timeline = ({expedition, currentDate}) => {
   return (
     <svg id="timeline" style={{height: height + 'px'}}>
       <g>{ days }</g>
-      <circle id="cursor" cx={width - padding * 2} cy={scaleTime(currentDate.getTime())} r={4} fill="yellow"/>
+      <circle id="cursor" cx={width - padding * 2} cy={scaleTime(expedition.currentDate.getTime())} r={4} fill="yellow"/>
     </svg>
   )
 }
 
 Timeline.propTypes = {
-  // expedition: PropTypes.object.isRequired
-  currentDate: PropTypes.object.isRequired
+  expedition: PropTypes.object
 }
 export default Timeline

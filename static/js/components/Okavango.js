@@ -14,7 +14,7 @@ const Okavango = ({children, expedition, currentDate}) => {
       <Navigation pathName={location.pathname}/>
       <div id="content" style={height}>
         <LightBox active={false}/>
-        <Timeline currentDate={currentDate} expedition={expedition}/>
+        <Timeline expedition={expedition}/>
         <div id="pageContainer">
           {children}
         </div>
@@ -25,8 +25,7 @@ const Okavango = ({children, expedition, currentDate}) => {
 
 Okavango.propTypes = {
   children: PropTypes.node.isRequired,
-  expedition: PropTypes.object.isRequired,
-  currentDate: PropTypes.object.isRequired
+  expedition: PropTypes.object
 }
 
 export default Okavango

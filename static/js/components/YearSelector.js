@@ -2,15 +2,14 @@
 import React, {PropTypes} from 'react'
 
 const YearSelector = ({expeditionID, expeditions, onYearChange}) => {
-
   var toggleDropdown = () => {
-    document.getElementById("YearSelectorDropdown").classList.toggle("show")
+    document.getElementById('YearSelectorDropdown').classList.toggle('show')
   }
 
-  var currentExpeditionName = expeditions[expeditionID].Name
-  var expeditionList = Object.keys(expeditions).map(function (k,i) {
-    var expedition = expeditions[k];
-    return <a href="#" onClick={()=>onYearChange({k})} key={i}>{expedition.Name}</a>
+  var currentExpeditionName = expeditions[expeditionID].name
+  var expeditionList = Object.keys(expeditions).map(function (k, i) {
+    var expedition = expeditions[k]
+    return <a href="#" onClick={() => onYearChange(k)} key={i}>{expedition.name}</a>
   })
 
   return (

@@ -19,7 +19,7 @@
     start 24h earlier
     load features through tiling
     ask multiple features at once
- 
+
 QUESTIONS
     dates of expeditions
     teams and core
@@ -31,14 +31,18 @@ QUESTIONS
     can I query all features
 */
 
+import 'babel-polyfill'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import * as d3 from 'd3'
-
+import thunkMiddleware from 'redux-thunk'
+import createLogger from 'redux-logger'
+import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
+// import * as d3 from 'd3'
 
 import OkavangoContainer from './containers/OkavangoContainer'
 import MapPage from './components/MapPage'
@@ -47,7 +51,15 @@ import DataPage from './components/DataPage'
 import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
 
-let store = createStore(okavangoApp)
+const loggerMiddleware = createLogger()
+
+let store = createStore(
+  okavangoApp,
+  applyMiddleware(
+    thunkMiddleware,
+    loggerMiddleware
+  )
+)
 
 const routes = (
   <Route path="/" component={OkavangoContainer}>
@@ -72,6 +84,7 @@ var render = function () {
 }
 
 store.subscribe(render)
+store.dispatch(fetchExpeditions())
 
 // d3.json('http://intotheokavango.org/api/expeditions', function (err, res) {
 //   if (err) throw ('error loading expeditions', err)
