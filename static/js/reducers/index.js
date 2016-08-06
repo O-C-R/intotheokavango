@@ -166,6 +166,7 @@ const expeditionReducer = (
   state = {
     name: '',
     playback: 'forward',
+    zoom: 10,
     isFetching: false,
     boundaries: [-180, -90, 180, 90],
     start: new Date(),
@@ -198,6 +199,10 @@ const expeditionReducer = (
       })
 
     case 'SET_CONTROL':
+      if (action.target === 'zoom') {
+        if (action.mode === 'increment') action.mode = Math.max(1, Math.min(15, state.zoom + 1))
+        if (action.mode === 'decrement') action.mode = Math.max(1, Math.min(15, state.zoom - 1))
+      }
       return Object.assign({}, state, {
         [action.target]: action.mode
       })
