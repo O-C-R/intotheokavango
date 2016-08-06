@@ -1,28 +1,36 @@
 
-const Actions = {
-
-  changeCurrentPage: function(state = initialState, action){
-    switch(action.type){
-      case 'NAV-MAP':
-        state.currentPage = 'map'
-        break
-      case 'NAV-JOURNAL':
-        state.currentPage = 'journal'
-        break
-      case 'NAV-DATA':
-        state.currentPage = 'data'
-        break
-      case 'NAV-ABOUT':
-        state.currentPage = 'about'  
-        break
-      case 'INIT-EXPEDITIONS':
-        state.expeditions = action.expeditions
-        break
-    }
-    return state
+export function loadBeacon (expedition, day) {
+  return {
+    type: 'LOAD-BEACON',
+    expedition,
+    day
   }
-
 }
 
+export function requestBeacon (expedition, day) {
+  return {
+    type: 'REQUEST-BEACON',
+    expedition,
+    day
+  }
+}
 
-export default Actions
+export function receiveBeacon (expedition, day, json) {
+  return {
+    type: 'RECEIVE-BEACON',
+    expedition,
+    day,
+    features: json.results,
+    receivedAt: Date.now()
+  }
+}
+
+export function errorBeacon (expedition, day, error) {
+  return {
+    type: 'ERROR-BEACON',
+    expedition,
+    day,
+    error: error,
+    receivedAt: Date.now()
+  }
+}

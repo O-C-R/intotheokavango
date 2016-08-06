@@ -5,10 +5,8 @@ import LightBox from './LightBox'
 import Timeline from './Timeline'
 import Navigation from './Navigation'
 
-
-const Okavango = ({children,expedition}) => {
-
-  var height = {height: window.innerHeight-100}
+const Okavango = ({children, expedition, currentDate}) => {
+  var height = {height: window.innerHeight - 100}
 
   return (
     <div id="root">
@@ -16,7 +14,7 @@ const Okavango = ({children,expedition}) => {
       <Navigation pathName={location.pathname}/>
       <div id="content" style={height}>
         <LightBox active={false}/>
-        <Timeline expedition={expedition}/>
+        <Timeline currentDate={currentDate} expedition={expedition}/>
         <div id="pageContainer">
           {children}
         </div>
@@ -27,6 +25,8 @@ const Okavango = ({children,expedition}) => {
 
 Okavango.propTypes = {
   children: PropTypes.node.isRequired,
-  expedition: PropTypes.object.isRequired
+  expedition: PropTypes.object.isRequired,
+  currentDate: PropTypes.object.isRequired
 }
+
 export default Okavango
