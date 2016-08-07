@@ -11,7 +11,7 @@ const mapStateToProps = (state, ownProps) => {
 
   var expedition = state.expeditions[state.selectedExpedition]
   if (props.expeditionID) {
-    props.date = expedition.currentDate
+    props.currentDate = expedition.currentDate
     props.playback = expedition.playback
     props.mainFocus = expedition.mainFocus
     props.secondaryFocus = expedition.secondaryFocus

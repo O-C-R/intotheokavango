@@ -1,14 +1,6 @@
 
 import fetch from 'isomorphic-fetch'
 
-export const LOAD_EXPEDITIONS = 'LOAD_EXPEDITIONS'
-
-export function loadExpeditions () {
-  return {
-    type: LOAD_EXPEDITIONS
-  }
-}
-
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 
 export function requestExpeditions () {
@@ -29,13 +21,26 @@ export function receiveExpeditions (data) {
 export function fetchExpeditions () {
   return function (dispatch) {
     dispatch(requestExpeditions())
-
     return fetch('http://intotheokavango.org/api/expeditions')
       .then(response => response.json())
-      .then(json =>
-        dispatch(receiveExpeditions(json))
-      )
-      // TODO: catch errors
+      .then(json => dispatch(receiveExpeditions(json)))
+      .then(() => dispatch(fetchDay()))
+      // TODO catch errors
+  }
+}
+
+export function fetchDay () {
+  return function (dispatch, getState) {
+    dispatch(requestDay())
+    var state = getState()
+    var expeditionID = state.selectedExpedition
+    var expedition = state.expeditions[expeditionID]
+    var expeditionDay = Math.floor((expedition.currentDate - expedition.start) / (1000 * 3600 * 24))
+    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&expeditionDay=' + (expeditionDay + 2) // TODO WHY +2?
+    console.log('QUERYSTRING', queryString)
+    return fetch(queryString)
+      .then(response => response.json())
+      .then(json => dispatch(receiveDay(expeditionID, expeditionDay, json)))
   }
 }
 
@@ -58,21 +63,13 @@ export function setControl (target, mode) {
   }
 }
 
-export const LOAD_DAY = 'LOAD_DAY'
-
-export function loadDay (expeditionID, dayID) {
-  return {
-    type: LOAD_DAY,
-    expeditionID,
-    dayID
-  }
-}
-
 export const REQUEST_DAY = 'REQUEST_DAY'
 
-export function requestDay () {
+export function requestDay (expeditionID, dayID) {
   return {
-    type: REQUEST_DAY
+    type: REQUEST_DAY,
+    expeditionID,
+    dayID
   }
 }
 
@@ -84,14 +81,6 @@ export function receiveDay (expeditionID, dayID, data) {
     expeditionID,
     dayID,
     data
-  }
-}
-
-export const LOAD_FEATURES = 'LOAD_FEATURES'
-
-export function loadFeatures () {
-  return {
-    type: LOAD_FEATURES
   }
 }
 
