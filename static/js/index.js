@@ -7,7 +7,7 @@
   expedition starts on expeditionDay=1
 
   LIVERELOAD:
-    node_modules/.bin/watchify static/js/index.js -t babelify -p livereactload -o static/js/index-babel.js
+    node_modules/.bin/  static/js/index.js -t babelify -p livereactload -o static/js/index-babel.js
 
   TODO:
     URL

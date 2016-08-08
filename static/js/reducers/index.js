@@ -1,7 +1,13 @@
 
+import * as actions from '../actions'
+
 const okavangoReducer = (
   state = {
+<<<<<<< Updated upstream
     animate: false
+=======
+    animate: false,
+>>>>>>> Stashed changes
     isFetching: false,
     selectedExpedition: null,
     expeditions: {}
@@ -11,11 +17,23 @@ const okavangoReducer = (
   var expeditions, features, id, dayID, expeditionID, expedition, tiles, days
 
   switch (action.type) {
+    case actions.START:
+      return Object.assign({}, state, {
+        animate: true
+      })
 
-    case 'REQUEST_EXPEDITIONS':
+    case actions.UPDATE_MAP:
+      expeditionID = action.expeditionID || state.selectedExpedition
+      return Object.assign({}, state, {
+        expeditions: Object.assign({}, state.expeditions, {
+          [expeditionID]: expeditionReducer(state.expeditions[expeditionID], action)
+        })
+      })
+
+    case actions.REQUEST_EXPEDITIONS:
       break
 
-    case 'RECEIVE_EXPEDITIONS':
+    case actions.RECEIVE_EXPEDITIONS:
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
@@ -34,13 +52,13 @@ const okavangoReducer = (
         selectedExpedition: latestExpedition
       })
 
-    case 'SET_EXPEDITION':
+    case actions.SET_EXPEDITION:
       var selectedExpedition = action.id
       return Object.assign({}, state, {
         selectedExpedition: selectedExpedition
       })
 
-    case 'SET_CONTROL':
+    case actions.SET_CONTROL:
       id = state.selectedExpedition
       expeditions = {
         [id]: expeditionReducer(state.expeditions[id], action)
@@ -49,9 +67,9 @@ const okavangoReducer = (
         expeditions: Object.assign({}, state.expeditions, expeditions)
       })
 
-    case 'REQUEST_DAY':
-      expedition = state.expeditions[state.selectedExpedition]
+    case actions.REQUEST_DAY:
       expeditionID = action.expeditionID || state.selectedExpedition
+      expedition = state.expeditions[expeditionID]
       dayID = action.dayID || Math.floor((expedition.currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       return Object.assign({}, state, {
         expeditions: Object.assign({}, state.expeditions, {
@@ -63,7 +81,7 @@ const okavangoReducer = (
         })
       })
 
-    case 'RECEIVE_DAY':
+    case actions.RECEIVE_DAY:
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
       dayID = action.dayID
@@ -107,10 +125,10 @@ const okavangoReducer = (
         })
       })
 
-    case 'REQUEST_FEATURES':
+    case actions.REQUEST_FEATURES:
       break
 
-    case 'RECEIVE_FEATURES':
+    case actions.RECEIVE_FEATURES:
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
 
@@ -148,10 +166,10 @@ const okavangoReducer = (
         })
       })
 
-    case 'SELECT_FEATURE':
+    case actions.SELECT_FEATURE:
       break
 
-    case 'UNSELECT_FEATURE':
+    case actions.UNSELECT_FEATURE:
       break
     default:
       return state
@@ -182,7 +200,12 @@ const expeditionReducer = (
   data
 ) => {
   switch (action.type) {
-    case 'RECEIVE_EXPEDITIONS':
+    case actions.UPDATE_MAP:
+      return Object.assign({}, state, {
+        currentDate: action.currentDate
+      })
+
+    case actions.RECEIVE_EXPEDITIONS:
       var dayCount = data.Days
       var start = new Date(data.StartDate)
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
@@ -200,7 +223,7 @@ const expeditionReducer = (
         boundaries: boundaries
       })
 
-    case 'SET_CONTROL':
+    case actions.SET_CONTROL:
       if (action.target === 'zoom') {
         if (action.mode === 'increment') action.mode = Math.max(1, Math.min(15, state.zoom + 1))
         if (action.mode === 'decrement') action.mode = Math.max(1, Math.min(15, state.zoom - 1))
@@ -228,12 +251,12 @@ const dayReducer = (
 ) => {
   var start, end, boundaries
   switch (action.type) {
-    case 'REQUEST_DAY':
+    case actions.REQUEST_DAY:
       return Object.assign({}, state, {
         isFetching: true
       })
 
-    case 'RECEIVE_DAY':
+    case actions.RECEIVE_DAY:
       start = new Date()
       end = new Date(0)
       boundaries = [180, 90, -180, -90]
@@ -272,9 +295,9 @@ const featureReducer = (
   feature
 ) => {
   switch (action.type) {
-    case 'RECEIVE_DAY':
+    case actions.RECEIVE_DAY:
       return Object.assign({}, state, feature)
-    case 'RECEIVE_FEATURES':
+    case actions.RECEIVE_FEATURES:
       return Object.assign({}, state, feature)
     default:
       break

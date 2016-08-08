@@ -1,5 +1,24 @@
 
 import fetch from 'isomorphic-fetch'
+// import { animate } from './animation'
+
+export const START = 'START'
+
+export function startAnimation (dispatch, getState) {
+  // animate(dispatch, getState, true)
+  return {
+    type: START
+  }
+}
+
+export const UPDATE_MAP = 'UPDATE_MAP'
+
+export function updateMap (currentDate) {
+  return {
+    type: UPDATE_MAP,
+    currentDate
+  }
+}
 
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 
@@ -19,12 +38,13 @@ export function receiveExpeditions (data) {
 }
 
 export function fetchExpeditions () {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     dispatch(requestExpeditions())
     return fetch('http://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
       .then(() => dispatch(fetchDay()))
+      .then(() => dispatch(startAnimation(dispatch, getState)))
       // TODO catch errors
   }
 }
@@ -37,7 +57,6 @@ export function fetchDay () {
     var expedition = state.expeditions[expeditionID]
     var expeditionDay = Math.floor((expedition.currentDate - expedition.start) / (1000 * 3600 * 24))
     var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&expeditionDay=' + (expeditionDay + 2) // TODO WHY +2?
-    console.log('QUERYSTRING', queryString)
     return fetch(queryString)
       .then(response => response.json())
       .then(json => dispatch(receiveDay(expeditionID, expeditionDay, json)))
