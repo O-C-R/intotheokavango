@@ -37,7 +37,6 @@ QUESTIONS
     can I query all features
 */
 
-
 import 'babel-polyfill'
 
 import React from 'react'
@@ -62,8 +61,8 @@ const loggerMiddleware = createLogger()
 let store = createStore(
   okavangoApp,
   applyMiddleware(
-    thunkMiddleware
-    // loggerMiddleware
+    thunkMiddleware,
+    loggerMiddleware
   )
 )
 

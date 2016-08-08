@@ -3,11 +3,7 @@ import * as actions from '../actions'
 
 const okavangoReducer = (
   state = {
-<<<<<<< Updated upstream
-    animate: false
-=======
     animate: false,
->>>>>>> Stashed changes
     isFetching: false,
     selectedExpedition: null,
     expeditions: {}
