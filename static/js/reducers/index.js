@@ -1,6 +1,7 @@
 
 const okavangoReducer = (
   state = {
+    animate: false
     isFetching: false,
     selectedExpedition: null,
     expeditions: {}

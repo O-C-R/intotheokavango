@@ -5,7 +5,8 @@ import Okavango from '../components/Okavango'
 const mapStateToProps = (state, ownProps) => {
   return {
     expedition: state.expeditions[state.selectedExpedition],
-    children: ownProps.children
+    children: ownProps.children,
+    animate: state.animate
   }
 }
 

@@ -1,17 +1,15 @@
-// var debug = process.env.NODE_ENV !== "production";
-var debug = false
-var webpack = require('webpack');
-var path = require('path');
+var debug = process.env.NODE_ENV !== 'production'
+var webpack = require('webpack')
+var path = require('path')
 
 module.exports = {
-  // context: path.join(__dirname, "src"),
-  devtool: debug ? "inline-sourcemap" : null,
-  entry: ['./static/js/index.js'],
+  context: path.join(__dirname, ''),
+  devtool: debug ? 'inline-sourcemap' : null,
+  entry: ['babel-polyfill', './static/js/index.js'],
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',
-      'sinon': 'sinon/pkg/sinon',
-      'react': path.resolve('./node_modules/react'),
+      'sinon': 'sinon/pkg/sinon'
     }
   },
   module: {
@@ -22,15 +20,11 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json-loader'
-      }, 
-      {
-          test: /render[\/\\]shaders\.js$/,
-          loader: 'transform/cacheable',
-          query: "brfs"
-      },
-      {
-          test: /[\/\\]webworkify[\/\\]index.js\.js$/,
-          loader: 'worker'
+      }, {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        include: path.resolve('node_modules/mapbox-gl-shaders/index.js'),
+        loader: 'transform/cacheable?brfs'
       },
       {
         test: /\.jsx?$/,
@@ -58,15 +52,24 @@ module.exports = {
       }
     ]
   },
+  devServer: {
+    host: '0.0.0.0',
+    proxy: {
+      '/api/v1/*': 'http://localhost:3000'
+    },
+    historyApiFallback: true
+  },
   output: {
-    path: __dirname + "/static/js/",
-    filename: "index-babel.js"
+    path: __dirname + './static/js/',
+    filename: 'index-babel.js'
+  },
+  stylus: {
+    use: [require('nib')()],
+    import: ['~nib/lib/nib/index.styl']
   },
   plugins: debug ? [] : [
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
+    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
   ]
-};
-
-
+}
