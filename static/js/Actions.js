@@ -39,6 +39,15 @@ export function requestExpeditions () {
   }
 }
 
+export const UPDATE_TIME = 'UPDATE_TIME'
+
+export function updateTime (currentDate) {
+  return {
+    type: UPDATE_TIME,
+    currentDate
+  }
+}
+
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 
 export function receiveExpeditions (data) {
@@ -60,26 +69,31 @@ export function fetchExpeditions () {
   }
 }
 
-export function fetchDay () {
+export function fetchDay (currentDate) {
   return function (dispatch, getState) {
-    dispatch(requestDay())
+    // dispatch(requestDay())
     var state = getState()
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
+    if (!currentDate) currentDate = expedition.currentDate
+    console.log('FETCH DAY', currentDate, expedition.currentDate)
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
-    var expeditionDay = Math.floor((expedition.currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    var expeditionDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     var daysToFetch = []
+    // console.log('DAYSTOFETCH', )
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
-    daysToFetch.push(expeditionDay)
-    daysToFetch.push(expeditionDay + 1)
-    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 <= expedition.dayCount) daysToFetch.push(expeditionDay + 1)
+    if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
+    if (!expedition.days[expeditionDay] + 1 && expeditionDay + 1 < expedition.dayCount) daysToFetch.push(expeditionDay + 1)
+
+    // if (!expedition.days[expeditionDay + 2] && expeditionDay + 2 < expedition.dayCount) daysToFetch.push(expeditionDay + 2)
+    console.log('DAYSTOFETCH', expedition.days, expeditionDay, daysToFetch)
     daysToFetch.forEach(function (d, i, a) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
       a[i] = t
     })
     var range = [
       timestampToString(d3.min(daysToFetch)),
-      timestampToString(d3.max(daysToFetch))
+      timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
     ]
     var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
     console.log('querystring:', queryString, expeditionDay)
