@@ -18,6 +18,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     updateTime: (currentDate) => {
       dispatch(actions.updateTime(currentDate))
+    },
+    setControl: (target, mode) => {
+      dispatch(actions.setControl(target, mode))
     }
   }
 }

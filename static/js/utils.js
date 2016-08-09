@@ -2,8 +2,10 @@
 export function dateToString (d) {
   var month = d.getMonth() + 1
   var day = d.getDate()
-  var hour = d.getHours()
-  var minute = d.getMinutes()
+  var hour = d.getHours() + ''
+  if (hour.length === 1) hour = '0' + hour
+  var minute = d.getMinutes() + ''
+  if (minute.length === 1) minute = '0' + minute
 
   var monthString = ''
   if (month === 1) monthString = 'January'

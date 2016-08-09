@@ -14,7 +14,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick () {
-    const {animate, expedition, fetchDay, updateTime} = this.props
+    const {animate, expedition, fetchDay, updateTime, setControl} = this.props
     if (animate) {
       // increment time
       var dateOffset = 0
@@ -29,7 +29,10 @@ class BackgroundMap extends React.Component {
         if (expedition.playback === 'forward') dateOffset = 2000
         if (expedition.playback === 'fastForward') dateOffset = 20000
       }
-      var currentDate = new Date(this.state.currentDate.getTime() + dateOffset)
+      var currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime(), this.state.currentDate.getTime() + dateOffset))))
+
+      if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback','pause')
+
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       if (currentDay !== this.state.currentDay) {
         // new day
@@ -151,7 +154,8 @@ BackgroundMap.propTypes = {
   animate: PropTypes.bool.isRequired,
   expedition: PropTypes.object,
   updateTime: PropTypes.func.isRequired,
-  fetchDay: PropTypes.func.isRequired
+  fetchDay: PropTypes.func.isRequired,
+  setControl: PropTypes.func.isRequired
 }
 
 export default BackgroundMap

@@ -22,15 +22,6 @@ export function startAnimation (dispatch, getState) {
   }
 }
 
-export const UPDATE_MAP = 'UPDATE_MAP'
-
-export function updateMap (currentDate) {
-  return {
-    type: UPDATE_MAP,
-    currentDate
-  }
-}
-
 export const REQUEST_EXPEDITIONS = 'REQUEST_EXPEDITIONS'
 
 export function requestExpeditions () {

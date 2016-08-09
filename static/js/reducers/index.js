@@ -19,7 +19,7 @@ const okavangoReducer = (
         animate: true
       })
 
-    case actions.UPDATE_MAP:
+    case actions.UPDATE_TIME:
       expeditionID = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
         expeditions: Object.assign({}, state.expeditions, {
@@ -227,7 +227,7 @@ const expeditionReducer = (
   data
 ) => {
   switch (action.type) {
-    case actions.UPDATE_MAP:
+    case actions.UPDATE_TIME:
       return Object.assign({}, state, {
         currentDate: action.currentDate
       })
