@@ -14,7 +14,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick () {
-    const {animate, expedition} = this.props
+    const {animate, expedition, fetchDay, updateTime} = this.props
     if (animate) {
       // increment time
       var dateOffset = 0
@@ -31,10 +31,9 @@ class BackgroundMap extends React.Component {
       }
       var currentDate = new Date(this.state.currentDate.getTime() + dateOffset)
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-      var newDay = false
       if (currentDay !== this.state.currentDay) {
         // new day
-        newDay = true
+        fetchDay(currentDate)
       }
 
       // look for current beacons
@@ -71,7 +70,11 @@ class BackgroundMap extends React.Component {
       this.state.day = day
       this.state.beaconIndex = beaconIndex
       this.state.timeToNextBeacon = timeToNextBeacon
-      if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
+      if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause'){
+        // update app state
+        updateTime(this.state.currentDate)
+        console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
+      } 
 
     }
     this.state.animate = animate
@@ -129,8 +132,6 @@ class BackgroundMap extends React.Component {
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/iaaaan/cioxda1tz000cbnm13jtwhl8q'
 
-    console.log('rendering')
-
     return (
       <div id="mapbox">
         <MapGL
@@ -148,7 +149,9 @@ class BackgroundMap extends React.Component {
 
 BackgroundMap.propTypes = {
   animate: PropTypes.bool.isRequired,
-  expedition: PropTypes.object
+  expedition: PropTypes.object,
+  updateTime: PropTypes.func.isRequired,
+  fetchDay: PropTypes.func.isRequired
 }
 
 export default BackgroundMap

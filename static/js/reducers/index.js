@@ -88,12 +88,6 @@ const okavangoReducer = (
         features[id] = featureReducer(expedition.features[id], action, f)
       })
 
-      // extending features to the extent of the days
-      // days = {}
-      // Object.keys(features).forEach((id) => {
-
-      // })
-
       var featuresByTile = {}
       var featuresByDay = {}
       Object.keys(features).forEach((id) => {

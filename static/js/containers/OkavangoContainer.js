@@ -1,6 +1,7 @@
 
 import { connect } from 'react-redux'
 import Okavango from '../components/Okavango'
+import * as actions from '../actions.js'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -12,6 +13,12 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    fetchDay: (currentDate) => {
+      return dispatch(actions.fetchDay(currentDate))
+    },
+    updateTime: (currentDate) => {
+      dispatch(actions.updateTime(currentDate))
+    }
   }
 }
 
