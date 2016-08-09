@@ -1,12 +1,13 @@
 import geojson
 from housepy import config, log, util
+from collections import OrderedDict
 
 """ list of days, with total counts across sightings for each one """
 
 def assemble(self, search, limit, order, resolution):
     log.info("sightings.assemble")
     try:
-        results = {}
+        results = OrderedDict()
         if 'properties.t_utc' not in search:
             raise Exception("Date constraints are required")
         intervals = []
