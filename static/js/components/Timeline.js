@@ -7,7 +7,7 @@ const Timeline = ({expedition}) => {
 
   var height = window.innerHeight - 72
   var width = window.innerWidth * 0.02
-  var padding = 2
+  var padding = [2,8]
   var dayCount = expedition.dayCount + 1
   var data = []
 
@@ -18,7 +18,7 @@ const Timeline = ({expedition}) => {
     data.push(d)
   }
 
-  var range = [0 + padding, height - padding]
+  var range = [0 + padding[1], height - padding[1]]
 
   const scaleDays = d3.scaleLinear()
     .domain([0, dayCount - 1])
@@ -29,10 +29,10 @@ const Timeline = ({expedition}) => {
     .range(range)
 
   const days = data.map((d, i) => {
-    return <circle cx={width - padding} cy={scaleDays(i)} r={2} key={i} fill="white"/>
+    return <circle cx={width - padding[0]} cy={scaleDays(i)} r={2} key={i} fill="white"/>
   })
 
-  var x = width - padding * 2
+  var x = width - padding[0] * 2
 
   return (
     <svg id="timeline" style={{height: height + 'px'}}>
