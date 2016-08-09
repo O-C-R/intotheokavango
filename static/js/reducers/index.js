@@ -14,6 +14,17 @@ const okavangoReducer = (
   var expeditions, features, id, expeditionID, expedition, tiles, days
 
   switch (action.type) {
+
+    case actions.SHOW_LOADING_WHEEL:
+      return Object.assign({}, state, {
+        isFetching: true
+      })
+
+    case actions.HIDE_LOADING_WHEEL:
+      return Object.assign({}, state, {
+        isFetching: false
+      })
+
     case actions.START:
       return Object.assign({}, state, {
         animate: true

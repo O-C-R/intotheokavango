@@ -7,7 +7,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     expedition: state.expeditions[state.selectedExpedition],
     children: ownProps.children,
-    animate: state.animate
+    animate: state.animate,
+    isFetching: state.isFetching
   }
 }
 
@@ -21,6 +22,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     setControl: (target, mode) => {
       dispatch(actions.setControl(target, mode))
+    },
+    jumpTo: (date) => {
+      dispatch(actions.jumpTo(date))
     }
   }
 }

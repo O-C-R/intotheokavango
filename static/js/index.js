@@ -1,40 +1,7 @@
 /*
-
-  okavango_15 +1
-  okavango_14 +1
-  bike_angola_16 +1
-
-  expedition starts on expeditionDay=1
-
-  LIVERELOAD:
-    node_modules/.bin/  static/js/index.js -t babelify -p livereactload -o static/js/index-babel.js
-
-  TODO:
-    URL
-    load data
-    look at changes to API
-    think of loading strategy
-
-  DATA LOADING
-
-    load entirety of beacon path and map it to timeline
-    all other features are loaded based on location
-
-    get dates of expedition to draw timeline
-    get last records
-    start 24h earlier
-    load features through tiling
-    ask multiple features at once
-
-QUESTIONS
-    dates of expeditions
-    teams and core
-    querying through space boundaries
-    inventory of sensors and media types
-
-    TEAM : river main
-
-    can I query all features
+  TODO: 
+  - sync time zones
+  - add timeline graph
 */
 
 import 'babel-polyfill'

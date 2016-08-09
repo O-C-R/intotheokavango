@@ -13,10 +13,44 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
+export const SHOW_LOADING_WHEEL = 'SHOW_LOADING_WHEEL'
+
+export function showLoadingWheel () {
+  return {
+    type: SHOW_LOADING_WHEEL
+  }
+}
+
+export const HIDE_LOADING_WHEEL = 'HIDE_LOADING_WHEEL'
+
+export function hideLoadingWheel () {
+  return {
+    type: HIDE_LOADING_WHEEL
+  }
+}
+
+export const JUMP_TO = 'JUMP_TO'
+
+export function jumpTo (date) {
+  return function (dispatch, getState) {
+    var state = getState()
+    var expeditionID = state.selectedExpedition
+    var expedition = state.expeditions[expeditionID]
+    // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
+    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    if (expedition.days[expeditionDay]){
+      return dispatch(updateTime(date))
+    } else {
+      return dispatch(showLoadingWheel())
+        // .then(() => dispatch(fetchDay(date)))
+        // .then(() => dispatch(updateTime(date)))
+    }
+  }
+}
+
 export const START = 'START'
 
-export function startAnimation (dispatch, getState) {
-  // animate(dispatch, getState, true)
+export function startAnimation () {
   return {
     type: START
   }
@@ -55,20 +89,20 @@ export function fetchExpeditions () {
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
       .then(() => dispatch(fetchDay()))
-      .then(() => dispatch(startAnimation(dispatch, getState)))
+      .then(() => dispatch(startAnimation()))
+      // .then(() => dispatch(fetchSightingSummary()))
       // TODO catch errors
   }
 }
 
-export function fetchDay (currentDate) {
+export function fetchDay (date) {
   return function (dispatch, getState) {
-    // dispatch(requestDay())
     var state = getState()
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
-    if (!currentDate) currentDate = expedition.currentDate
+    if (!date) date = expedition.currentDate
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
-    var expeditionDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     var daysToFetch = []
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
@@ -92,7 +126,7 @@ export function fetchDay (currentDate) {
 
 export const SET_EXPEDITION = 'SET_EXPEDITION'
 
-export function setExpeditions (id) {
+export function setExpedition (id) {
   return {
     type: SET_EXPEDITION,
     id

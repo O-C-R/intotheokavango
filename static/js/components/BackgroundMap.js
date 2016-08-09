@@ -76,7 +76,7 @@ class BackgroundMap extends React.Component {
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause'){
         // update app state
         updateTime(this.state.currentDate)
-        console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
+        // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
       } 
 
     }

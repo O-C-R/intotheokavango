@@ -1,6 +1,7 @@
 
 import { connect } from 'react-redux'
 import ControlPanel from '../components/ControlPanel'
+import * as actions from '../actions'
 
 const mapStateToProps = (state, ownProps) => {
   var props = {
@@ -25,22 +26,22 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onYearChange: (value) => {
-      dispatch({'type': 'SET_EXPEDITION', 'id': value})
+      return dispatch(actions.setExpedition(value))
     },
     onPlaybackChange: (value) => {
-      dispatch({'type': 'SET_CONTROL', 'target': 'playback', 'mode': value})
+      return dispatch(actions.setControl('playback', value))
     },
     onMainFocusChange: (value) => {
-      dispatch({'type': 'SET_CONTROL', 'target': 'mainFocus', 'mode': value})
+      return dispatch(actions.setControl('mainFocus', value))
     },
     onSecondaryFocusChange: (value) => {
-      dispatch({'type': 'SET_CONTROL', 'target': 'secondaryFocus', 'mode': value})
+      return dispatch(actions.setControl('secondaryFocus', value))
     },
     onZoomChange: (value) => {
-      dispatch({'type': 'SET_CONTROL', 'target': 'zoom', 'mode': value})
+      return dispatch(actions.setControl('zoom', value))
     },
     onLayoutChange: (value) => {
-      dispatch({'type': 'SET_CONTROL', 'target': 'layout', 'mode': value})
+      return dispatch(actions.setControl('layout', value))
     }
   }
 }

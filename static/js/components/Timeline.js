@@ -2,7 +2,7 @@
 import React, {PropTypes} from 'react'
 import * as d3 from 'd3'
 
-const Timeline = ({expedition}) => {
+const Timeline = ({expedition, jumpTo}) => {
   if (!expedition) return <svg id="timeline"></svg>
 
   var height = window.innerHeight - 72
@@ -34,8 +34,19 @@ const Timeline = ({expedition}) => {
 
   var x = width - padding[0] * 2
 
+  const onMouseMove = (e) => {
+    var y = e.nativeEvent.offsetY
+    // var date = new Date(scaleTime.invert(y))
+    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+  }
+
+  const onClick = (e) => {
+    var y = e.nativeEvent.offsetY
+    jumpTo(new Date(scaleTime.invert(y)))
+  }
+
   return (
-    <svg id="timeline" style={{height: height + 'px'}}>
+    <svg id="timeline" style={{height: height + 'px'}} onMouseMove={onMouseMove} onClick={onClick}>
       <line x1={x + 2} x2={x + 2} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
       <g>{ days }</g>
       <circle id="cursor" cx={x} cy={scaleTime(expedition.currentDate.getTime())} r={4} fill="yellow"/>
@@ -44,6 +55,7 @@ const Timeline = ({expedition}) => {
 }
 
 Timeline.propTypes = {
-  expedition: PropTypes.object
+  expedition: PropTypes.object,
+  jumpTo: PropTypes.func.isRequired
 }
 export default Timeline

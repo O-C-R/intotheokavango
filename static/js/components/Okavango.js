@@ -8,7 +8,7 @@ import Navigation from './Navigation'
 export default class Okavango extends React.Component {
 
   render () {
-    const {children, expedition, animate, updateTime, fetchDay, setControl} = this.props
+    const {children, expedition, animate, updateTime, fetchDay, setControl, jumpTo, isFetching} = this.props
     var height = {height: window.innerHeight - 100}
 
     return (
@@ -16,8 +16,9 @@ export default class Okavango extends React.Component {
         <BackgroundMap animate={animate} expedition={expedition} updateTime={updateTime} fetchDay={fetchDay} setControl={setControl}/>
         <Navigation pathName={location.pathname}/>
         <div id="content" style={height}>
+          {isFetching ? <div id="loadingWheel"></div> : null}
           <LightBox active={false}/>
-          <Timeline expedition={expedition}/>
+          <Timeline expedition={expedition} jumpTo={jumpTo}/>
           <div id="pageContainer">
             {children}
           </div>
@@ -33,5 +34,7 @@ Okavango.propTypes = {
   expedition: PropTypes.object,
   updateTime: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
-  setControl: PropTypes.func.isRequired
+  setControl: PropTypes.func.isRequired,
+  jumpTo: PropTypes.func.isRequired,
+  isFetching: PropTypes.bool.isRequired
 }
