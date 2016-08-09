@@ -4,14 +4,19 @@ from housepy import config, log
 def assemble(self, search, limit, order, resolution):
     log.info("expeditions.assemble")
     try:
-        species = set(self.db.features.find(search).distinct('properties.SpeciesName')) ## no longer needed
+        species = set(self.db.features.find(search).distinct('properties.SpeciesName'))
         birds = set(self.db.features.find(search).distinct('properties.BirdName'))
         species = [specie for specie in list(species | birds) if len(specie)]
         species.sort()
         results = {}
         for specie in species:
             search.update({'properties.SpeciesName': specie})
-            count = self.db.features.find(search).count()
+            # count = self.db.features.find(search).count()
+            try:
+                count = list(self.db.features.aggregate([ {'$match': search}, {'$group': {'_id': None, 'total': {'$sum': "$properties.Count"} }} ]))[0]['total']
+            except Exception as e:
+                log.error(log.exc(e))
+                count = 0
             results[specie] = count
     except Exception as e:
         return self.error(log.exc(e))
