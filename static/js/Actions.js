@@ -76,17 +76,12 @@ export function fetchDay (currentDate) {
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
     if (!currentDate) currentDate = expedition.currentDate
-    console.log('FETCH DAY', currentDate, expedition.currentDate)
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     var daysToFetch = []
-    // console.log('DAYSTOFETCH', )
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
-    if (!expedition.days[expeditionDay] + 1 && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
-
-    // if (!expedition.days[expeditionDay + 2] && expeditionDay + 2 < expedition.dayCount) daysToFetch.push(expeditionDay + 2)
-    console.log('DAYSTOFETCH', expedition.days, expeditionDay, daysToFetch)
+    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
     daysToFetch.forEach(function (d, i, a) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
       a[i] = t
