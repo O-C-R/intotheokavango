@@ -13,7 +13,7 @@ export default class Okavango extends React.Component {
 
     return (
       <div id="root">
-        <BackgroundMap animate={animate} expedition={expedition} updateTime={updateTime} fetchDay={fetchDay} setControl={setControl}/>
+        <BackgroundMap isFetching={isFetching} animate={animate} expedition={expedition} updateTime={updateTime} fetchDay={fetchDay} setControl={setControl}/>
         <Navigation pathName={location.pathname}/>
         <div id="content" style={height}>
           {isFetching ? <div id="loadingWheel"></div> : null}

@@ -14,8 +14,8 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick () {
-    const {animate, expedition, fetchDay, updateTime, setControl} = this.props
-    if (animate) {
+    const {animate, expedition, fetchDay, updateTime, setControl, isFetching} = this.props
+    if (animate && !isFetching) {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
@@ -82,15 +82,14 @@ class BackgroundMap extends React.Component {
     }
     this.state.animate = animate
     this.state.frameCount++
+    // if (this.state.frameCount % 60 === 0) console.log(this.state.frameCount)
     requestAnimationFrame(this.tick)
   }
 
   componentWillReceiveProps (nextProps) {
 
     const {animate, expedition} = nextProps
-    if (animate && !this.state.animate) {
-      console.log('starting animation')
-
+    if (animate) {
       const currentDate = expedition.currentDate
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
       const currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
@@ -120,13 +119,16 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = 0
       }
 
-      this.state.animate = animate
       this.state.currentDate = currentDate
       this.state.currentDay = currentDay
       this.state.day = day
       this.state.beaconIndex = beaconIndex
       this.state.frameCount = 0
-      this.tick()
+      if (!this.state.animate) {
+        this.state.animate = animate
+        console.log('starting animation')
+        this.tick()
+      }
     }
   }
 

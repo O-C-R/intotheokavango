@@ -38,12 +38,11 @@ export function jumpTo (date) {
     var expedition = state.expeditions[expeditionID]
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-    if (expedition.days[expeditionDay]){
+    if (expedition.days[expeditionDay]) {
       return dispatch(updateTime(date))
     } else {
-      return dispatch(showLoadingWheel())
-        // .then(() => dispatch(fetchDay(date)))
-        // .then(() => dispatch(updateTime(date)))
+      dispatch(showLoadingWheel())
+      return dispatch(fetchDay(date))
     }
   }
 }
@@ -121,6 +120,8 @@ export function fetchDay (date) {
     return fetch(queryString)
       .then(response => response.json())
       .then(json => dispatch(receiveDay(expeditionID, json)))
+      .then(() => dispatch(updateTime(date)))
+      .then(() => dispatch(hideLoadingWheel()))
   }
 }
 

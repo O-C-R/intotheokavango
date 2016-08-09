@@ -1,7 +1,8 @@
 /*
-  TODO: 
+  TODO:
   - sync time zones
   - add timeline graph
+  - add yello line to timeline to indicate areas already played
 */
 
 import 'babel-polyfill'
