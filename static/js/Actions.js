@@ -83,7 +83,7 @@ export function fetchDay (currentDate) {
     // console.log('DAYSTOFETCH', )
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
-    if (!expedition.days[expeditionDay] + 1 && expeditionDay + 1 < expedition.dayCount) daysToFetch.push(expeditionDay + 1)
+    if (!expedition.days[expeditionDay] + 1 && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
 
     // if (!expedition.days[expeditionDay + 2] && expeditionDay + 2 < expedition.dayCount) daysToFetch.push(expeditionDay + 2)
     console.log('DAYSTOFETCH', expedition.days, expeditionDay, daysToFetch)
