@@ -166,17 +166,17 @@ class Api(server.Handler):
         log.info("FILTER %s" % search)
 
         # pass our search to the view module for execution and formatting
-        # try:         
-        result = view.assemble(self, search, limit, order, resolution)   
-        if result is None:
-            return
-        if csv:
-            return self.csv(format_csv(result), "data.csv")
-        results, total, returned = result
-        search = {key.replace('properties.', ''): value for (key, value) in search.items()}
-        return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
-        # except Exception as e:
-        #     return self.error(log.exc(e))
+        try:         
+            result = view.assemble(self, search, limit, order, resolution)   
+            if result is None:
+                return
+            if csv:
+                return self.csv(format_csv(result), "data.csv")
+            results, total, returned = result
+            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
+        except Exception as e:
+            return self.error(log.exc(e))
 
 def format_csv(data):
     import csv    

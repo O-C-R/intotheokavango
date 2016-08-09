@@ -1,14 +1,17 @@
 import geojson
 from housepy import config, log
 
+""" list of species, with total counts across sightings for each one """
+
 def assemble(self, search, limit, order, resolution):
-    log.info("expeditions.assemble")
+    log.info("species.assemble")
     try:
         species = set(self.db.features.find(search).distinct('properties.SpeciesName'))
         birds = set(self.db.features.find(search).distinct('properties.BirdName'))
         species = [specie for specie in list(species | birds) if len(specie)]
         species.sort()
         results = {}
+        total_count = 0
         for specie in species:
             search.update({'properties.SpeciesName': specie})
             # count = self.db.features.find(search).count()
@@ -18,6 +21,7 @@ def assemble(self, search, limit, order, resolution):
                 log.error(log.exc(e))
                 count = 0
             results[specie] = count
+            total_count += count
     except Exception as e:
         return self.error(log.exc(e))
     species = results
