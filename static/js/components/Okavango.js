@@ -13,7 +13,7 @@ export default class Okavango extends React.Component {
 
     return (
       <div id="root">
-        <BackgroundMap animate={animate}/>
+        <BackgroundMap animate={animate} expedition={expedition}/>
         <Navigation pathName={location.pathname}/>
         <div id="content" style={height}>
           <LightBox active={false}/>

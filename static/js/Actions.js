@@ -1,6 +1,17 @@
 
 import fetch from 'isomorphic-fetch'
+import * as d3 from 'd3'
 // import { animate } from './animation'
+
+function timestampToString (t) {
+  var d = new Date(t)
+  var year = d.getUTCFullYear()
+  var month = (d.getUTCMonth() + 1) + ''
+  if (month.length === 1) month = '0' + month
+  var date = (d.getUTCDate()) + ''
+  if (date.length === 1) date = '0' + date
+  return year + '-' + month + '-' + date
+}
 
 export const START = 'START'
 
@@ -55,11 +66,27 @@ export function fetchDay () {
     var state = getState()
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
-    var expeditionDay = Math.floor((expedition.currentDate - expedition.start) / (1000 * 3600 * 24))
-    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&expeditionDay=' + (expeditionDay + 2) // TODO WHY +2?
+    // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
+    var expeditionDay = Math.floor((expedition.currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    var daysToFetch = []
+    if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
+    daysToFetch.push(expeditionDay)
+    daysToFetch.push(expeditionDay + 1)
+    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 <= expedition.dayCount) daysToFetch.push(expeditionDay + 1)
+    daysToFetch.forEach(function (d, i, a) {
+      var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
+      a[i] = t
+    })
+    var range = [
+      timestampToString(d3.min(daysToFetch)),
+      timestampToString(d3.max(daysToFetch))
+    ]
+    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
+    console.log('querystring:', queryString, expeditionDay)
+
     return fetch(queryString)
       .then(response => response.json())
-      .then(json => dispatch(receiveDay(expeditionID, expeditionDay, json)))
+      .then(json => dispatch(receiveDay(expeditionID, json)))
   }
 }
 
@@ -94,11 +121,10 @@ export function requestDay (expeditionID, dayID) {
 
 export const RECEIVE_DAY = 'RECEIVE_DAY'
 
-export function receiveDay (expeditionID, dayID, data) {
+export function receiveDay (expeditionID, data) {
   return {
     type: RECEIVE_DAY,
     expeditionID,
-    dayID,
     data
   }
 }
