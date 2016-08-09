@@ -3,7 +3,6 @@ import React, {PropTypes} from 'react'
 import * as d3 from 'd3'
 
 const Timeline = ({expedition}) => {
-
   if (!expedition) return <svg id="timeline"></svg>
 
   var height = window.innerHeight - 72
@@ -22,21 +21,24 @@ const Timeline = ({expedition}) => {
   var range = [0 + padding, height - padding]
 
   const scaleDays = d3.scaleLinear()
-    .domain([0, dayCount])
+    .domain([0, dayCount - 1])
     .range(range)
 
   const scaleTime = d3.scaleLinear()
-    .domain([startDate.getTime(), startDate.getTime() + (dayCount) * (1000 * 3600 * 24)])
+    .domain([startDate.getTime(), startDate.getTime() + (dayCount - 1) * (1000 * 3600 * 24)])
     .range(range)
 
   const days = data.map((d, i) => {
     return <circle cx={width - padding} cy={scaleDays(i)} r={2} key={i} fill="white"/>
   })
 
+  var x = width - padding * 2
+
   return (
     <svg id="timeline" style={{height: height + 'px'}}>
+      <line x1={x + 2} x2={x + 2} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
       <g>{ days }</g>
-      <circle id="cursor" cx={width - padding * 2} cy={scaleTime(expedition.currentDate.getTime())} r={4} fill="yellow"/>
+      <circle id="cursor" cx={x} cy={scaleTime(expedition.currentDate.getTime())} r={4} fill="yellow"/>
     </svg>
   )
 }
