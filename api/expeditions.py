@@ -13,10 +13,11 @@ def assemble(self, search, limit, order, resolution):
             end_date = util.parse_date(last_feature['properties']['DateTime'], tz=config['local_tz'])
             duration = end_date - start_date
             try:
-                max_lon = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}}).sort([('geometry.coordinates.0', DESCENDING)]).limit(1))[0]['geometry']['coordinates'][0]
-                min_lon = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}}).sort([('geometry.coordinates.0', ASCENDING)]).limit(1))[0]['geometry']['coordinates'][0]
-                max_lat = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}}).sort([('geometry.coordinates.1', DESCENDING)]).limit(1))[0]['geometry']['coordinates'][1]
-                min_lat = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}}).sort([('geometry.coordinates.1', ASCENDING)]).limit(1))[0]['geometry']['coordinates'][1]
+                ## there is an okavango hack here that ignores points west of the prime meridian
+                max_lon = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}, 'geometry.coordinates.0': {'$gt': 0}}).sort([('geometry.coordinates.0', DESCENDING)]).limit(1))[0]['geometry']['coordinates'][0]
+                min_lon = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}, 'geometry.coordinates.0': {'$gt': 0}}).sort([('geometry.coordinates.0', ASCENDING)]).limit(1))[0]['geometry']['coordinates'][0]
+                max_lat = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}, 'geometry.coordinates.0': {'$gt': 0}}).sort([('geometry.coordinates.1', DESCENDING)]).limit(1))[0]['geometry']['coordinates'][1]
+                min_lat = list(self.db.features.find({'properties.Expedition': expedition, 'properties.FeatureType': "beacon", 'geometry': {'$exists': True, '$ne': None}, 'geometry.coordinates.0': {'$gt': 0}}).sort([('geometry.coordinates.1', ASCENDING)]).limit(1))[0]['geometry']['coordinates'][1]
                 bounds = min_lon, max_lat, max_lon, min_lat
             except Exception as e:
                 log.warning(log.exc(e))
