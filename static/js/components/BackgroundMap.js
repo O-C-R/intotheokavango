@@ -8,7 +8,8 @@ class BackgroundMap extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      animate: false
+      animate: false,
+      coordinates: [-122.4376, 37.7577]
     }
   }
 
@@ -67,17 +68,24 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = 0
       }
 
+      var currentBeacon = beacons[beaconIndex + (forward ? 0 : 1)]
+      var nextBeacon = beacons[beaconIndex + (forward ? 1 : 0)]
+      var coordinates = [(currentBeacon.geometry.coordinates[0] + nextBeacon.geometry.coordinates[0]) / 2,
+                      (currentBeacon.geometry.coordinates[1] + nextBeacon.geometry.coordinates[1]) / 2]
+
       this.state.animate = animate
       this.state.currentDate = currentDate
       this.state.currentDay = currentDay
       this.state.day = day
       this.state.beaconIndex = beaconIndex
       this.state.timeToNextBeacon = timeToNextBeacon
+      this.state.coordinates = coordinates
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
         // update app state
         updateTime(this.state.currentDate)
         // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
         // console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
+        console.log(this.state.coordinates)
       }
     }
     this.state.animate = animate
@@ -134,15 +142,17 @@ class BackgroundMap extends React.Component {
 
   render () {
     const {animate, expedition} = this.props
+    const {coordinates} = this.state
+
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
-    const MAPBOX_STYLE = 'mapbox://styles/iaaaan/cioxda1tz000cbnm13jtwhl8q'
+    const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
 
     return (
       <div id="mapbox">
         <MapGL
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          width={window.innerWidth} height={window.innerHeight} latitude={37.7577} longitude={-122.4376}
+          width={window.innerWidth} height={window.innerHeight} longitude={coordinates[0]} latitude={coordinates[1]}
           zoom={8} onChangeViewport={(viewport) => {
             const {latitude, longitude, zoom} = viewport
           }}

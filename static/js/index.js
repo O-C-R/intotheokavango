@@ -1,9 +1,8 @@
 /*
   TODO:
-  - load new days even when jumping
   - sync time zones
   - add timeline graph
-  - add yello line to timeline to indicate areas already played
+  - add yellow line to timeline to indicate areas already played
 */
 
 import 'babel-polyfill'
