@@ -93,6 +93,7 @@ class BackgroundMap extends React.Component {
       const currentDate = expedition.currentDate
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
       const currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+      // console.log(expedition.days, currentDay)
       const day = expedition.days[currentDay]
       var beacons = d3.values(day.beacons).sort((a, b) => {
         return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()

@@ -119,7 +119,7 @@ export function fetchDay (date) {
 
     return fetch(queryString)
       .then(response => response.json())
-      .then(json => dispatch(receiveDay(expeditionID, json)))
+      .then(json => dispatch(receiveDay(expeditionID, json, range)))
       .then(() => dispatch(updateTime(date)))
       .then(() => dispatch(hideLoadingWheel()))
   }
@@ -156,11 +156,12 @@ export function requestDay (expeditionID, dayID) {
 
 export const RECEIVE_DAY = 'RECEIVE_DAY'
 
-export function receiveDay (expeditionID, data) {
+export function receiveDay (expeditionID, data, dateRange) {
   return {
     type: RECEIVE_DAY,
     expeditionID,
-    data
+    data,
+    dateRange
   }
 }
 
