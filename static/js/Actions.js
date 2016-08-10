@@ -13,6 +13,15 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
+export const COMPLETE_DAYS = 'COMPLETE_DAYS'
+
+export function completeDays (expeditionID) {
+  return {
+    type: COMPLETE_DAYS,
+    expeditionID
+  }
+}
+
 export const SHOW_LOADING_WHEEL = 'SHOW_LOADING_WHEEL'
 
 export function showLoadingWheel () {
@@ -94,8 +103,11 @@ export function fetchExpeditions () {
   }
 }
 
-export function fetchDay (date) {
+export function fetchDay (date, initialDate) {
+  if (!initialDate) initialDate = date
   return function (dispatch, getState) {
+
+
     var state = getState()
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
@@ -120,8 +132,38 @@ export function fetchDay (date) {
     return fetch(queryString)
       .then(response => response.json())
       .then(json => dispatch(receiveDay(expeditionID, json, range)))
-      .then(() => dispatch(updateTime(date)))
-      .then(() => dispatch(hideLoadingWheel()))
+      .then(() => dispatch(completeDays(expeditionID)))
+      .then(() => {
+        var state = getState()
+        var expedition = state.expeditions[state.selectedExpedition]
+        var days = expedition.days
+        var incompleteDays = []
+        d3.keys(expedition.days).forEach((k) => {
+          if (expedition.days[k].incomplete) incompleteDays.push(k)
+        })
+        if (incompleteDays.length === 0) {
+          // not sure why I need this || date
+          dispatch(updateTime(initialDate || date))
+          dispatch(hideLoadingWheel())
+        } else {
+          console.log('incomplete days', incompleteDays)
+          var nextTarget = -1
+          for (var i = 0; i < incompleteDays.length; i++) {
+            var id = incompleteDays[i]
+            for (var j = Math.max(0, id - 1); j < expedition.dayCount; j++) {
+              if (!days[j]) {
+                nextTarget = j
+                break
+              }
+            }
+            if (nextTarget > -1) break
+          }
+          if (nextTarget > -1) {
+            nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
+            dispatch(fetchDay(nextTarget, initialDate))
+          }
+        }
+      })
   }
 }
 

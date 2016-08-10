@@ -14,6 +14,13 @@ const okavangoReducer = (
   var expeditions, features, id, expeditionID, expedition, tiles, days
 
   switch (action.type) {
+    case actions.COMPLETE_DAYS:
+      id = action.expeditionID || state.selectedExpedition
+      return Object.assign({}, state, {
+        expeditions: Object.assign({}, state.expeditions, {
+          [id]: expeditionReducer(state.expeditions[id], action)
+        })
+      })
 
     case actions.SHOW_LOADING_WHEEL:
       return Object.assign({}, state, {
@@ -76,6 +83,12 @@ const okavangoReducer = (
       })
 
     case actions.RECEIVE_DAY:
+      /*
+        assess incomplete days
+        fill missing days
+        jump reload
+        map
+      */
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
 
@@ -98,6 +111,11 @@ const okavangoReducer = (
       // sort features by tile and time buckets
       var featuresByTile = {}
       var featuresByDay = {}
+
+      daysQueried.forEach((d) => {
+        featuresByDay[d] = {}
+      })
+
       Object.keys(features).forEach((id) => {
         var feature = features[id]
 
@@ -118,84 +136,39 @@ const okavangoReducer = (
 
         // extending beaon features to entire day
         // pick the two earliest and latest features
-        var timeRange = [new Date(), new Date(0)]
-        var featureRange = []
-        d3.values(featuresByDay[d]).forEach((f) => {
-          var dateTime = new Date(f.properties.DateTime)
-          if (timeRange[0].getTime() > dateTime.getTime()) {
-            timeRange[0] = dateTime
-            featureRange[0] = f
-          }
-          if (timeRange[1].getTime() < dateTime.getTime()) {
-            timeRange[1] = dateTime
-            featureRange[1] = f
-          }
-        })
+        if (d3.values(featuresByDay[d]).length > 0) {
+          var timeRange = [new Date(), new Date(0)]
+          var featureRange = []
+          d3.values(featuresByDay[d]).forEach((f) => {
+            var dateTime = new Date(f.properties.DateTime)
+            if (timeRange[0].getTime() > dateTime.getTime()) {
+              timeRange[0] = dateTime
+              featureRange[0] = f
+            }
+            if (timeRange[1].getTime() < dateTime.getTime()) {
+              timeRange[1] = dateTime
+              featureRange[1] = f
+            }
+          })
 
-        // clone features with new dates
-        var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
-        var end = new Date(start.getTime() + (1000 * 3600 * 24))
-        id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-        featuresByDay[d][id] = Object.assign({}, featureRange[0])
-        featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-          DateTime: start.toString()
-        })
-        id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-        featuresByDay[d][id] = Object.assign({}, featureRange[1])
-        featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-          DateTime: end.toString()
-        })
-      })
-      featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
-
-      // list days for which data is missing, and incomplete days which can be filled out
-      var missingDays = {}
-      var incompleteDays = {}
-      daysQueried.forEach((d) => {
-        if (!featuresByDay[d]) {
-          if ((d === 0 && featuresByDay[d + 1]) || (d === expedition.dayCount - 1 && featuresByDay[d - 1]) || (featuresByDay[d - 1] && featuresByDay[d + 1])) incompleteDays[d] = d
-          else missingDays[d] = d
+          // clone features with new dates
+          var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
+          var end = new Date(start.getTime() + (1000 * 3600 * 24))
+          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+          featuresByDay[d][id] = Object.assign({}, featureRange[0])
+          featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
+            DateTime: start.toString()
+          })
+          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+          featuresByDay[d][id] = Object.assign({}, featureRange[1])
+          featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
+            DateTime: end.toString()
+          })
         }
-      })
-
-      d3.values(incompleteDays).forEach((d, i, a) => {
-        featuresByDay[d] = {}
-        var start = new Date(expedition.start.getTime() + d * (1000 * 3600 * 24))
-        var end = new Date(start.getTime() + (1000 * 3600 * 24))
-
-        var featureRange = []
-        d3.values(featuresByDay[d - 1]).forEach((f) => {
-          if (new Date(f.properties.DateTime).getTime() === start.getTime()) featureRange[0] = f
-        })
-        d3.values(featuresByDay[d + 1]).forEach((f) => {
-          if (new Date(f.properties.DateTime).getTime() === end.getTime()) featureRange[1] = f
-        })
-        id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-        featuresByDay[d][id] = Object.assign({}, featureRange[0])
-        featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-          DateTime: start.toString()
-        })
-        id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-        featuresByDay[d][id] = Object.assign({}, featureRange[1])
-        featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-          DateTime: end.toString()
-        })
       })
 
       featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
       featuresByTile = Object.assign({}, expedition.featuresByTile, featuresByTile)
-
-      // console.log('oh', missingDays, featuresByDay)
-
-      // console.log('aga2', daysQueried, featuresByDay)
-      // var missingData = []
-      // for(i = 0; i < daysQueried.length; i++){
-      //   if(!featuresByDay[daysQueried[i]]){
-
-      //   } else break
-      // }
-
-      // console.log('aga', featuresByDay)
 
       days = Object.assign({}, featuresByDay)
       for (id in days) {
@@ -205,7 +178,6 @@ const okavangoReducer = (
       return Object.assign({}, state, {
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
-            missingDays: Object.assign({}, expedition.missingDays, missingDays),
             days: Object.assign({}, expedition.days, days),
             features: Object.assign({}, expedition.features, features),
             featuresByTile: featuresByTile,
@@ -275,7 +247,7 @@ const expeditionReducer = (
     isFetching: false,
     boundaries: [-180, -90, 180, 90],
     start: new Date(),
-    end: new Date(),
+    end: new Date(0),
     currentDate: new Date(),
     dayCount: 0,
     days: [],
@@ -290,6 +262,85 @@ const expeditionReducer = (
   data
 ) => {
   switch (action.type) {
+    case actions.COMPLETE_DAYS:
+      var i
+      var days = Object.assign({}, state.days)
+
+      // add mock days at both ends of the expedition
+      for (i = 0; i < state.dayCount; i++) {
+        if (days[i] && !days[i].incomplete) {
+          days[-1] = Object.assign({}, days[i])
+          break
+        }
+      }
+      for (i = state.dayCount; i >= 0; i--) {
+        if (days[i] && !days[i].incomplete) {
+          days[state.dayCount] = Object.assign({}, days[i])
+          break
+        }
+      }
+
+      // detect incomplete days
+      var incompleteRange = [-1, -1]
+      var completedDays = []
+      for (i = 0; i < state.dayCount; i++) {
+        var day = days[i]
+        if (!day) {
+          incompleteRange = [-1, -1]
+        } else {
+          if (day.incomplete && days[i - 1] && !days[i - 1].incomplete) {
+            incompleteRange[0] = i
+            incompleteRange[1] = -1
+          }
+          if (day.incomplete && days[i + 1] && !days[i + 1].incomplete) {
+            incompleteRange[1] = i
+          }
+        }
+
+        // full data gap detected, filling in
+        if (incompleteRange[0] > -1 && incompleteRange[1] > -1) {
+          // look for filling values bordering the gap
+          var fillingDays = [days[+incompleteRange[0] - 1], days[+incompleteRange[1] + 1]]
+          var fillingBeacons = [
+            d3.values(fillingDays[0].beacons).slice(0).sort((a, b) => {
+              return new Date(b.properties.DateTime).getTime() - new Date(a.properties.DateTime).getTime()
+            })[0],
+            d3.values(fillingDays[1].beacons).slice(0).sort((a, b) => {
+              return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+            })[0]
+          ]
+
+          // fill in gaps
+          var l2 = Math.ceil((incompleteRange[1] - incompleteRange[0] + 1) / 2)
+          for (var j = 0; j < l2; j++) {
+            var dayIndex = [(+incompleteRange[0] + j), (+incompleteRange[1] - j)]
+            for (var k = 0; k < 2; k++) {
+              for (var l = 0; l < 2; l++) {
+                if (l === 0 || days[dayIndex[0]] !== days[dayIndex[1]]) {
+                  var id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+                  days[dayIndex[k]].beacons[id] = Object.assign({}, fillingBeacons[k])
+                  days[dayIndex[k]].beacons[id].properties = Object.assign({}, days[dayIndex[k]].beacons[id].properties, {
+                    DateTime: fillingBeacons[k].properties.DateTime.toString()
+                  })
+                  days[dayIndex[k]].incomplete = false
+                  if (completedDays.indexOf(dayIndex[k]) === -1) completedDays.push(dayIndex[k])
+                }
+              }
+            }
+          }
+          incompleteRange = [-1, -1]
+        }
+      }
+
+      // remove mock days at both ends of the expedition
+      delete days[-1]
+      delete days[state.dayCount]
+
+      console.log('fill following days:', completedDays)
+      return Object.assign({}, state, {
+        days: days
+      })
+
     case actions.UPDATE_TIME:
       return Object.assign({}, state, {
         currentDate: action.currentDate
@@ -302,7 +353,8 @@ const expeditionReducer = (
 
     case actions.RECEIVE_EXPEDITIONS:
       var dayCount = data.Days + 1
-      var start = new Date(data.StartDate)
+      // TODO time zone ???
+      var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
       var currentDate = new Date(end.getTime() - (1000 * 3600 * 24))
 
@@ -338,9 +390,10 @@ const dayReducer = (
   state = {
     isFetching: false,
     start: new Date(),
-    end: new Date(),
+    end: new Date(0),
     boundaries: [0, 0, 0, 0],
-    beacons: []
+    beacons: {},
+    incomplete: true
   },
   action,
   features
@@ -356,6 +409,8 @@ const dayReducer = (
       start = new Date()
       end = new Date(0)
       boundaries = [180, 90, -180, -90]
+
+      var incomplete = Object.keys(features).length === 0
 
       Object.keys(features).forEach((k) => {
         var f = features[k]
@@ -375,7 +430,8 @@ const dayReducer = (
         start: start,
         end: end,
         boundaries: boundaries,
-        beacons: Object.assign({}, state.features, features)
+        beacons: Object.assign({}, state.features, features),
+        incomplete: incomplete
       })
 
     default:
