@@ -31,7 +31,7 @@ class BackgroundMap extends React.Component {
       }
       var currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime(), this.state.currentDate.getTime() + dateOffset))))
 
-      if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback','pause')
+      if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback', 'pause')
 
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       if (currentDay !== this.state.currentDay) {
@@ -73,12 +73,12 @@ class BackgroundMap extends React.Component {
       this.state.day = day
       this.state.beaconIndex = beaconIndex
       this.state.timeToNextBeacon = timeToNextBeacon
-      if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause'){
+      if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
         // update app state
         updateTime(this.state.currentDate)
         // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
-      } 
-
+        console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
+      }
     }
     this.state.animate = animate
     this.state.frameCount++
@@ -87,7 +87,6 @@ class BackgroundMap extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-
     const {animate, expedition} = nextProps
     if (animate) {
       const currentDate = expedition.currentDate

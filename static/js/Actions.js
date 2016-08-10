@@ -107,7 +107,6 @@ export function fetchDay (date, initialDate) {
   if (!initialDate) initialDate = date
   return function (dispatch, getState) {
 
-
     var state = getState()
     var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
@@ -115,9 +114,13 @@ export function fetchDay (date, initialDate) {
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     var daysToFetch = []
+    console.log('asd', expedition.days, expeditionDay)
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
     if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
+
+    if (daysToFetch.length === 0) return
+
     daysToFetch.forEach(function (d, i, a) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
       a[i] = t
@@ -142,7 +145,7 @@ export function fetchDay (date, initialDate) {
           if (expedition.days[k].incomplete) incompleteDays.push(k)
         })
         if (incompleteDays.length === 0) {
-          // not sure why I need this || date
+          // not sure why I need this '|| date'
           dispatch(updateTime(initialDate || date))
           dispatch(hideLoadingWheel())
         } else {

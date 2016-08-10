@@ -317,13 +317,16 @@ const expeditionReducer = (
             for (var k = 0; k < 2; k++) {
               for (var l = 0; l < 2; l++) {
                 if (l === 0 || days[dayIndex[0]] !== days[dayIndex[1]]) {
-                  var id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-                  days[dayIndex[k]].beacons[id] = Object.assign({}, fillingBeacons[k])
-                  days[dayIndex[k]].beacons[id].properties = Object.assign({}, days[dayIndex[k]].beacons[id].properties, {
-                    DateTime: fillingBeacons[k].properties.DateTime.toString()
+                  var dayID = dayIndex[k]
+                  day = days[dayID]
+                  var date = new Date(state.start.getTime() + (1000 * 3600 * 24) * (dayID + (k === l ? 0 : 1)))
+                  var beaconID = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+                  day.beacons[beaconID] = Object.assign({}, fillingBeacons[k])
+                  day.beacons[beaconID].properties = Object.assign({}, day.beacons[beaconID].properties, {
+                    DateTime: date
                   })
-                  days[dayIndex[k]].incomplete = false
-                  if (completedDays.indexOf(dayIndex[k]) === -1) completedDays.push(dayIndex[k])
+                  day.incomplete = false
+                  if (completedDays.indexOf(dayID) === -1) completedDays.push(dayID)
                 }
               }
             }
@@ -336,7 +339,7 @@ const expeditionReducer = (
       delete days[-1]
       delete days[state.dayCount]
 
-      console.log('fill following days:', completedDays)
+      console.log('fill following days:', completedDays, days)
       return Object.assign({}, state, {
         days: days
       })
