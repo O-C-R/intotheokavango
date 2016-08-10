@@ -77,7 +77,7 @@ class BackgroundMap extends React.Component {
         // update app state
         updateTime(this.state.currentDate)
         // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
-        console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
+        // console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
       }
     }
     this.state.animate = animate
