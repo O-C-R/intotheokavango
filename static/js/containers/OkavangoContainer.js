@@ -18,14 +18,14 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchDay: (currentDate) => {
       return dispatch(actions.fetchDay(currentDate))
     },
-    updateTime: (currentDate) => {
-      dispatch(actions.updateTime(currentDate))
+    updateMap: (currentDate, coordinates, viewGeoBounds) => {
+      return dispatch(actions.updateMap(currentDate, coordinates, viewGeoBounds))
     },
     setControl: (target, mode) => {
-      dispatch(actions.setControl(target, mode))
+      return dispatch(actions.setControl(target, mode))
     },
     jumpTo: (date) => {
-      dispatch(actions.jumpTo(date))
+      return dispatch(actions.jumpTo(date))
     }
   }
 }

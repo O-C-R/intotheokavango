@@ -84,6 +84,93 @@ export function updateTime (currentDate, updateMapState, expeditionID) {
   }
 }
 
+export const UPDATE_MAP = 'UPDATE_MAP'
+
+export function updateMap (currentDate, coordinates, viewGeoBounds) {
+  return function (dispatch, getState) {
+    /*
+      get first tile
+      move x
+      move y
+      get global range
+      fetch features
+    */
+
+    // [west, north, east, south]
+
+    var state = getState()
+    var expedition = state.expeditions[state.selectedExpedition]
+    var tiles = expedition.featuresByTile
+    var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
+
+    const coordinatesToTile = (coordinates, geoBounds) => {
+      var x = Math.floor((coordinates[0] - geoBounds[0]) * 111 / 10)
+      var y = Math.floor((coordinates[1] - geoBounds[3]) * 111 / 10)
+      return {x, y}
+    }
+
+    const tileToCoordinates = (tile, geoBounds) => {
+      var lng = (tile.x * 10 / 111) + geoBounds[0]
+      var lat = (tile.y * 10 / 111) + geoBounds[3]
+      return [lng, lat]
+    }
+
+    var west = viewGeoBounds[0]
+    var north = viewGeoBounds[1]
+    var east = viewGeoBounds[2]
+    var south = viewGeoBounds[3]
+
+    var northWestTile = coordinatesToTile([west, north], expedition.geoBounds)
+    var southEastTile = Object.assign({}, northWestTile)
+    while (tileToCoordinates(southEastTile, expedition.geoBounds)[0] <= east) {
+      southEastTile.x++
+    }
+    while (tileToCoordinates(southEastTile, expedition.geoBounds)[1] >= south) {
+      southEastTile.y--
+    }
+
+    var tileRange = []
+    for (var x = northWestTile.x; x <= southEastTile.x; x++) {
+      for (var y = northWestTile.y; y >= southEastTile.y; y--) {
+        var tile = x + y * tileResolution
+        if (!tiles[tile]) tileRange.push({x, y})
+      }
+    }
+
+    var queryNorthWest = [180, -90]
+    var querySouthEast = [-180, 90]
+    tileRange.forEach((t) => {
+      var northWest = tileToCoordinates(t, expedition.geoBounds)
+      var southEast = tileToCoordinates({x: t.x + 1, y: t.y - 1}, expedition.geoBounds)
+      if (queryNorthWest[0] > northWest[0]) queryNorthWest[0] = northWest[0]
+      if (queryNorthWest[1] < northWest[1]) queryNorthWest[1] = northWest[1]
+      if (querySouthEast[0] < southEast[0]) querySouthEast[0] = southEast[0]
+      if (querySouthEast[1] > southEast[1]) querySouthEast[1] = southEast[1]
+    })
+    var queryGeoBounds = [queryNorthWest[0], queryNorthWest[1], querySouthEast[0], querySouthEast[1]]
+
+    tileRange.forEach((t, i, a) => {
+      a[i] = t.x + t.y * tileResolution
+    })
+
+    if (tileRange.length > 0) {
+      var queryString = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
+      console.log('fetch', queryString)
+
+      fetch(queryString)
+        .then(response => response.json())
+        .then(json => dispatch(receiveFeatures(state.selectedExpedition, json, tileRange)))
+    }
+
+    return dispatch({
+      type: UPDATE_MAP,
+      currentDate,
+      coordinates,
+      viewGeoBounds
+    })
+  }
+}
+
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 
 export function receiveExpeditions (data) {
@@ -219,21 +306,14 @@ export function receiveDay (expeditionID, data, dateRange) {
   }
 }
 
-export const REQUEST_FEATURES = 'REQUEST_FEATURES'
-
-export function requestFeatures () {
-  return {
-    type: REQUEST_FEATURES
-  }
-}
-
 export const RECEIVE_FEATURES = 'RECEIVE_FEATURES'
 
-export function receiveFeatures (expeditionID, data) {
+export function receiveFeatures (expeditionID, data, tileRange) {
   return {
     type: RECEIVE_FEATURES,
     expeditionID,
-    data
+    data,
+    tileRange
   }
 }
 

@@ -51,8 +51,14 @@ const okavangoReducer = (
         })
       })
 
-    case actions.REQUEST_EXPEDITIONS:
-      break
+    case actions.UPDATE_MAP:
+      expeditionID = action.expeditionID || state.selectedExpedition
+      return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
+        expeditions: Object.assign({}, state.expeditions, {
+          [expeditionID]: expeditionReducer(state.expeditions[expeditionID], action)
+        })
+      })
 
     case actions.RECEIVE_EXPEDITIONS:
       expeditions = {}
@@ -91,22 +97,16 @@ const okavangoReducer = (
       })
 
     case actions.RECEIVE_DAY:
-      /*
-        assess incomplete days
-        fill missing days
-        jump reload
-        map
-      */
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
 
-      // list expected received days
+      // initialize feature buckets
+      var featuresByDay = {}
       var dateRange = action.dateRange.map((d) => {
         return Math.floor((new Date(d).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       })
-      var daysQueried = []
-      for (var i = dateRange[0]; i < dateRange[1]; i++) {
-        daysQueried.push(i)
+      for (var i = dateRange[0]; i <= dateRange[1]; i++) {
+        featuresByDay[i] = {}
       }
 
       // initialize features
@@ -117,26 +117,11 @@ const okavangoReducer = (
       })
 
       // sort features by tile and time buckets
-      var featuresByTile = {}
-      var featuresByDay = {}
-
-      daysQueried.forEach((d) => {
-        featuresByDay[d] = {}
-      })
-
       Object.keys(features).forEach((id) => {
         var feature = features[id]
-
-        var tile = Math.floor(feature.geometry.coordinates[1] * 10) * Math.floor((expedition.boundaries[2] - expedition.boundaries[0]) * 10) + Math.floor(feature.geometry.coordinates[0] * 10)
-
         var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (!featuresByTile[tile]) featuresByTile[tile] = {}
         if (!featuresByDay[day]) featuresByDay[day] = {}
-        featuresByTile[tile][id] = feature
         featuresByDay[day][id] = feature
-      })
-      Object.keys(featuresByTile).forEach((t) => {
-        featuresByTile[t] = Object.assign({}, expedition.featuresByTile[t], featuresByTile[t])
       })
 
       Object.keys(featuresByDay).forEach((d) => {
@@ -176,7 +161,6 @@ const okavangoReducer = (
       })
 
       featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
-      featuresByTile = Object.assign({}, expedition.featuresByTile, featuresByTile)
 
       days = Object.assign({}, featuresByDay)
       for (id in days) {
@@ -189,18 +173,20 @@ const okavangoReducer = (
           [expeditionID]: Object.assign({}, expedition, {
             days: Object.assign({}, expedition.days, days),
             features: Object.assign({}, expedition.features, features),
-            featuresByTile: featuresByTile,
             featuresByDay: featuresByDay
           })
         })
       })
 
-    case actions.REQUEST_FEATURES:
-      break
-
     case actions.RECEIVE_FEATURES:
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
+
+      var tileRange = action.tileRange
+      var featuresByTile = {}
+      tileRange.forEach((t, i) => {
+        featuresByTile[t] = {}
+      })
 
       features = {}
       action.data.results.features.forEach((f) => {
@@ -208,22 +194,18 @@ const okavangoReducer = (
         features[id] = featureReducer(expedition.features[id], action, f)
       })
 
-      tiles = {}
-      days = {}
+      // if (action.data.results.features && action.data.results.features.length > 0) {
+      //   console.log('YES', action.data.results.features)
+      // }
+
       Object.keys(features).forEach((id) => {
         var feature = features[id]
-        var tile = Math.floor(feature.geometry.coordinates[1] * 10) * Math.floor((expedition.boundaries[2] - expedition.boundaries[0]) * 10) + Math.floor(feature.geometry.coordinates[0] * 10)
-        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (!tiles[tile]) tiles[tile] = {}
-        if (!days[day]) days[day] = {}
-        tiles[tile][id] = feature
-        days[day][id] = feature
+        var tile = Math.floor(feature.geometry.coordinates[1] * 10) * Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 10) + Math.floor(feature.geometry.coordinates[0] * 10)
+        if (!featuresByTile[tile]) featuresByTile[tile] = {}
+        featuresByTile[tile][id] = feature
       })
-      Object.keys(tiles).forEach((k) => {
-        tiles[k] = Object.assign({}, expedition.featuresByTile[k], tiles[k])
-      })
-      Object.keys(days).forEach((k) => {
-        days[k] = Object.assign({}, expedition.featuresByDay[k], days[k])
+      Object.keys(featuresByTile).forEach((k) => {
+        featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
 
       return Object.assign({}, state, {
@@ -231,8 +213,7 @@ const okavangoReducer = (
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             features: Object.assign({}, expedition.features, features),
-            featuresByTile: Object.assign({}, expedition.featuresByTile, tiles),
-            featuresByDay: Object.assign({}, expedition.featuresByDay, days)
+            featuresByTile: Object.assign({}, expedition.featuresByTile, featuresByTile)
           })
         })
       })
@@ -255,7 +236,8 @@ const expeditionReducer = (
     playback: 'forward',
     zoom: 10,
     isFetching: false,
-    boundaries: [-180, -90, 180, 90],
+    geoBounds: [-8, -21.5, 25.5, 12],
+    tileSize: 10,
     start: new Date(),
     end: new Date(0),
     currentDate: new Date(),
@@ -266,7 +248,7 @@ const expeditionReducer = (
     featuresByDay: {},
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
-    missingDays: {}
+    coordinates: [0, 0]
   },
   action,
   data
@@ -359,21 +341,25 @@ const expeditionReducer = (
         currentDate: action.currentDate
       })
 
-    // 86400
-    // expeditionDay 1 : startDate => startDate + 1
-    // expeditionDay 34 : startDate => startDate + 34
-    // end 35
+    case actions.UPDATE_MAP:
+      return Object.assign({}, state, {
+        currentDate: action.currentDate,
+        coordinates: action.coordinates
+      })
 
     case actions.RECEIVE_EXPEDITIONS:
       var dayCount = data.Days + 1
-      // TODO time zone ???
       var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
       var currentDate = new Date(end.getTime() - (1000 * 3600 * 24))
 
       var name = data.Name
 
-      var boundaries = [-180, -90, 180, 90]
+      // 111 km per latitude degree
+      // ~ 10km per screen at zoom level 14
+      // [west, north, east, south]
+      var geoBounds = data.GeoBounds
+      // var geoBoundsDistance = [(geoBounds[2] - geoBounds[0]) * 111, (geoBounds[3] - geoBounds[1]) * 111]
 
       return Object.assign({}, state, {
         name: name,
@@ -381,7 +367,7 @@ const expeditionReducer = (
         currentDate: currentDate,
         end: end,
         dayCount: dayCount,
-        boundaries: boundaries
+        geoBounds: geoBounds
       })
 
     case actions.SET_CONTROL:
@@ -404,24 +390,17 @@ const dayReducer = (
     isFetching: false,
     start: new Date(),
     end: new Date(0),
-    boundaries: [0, 0, 0, 0],
     beacons: {},
     incomplete: true
   },
   action,
   features
 ) => {
-  var start, end, boundaries
+  var start, end
   switch (action.type) {
-    // case actions.REQUEST_DAY:
-    //   return Object.assign({}, state, {
-    //     isFetching: true
-    //   })
-
     case actions.RECEIVE_DAY:
       start = new Date()
       end = new Date(0)
-      boundaries = [180, 90, -180, -90]
 
       var incomplete = Object.keys(features).length === 0
 
@@ -430,19 +409,12 @@ const dayReducer = (
         var d = new Date(f.properties.DateTime)
         if (d.getTime() < start.getTime()) start = d
         if (d.getTime() > end.getTime()) end = d
-
-        var l = f.geometry.coordinates
-        if (l[0] < boundaries[0]) boundaries[0] = l[0]
-        if (l[0] > boundaries[2]) boundaries[2] = l[0]
-        if (l[1] < boundaries[1]) boundaries[1] = l[1]
-        if (l[1] > boundaries[3]) boundaries[3] = l[1]
       })
 
       return Object.assign({}, state, {
         isFetching: false,
         start: start,
         end: end,
-        boundaries: boundaries,
         beacons: Object.assign({}, state.features, features),
         incomplete: incomplete
       })

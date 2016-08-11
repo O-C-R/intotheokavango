@@ -3,6 +3,8 @@ import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import * as utils from '../utils'
+import MapStateOverlay from './MapStateOverlay'
+import ViewportMercator from 'viewport-mercator-project'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -15,7 +17,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick () {
-    const {animate, expedition, fetchDay, updateTime, setControl, isFetching} = this.props
+    const {animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
     if (animate && !isFetching) {
       // increment time
@@ -99,8 +101,20 @@ class BackgroundMap extends React.Component {
         // console.log(currentBeacon.id, nextBeacon.id)
       }
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
+
+        const { unproject } = ViewportMercator({
+          longitude: this.state.coordinates[0],
+          latitude: this.state.coordinates[1],
+          width: window.innerWidth,
+          height: window.innerHeight,
+          zoom: 14
+        })
+        const nw = unproject([0, 0])
+        const se = unproject([window.innerWidth, window.innerHeight])
+        const viewGeoBounds = [nw[0], nw[1], se[0], se[1]]
+        updateMap(this.state.currentDate, this.state.coordinates, viewGeoBounds)
+
         // update app state
-        updateTime(this.state.currentDate)
         // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
         // console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
         // console.log(this.state.coordinates)
@@ -136,7 +150,6 @@ class BackgroundMap extends React.Component {
   }
 
   render () {
-    const {animate, expedition} = this.props
     const {coordinates} = this.state
 
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
@@ -147,10 +160,11 @@ class BackgroundMap extends React.Component {
         <MapGL
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          width={window.innerWidth} height={window.innerHeight} longitude={this.state.coordinates[0]} latitude={this.state.coordinates[1]}
-          zoom={10} onChangeViewport={(viewport) => {
-            const {latitude, longitude, zoom} = viewport
-          }}
+          width={window.innerWidth}
+          height={window.innerHeight}
+          longitude={coordinates[0]}
+          latitude={coordinates[1]}
+          zoom={14}
         />
       </div>
     )
@@ -160,7 +174,7 @@ class BackgroundMap extends React.Component {
 BackgroundMap.propTypes = {
   animate: PropTypes.bool.isRequired,
   expedition: PropTypes.object,
-  updateTime: PropTypes.func.isRequired,
+  updateMap: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired

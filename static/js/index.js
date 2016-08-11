@@ -5,7 +5,7 @@
   - add yellow line to timeline to indicate areas already played
 
   DOING:
-*/
+grunt browserify*/
 
 import 'babel-polyfill'
 
