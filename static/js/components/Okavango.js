@@ -37,5 +37,5 @@ Okavango.propTypes = {
   setControl: PropTypes.func.isRequired,
   jumpTo: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
-  mapStateNeedsUpdate: PropTypes.func.isRequired
+  mapStateNeedsUpdate: PropTypes.bool.isRequired
 }

@@ -76,14 +76,14 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = 0
       }
 
-      var currentBeacon = beacons[beaconIndex + (forward ? 0 : 1)]
-      var nextBeacon = beacons[beaconIndex + (forward ? 1 : 0)]
+      var currentBeacon = beacons[beaconIndex + (forward ? 0 : 0)]
+      var nextBeacon = beacons[beaconIndex + (forward ? 1 : -1)]
       var coordinates = [
         utils.lerp(currentBeacon.geometry.coordinates[0], nextBeacon.geometry.coordinates[0], ratioBetweenBeacons),
         utils.lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
       ]
 
-      // if(expedition.playback !== 'pause') console.log(currentDate)
+      // if (this.state.frameCount % 30 === 0) console.log(currentBeacon.id, nextBeacon.id)
 
       this.setState({
         currentDate: currentDate,
@@ -189,7 +189,7 @@ BackgroundMap.propTypes = {
   updateTime: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
-  mapStateNeedsUpdate: PropTypes.func.isRequired
+  mapStateNeedsUpdate: PropTypes.bool.isRequired
 }
 
 export default BackgroundMap

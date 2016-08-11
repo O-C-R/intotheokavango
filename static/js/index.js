@@ -5,7 +5,6 @@
   - add yellow line to timeline to indicate areas already played
 
   DOING: 
-  - fixing inconsistencies between playback modes
   - fix expedition swap
 */
 
