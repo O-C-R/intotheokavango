@@ -206,6 +206,13 @@ handlers = [
     (r"/upload/?([^/]*)", Upload),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
+
+    (r"/map/?([^/]*)", Home),
+    (r"/journal/?([^/]*)", Home),
+    (r"/data/?([^/]*)", Home),
+    (r"/about/?([^/]*)", Home),
+    (r"/share/?([^/]*)", Home),
+    
     (r"/?([^/]*)", Home),    
 ]    
 
