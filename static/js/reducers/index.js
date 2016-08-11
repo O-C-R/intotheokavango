@@ -45,7 +45,7 @@ const okavangoReducer = (
     case actions.UPDATE_TIME:
       expeditionID = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
-        mapStateNeedsUpdate: false,
+        mapStateNeedsUpdate: action.updateMapState,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: expeditionReducer(state.expeditions[expeditionID], action)
         })

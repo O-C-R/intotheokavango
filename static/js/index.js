@@ -4,7 +4,7 @@
   - add timeline graph
   - add yellow line to timeline to indicate areas already played
 
-  DOING: 
+  DOING:
   - fix expedition swap
 */
 
@@ -33,7 +33,7 @@ let store = createStore(
   okavangoApp,
   applyMiddleware(
     thunkMiddleware,
-    // loggerMiddleware
+    loggerMiddleware
   )
 )
 

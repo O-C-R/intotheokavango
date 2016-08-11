@@ -19,9 +19,10 @@ const Timeline = ({expedition, jumpTo}) => {
   }
 
   var range = [0 + padding[1], height - padding[1]]
+  var domain = [0, dayCount - 1]
 
   const scaleDays = d3.scaleLinear()
-    .domain([0, dayCount - 1])
+    .domain(domain)
     .range(range)
 
   const scaleTime = d3.scaleLinear()
@@ -42,7 +43,7 @@ const Timeline = ({expedition, jumpTo}) => {
 
   const onClick = (e) => {
     var y = e.nativeEvent.offsetY
-    jumpTo(new Date(scaleTime.invert(y)))
+    jumpTo(new Date(scaleTime.invert(Math.max(range[0] + 1, Math.min(range[1] - 1, y)))))
   }
 
   return (
