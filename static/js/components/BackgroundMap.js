@@ -22,7 +22,7 @@ class BackgroundMap extends React.Component {
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
       if (this.state.beaconIndex === (forward ? 0 : 1) || this.state.beaconIndex === (forward ? d3.values(this.state.day.beacons).length - 2 : d3.values(this.state.day.beacons).length - 1)) {
-        var offset = this.state.timeToNextBeacon > 0 ? Math.min(100000, this.state.timeToNextBeacon) : 100000
+        var offset = this.state.timeToNextBeacon > 0 ? Math.min(100000, this.state.timeToNextBeacon + 1) : 100000
         if (expedition.playback === 'fastBackward' || expedition.playback === 'backward') dateOffset = -1 * offset
         if (expedition.playback === 'forward' || expedition.playback === 'fastForward') dateOffset = offset
       } else {
@@ -36,6 +36,7 @@ class BackgroundMap extends React.Component {
       if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback', 'pause')
 
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+      console.log(currentDay)
       if (currentDay !== this.state.currentDay) {
         // new day
         fetchDay(currentDate)
