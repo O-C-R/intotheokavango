@@ -36,7 +36,6 @@ class BackgroundMap extends React.Component {
       if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() + 1 && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback', 'pause')
 
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-      console.log(currentDay)
       if (currentDay !== this.state.currentDay) {
         // new day
         fetchDay(currentDate)
@@ -119,38 +118,12 @@ class BackgroundMap extends React.Component {
       const currentDate = expedition.currentDate
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
       const currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-      // console.log(expedition.days, currentDay)
       const day = expedition.days[currentDay]
-      var beacons = d3.values(day.beacons).sort((a, b) => {
-        return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
-      })
-      const beaconCount = beacons.length
-      var i = -1
-      var beaconIndex
-
-      if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
-        for (i = 0; i < beaconCount - 1; i++) {
-          if (currentDate.getTime() >= new Date(beacons[i].properties.DateTime).getTime() && currentDate.getTime() < new Date(beacons[i + 1].properties.DateTime).getTime()) {
-            beaconIndex = i
-            break
-          }
-        }
-        if (beaconIndex < 0) beaconIndex = beaconCount - 1
-      } else {
-        for (i = beaconCount - 1; i >= 0; i--) {
-          if (currentDate.getTime() <= new Date(beacons[i].properties.DateTime).getTime() && currentDate.getTime() > new Date(beacons[i - 1].properties.DateTime).getTime()) {
-            beaconIndex = i
-            break
-          }
-        }
-        if (beaconIndex < 0) beaconIndex = 0
-      }
 
       if (mapStateNeedsUpdate) {
         this.state.currentDate = currentDate
         this.state.currentDay = currentDay
         this.state.day = day
-        this.state.beaconIndex = beaconIndex
         this.state.frameCount = 0
       }
 

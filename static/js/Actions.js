@@ -75,11 +75,12 @@ export function requestExpeditions () {
 
 export const UPDATE_TIME = 'UPDATE_TIME'
 
-export function updateTime (currentDate, updateMapState) {
+export function updateTime (currentDate, updateMapState, expeditionID) {
   return {
     type: UPDATE_TIME,
     currentDate,
-    updateMapState
+    updateMapState,
+    expeditionID
   }
 }
 
@@ -100,16 +101,24 @@ export function fetchExpeditions () {
       .then(json => dispatch(receiveExpeditions(json)))
       .then(() => dispatch(fetchDay()))
       .then(() => dispatch(startAnimation()))
+      .then(() => {
+        var state = getState()
+        Object.keys(state.expeditions).forEach((id) => {
+          if (id !== state.selectedExpedition) {
+            dispatch(fetchDay(null, null, id))
+          }
+        })
+      })
       // .then(() => dispatch(fetchSightingSummary()))
       // TODO catch errors
   }
 }
 
-export function fetchDay (date, initialDate) {
+export function fetchDay (date, initialDate, id) {
   if (!initialDate) initialDate = date
   return function (dispatch, getState) {
     var state = getState()
-    var expeditionID = state.selectedExpedition
+    var expeditionID = id || state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
     if (!date) date = expedition.currentDate
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
@@ -146,7 +155,7 @@ export function fetchDay (date, initialDate) {
         })
         if (incompleteDays.length === 0) {
           // not sure why I need this '|| date'
-          dispatch(updateTime(initialDate || date))
+          dispatch(updateTime(initialDate || date, false, expeditionID))
           dispatch(hideLoadingWheel())
         } else {
           console.log('incomplete days', incompleteDays)
@@ -163,7 +172,7 @@ export function fetchDay (date, initialDate) {
           }
           if (nextTarget > -1) {
             nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
-            dispatch(fetchDay(nextTarget, initialDate))
+            dispatch(fetchDay(nextTarget, initialDate, expeditionID))
           }
         }
       })

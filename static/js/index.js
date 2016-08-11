@@ -5,7 +5,6 @@
   - add yellow line to timeline to indicate areas already played
 
   DOING:
-  - fix expedition swap
 */
 
 import 'babel-polyfill'
@@ -33,7 +32,7 @@ let store = createStore(
   okavangoApp,
   applyMiddleware(
     thunkMiddleware,
-    loggerMiddleware
+    // loggerMiddleware
   )
 )
 
