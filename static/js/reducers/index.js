@@ -4,6 +4,7 @@ import * as d3 from 'd3'
 
 const okavangoReducer = (
   state = {
+    mapStateNeedsUpdate: false,
     animate: false,
     isFetching: false,
     selectedExpedition: null,
@@ -17,6 +18,7 @@ const okavangoReducer = (
     case actions.COMPLETE_DAYS:
       id = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [id]: expeditionReducer(state.expeditions[id], action)
         })
@@ -24,22 +26,26 @@ const okavangoReducer = (
 
     case actions.SHOW_LOADING_WHEEL:
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         isFetching: true
       })
 
     case actions.HIDE_LOADING_WHEEL:
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: true,
         isFetching: false
       })
 
     case actions.START:
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: true,
         animate: true
       })
 
     case actions.UPDATE_TIME:
       expeditionID = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: expeditionReducer(state.expeditions[expeditionID], action)
         })
@@ -70,6 +76,7 @@ const okavangoReducer = (
     case actions.SET_EXPEDITION:
       var selectedExpedition = action.id
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: true,
         selectedExpedition: selectedExpedition
       })
 
@@ -79,6 +86,7 @@ const okavangoReducer = (
         [id]: expeditionReducer(state.expeditions[id], action)
       }
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, expeditions)
       })
 
@@ -176,6 +184,7 @@ const okavangoReducer = (
       }
 
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             days: Object.assign({}, expedition.days, days),
@@ -218,6 +227,7 @@ const okavangoReducer = (
       })
 
       return Object.assign({}, state, {
+        mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             features: Object.assign({}, expedition.features, features),

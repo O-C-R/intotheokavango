@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => {
     expedition: state.expeditions[state.selectedExpedition],
     children: ownProps.children,
     animate: state.animate,
-    isFetching: state.isFetching
+    isFetching: state.isFetching,
+    mapStateNeedsUpdate: state.mapStateNeedsUpdate
   }
 }
 

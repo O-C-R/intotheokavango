@@ -1,9 +1,7 @@
 import React, { PropTypes } from 'react'
 import MapGL from 'react-map-gl'
-import I from 'immutable'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
-import ReactStateAnimation from 'react-state-animation'
 import * as utils from '../utils'
 
 class BackgroundMap extends React.Component {
@@ -18,6 +16,7 @@ class BackgroundMap extends React.Component {
   @autobind
   tick () {
     const {animate, expedition, fetchDay, updateTime, setControl, isFetching} = this.props
+    var b1, b2
     if (animate && !isFetching) {
       // increment time
       var dateOffset = 0
@@ -53,8 +52,8 @@ class BackgroundMap extends React.Component {
       var ratioBetweenBeacons = 0
       if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
         for (var i = 0; i < beaconCount - 1; i++) {
-          var b1 = new Date(beacons[i].properties.DateTime).getTime()
-          var b2 = new Date(beacons[i + 1].properties.DateTime).getTime()
+          b1 = new Date(beacons[i].properties.DateTime).getTime()
+          b2 = new Date(beacons[i + 1].properties.DateTime).getTime()
           if (currentDate.getTime() >= b1 && currentDate.getTime() < b2) {
             beaconIndex = i
             timeToNextBeacon = b2 - currentDate.getTime()
@@ -65,8 +64,8 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = beaconCount - 1
       } else {
         for (i = beaconCount - 1; i > 0; i--) {
-          var b1 = new Date(beacons[i].properties.DateTime).getTime()
-          var b2 = new Date(beacons[i - 1].properties.DateTime).getTime()
+          b1 = new Date(beacons[i].properties.DateTime).getTime()
+          b2 = new Date(beacons[i - 1].properties.DateTime).getTime()
           if (currentDate.getTime() <= b1 && currentDate.getTime() > b2) {
             beaconIndex = i
             timeToNextBeacon = currentDate.getTime() - b2
@@ -84,14 +83,7 @@ class BackgroundMap extends React.Component {
         utils.lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
       ]
 
-      // this.state.animate = animate
-      // this.state.currentDate = currentDate
-      // this.state.currentDay = currentDay
-      // this.state.day = day
-      // this.state.beaconIndex = beaconIndex
-      // this.state.timeToNextBeacon = timeToNextBeacon
-      // this.state.coordinates = coordinates
-      // this.render()
+      // if(expedition.playback !== 'pause') console.log(currentDate)
 
       this.setState({
         currentDate: currentDate,
@@ -104,7 +96,7 @@ class BackgroundMap extends React.Component {
       })
 
       if (this.state.frameCount % 10 === 0 && expedition.playback !== 'pause') {
-        // console.log(this.state.coordinates)
+        // console.log(currentBeacon.id, nextBeacon.id)
       }
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
         // update app state
@@ -121,7 +113,7 @@ class BackgroundMap extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const {animate, expedition} = nextProps
+    const {animate, expedition, mapStateNeedsUpdate} = nextProps
     if (animate) {
       const currentDate = expedition.currentDate
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
@@ -153,11 +145,14 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = 0
       }
 
-      this.state.currentDate = currentDate
-      this.state.currentDay = currentDay
-      this.state.day = day
-      this.state.beaconIndex = beaconIndex
-      this.state.frameCount = 0
+      if (mapStateNeedsUpdate) {
+        this.state.currentDate = currentDate
+        this.state.currentDay = currentDay
+        this.state.day = day
+        this.state.beaconIndex = beaconIndex
+        this.state.frameCount = 0
+      }
+
       if (!this.state.animate) {
         this.state.animate = animate
         console.log('starting animation')
@@ -179,7 +174,7 @@ class BackgroundMap extends React.Component {
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
           width={window.innerWidth} height={window.innerHeight} longitude={this.state.coordinates[0]} latitude={this.state.coordinates[1]}
-          zoom={14} onChangeViewport={(viewport) => {
+          zoom={10} onChangeViewport={(viewport) => {
             const {latitude, longitude, zoom} = viewport
           }}
         />
@@ -193,7 +188,8 @@ BackgroundMap.propTypes = {
   expedition: PropTypes.object,
   updateTime: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
-  setControl: PropTypes.func.isRequired
+  setControl: PropTypes.func.isRequired,
+  mapStateNeedsUpdate: PropTypes.func.isRequired
 }
 
 export default BackgroundMap

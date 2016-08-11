@@ -1,8 +1,12 @@
 /*
-  TODO:
+  WILL DO:
   - sync time zones
   - add timeline graph
   - add yellow line to timeline to indicate areas already played
+
+  DOING: 
+  - fixing inconsistencies between playback modes
+  - fix expedition swap
 */
 
 import 'babel-polyfill'
@@ -30,7 +34,7 @@ let store = createStore(
   okavangoApp,
   applyMiddleware(
     thunkMiddleware,
-    loggerMiddleware
+    // loggerMiddleware
   )
 )
 
