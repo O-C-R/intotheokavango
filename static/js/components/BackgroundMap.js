@@ -3,6 +3,8 @@ import MapGL from 'react-map-gl'
 import I from 'immutable'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
+import ReactStateAnimation from 'react-state-animation'
+import * as utils from '../utils'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -48,20 +50,27 @@ class BackgroundMap extends React.Component {
       var beaconCount = beacons.length
       var beaconIndex
       var timeToNextBeacon = 0
+      var ratioBetweenBeacons = 0
       if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
         for (var i = 0; i < beaconCount - 1; i++) {
-          if (currentDate.getTime() >= new Date(beacons[i].properties.DateTime).getTime() && currentDate.getTime() < new Date(beacons[i + 1].properties.DateTime).getTime()) {
+          var b1 = new Date(beacons[i].properties.DateTime).getTime()
+          var b2 = new Date(beacons[i + 1].properties.DateTime).getTime()
+          if (currentDate.getTime() >= b1 && currentDate.getTime() < b2) {
             beaconIndex = i
-            timeToNextBeacon = new Date(beacons[i + 1].properties.DateTime).getTime() - currentDate.getTime()
+            timeToNextBeacon = b2 - currentDate.getTime()
+            ratioBetweenBeacons = (currentDate.getTime() - b1) / (b2 - b1)
             break
           }
         }
         if (beaconIndex < 0) beaconIndex = beaconCount - 1
       } else {
         for (i = beaconCount - 1; i > 0; i--) {
-          if (currentDate.getTime() <= new Date(beacons[i].properties.DateTime).getTime() && currentDate.getTime() > new Date(beacons[i - 1].properties.DateTime).getTime()) {
+          var b1 = new Date(beacons[i].properties.DateTime).getTime()
+          var b2 = new Date(beacons[i - 1].properties.DateTime).getTime()
+          if (currentDate.getTime() <= b1 && currentDate.getTime() > b2) {
             beaconIndex = i
-            timeToNextBeacon = currentDate.getTime() - new Date(beacons[i - 1].properties.DateTime).getTime()
+            timeToNextBeacon = currentDate.getTime() - b2
+            ratioBetweenBeacons = (currentDate.getTime() - b1) / (b2 - b1)
             break
           }
         }
@@ -70,22 +79,39 @@ class BackgroundMap extends React.Component {
 
       var currentBeacon = beacons[beaconIndex + (forward ? 0 : 1)]
       var nextBeacon = beacons[beaconIndex + (forward ? 1 : 0)]
-      var coordinates = [(currentBeacon.geometry.coordinates[0] + nextBeacon.geometry.coordinates[0]) / 2,
-                      (currentBeacon.geometry.coordinates[1] + nextBeacon.geometry.coordinates[1]) / 2]
+      var coordinates = [
+        utils.lerp(currentBeacon.geometry.coordinates[0], nextBeacon.geometry.coordinates[0], ratioBetweenBeacons),
+        utils.lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
+      ]
 
-      this.state.animate = animate
-      this.state.currentDate = currentDate
-      this.state.currentDay = currentDay
-      this.state.day = day
-      this.state.beaconIndex = beaconIndex
-      this.state.timeToNextBeacon = timeToNextBeacon
-      this.state.coordinates = coordinates
+      // this.state.animate = animate
+      // this.state.currentDate = currentDate
+      // this.state.currentDay = currentDay
+      // this.state.day = day
+      // this.state.beaconIndex = beaconIndex
+      // this.state.timeToNextBeacon = timeToNextBeacon
+      // this.state.coordinates = coordinates
+      // this.render()
+
+      this.setState({
+        currentDate: currentDate,
+        coordinates: coordinates,
+        animate: animate,
+        currentDay: currentDay,
+        day: day,
+        beaconIndex: beaconIndex,
+        timeToNextBeacon: timeToNextBeacon
+      })
+
+      if (this.state.frameCount % 10 === 0 && expedition.playback !== 'pause') {
+        // console.log(this.state.coordinates)
+      }
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
         // update app state
         updateTime(this.state.currentDate)
         // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
         // console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
-        console.log(this.state.coordinates)
+        // console.log(this.state.coordinates)
       }
     }
     this.state.animate = animate
@@ -152,8 +178,8 @@ class BackgroundMap extends React.Component {
         <MapGL
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          width={window.innerWidth} height={window.innerHeight} longitude={coordinates[0]} latitude={coordinates[1]}
-          zoom={8} onChangeViewport={(viewport) => {
+          width={window.innerWidth} height={window.innerHeight} longitude={this.state.coordinates[0]} latitude={this.state.coordinates[1]}
+          zoom={14} onChangeViewport={(viewport) => {
             const {latitude, longitude, zoom} = viewport
           }}
         />

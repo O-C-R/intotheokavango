@@ -23,3 +23,7 @@ export function dateToString (d) {
 
   return monthString + ' ' + day + ', ' + hour + ':' + minute
 }
+
+export function lerp (start, end, ratio) {
+  return start + (end - start) * ratio
+}

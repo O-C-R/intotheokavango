@@ -30,7 +30,7 @@ let store = createStore(
   okavangoApp,
   applyMiddleware(
     thunkMiddleware,
-    // loggerMiddleware
+    loggerMiddleware
   )
 )
 
