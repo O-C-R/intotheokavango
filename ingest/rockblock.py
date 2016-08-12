@@ -12,15 +12,16 @@ def parse(request):
         log.error(log.exc(e))
         return None, "Parsing error"
 
-    try:
+    labels = ['t_utc', 'v1', 'v2', 'v3']
+    values = data.split(",")
+    feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
+    for l, label in enumerate(labels):
+        try:
+            feature[label] = strings.as_numeric(values[l])
+        except IndexError:
+            log.error("Missing value for %s" % label)
+    log.debug(feature)
 
-        log.debug(data)
-        feature = {}
 
-    except Exception as e:
-        log.error(log.exc(e))
-        return None, "Unexpected fields"
-
-
-    return feature
+    return True
 
