@@ -5,6 +5,7 @@ import * as d3 from 'd3'
 import * as utils from '../utils'
 import MapStateOverlay from './MapStateOverlay'
 import ViewportMercator from 'viewport-mercator-project'
+import { DeckGLOverlay, ScatterplotLayer } from 'deck.gl'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -165,7 +166,33 @@ class BackgroundMap extends React.Component {
           longitude={coordinates[0]}
           latitude={coordinates[1]}
           zoom={14}
-        />
+        >
+          <DeckGLOverlay
+            width={window.innerWidth}
+            height={window.innerHeight}
+            longitude={coordinates[0]}
+            latitude={coordinates[1]}
+            zoom={14}
+            layers={[
+              new ScatterplotLayer({
+                id: 'sightings',
+                width: window.innerWidth,
+                height: window.innerHeight,
+                latitude: coordinates[1],
+                longitude: coordinates[0],
+                zoom: 14,
+                data: [
+                  {position:{x:coordinates[0],y:coordinates[1],z:0}, color:[255,0,0]}
+                ],
+                radius: 20
+                // isPickable: true,
+                // onHover: this._handleScatterplotHovered,
+                // onClick: this._handleScatterplotClicked
+              })
+            ]}
+            onAfterRender={(aga) => {console.log('aga', aga)}}
+          />
+        </MapGL>
       </div>
     )
   }

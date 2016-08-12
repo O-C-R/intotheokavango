@@ -194,9 +194,9 @@ const okavangoReducer = (
         features[id] = featureReducer(expedition.features[id], action, f)
       })
 
-      // if (action.data.results.features && action.data.results.features.length > 0) {
-      //   console.log('YES', action.data.results.features)
-      // }
+      if (action.data.results.features && action.data.results.features.length > 0) {
+        console.log('YES', features)
+      }
 
       Object.keys(features).forEach((id) => {
         var feature = features[id]
