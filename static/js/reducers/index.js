@@ -463,8 +463,8 @@ const featureReducer = (
       return Object.assign({}, state, feature)
     case actions.RECEIVE_FEATURES:
       feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
-      if(feature.properties.FeatureType === 'sighting'){
-        feature.properties.radius = 2 + (Math.sqrt(feature.properties.Count) * 2
+      if(feature.properties.FeatureType === 'sighting') {
+        feature.properties.radius = 2 + Math.sqrt(feature.properties.Count) * 2
         // var bn = feature.properties.SpeciesName;
         // if (colorMap[bn] == undefined) {
         //   var c = new RColor().get(true);
