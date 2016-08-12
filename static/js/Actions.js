@@ -88,16 +88,6 @@ export const UPDATE_MAP = 'UPDATE_MAP'
 
 export function updateMap (currentDate, coordinates, viewGeoBounds) {
   return function (dispatch, getState) {
-    /*
-      get first tile
-      move x
-      move y
-      get global range
-      fetch features
-    */
-
-    // [west, north, east, south]
-
     var state = getState()
     var expedition = state.expeditions[state.selectedExpedition]
     var tiles = expedition.featuresByTile
@@ -130,10 +120,12 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
     }
 
     var tileRange = []
+    var tilesInView = []
     for (var x = northWestTile.x; x <= southEastTile.x; x++) {
       for (var y = northWestTile.y; y >= southEastTile.y; y--) {
         var tile = x + y * tileResolution
         if (!tiles[tile]) tileRange.push({x, y})
+        tilesInView.push(x + y * tileResolution)
       }
     }
 
@@ -166,7 +158,8 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
       type: UPDATE_MAP,
       currentDate,
       coordinates,
-      viewGeoBounds
+      viewGeoBounds,
+      tilesInView
     })
   }
 }
@@ -225,7 +218,7 @@ export function fetchDay (date, initialDate, id) {
       timestampToString(d3.min(daysToFetch)),
       timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
     ]
-    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
+    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&limit=0&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
     console.log('querystring:', queryString, expeditionDay)
 
     return fetch(queryString)

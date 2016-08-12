@@ -54,7 +54,7 @@ const okavangoReducer = (
     case actions.UPDATE_MAP:
       expeditionID = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
-        mapStateNeedsUpdate: false,
+        mapStateNeedsUpdate: true,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: expeditionReducer(state.expeditions[expeditionID], action)
         })
@@ -194,19 +194,27 @@ const okavangoReducer = (
         features[id] = featureReducer(expedition.features[id], action, f)
       })
 
-      if (action.data.results.features && action.data.results.features.length > 0) {
-        console.log('YES', features)
+      var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
+      const coordinatesToTile = (coordinates, geoBounds) => {
+        var x = Math.floor((coordinates[0] - geoBounds[0]) * 111 / 10)
+        var y = Math.floor((coordinates[1] - geoBounds[3]) * 111 / 10)
+        return {x, y}
       }
 
       Object.keys(features).forEach((id) => {
         var feature = features[id]
-        var tile = Math.floor(feature.geometry.coordinates[1] * 10) * Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 10) + Math.floor(feature.geometry.coordinates[0] * 10)
+        var tileCoordinates = coordinatesToTile(feature.geometry.coordinates, expedition.geoBounds)
+        var tile = tileCoordinates.x + tileCoordinates.y * tileResolution
         if (!featuresByTile[tile]) featuresByTile[tile] = {}
         featuresByTile[tile][id] = feature
       })
       Object.keys(featuresByTile).forEach((k) => {
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
+
+      if (action.data.results.features && action.data.results.features.length > 0) {
+        console.log('YES', featuresByTile)
+      }
 
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
@@ -248,7 +256,8 @@ const expeditionReducer = (
     featuresByDay: {},
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
-    coordinates: [0, 0]
+    coordinates: [0, 0],
+    currentFeatures: []
   },
   action,
   data
@@ -342,7 +351,24 @@ const expeditionReducer = (
       })
 
     case actions.UPDATE_MAP:
+      var currentFeatures = []
+      action.tilesInView.forEach((t) => {
+        var tileFeatures = d3.values(state.featuresByTile[t]).map((f) => {
+          return {
+            position: {
+              x: f.geometry.coordinates[0] + f.properties.scatter[0],
+              y: f.geometry.coordinates[1] + f.properties.scatter[1],
+              z: 0
+            },
+            radius: f.properties.radius,
+            color: [255, 0, 0]
+          }
+        })
+        currentFeatures = currentFeatures.concat(tileFeatures)
+      })
+
       return Object.assign({}, state, {
+        currentFeatures: currentFeatures,
         currentDate: action.currentDate,
         coordinates: action.coordinates
       })
@@ -433,8 +459,22 @@ const featureReducer = (
 ) => {
   switch (action.type) {
     case actions.RECEIVE_DAY:
+      // feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
       return Object.assign({}, state, feature)
     case actions.RECEIVE_FEATURES:
+      feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
+      if(feature.properties.FeatureType === 'sighting'){
+        feature.properties.radius = 2 + (Math.sqrt(feature.properties.Count) * 2
+        // var bn = feature.properties.SpeciesName;
+        // if (colorMap[bn] == undefined) {
+        //   var c = new RColor().get(true);
+        //   so.fillColor = c;
+        //   colorMap[bn] = c;
+        // } else {
+        //   so.fillColor = colorMap[bn];
+        // }
+      }
+
       return Object.assign({}, state, feature)
     default:
       break

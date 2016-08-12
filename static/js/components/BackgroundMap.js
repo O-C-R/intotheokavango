@@ -5,7 +5,7 @@ import * as d3 from 'd3'
 import * as utils from '../utils'
 import MapStateOverlay from './MapStateOverlay'
 import ViewportMercator from 'viewport-mercator-project'
-import { DeckGLOverlay, ScatterplotLayer } from 'deck.gl'
+import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -151,7 +151,8 @@ class BackgroundMap extends React.Component {
   }
 
   render () {
-    const {coordinates} = this.state
+    const { coordinates } = this.state
+    const { expedition } = this.props
 
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
@@ -167,7 +168,7 @@ class BackgroundMap extends React.Component {
           latitude={coordinates[1]}
           zoom={14}
         >
-          <DeckGLOverlay
+          {expedition?<DeckGLOverlay
             width={window.innerWidth}
             height={window.innerHeight}
             longitude={coordinates[0]}
@@ -181,17 +182,15 @@ class BackgroundMap extends React.Component {
                 latitude: coordinates[1],
                 longitude: coordinates[0],
                 zoom: 14,
-                data: [
-                  {position:{x:coordinates[0],y:coordinates[1],z:0}, color:[255,0,0]}
-                ],
-                radius: 20
+                data: expedition.currentFeatures
+                // radius: 20
                 // isPickable: true,
                 // onHover: this._handleScatterplotHovered,
                 // onClick: this._handleScatterplotClicked
               })
             ]}
             onAfterRender={(aga) => {console.log('aga', aga)}}
-          />
+          />:null}
         </MapGL>
       </div>
     )

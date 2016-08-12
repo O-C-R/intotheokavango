@@ -4,7 +4,18 @@
   - add timeline graph
   - add yellow line to timeline to indicate areas already played
 
-  DOING:
+  Features
+  Content markers
+  Notifications
+
+  Journal
+  Mosaic
+  Lightbox
+  Animations
+  Responsiveness
+  Shareables
+  API page
+
 grunt browserify*/
 
 import 'babel-polyfill'
