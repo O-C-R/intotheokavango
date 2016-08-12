@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: intotheokavango
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: intotheokavango
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:3.2.8
+        ports:
+        - containerPort: 27017
+      - name: intotheokavango
+        image: ocrnyc/intotheokavango
+        ports:
+        - containerPort: 7777
+      - name: nginx
+        image: ocrnyc/intotheokavango-nginx
+        ports:
+        - containerPort: 80

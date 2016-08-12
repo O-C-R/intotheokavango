@@ -12,6 +12,7 @@ COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
+RUN cp /usr/src/app/config.yaml.smp /usr/src/app/config.yaml
 
 VOLUME /usr/src/app/uploads
 
