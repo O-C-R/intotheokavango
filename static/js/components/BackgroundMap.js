@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react'
-import MapGL from 'react-map-gl'
+import MapGL, {SVGOverlay, CanvasOverlay} from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import * as utils from '../utils'
-import MapStateOverlay from './MapStateOverlay'
+import { MapStateOverlay } from './MapStateOverlay'
 import ViewportMercator from 'viewport-mercator-project'
 import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 
@@ -12,7 +12,16 @@ class BackgroundMap extends React.Component {
     super(props)
     this.state = {
       animate: false,
-      coordinates: [-122.4376, 37.7577]
+      coordinates: [0,0],
+      viewport: {
+        latitude: -22,
+        longitude: 18,
+        zoom: 14,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        startDragLngLat: null,
+        isDragging: null
+      },
     }
   }
 
@@ -150,6 +159,50 @@ class BackgroundMap extends React.Component {
     }
   }
 
+  
+  @autobind
+  redrawSVGOverlay ({ project }) {
+
+    const { expedition } = this.props
+                // onClick={ () => windowAlert(`route ${index}`) }>
+                // 
+    return (
+      <g>
+      {
+        expedition.currentAmbit.map((route, index) => {
+          const points = route.coordinates.map(project).map(
+            p => [Math.round(p[0]), Math.round(p[1])]
+          )
+          return <g key={ index }>
+            <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
+              <g style={ {pointerEvents: 'visibleStroke'} }>
+                <path
+                  style={{
+                    fill: 'none',
+                    stroke: route.color,
+                    strokeWidth: 2
+                  }}
+                  d={ `M${points.join('L')}`}
+                />
+              </g>
+            </g>
+          </g>
+        })
+      }
+      </g>
+    )
+  }
+
+  @autobind
+  onChangeViewport(newViewport) {
+    newViewport.width = window.innerWidth
+    newViewport.height = window.innerHeight
+    this.setState({ 
+      ...this.state,
+      viewport: newViewport
+    })
+  }
+  
   render () {
     const { coordinates } = this.state
     const { expedition } = this.props
@@ -157,40 +210,46 @@ class BackgroundMap extends React.Component {
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
 
+    // var viewport = {
+    //   width: window.innerWidth,
+    //   height: window.innerHeight,
+    //   longitude: coordinates[0],
+    //   latitude: coordinates[1],
+    //   zoom: 14
+    // }
+          
+          // {expedition?
+          // <div>
+          //   <SVGOverlay 
+          //     {...this.state.viewport}
+          //     startDragLngLat={[0,0]}
+          //     redraw={ this.redrawSVGOverlay }
+          //   />
+          //   <DeckGLOverlay
+          //     {...this.state.viewport}
+          //     startDragLngLat={[0,0]}
+          //     layers={[
+          //       new ScatterplotLayer({ 
+          //         ...this.state.viewport, 
+          //         id:'sightings', 
+          //         data: expedition.currentSightings
+          //       })
+          //     ]}
+          //     // onAfterRender={(aga) => {/*console.log('aga', aga)*/}}
+          //   />
+          // </div>
+          // :''}
+
     return (
       <div id="mapbox">
         <MapGL
+          {...this.state.viewport}
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          width={window.innerWidth}
-          height={window.innerHeight}
-          longitude={coordinates[0]}
-          latitude={coordinates[1]}
-          zoom={14}
+          onChangeViewport={this.onChangeViewport}
         >
-          {expedition?<DeckGLOverlay
-            width={window.innerWidth}
-            height={window.innerHeight}
-            longitude={coordinates[0]}
-            latitude={coordinates[1]}
-            zoom={14}
-            layers={[
-              new ScatterplotLayer({
-                id: 'sightings',
-                width: window.innerWidth,
-                height: window.innerHeight,
-                latitude: coordinates[1],
-                longitude: coordinates[0],
-                zoom: 14,
-                data: expedition.currentFeatures
-                // radius: 20
-                // isPickable: true,
-                // onHover: this._handleScatterplotHovered,
-                // onClick: this._handleScatterplotClicked
-              })
-            ]}
-            onAfterRender={(aga) => {console.log('aga', aga)}}
-          />:null}
+
+
         </MapGL>
       </div>
     )

@@ -110,6 +110,14 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
     var east = viewGeoBounds[2]
     var south = viewGeoBounds[3]
 
+    // TODO TEMPORARY: limiting max range
+    var centroid = [(west + east) / 2, (south + north) /2]
+    west = centroid[0] + Math.max(west - centroid[0], -0.1)
+    east = centroid[0] + Math.min(east - centroid[0], 0.1)
+    north = centroid[1] + Math.min(north - centroid[1], 0.1)
+    south = centroid[1] + Math.max(south - centroid[1], -0.1)
+    // TEMPORARY
+
     var northWestTile = coordinatesToTile([west, north], expedition.geoBounds)
     var southEastTile = Object.assign({}, northWestTile)
     while (tileToCoordinates(southEastTile, expedition.geoBounds)[0] <= east) {
@@ -146,12 +154,25 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
     })
 
     if (tileRange.length > 0) {
-      var queryString = 'http://intotheokavango.org/api/features?FeatureType=sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-      console.log('fetch', queryString)
-
-      fetch(queryString)
-        .then(response => response.json())
-        .then(json => dispatch(receiveFeatures(state.selectedExpedition, json, tileRange)))
+      const goFetch = (featureTypes, results) => {
+        var type = featureTypes.shift()
+        var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
+        if(type === 'ambit_geo') queryString += '&resolution=60'
+        console.log('querying:', queryString)
+        fetch(queryString)
+          .then(response => response.json())
+          .then(json => {
+            results = results.concat(json.results.features)
+            if (featureTypes.length > 0) {
+              // console.log('received ' + json.results.features.length + ' ' + type)
+              goFetch(featureTypes, results)
+            } else {
+              // console.log('done with query! Received ' + json.results.features.length + ' ' + type, results)
+              dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
+            }
+          })
+      }
+      goFetch(['ambit_geo', 'sighting'], [])
     }
 
     return dispatch({
@@ -306,7 +327,7 @@ export function receiveFeatures (expeditionID, data, tileRange) {
     type: RECEIVE_FEATURES,
     expeditionID,
     data,
-    tileRange
+    tileRange,
   }
 }
 

@@ -1,9 +1,19 @@
 /*
+  MAP:
+  check whether path are closed
+  round path waypoints
+  add colors to ambit_geo routes
+  add post features
+  timeline graph
+  timeline interaction / animation
+  notifications
+  scale
+  icons
+
   WILL DO:
-  - sync time zones
-  - add timeline graph
   - add yellow line to timeline to indicate areas already played
 
+  map interactivity
   Features
   Content markers
   Notifications

@@ -189,7 +189,7 @@ const okavangoReducer = (
       })
 
       features = {}
-      action.data.results.features.forEach((f) => {
+      action.data.forEach((f) => {
         var id = f.id
         features[id] = featureReducer(expedition.features[id], action, f)
       })
@@ -212,9 +212,9 @@ const okavangoReducer = (
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
 
-      if (action.data.results.features && action.data.results.features.length > 0) {
-        console.log('YES', featuresByTile)
-      }
+      // if (action.data.results.features && action.data.results.features.length > 0) {
+      //   console.log('YES', featuresByTile)
+      // }
 
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
@@ -257,7 +257,15 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
-    currentFeatures: []
+    currentSightings: [],
+    currentAmbit: [],
+    routeColors: [
+      'rgba(253, 191, 111, 1)',
+      'rgba(166, 206, 227, 1)',
+      'rgba(178, 223, 138, 1)',
+      'rgba(251, 154, 153, 1)',
+      'rgba(202, 178, 214, 1)'
+    ]
   },
   action,
   data
@@ -351,24 +359,54 @@ const expeditionReducer = (
       })
 
     case actions.UPDATE_MAP:
-      var currentFeatures = []
+      
+      var currentSightings = []
+      var currentAmbit = {}
+
       action.tilesInView.forEach((t) => {
-        var tileFeatures = d3.values(state.featuresByTile[t]).map((f) => {
-          return {
-            position: {
-              x: f.geometry.coordinates[0] + f.properties.scatter[0],
-              y: f.geometry.coordinates[1] + f.properties.scatter[1],
-              z: 0
-            },
-            radius: f.properties.radius,
-            color: [255, 0, 0]
-          }
+        
+        // sort features by type
+        var features = {}
+        d3.values(state.featuresByTile[t]).forEach((f) => {
+          if(!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
+          features[f.properties.FeatureType].push(f)
         })
-        currentFeatures = currentFeatures.concat(tileFeatures)
+
+        if(features.sighting) {
+          var sightings = features.sighting.map((f) => {
+            return {
+              position: {
+                x: f.geometry.coordinates[0] + f.properties.scatter[0],
+                y: f.geometry.coordinates[1] + f.properties.scatter[1],
+                z: 0
+              },
+              radius: f.properties.radius,
+              color: [255, 0, 0],
+              type: f.properties.FeatureType
+            }
+          })
+          currentSightings = currentSightings.concat(sightings)
+        }
+
+        if(features.ambit_geo) {
+          // sort routes by member
+          features.ambit_geo.forEach((f) => {
+            if(!currentAmbit[f.properties.Member]) currentAmbit[f.properties.Member] = { 
+              color: state.routeColors[(d3.values(currentAmbit).length) % state.routeColors.length],
+              coordinates: []
+            }
+            currentAmbit[f.properties.Member].coordinates.push(f.geometry.coordinates)
+          })
+        }
       })
+      
+      currentAmbit = d3.values(currentAmbit)
+
+      // console.log('aga!', currentAmbit)
 
       return Object.assign({}, state, {
-        currentFeatures: currentFeatures,
+        currentSightings: currentSightings,
+        currentAmbit: currentAmbit,
         currentDate: action.currentDate,
         coordinates: action.coordinates
       })
@@ -459,7 +497,6 @@ const featureReducer = (
 ) => {
   switch (action.type) {
     case actions.RECEIVE_DAY:
-      // feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
       return Object.assign({}, state, feature)
     case actions.RECEIVE_FEATURES:
       feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
@@ -474,6 +511,19 @@ const featureReducer = (
         //   so.fillColor = colorMap[bn];
         // }
       }
+
+      if(feature.properties.FeatureType === 'ambit_geo') {
+        feature.properties.radius = 2
+
+        // ambit
+        // sensor
+        // sighting
+        // tweet
+        // post
+        // member        
+
+      }
+
 
       return Object.assign({}, state, feature)
     default:
