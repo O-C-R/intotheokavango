@@ -1,9 +1,8 @@
 import React, { PropTypes } from 'react'
-import MapGL, {SVGOverlay, CanvasOverlay} from 'react-map-gl'
+import MapGL, { SVGOverlay, CanvasOverlay } from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import * as utils from '../utils'
-import { MapStateOverlay } from './MapStateOverlay'
 import ViewportMercator from 'viewport-mercator-project'
 import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 
@@ -12,7 +11,7 @@ class BackgroundMap extends React.Component {
     super(props)
     this.state = {
       animate: false,
-      coordinates: [0,0],
+      coordinates: [0, 0],
       viewport: {
         latitude: -22,
         longitude: 18,
@@ -20,8 +19,8 @@ class BackgroundMap extends React.Component {
         width: window.innerWidth,
         height: window.innerHeight,
         startDragLngLat: null,
-        isDragging: null
-      },
+        isDragging: false
+      }
     }
   }
 
@@ -99,40 +98,28 @@ class BackgroundMap extends React.Component {
 
       this.setState({
         currentDate: currentDate,
-        coordinates: coordinates,
         animate: animate,
         currentDay: currentDay,
         day: day,
         beaconIndex: beaconIndex,
-        timeToNextBeacon: timeToNextBeacon
+        timeToNextBeacon: timeToNextBeacon,
+        viewport: {
+          ...this.state.viewport,
+          longitude: coordinates[0],
+          latitude: coordinates[1]
+        }
       })
 
-      if (this.state.frameCount % 10 === 0 && expedition.playback !== 'pause') {
-        // console.log(currentBeacon.id, nextBeacon.id)
-      }
       if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
-
-        const { unproject } = ViewportMercator({
-          longitude: this.state.coordinates[0],
-          latitude: this.state.coordinates[1],
-          width: window.innerWidth,
-          height: window.innerHeight,
-          zoom: 14
-        })
+        const { unproject } = ViewportMercator({ ...this.state.viewport })
         const nw = unproject([0, 0])
         const se = unproject([window.innerWidth, window.innerHeight])
         const viewGeoBounds = [nw[0], nw[1], se[0], se[1]]
-        updateMap(this.state.currentDate, this.state.coordinates, viewGeoBounds)
-
-        // update app state
-        // console.log('aga', this.state.currentDate, this.state.currentDay, this.state.beaconIndex, d3.values(this.state.day.beacons).length, this.state.timeToNextBeacon)
-        // console.log('aga', beaconIndex, beacons[beaconIndex], beacons[+beaconIndex+1])
-        // console.log(this.state.coordinates)
+        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds)
       }
     }
     this.state.animate = animate
     this.state.frameCount++
-    // if (this.state.frameCount % 60 === 0) console.log(this.state.frameCount)
     requestAnimationFrame(this.tick)
   }
 
@@ -159,13 +146,9 @@ class BackgroundMap extends React.Component {
     }
   }
 
-  
   @autobind
   redrawSVGOverlay ({ project }) {
-
     const { expedition } = this.props
-                // onClick={ () => windowAlert(`route ${index}`) }>
-                // 
     return (
       <g>
       {
@@ -194,62 +177,50 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  onChangeViewport(newViewport) {
+  onChangeViewport (newViewport) {
     newViewport.width = window.innerWidth
     newViewport.height = window.innerHeight
-    this.setState({ 
+    this.setState({
       ...this.state,
       viewport: newViewport
     })
   }
-  
-  render () {
-    const { coordinates } = this.state
-    const { expedition } = this.props
 
+  render () {
+    const { expedition } = this.props
+    const { viewport } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
-
-    // var viewport = {
-    //   width: window.innerWidth,
-    //   height: window.innerHeight,
-    //   longitude: coordinates[0],
-    //   latitude: coordinates[1],
-    //   zoom: 14
-    // }
-          
-          // {expedition?
-          // <div>
-          //   <SVGOverlay 
-          //     {...this.state.viewport}
-          //     startDragLngLat={[0,0]}
-          //     redraw={ this.redrawSVGOverlay }
-          //   />
-          //   <DeckGLOverlay
-          //     {...this.state.viewport}
-          //     startDragLngLat={[0,0]}
-          //     layers={[
-          //       new ScatterplotLayer({ 
-          //         ...this.state.viewport, 
-          //         id:'sightings', 
-          //         data: expedition.currentSightings
-          //       })
-          //     ]}
-          //     // onAfterRender={(aga) => {/*console.log('aga', aga)*/}}
-          //   />
-          // </div>
-          // :''}
 
     return (
       <div id="mapbox">
         <MapGL
-          {...this.state.viewport}
+          {...viewport}
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
           onChangeViewport={this.onChangeViewport}
         >
-
-
+          {expedition
+          ? <div>
+            <SVGOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              redraw={ this.redrawSVGOverlay }
+            />
+            <DeckGLOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              layers={[
+                new ScatterplotLayer({
+                  ...viewport,
+                  id: 'sightings',
+                  data: expedition.currentSightings
+                })
+              ]}
+              // onAfterRender={(aga) => {/*console.log('aga', aga)*/}}
+            />
+          </div>
+          : ''}
         </MapGL>
       </div>
     )
