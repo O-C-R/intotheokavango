@@ -406,6 +406,11 @@ ul{
                 margin:0;
               }
 
+              .notification .content img{
+                width:100%;
+                height:auto;
+              }
+
             .notification .type{
               display: inline-block;
               width: 20%;

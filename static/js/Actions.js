@@ -172,7 +172,7 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
             }
           })
       }
-      goFetch(['longform', 'audio', 'image', 'tweet', 'ambit_geo', 'sighting'], [])
+      goFetch(['blog', 'audio', 'image', 'tweet', 'ambit_geo', 'sighting'], [])
     }
 
     return dispatch({

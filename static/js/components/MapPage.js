@@ -1,27 +1,19 @@
 
-import React, {PropTypes} from 'react'
-import NotificationPanel from './NotificationPanel'
+// import React, { PropTypes } from 'react'
+import React from 'react'
+import NotificationPanelContainer from '../containers/NotificationPanelContainer'
 import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
 const MapPage = () => {
-
-
-  var notifications = [
-    {type:'twitter',content:'lorem ipsum dolor sit amet',key:1},
-    {type:'twitter',content:'lorem ipsum dolor sit amet',key:2}
-  ]
-
-  var date = new Date()
-  var year = 2016
   return (
     <div className='page' id="mapPage">
       <ControlPanelContainer pathName={location.pathname}/>
-      <NotificationPanel notifications={notifications}/>
+      <NotificationPanelContainer/>
     </div>
   )
 }
 
-MapPage.propTypes = {
-  // active : PropTypes.bool.isRequired
-}
+// MapPage.propTypes = {
+//   active : PropTypes.bool.isRequired
+// }
 export default MapPage

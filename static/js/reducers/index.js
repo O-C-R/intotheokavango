@@ -260,7 +260,7 @@ const okavangoReducer = (
 const expeditionReducer = (
   state = {
     name: '',
-    playback: 'forward',
+    playback: 'pause',
     zoom: 10,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
@@ -418,9 +418,8 @@ const expeditionReducer = (
         var allPosts = []
         if (features.tweet) allPosts = allPosts.concat(features.tweet)
         if (features.audio) allPosts = allPosts.concat(features.audio)
-        if (features.longform) allPosts = allPosts.concat(features.longform)
+        if (features.blog) allPosts = allPosts.concat(features.blog)
         if (features.image) allPosts = allPosts.concat(features.image)
-
         if (allPosts) {
           var posts = allPosts.map((f) => {
             return {
@@ -429,7 +428,8 @@ const expeditionReducer = (
                 f.geometry.coordinates[1] + f.properties.scatter[1]
               ],
               type: f.properties.FeatureType,
-              id: f.id
+              id: f.id,
+              properties: f.properties
             }
           })
           currentPosts = currentPosts.concat(posts)

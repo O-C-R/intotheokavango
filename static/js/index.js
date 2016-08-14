@@ -1,37 +1,17 @@
 /*
   MAP:
-  sort options in yearselector
-  color sightings
-  add post features
-    tweet
-    medium
-    soundcloud
-    picture
-  round path waypoints
-  timeline graph
   timeline interaction / animation
-  notifications
-  scale
-  icons
   introduction
-
-  WILL DO:
-  - add yellow line to timeline to indicate areas already played
-
-  map interactivity
-  Features
-  Content markers
-  Notifications
-
-  Journal
-  Mosaic
-  Lightbox
-  Animations
-  Responsiveness
-  Shareables
-  API page
-
-grunt browserify*/
+  feature loading zoomed out
+  timeline graph
+  ambit_geo are linked backwards fromd day to day
+  color sightings
+  round path waypoints
+  scale
+  UI icons
+  preloader
+  endpoint for Jane
+*/
 
 import 'babel-polyfill'
 
