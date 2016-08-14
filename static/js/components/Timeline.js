@@ -6,8 +6,8 @@ const Timeline = ({expedition, jumpTo}) => {
   if (!expedition) return <svg id="timeline"></svg>
 
   var height = window.innerHeight - 72
-  var width = window.innerWidth * 0.02
-  var padding = [2,8]
+  var width = window.innerWidth * 0.05
+  var padding = [2, 8]
   var dayCount = expedition.dayCount + 1
   var data = []
 
@@ -29,11 +29,12 @@ const Timeline = ({expedition, jumpTo}) => {
     .domain([startDate.getTime(), startDate.getTime() + (dayCount - 1) * (1000 * 3600 * 24)])
     .range(range)
 
+  var x = width * 0.58
+
   const days = data.map((d, i) => {
-    return <circle cx={width - padding[0]} cy={scaleDays(i)} r={2} key={i} fill="white"/>
+    return <circle cx={x} cy={scaleDays(i)} r={2} key={i} fill="white"/>
   })
 
-  var x = width - padding[0] * 2
 
   const onMouseMove = (e) => {
     var y = e.nativeEvent.offsetY
@@ -48,11 +49,19 @@ const Timeline = ({expedition, jumpTo}) => {
 
   return (
     <svg id="timeline" style={{height: height + 'px'}} onMouseMove={onMouseMove} onClick={onClick}>
-      <line x1={x + 2} x2={x + 2} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
+      <filter id="dropshadow" height="130%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+        <feOffset dx="2" dy="0" result="offsetblur"/>
+        <feMerge> 
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <line x1={x} x2={x} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
       <g>{ days }</g>
-      <g transform={'translate(' + (x-17) + ',' + (scaleTime(expedition.currentDate.getTime())-8) + ')'}>
-        <path fill="#F9D144" d="M8,0c5,0,12,8,12,8s-7,8-12,8c-4.4,0-8-3.6-8-8C0,3.6,3.6,0,8,0z"/>
-        <circle fill="#1F1426" class="st1" cx="7.9" cy="7.8" r="3"/>
+      <g transform={'translate(' + (x - 20) + ',' + (scaleTime(expedition.currentDate.getTime()) - 8) + ')'}>
+        <path fill="#F9D144" d="M8,0c5,0,12,8,12,8s-7,8-12,8c-4.4,0-8-3.6-8-8C0,3.6,3.6,0,8,0z" style={{filter: 'url(#dropshadow)'}}/>
+        <circle fill="#1F1426" cx="7.9" cy="7.8" r="3"/>
       </g>
     </svg>
   )

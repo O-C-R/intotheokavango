@@ -1,3 +1,4 @@
+
 /*
   MAP:
   timeline interaction / animation
@@ -10,6 +11,7 @@
   scale
   UI icons
   preloader
+  focus
   endpoint for Jane
 */
 

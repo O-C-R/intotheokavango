@@ -234,8 +234,8 @@ ul{
       #timeline{
         position:absolute;
         top:40px;
-        left:1%;
-        width:2%;
+        left:0;
+        width:5%;
       }
 
       #pageContainer{
