@@ -220,7 +220,7 @@ class BackgroundMap extends React.Component {
   @autobind
   drawPosts (project) {
     const { expedition } = this.props
-    const icons = expedition.currentTweets.map(tweet => {
+    const icons = expedition.currentPosts.map(post => {
       const translate = (position) => {
         var coords = project(position)
         var x = coords[0]
@@ -228,8 +228,8 @@ class BackgroundMap extends React.Component {
         return 'translate(' + x + ',' + y + ')'
       }
       return (
-        <g transform={ translate(tweet.position) } key={tweet.id}>
-          <image xlinkHref="/static/img/icon-map-tweet.png" x={-12} y={-24} height={31} width={24} />
+        <g transform={ translate(post.position) } key={post.id}>
+          <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
         </g>
       )
     })

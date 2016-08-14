@@ -277,7 +277,7 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
-    currentTweets: [],
+    currentPosts: [],
     currentSightings: [],
     currentAmbits: [],
     memberColors: [
@@ -387,7 +387,7 @@ const expeditionReducer = (
 
     case actions.UPDATE_MAP:
       var currentSightings = []
-      var currentTweets = []
+      var currentPosts = []
       var currentAmbits = {}
       var currentMembers = []
 
@@ -415,8 +415,14 @@ const expeditionReducer = (
           currentSightings = currentSightings.concat(sightings)
         }
 
-        if (features.tweet) {
-          var tweets = features.tweet.map((f) => {
+        var allPosts = []
+        if (features.tweet) allPosts = allPosts.concat(features.tweet)
+        if (features.audio) allPosts = allPosts.concat(features.audio)
+        if (features.longform) allPosts = allPosts.concat(features.longform)
+        if (features.image) allPosts = allPosts.concat(features.image)
+
+        if (allPosts) {
+          var posts = allPosts.map((f) => {
             return {
               position: [
                 f.geometry.coordinates[0] + f.properties.scatter[0],
@@ -426,7 +432,7 @@ const expeditionReducer = (
               id: f.id
             }
           })
-          currentTweets = currentTweets.concat(tweets)
+          currentPosts = currentPosts.concat(posts)
         }
 
         if (features.ambit_geo) {
@@ -453,7 +459,7 @@ const expeditionReducer = (
         currentSightings,
         currentAmbits,
         currentMembers,
-        currentTweets,
+        currentPosts,
         currentDate: action.currentDate,
         coordinates: action.coordinates
       })
@@ -549,28 +555,11 @@ const featureReducer = (
       feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
       if (feature.properties.FeatureType === 'sighting') {
         feature.properties.radius = 2 + Math.sqrt(feature.properties.Count) * 2
-        // var bn = feature.properties.SpeciesName;
-        // if (colorMap[bn] == undefined) {
-        //   var c = new RColor().get(true);
-        //   so.fillColor = c;
-        //   colorMap[bn] = c;
-        // } else {
-        //   so.fillColor = colorMap[bn];
-        // }
       }
 
       if (feature.properties.FeatureType === 'ambit_geo') {
         feature.properties.radius = 2
-
-        // ambit
-        // sensor
-        // sighting
-        // tweet
-        // post
-        // member        
-
       }
-
 
       return Object.assign({}, state, feature)
     default:
