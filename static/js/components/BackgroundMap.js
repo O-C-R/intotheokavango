@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import MapGL, { SVGOverlay, CanvasOverlay } from 'react-map-gl'
+import MapGL, { SVGOverlay } from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import * as utils from '../utils'
@@ -44,15 +44,17 @@ class BackgroundMap extends React.Component {
       }
       var currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime() + 1, this.state.currentDate.getTime() + dateOffset))))
 
+      // pause playback if time reaches beginning or end
       if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() + 1 && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback', 'pause')
 
+      // checks current day
       var currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       if (currentDay !== this.state.currentDay) {
         // new day
         fetchDay(currentDate)
       }
 
-      // look for current beacons
+      // look for most current beacon
       const day = expedition.days[currentDay]
       var beacons = d3.values(day.beacons).sort((a, b) => {
         return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
@@ -86,7 +88,7 @@ class BackgroundMap extends React.Component {
         }
         if (beaconIndex < 0) beaconIndex = 0
       }
-
+      // set map coordinates to current beacon
       var currentBeacon = beacons[beaconIndex + (forward ? 0 : 0)]
       var nextBeacon = beacons[beaconIndex + (forward ? 1 : -1)]
       var coordinates = [
@@ -94,15 +96,66 @@ class BackgroundMap extends React.Component {
         utils.lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
       ]
 
-      // if (this.state.frameCount % 30 === 0) console.log(currentBeacon.id, nextBeacon.id)
+       // look for most current ambit_geo
+      const members = { ...expedition.members }
+      Object.keys(members).forEach(memberID => {
+        var member = members[memberID]
+        var ambits = d3.values(expedition.featuresByMember[memberID][currentDay]).sort((a, b) => {
+          return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+        })
+        var ambitCount = ambits.length
+        var ambitIndex
+        var ratioBetweenAmbits = 0
+        if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
+          for (var i = 0; i < ambitCount - 1; i++) {
+            b1 = new Date(ambits[i].properties.DateTime).getTime()
+            b2 = new Date(ambits[i + 1].properties.DateTime).getTime()
+            if (currentDate.getTime() >= b1 && currentDate.getTime() < b2) {
+              ambitIndex = i
+              ratioBetweenAmbits = (currentDate.getTime() - b1) / (b2 - b1)
+              break
+            }
+          }
+          if (ambitIndex < 0) ambitIndex = ambitCount - 1
+        } else {
+          for (i = ambitCount - 1; i > 0; i--) {
+            b1 = new Date(ambits[i].properties.DateTime).getTime()
+            b2 = new Date(ambits[i - 1].properties.DateTime).getTime()
+            if (currentDate.getTime() <= b1 && currentDate.getTime() > b2) {
+              ambitIndex = i
+              ratioBetweenAmbits = (currentDate.getTime() - b1) / (b2 - b1)
+              break
+            }
+          }
+          if (ambitIndex < 0) ambitIndex = 0
+        }
+        // set member coordinates
+        var currentID = ambitIndex + (forward ? 0 : 0)
+        var nextID = ambitIndex + (forward ? 1 : -1)
+        if (currentID >= 0 && currentID < ambits.length && nextID >= 0 && nextID < ambits.length) {
+          var currentAmbit = ambits[currentID]
+          var nextAmbit = ambits[nextID]
+          member.coordinates = [
+            utils.lerp(currentAmbit.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
+            utils.lerp(currentAmbit.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
+          ]
+        } else {
+          member.coordinates = [0, 0]
+        }
+      })
+
+      // Object.keys(members).forEach(memberID => {
+      //   if (this.state.frameCount % 30 === 0) console.log(memberID, members[memberID].coordinates)
+      // })
 
       this.setState({
-        currentDate: currentDate,
-        animate: animate,
-        currentDay: currentDay,
-        day: day,
-        beaconIndex: beaconIndex,
-        timeToNextBeacon: timeToNextBeacon,
+        currentDate,
+        animate,
+        currentDay,
+        day,
+        beaconIndex,
+        timeToNextBeacon,
+        members,
         viewport: {
           ...this.state.viewport,
           longitude: coordinates[0],
@@ -150,30 +203,87 @@ class BackgroundMap extends React.Component {
   redrawSVGOverlay ({ project }) {
     const { expedition } = this.props
     return (
+
       <g>
-      {
-        expedition.currentAmbit.map((route, index) => {
-          const points = route.coordinates.map(project).map(
-            p => [Math.round(p[0]), Math.round(p[1])]
-          )
-          return <g key={ index }>
-            <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
-              <g style={ {pointerEvents: 'visibleStroke'} }>
-                <path
-                  style={{
-                    fill: 'none',
-                    stroke: route.color,
-                    strokeWidth: 2
-                  }}
-                  d={ `M${points.join('L')}`}
-                />
-              </g>
-            </g>
-          </g>
-        })
-      }
+        <g>
+          {
+            expedition.currentAmbit.map((route, index) => {
+              const points = route.coordinates.map(project).map(
+                p => [Math.round(p[0]), Math.round(p[1])]
+              )
+              return (
+                <g key={ index }>
+                  <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
+                    <g style={ {pointerEvents: 'visibleStroke'} }>
+                      <path
+                        style={{
+                          fill: 'none',
+                          stroke: route.color,
+                          strokeWidth: 2
+                        }}
+                        d={ `M${points.join('L')}`}
+                      />
+                    </g>
+                  </g>
+                </g>
+              )
+            })
+          }
+        </g>
+        <g>
+        {this.drawMembers(project)}
+        </g>
       </g>
     )
+  }
+
+  @autobind
+  drawMembers (project) {
+    const { members } = this.state
+    // if (this.state.frameCount % 60 === 0) console.log(members)
+    if (!members || members.length === 0) return ''
+    const markers = Object.keys(members).map(memberID => {
+      var member = members[memberID]
+      const translate = (member) => {
+        var coords = project(member.coordinates)
+        var x = coords[0] - 27 / 2
+        var y = coords[1] - 34
+        return 'translate(' + x + ',' + y + ')'
+      }
+      return (
+        <g transform={ translate(member) } key={memberID}>
+          <path fill="rgba(4,0,26,0.7)" d="M27,13.8C27,22.2,13.5,34,13.5,34S0,22.2,0,13.8C0,6.3,6,0.3,13.5,0.3S27,6.3,27,13.8z"/>
+          <text x={6} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
+        </g>
+      )
+    })
+  return markers
+  }
+
+  @autobind
+  drawAmbits (project) {
+    const { expedition } = this.props
+    expedition.currentAmbit.map((route, index) => {
+      const points = route.coordinates.map(project).map(
+        p => [Math.round(p[0]), Math.round(p[1])]
+      )
+      return (
+        <g key={ index }>
+          <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
+            <g style={ {pointerEvents: 'visibleStroke'} }>
+              <path
+                style={{
+                  fill: 'none',
+                  stroke: route.color,
+                  strokeWidth: 2
+                }}
+                d={ `M${points.join('L')}`}
+              />
+            </g>
+          </g>
+        </g>
+      )
+    })
   }
 
   @autobind

@@ -182,8 +182,10 @@ const okavangoReducer = (
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
 
+      var members = { ...expedition.members }
       var tileRange = action.tileRange
       var featuresByTile = {}
+      var featuresByMember = {}
       tileRange.forEach((t, i) => {
         featuresByTile[t] = {}
       })
@@ -204,12 +206,27 @@ const okavangoReducer = (
       Object.keys(features).forEach((id) => {
         var feature = features[id]
         var tileCoordinates = coordinatesToTile(feature.geometry.coordinates, expedition.geoBounds)
-        var tile = tileCoordinates.x + tileCoordinates.y * tileResolution
-        if (!featuresByTile[tile]) featuresByTile[tile] = {}
-        featuresByTile[tile][id] = feature
+        var tileID = tileCoordinates.x + tileCoordinates.y * tileResolution
+        if (!featuresByTile[tileID]) featuresByTile[tileID] = {}
+        featuresByTile[tileID][id] = feature
+
+        var memberID = feature.properties.Member
+        if (!members[memberID]) {
+          members[memberID] = {
+            name: memberID,
+            color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+          }
+        }
+        var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
+        if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
+        featuresByMember[memberID][dayID][id] = feature
       })
       Object.keys(featuresByTile).forEach((k) => {
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
+      })
+      Object.keys(featuresByMember).forEach((k) => {
+        featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
       })
 
       // if (action.data.results.features && action.data.results.features.length > 0) {
@@ -221,7 +238,9 @@ const okavangoReducer = (
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             features: Object.assign({}, expedition.features, features),
-            featuresByTile: Object.assign({}, expedition.featuresByTile, featuresByTile)
+            featuresByTile: Object.assign({}, expedition.featuresByTile, featuresByTile),
+            featuresByMember: Object.assign({}, expedition.featuresByMember, featuresByMember),
+            members
           })
         })
       })
@@ -254,18 +273,25 @@ const expeditionReducer = (
     features: {},
     featuresByTile: {},
     featuresByDay: {},
+    featuresByMember: {},
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
     currentSightings: [],
     currentAmbit: [],
-    routeColors: [
+    memberColors: [
       'rgba(253, 191, 111, 1)',
       'rgba(166, 206, 227, 1)',
       'rgba(178, 223, 138, 1)',
       'rgba(251, 154, 153, 1)',
-      'rgba(202, 178, 214, 1)'
-    ]
+      'rgba(202, 178, 214, 1)',
+      'rgba(252, 234, 151, 1)',
+      'rgba(180, 240, 209, 1)',
+      'rgba(191, 191, 255, 1)',
+      'rgba(255, 171, 213, 1)'
+    ],
+    members: {},
+    currentMembers: []
   },
   action,
   data
@@ -359,20 +385,19 @@ const expeditionReducer = (
       })
 
     case actions.UPDATE_MAP:
-      
       var currentSightings = []
       var currentAmbit = {}
+      var currentMembers = []
 
       action.tilesInView.forEach((t) => {
-        
         // sort features by type
         var features = {}
         d3.values(state.featuresByTile[t]).forEach((f) => {
-          if(!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
+          if (!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
           features[f.properties.FeatureType].push(f)
         })
 
-        if(features.sighting) {
+        if (features.sighting) {
           var sightings = features.sighting.map((f) => {
             return {
               position: {
@@ -388,25 +413,30 @@ const expeditionReducer = (
           currentSightings = currentSightings.concat(sightings)
         }
 
-        if(features.ambit_geo) {
+        if (features.ambit_geo) {
           // sort routes by member
           features.ambit_geo.forEach((f) => {
-            if(!currentAmbit[f.properties.Member]) currentAmbit[f.properties.Member] = { 
-              color: state.routeColors[(d3.values(currentAmbit).length) % state.routeColors.length],
-              coordinates: []
+            var memberID = f.properties.Member
+            if (!currentAmbit[memberID]) {
+              currentAmbit[memberID] = {
+                color: state.members[memberID].color,
+                coordinates: []
+              }
             }
-            currentAmbit[f.properties.Member].coordinates.push(f.geometry.coordinates)
+            if (!currentMembers[memberID]) currentMembers[memberID] = {}
+            currentAmbit[memberID].coordinates.push(f.geometry.coordinates)
           })
         }
       })
-      
+
       currentAmbit = d3.values(currentAmbit)
 
       // console.log('aga!', currentAmbit)
 
       return Object.assign({}, state, {
-        currentSightings: currentSightings,
-        currentAmbit: currentAmbit,
+        currentSightings,
+        currentAmbit,
+        currentMembers,
         currentDate: action.currentDate,
         coordinates: action.coordinates
       })
@@ -500,7 +530,7 @@ const featureReducer = (
       return Object.assign({}, state, feature)
     case actions.RECEIVE_FEATURES:
       feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
-      if(feature.properties.FeatureType === 'sighting') {
+      if (feature.properties.FeatureType === 'sighting') {
         feature.properties.radius = 2 + Math.sqrt(feature.properties.Count) * 2
         // var bn = feature.properties.SpeciesName;
         // if (colorMap[bn] == undefined) {
@@ -512,7 +542,7 @@ const featureReducer = (
         // }
       }
 
-      if(feature.properties.FeatureType === 'ambit_geo') {
+      if (feature.properties.FeatureType === 'ambit_geo') {
         feature.properties.radius = 2
 
         // ambit

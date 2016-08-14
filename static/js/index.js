@@ -1,5 +1,6 @@
 /*
   MAP:
+  ambit markers
   check whether path are closed
   round path waypoints
   add colors to ambit_geo routes
