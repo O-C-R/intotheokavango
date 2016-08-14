@@ -133,11 +133,11 @@ class BackgroundMap extends React.Component {
         var currentID = ambitIndex + (forward ? 0 : 0)
         var nextID = ambitIndex + (forward ? 1 : -1)
         if (currentID >= 0 && currentID < ambits.length && nextID >= 0 && nextID < ambits.length) {
-          var currentAmbit = ambits[currentID]
+          var currentAmbits = ambits[currentID]
           var nextAmbit = ambits[nextID]
           member.coordinates = [
-            utils.lerp(currentAmbit.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
-            utils.lerp(currentAmbit.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
+            utils.lerp(currentAmbits.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
+            utils.lerp(currentAmbits.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
           ]
         } else {
           member.coordinates = [0, 0]
@@ -203,38 +203,37 @@ class BackgroundMap extends React.Component {
   redrawSVGOverlay ({ project }) {
     const { expedition } = this.props
     return (
-
       <g>
         <g>
-          {
-            expedition.currentAmbit.map((route, index) => {
-              const points = route.coordinates.map(project).map(
-                p => [Math.round(p[0]), Math.round(p[1])]
-              )
-              return (
-                <g key={ index }>
-                  <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
-                    <g style={ {pointerEvents: 'visibleStroke'} }>
-                      <path
-                        style={{
-                          fill: 'none',
-                          stroke: route.color,
-                          strokeWidth: 2
-                        }}
-                        d={ `M${points.join('L')}`}
-                      />
-                    </g>
-                  </g>
-                </g>
-              )
-            })
-          }
+          {this.drawAmbits(project)}
         </g>
         <g>
-        {this.drawMembers(project)}
+          {this.drawMembers(project)}
+        </g>
+        <g>
+          {this.drawPosts(project)}
         </g>
       </g>
     )
+  }
+
+  @autobind
+  drawPosts (project) {
+    const { expedition } = this.props
+    const icons = expedition.currentTweets.map(tweet => {
+      const translate = (position) => {
+        var coords = project(position)
+        var x = coords[0]
+        var y = coords[1]
+        return 'translate(' + x + ',' + y + ')'
+      }
+      return (
+        <g transform={ translate(tweet.position) } key={tweet.id}>
+          <image xlinkHref="/static/img/icon-map-tweet.png" x={-12} y={-24} height={31} width={24} />
+        </g>
+      )
+    })
+    return icons
   }
 
   @autobind
@@ -253,19 +252,19 @@ class BackgroundMap extends React.Component {
       return (
         <g transform={ translate(member) } key={memberID}>
           <path fill="rgba(4,0,26,0.7)" d="M27,13.8C27,22.2,13.5,34,13.5,34S0,22.2,0,13.8C0,6.3,6,0.3,13.5,0.3S27,6.3,27,13.8z"/>
-          <text x={6} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
+          <text x={7.5} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
         </g>
       )
     })
-  return markers
+    return markers
   }
 
   @autobind
   drawAmbits (project) {
     const { expedition } = this.props
-    expedition.currentAmbit.map((route, index) => {
+    const paths = expedition.currentAmbits.map((route, index) => {
       const points = route.coordinates.map(project).map(
-        p => [Math.round(p[0]), Math.round(p[1])]
+        p => [p[0], p[1]]
       )
       return (
         <g key={ index }>
@@ -284,6 +283,7 @@ class BackgroundMap extends React.Component {
         </g>
       )
     })
+    return paths
   }
 
   @autobind

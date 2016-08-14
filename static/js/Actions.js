@@ -157,8 +157,8 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
       const goFetch = (featureTypes, results) => {
         var type = featureTypes.shift()
         var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-        if(type === 'ambit_geo') queryString += '&resolution=60'
-        console.log('querying:', queryString)
+        if (type === 'ambit_geo') queryString += '&resolution=60'
+        // console.log('querying:', queryString)
         fetch(queryString)
           .then(response => response.json())
           .then(json => {
@@ -167,12 +167,12 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
               // console.log('received ' + json.results.features.length + ' ' + type)
               goFetch(featureTypes, results)
             } else {
-              // console.log('done with query! Received ' + json.results.features.length + ' ' + type, results)
+              // console.log('done with query! Received ' + json.results.features.length + ' ' + type)
               dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
             }
           })
       }
-      goFetch(['ambit_geo', 'sighting'], [])
+      goFetch(['tweet', 'ambit_geo', 'sighting'], [])
     }
 
     return dispatch({

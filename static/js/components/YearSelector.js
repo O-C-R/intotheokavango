@@ -7,10 +7,14 @@ const YearSelector = ({expeditionID, expeditions, onYearChange}) => {
   }
 
   var currentExpeditionName = expeditions[expeditionID].name
-  var expeditionList = Object.keys(expeditions).map(function (k, i) {
-    var expedition = expeditions[k]
-    return <a href="#" onClick={() => onYearChange(k)} key={i}>{expedition.name}</a>
-  })
+  var expeditionList = Object.keys(expeditions)
+    .sort((a, b) => {
+      return expeditions[b].end.getTime() - expeditions[a].end.getTime()
+    })
+    .map(function (k, i) {
+      var expedition = expeditions[k]
+      return <a href="#" onClick={() => onYearChange(k)} key={i}>{expedition.name}</a>
+    })
 
   return (
     <div className="dropdown yearSelector">

@@ -277,8 +277,9 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
+    currentTweets: [],
     currentSightings: [],
-    currentAmbit: [],
+    currentAmbits: [],
     memberColors: [
       'rgba(253, 191, 111, 1)',
       'rgba(166, 206, 227, 1)',
@@ -374,7 +375,7 @@ const expeditionReducer = (
       delete days[-1]
       delete days[state.dayCount]
 
-      console.log('fill following days:', completedDays, days)
+      // console.log('fill following days:', completedDays, days)
       return Object.assign({}, state, {
         days: days
       })
@@ -386,7 +387,8 @@ const expeditionReducer = (
 
     case actions.UPDATE_MAP:
       var currentSightings = []
-      var currentAmbit = {}
+      var currentTweets = []
+      var currentAmbits = {}
       var currentMembers = []
 
       action.tilesInView.forEach((t) => {
@@ -413,30 +415,45 @@ const expeditionReducer = (
           currentSightings = currentSightings.concat(sightings)
         }
 
+        if (features.tweet) {
+          var tweets = features.tweet.map((f) => {
+            return {
+              position: [
+                f.geometry.coordinates[0] + f.properties.scatter[0],
+                f.geometry.coordinates[1] + f.properties.scatter[1]
+              ],
+              type: f.properties.FeatureType,
+              id: f.id
+            }
+          })
+          currentTweets = currentTweets.concat(tweets)
+        }
+
         if (features.ambit_geo) {
           // sort routes by member
           features.ambit_geo.forEach((f) => {
             var memberID = f.properties.Member
-            if (!currentAmbit[memberID]) {
-              currentAmbit[memberID] = {
+            if (!currentAmbits[memberID]) {
+              currentAmbits[memberID] = {
                 color: state.members[memberID].color,
                 coordinates: []
               }
             }
             if (!currentMembers[memberID]) currentMembers[memberID] = {}
-            currentAmbit[memberID].coordinates.push(f.geometry.coordinates)
+            currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
           })
         }
       })
 
-      currentAmbit = d3.values(currentAmbit)
+      currentAmbits = d3.values(currentAmbits)
 
-      // console.log('aga!', currentAmbit)
+      // console.log('aga!', currentAmbits)
 
       return Object.assign({}, state, {
         currentSightings,
-        currentAmbit,
+        currentAmbits,
         currentMembers,
+        currentTweets,
         currentDate: action.currentDate,
         coordinates: action.coordinates
       })

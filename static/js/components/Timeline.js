@@ -50,7 +50,7 @@ const Timeline = ({expedition, jumpTo}) => {
     <svg id="timeline" style={{height: height + 'px'}} onMouseMove={onMouseMove} onClick={onClick}>
       <line x1={x + 2} x2={x + 2} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
       <g>{ days }</g>
-      <g transform={'translate(' + (x-17) + ',' + scaleTime(expedition.currentDate.getTime()) + ')'}>
+      <g transform={'translate(' + (x-17) + ',' + (scaleTime(expedition.currentDate.getTime())-8) + ')'}>
         <path fill="#F9D144" d="M8,0c5,0,12,8,12,8s-7,8-12,8c-4.4,0-8-3.6-8-8C0,3.6,3.6,0,8,0z"/>
         <circle fill="#1F1426" class="st1" cx="7.9" cy="7.8" r="3"/>
       </g>

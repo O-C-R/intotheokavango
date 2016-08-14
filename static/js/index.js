@@ -1,15 +1,19 @@
 /*
   MAP:
-  ambit markers
-  check whether path are closed
-  round path waypoints
-  add colors to ambit_geo routes
+  sort options in yearselector
+  color sightings
   add post features
+    tweet
+    medium
+    soundcloud
+    picture
+  round path waypoints
   timeline graph
   timeline interaction / animation
   notifications
   scale
   icons
+  introduction
 
   WILL DO:
   - add yellow line to timeline to indicate areas already played
