@@ -169,7 +169,8 @@ class BackgroundMap extends React.Component {
         }
       })
 
-      if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
+      // if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
+      if (this.state.frameCount % 60 === 0) {
         const { unproject } = ViewportMercator({ ...this.state.viewport })
         const nw = unproject([0, 0])
         const se = unproject([window.innerWidth, window.innerHeight])
