@@ -116,6 +116,7 @@ const okavangoReducer = (
       var members = { ...expedition.members }
       var featuresByMember = {}
       var featuresByDay = {}
+      var ambitsByTile = {}
       var dateRange = action.dateRange.map((d) => {
         return Math.floor((new Date(d).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
       })
@@ -137,15 +138,24 @@ const okavangoReducer = (
         }
       })
 
-      // sort features by day and type
+      var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
+      var coordinatesToTile = (coordinates, geoBounds) => {
+        var x = Math.floor((coordinates[0] - geoBounds[0]) * 111 / 10)
+        var y = Math.floor((coordinates[1] - geoBounds[3]) * 111 / 10)
+        return {x, y}
+      }
+
+      // assign feature to day, tile and member
       Object.keys(features).forEach((id) => {
         var feature = features[id]
+        // assign feature to day
         var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
         var type = feature.properties.FeatureType
         if (!featuresByDay[day]) featuresByDay[day] = {}
         if (!featuresByDay[day][type]) featuresByDay[day][type] = {}
         featuresByDay[day][type][id] = feature
 
+        // assign feature to member
         var memberID = feature.properties.Member
         if (!members[memberID]) {
           members[memberID] = {
@@ -157,6 +167,12 @@ const okavangoReducer = (
         if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
         if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
         featuresByMember[memberID][dayID][id] = feature
+        
+        // assign feature to tile
+        var tileCoordinates = coordinatesToTile(feature.geometry.coordinates, expedition.geoBounds)
+        var tileID = tileCoordinates.x + tileCoordinates.y * tileResolution
+        if (!ambitsByTile[tileID]) ambitsByTile[tileID] = {}
+        ambitsByTile[tileID][id] = feature
       })
 
       Object.keys(featuresByDay).forEach((d) => {
@@ -207,6 +223,10 @@ const okavangoReducer = (
         featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
       })
 
+      Object.keys(ambitsByTile).forEach((k) => {
+        ambitsByTile[k] = Object.assign({}, expedition.ambitsByTile[k], ambitsByTile[k])
+      })
+
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
@@ -215,6 +235,7 @@ const okavangoReducer = (
             features: Object.assign({}, expedition.features, features),
             featuresByDay: featuresByDay,
             featuresByMember: Object.assign({}, expedition.featuresByMember, featuresByMember),
+            ambitsByTile: Object.assign({}, expedition.ambitsByTile, ambitsByTile),
             members
           })
         })
@@ -249,7 +270,7 @@ const okavangoReducer = (
       })
 
       var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
-      const coordinatesToTile = (coordinates, geoBounds) => {
+      var coordinatesToTile = (coordinates, geoBounds) => {
         var x = Math.floor((coordinates[0] - geoBounds[0]) * 111 / 10)
         var y = Math.floor((coordinates[1] - geoBounds[3]) * 111 / 10)
         return {x, y}
@@ -261,25 +282,10 @@ const okavangoReducer = (
         var tileID = tileCoordinates.x + tileCoordinates.y * tileResolution
         if (!featuresByTile[tileID]) featuresByTile[tileID] = {}
         featuresByTile[tileID][id] = feature
-
-        // var memberID = feature.properties.Member
-        // if (!members[memberID]) {
-        //   members[memberID] = {
-        //     name: memberID,
-        //     color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
-        //   }
-        // }
-        // var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        // if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
-        // if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
-        // featuresByMember[memberID][dayID][id] = feature
       })
       Object.keys(featuresByTile).forEach((k) => {
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
-      // Object.keys(featuresByMember).forEach((k) => {
-      //   featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
-      // })
 
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
@@ -318,6 +324,7 @@ const expeditionReducer = (
     days: [],
     features: {},
     featuresByTile: {},
+    ambitsByTile: {},
     featuresByDay: {},
     featuresByMember: {},
     mainFocus: 'Explorers',
@@ -452,6 +459,12 @@ const expeditionReducer = (
         d3.values(state.featuresByTile[t]).forEach((f) => {
           if (!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
           features[f.properties.FeatureType].push(f)
+          var day = Math.floor((new Date(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+          if (currentDays.indexOf(day) === -1) currentDays.push(day)
+        })
+
+        // this def could be written more elegantly...
+        d3.values(state.ambitsByTile[t]).forEach((f) => {
           var day = Math.floor((new Date(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
           if (currentDays.indexOf(day) === -1) currentDays.push(day)
         })
