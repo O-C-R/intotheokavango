@@ -177,45 +177,47 @@ const okavangoReducer = (
         }
       })
 
-      Object.keys(featuresByDay).forEach((d) => {
-        featuresByDay[d] = Object.assign({}, expedition.featuresByDay[d], featuresByDay[d])
+      const extendFeatures = (bucket) => {
+        if (d3.values(bucket).length > 0) {
+          // pick the two earliest and latest features
+          var timeRange = [new Date(), new Date(0)]
+          var featureRange = []
+          d3.values(bucket).forEach((f) => {
+            var dateTime = new Date(f.properties.DateTime)
+            if (timeRange[0].getTime() > dateTime.getTime()) {
+              timeRange[0] = dateTime
+              featureRange[0] = f
+            }
+            if (timeRange[1].getTime() < dateTime.getTime()) {
+              timeRange[1] = dateTime
+              featureRange[1] = f
+            }
+          })
 
-        // extending beaon features to entire day
-        // pick the two earliest and latest features
-        for (var type in featuresByDay[d]) {
-          if (d3.values(featuresByDay[d][type]).length > 0) {
-            var timeRange = [new Date(), new Date(0)]
-            var featureRange = []
-            d3.values(featuresByDay[d][type]).forEach((f) => {
-              var dateTime = new Date(f.properties.DateTime)
-              if (timeRange[0].getTime() > dateTime.getTime()) {
-                timeRange[0] = dateTime
-                featureRange[0] = f
-              }
-              if (timeRange[1].getTime() < dateTime.getTime()) {
-                timeRange[1] = dateTime
-                featureRange[1] = f
-              }
-            })
-
-            // clone features with new dates
-            var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
-            var end = new Date(start.getTime() + (1000 * 3600 * 24))
-            id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-            featuresByDay[d][type][id] = Object.assign({}, featureRange[0])
-            featuresByDay[d][type][id].properties = Object.assign({}, featuresByDay[d][type][id].properties, {
-              DateTime: start.toString()
-            })
-            id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-            featuresByDay[d][type][id] = Object.assign({}, featureRange[1])
-            featuresByDay[d][type][id].properties = Object.assign({}, featuresByDay[d][type][id].properties, {
-              DateTime: end.toString()
-            })
-          }
+          // clone features with new dates
+          var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
+          var end = new Date(start.getTime() + (1000 * 3600 * 24))
+          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+          bucket[id] = Object.assign({}, featureRange[0])
+          bucket[id].properties = Object.assign({}, bucket[id].properties, {
+            DateTime: start.toString()
+          })
+          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+          bucket[id] = Object.assign({}, featureRange[1])
+          bucket[id].properties = Object.assign({}, bucket[id].properties, {
+            DateTime: end.toString()
+          })
         }
+      }
+      Object.keys(featuresByDay).forEach(d => {
+        featuresByDay[d] = Object.assign({}, expedition.featuresByDay[d], featuresByDay[d])
+        extendFeatures(featuresByDay[d].beacon)
       })
-
-      console.log('WAT', featuresByDay)
+      Object.keys(featuresByMember).forEach(m => {
+        Object.keys(featuresByMember[m]).forEach(d => {
+          extendFeatures(featuresByMember[m][d])
+        })
+      })
 
       featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
       days = Object.assign({}, featuresByDay)
@@ -410,7 +412,7 @@ const expeditionReducer = (
             var dayIndex = [(+incompleteRange[0] + j), (+incompleteRange[1] - j)]
             for (var k = 0; k < 2; k++) {
               for (var l = 0; l < 2; l++) {
-                if (l === 0 || days[dayIndex[0]] !== days[dayIndex[1]]) {
+                if (k === 0 || (days[dayIndex[0]] !== days[dayIndex[1]]) || l === 0) {
                   var dayID = dayIndex[k]
                   day = days[dayID]
                   var date = new Date(state.start.getTime() + (1000 * 3600 * 24) * (dayID + (k === l ? 0 : 1)))

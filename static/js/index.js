@@ -1,9 +1,13 @@
 
 /*
 
-  when updating map, check we're not missing days in viewport
-  wtf is that N marker following beacon?
-  update_map on jumpto
+  skip day as night if there's no beacon or ambit
+  day 15, 21 are examples of broken beacon
+  fix timeline cursor going back to store position
+  notifications not appearing
+  round paths
+  disconnect ambit paths when they are more than one day apart
+  fix timeline graph
 
   MAP:
   STYLING
@@ -20,8 +24,8 @@
   round path waypoints
   endpoint for Jane
 
-  WILL DO:
-  fix timeline graph
+  NICE TO HAVE:
+  fly to next location when there is no beacon or ambit for one day
 
   load features by tile
   get feature days

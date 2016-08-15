@@ -146,6 +146,7 @@ class BackgroundMap extends React.Component {
             utils.lerp(currentAmbits.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
           ]
         } else {
+          // console.log(this.state.frameCount, memberID)
           member.coordinates = [0, 0]
         }
       })
