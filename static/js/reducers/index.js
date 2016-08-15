@@ -213,6 +213,8 @@ const okavangoReducer = (
         }
       })
 
+      console.log('WAT', featuresByDay)
+
       featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
       days = Object.assign({}, featuresByDay)
       for (var d in days) {

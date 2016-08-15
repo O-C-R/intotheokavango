@@ -60,7 +60,7 @@ class BackgroundMap extends React.Component {
         return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
       })
       var beaconCount = beacons.length
-      var beaconIndex
+      var beaconIndex = -1
       var timeToNextBeacon = 0
       var ratioBetweenBeacons = 0
       if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
@@ -104,7 +104,7 @@ class BackgroundMap extends React.Component {
           return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
         })
         var ambitCount = ambits.length
-        var ambitIndex
+        var ambitIndex = -1
         var ratioBetweenAmbits = 0
         if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
           for (var i = 0; i < ambitCount - 1; i++) {
@@ -116,7 +116,10 @@ class BackgroundMap extends React.Component {
               break
             }
           }
-          if (ambitIndex < 0) ambitIndex = ambitCount - 1
+          if (ambitIndex < 0) {
+            ambitIndex = ambitCount - 2
+            ratioBetweenAmbits = 1
+          }
         } else {
           for (i = ambitCount - 1; i > 0; i--) {
             b1 = new Date(ambits[i].properties.DateTime).getTime()
@@ -127,10 +130,13 @@ class BackgroundMap extends React.Component {
               break
             }
           }
-          if (ambitIndex < 0) ambitIndex = 0
+          if (ambitIndex < 0) {
+            ambitIndex = 1
+            ratioBetweenAmbits = 1
+          }
         }
         // set member coordinates
-        var currentID = ambitIndex + (forward ? 0 : 0)
+        var currentID = ambitIndex
         var nextID = ambitIndex + (forward ? 1 : -1)
         if (currentID >= 0 && currentID < ambits.length && nextID >= 0 && nextID < ambits.length) {
           var currentAmbits = ambits[currentID]

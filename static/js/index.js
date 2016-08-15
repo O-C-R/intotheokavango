@@ -1,12 +1,14 @@
 
 /*
 
-  persistant markers
-  why are paths looping?
+  when updating map, check we're not missing days in viewport
+  wtf is that N marker following beacon?
+  update_map on jumpto
 
   MAP:
   STYLING
   night
+  visual night
   focus
   UI icons
   preloader
