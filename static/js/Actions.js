@@ -201,17 +201,16 @@ export function fetchExpeditions () {
     return fetch('http://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay()))
-      // .then(() => dispatch(startAnimation()))
-      // .then(() => {
-      //   var state = getState()
-      //   Object.keys(state.expeditions).forEach((id) => {
-      //     if (id !== state.selectedExpedition) {
-      //       dispatch(fetchDay(null, null, id))
-      //     }
-      //   })
-      //   dispatch(fetchTotalSightings(state.selectedExpedition))
-      // })
+      .then(() => dispatch(fetchDay(null, null, null, true)))
+      .then(() => {
+        var state = getState()
+        Object.keys(state.expeditions).forEach((id) => {
+          if (id !== state.selectedExpedition) {
+            dispatch(fetchDay(null, null, id, false))
+          }
+        })
+        dispatch(fetchTotalSightings(state.selectedExpedition))
+      })
   }
 }
 
@@ -233,7 +232,7 @@ export function receiveTotalSightings (id, data) {
   }
 }
 
-export function fetchDay (date, initialDate, id) {
+export function fetchDay (date, initialDate, id, initialize) {
   if (!initialDate) initialDate = date
   return function (dispatch, getState) {
     var state = getState()
@@ -285,7 +284,7 @@ export function fetchDay (date, initialDate, id) {
             })
             if (incompleteDays.length === 0) {
               // not sure why I need this '|| date'
-              if (!state.animate) dispatch(startAnimation())
+              if (!state.animate && initialize) dispatch(startAnimation())
               dispatch(updateTime(initialDate || date, false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {

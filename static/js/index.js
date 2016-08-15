@@ -1,16 +1,14 @@
 
 /*
+  UI icons
+  Fonts
 
-  fix timeline cursor going back to store position
-  notifications not appearing
-
+  notification animations
+  disconnect ambit paths when they are more than one day apart
   skip day as night if there's no beacon or ambit
   round paths
-  disconnect ambit paths when they are more than one day apart
-  fix timeline graph
-
-  MAP:
-  STYLING
+  sighting popups
+  CSS STYLING
   night
   visual night
   focus
@@ -27,11 +25,6 @@
   NICE TO HAVE:
   fly to next location when there is no beacon or ambit for one day
   perlin noise moving sightings
-
-  load features by tile
-  get feature days
-  load all ambit_geo in that timespan
-
 */
 
 import 'babel-polyfill'
