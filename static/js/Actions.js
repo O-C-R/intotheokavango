@@ -154,24 +154,15 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
     })
 
     if (tileRange.length > 0) {
-      const goFetch = (featureTypes, results) => {
-        var type = featureTypes.shift()
-        var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-        console.log('querying:', queryString)
-        fetch(queryString)
-          .then(response => response.json())
-          .then(json => {
-            results = results.concat(json.results.features)
-            if (featureTypes.length > 0) {
-              // console.log('received ' + json.results.features.length + ' ' + type)
-              goFetch(featureTypes, results)
-            } else {
-              console.log('done with query! Received ' + json.results.features.length + ' ' + type)
-              dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
-            }
-          })
-      }
-      goFetch(['blog', 'audio', 'image', 'tweet', 'sighting'], [])
+      var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet,sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
+      console.log('querying:', queryString)
+      fetch(queryString)
+        .then(response => response.json())
+        .then(json => {
+          var results = json.results.features
+          console.log('done with query! Received ' + results.length + ' features.')
+          dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
+        })
     }
 
     return dispatch({
@@ -308,7 +299,6 @@ export function fetchDay (date, initialDate, id, initialize) {
           }
         })
     }
-    // goFetch(['beacon', 'ambit_geo'], [])
     goFetch(['ambit_geo', 'beacon'], [])
   }
 }
