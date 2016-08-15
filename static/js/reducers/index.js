@@ -412,6 +412,7 @@ const expeditionReducer = (
             var dayIndex = [(+incompleteRange[0] + j), (+incompleteRange[1] - j)]
             for (var k = 0; k < 2; k++) {
               for (var l = 0; l < 2; l++) {
+                // here k === 0 removes gradual translation between day 1 to day 2
                 if (k === 0 || (days[dayIndex[0]] !== days[dayIndex[1]]) || l === 0) {
                   var dayID = dayIndex[k]
                   day = days[dayID]

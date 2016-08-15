@@ -18,7 +18,8 @@ class Timeline extends React.Component {
       domain: [0, 0],
       scaleDays: null,
       scaleTime: null,
-      totalSightings: []
+      totalSightings: [],
+      mouseOver: false
     }
   }
 
@@ -47,7 +48,7 @@ class Timeline extends React.Component {
         .domain([startDate.getTime(), startDate.getTime() + (dayCount - 1) * (1000 * 3600 * 24)])
         .range(range)
 
-      const cursorY = (scaleTime(expedition.currentDate.getTime()) - 8)
+      const cursorY = this.state.mouseOver ? this.state.cursorY : (scaleTime(expedition.currentDate.getTime()) - 8)
 
       var totalSightings = expedition.totalSightings
 
@@ -81,7 +82,8 @@ class Timeline extends React.Component {
     const cursorY = Math.max(range[0], Math.min(range[1], e.nativeEvent.offsetY)) - padding[1]
     this.setState({
       ...this.state,
-      cursorY
+      cursorY,
+      mouseOver: true
     })
   }
 
@@ -92,7 +94,8 @@ class Timeline extends React.Component {
     const cursorY = (scaleTime(expedition.currentDate.getTime()) - 8)
     this.setState({
       ...this.state,
-      cursorY
+      cursorY,
+      mouseOver: false
     })
   }
 

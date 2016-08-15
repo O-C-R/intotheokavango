@@ -1,10 +1,10 @@
 
 /*
 
-  skip day as night if there's no beacon or ambit
-  day 15, 21 are examples of broken beacon
   fix timeline cursor going back to store position
   notifications not appearing
+
+  skip day as night if there's no beacon or ambit
   round paths
   disconnect ambit paths when they are more than one day apart
   fix timeline graph
@@ -26,6 +26,7 @@
 
   NICE TO HAVE:
   fly to next location when there is no beacon or ambit for one day
+  perlin noise moving sightings
 
   load features by tile
   get feature days
