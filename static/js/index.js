@@ -1,5 +1,9 @@
 
 /*
+
+  persistant markers
+  why are paths looping?
+
   MAP:
   STYLING
   night

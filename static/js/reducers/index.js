@@ -422,6 +422,7 @@ const expeditionReducer = (
       var currentAmbits = {}
       var currentMembers = []
 
+      var allAmbits = []
       action.tilesInView.forEach((t) => {
         // sort features by type
         var features = {}
@@ -439,7 +440,7 @@ const expeditionReducer = (
                 z: 0
               },
               radius: f.properties.radius,
-              color: [255, 0, 0],
+              color: f.properties.color,
               type: f.properties.FeatureType
             }
           })
@@ -467,22 +468,56 @@ const expeditionReducer = (
         }
 
         if (features.ambit_geo) {
-          // sort routes by member
-          features.ambit_geo.forEach((f) => {
-            var memberID = f.properties.Member
-            if (!currentAmbits[memberID]) {
-              currentAmbits[memberID] = {
-                color: state.members[memberID].color,
-                coordinates: []
-              }
-            }
-            if (!currentMembers[memberID]) currentMembers[memberID] = {}
-            currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
-          })
+          allAmbits = allAmbits.concat(features.ambit_geo)
+          // // sort routes by member
+          // features.ambit_geo
+          // console.log('aga1', features.ambit_geo)
+
+          // features.ambit_geo
+          //   .forEach(f => {
+          //     var memberID = f.properties.Member
+          //     if (!currentAmbits[memberID]) {
+          //       currentAmbits[memberID] = {
+          //         color: state.members[memberID].color,
+          //         coordinates: [],
+          //         dates: []
+          //       }
+          //     }
+          //     if (!currentMembers[memberID]) currentMembers[memberID] = {}
+          //     currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
+          //     currentAmbits[memberID].dates.push(f.properties.DateTime)
+          //   })
+
+          // console.log('okok', currentAmbits)
+
         }
       })
 
+      allAmbits
+        .sort((a, b) => {
+          return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+        })
+        .forEach(f => {
+          var memberID = f.properties.Member
+          if (!currentAmbits[memberID]) {
+            currentAmbits[memberID] = {
+              color: state.members[memberID].color,
+              coordinates: [],
+              dates: []
+            }
+          }
+          if (!currentMembers[memberID]) currentMembers[memberID] = {}
+          currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
+          currentAmbits[memberID].dates.push(f.properties.DateTime)
+        })
+
       currentAmbits = d3.values(currentAmbits)
+      console.log('aga2', currentAmbits)
+
+      // if(currentAmbits[0]){
+        // currentAmbits[0].forEach((f) {
+        // })
+      // }
 
       return Object.assign({}, state, {
         currentSightings,

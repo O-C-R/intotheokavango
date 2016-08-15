@@ -153,8 +153,6 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
       a[i] = t.x + t.y * tileResolution
     })
 
-    console.log('ok', tileRange)
-
     if (tileRange.length > 0) {
       const goFetch = (featureTypes, results) => {
         var type = featureTypes.shift()
