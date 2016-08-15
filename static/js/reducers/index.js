@@ -411,6 +411,12 @@ const expeditionReducer = (
       })
 
     case actions.UPDATE_MAP:
+
+      // initializing featuresByTile entries so they won't be queries multiple times
+      action.tileRange.forEach(t => {
+        if (!state.featuresByTile[t]) state.featuresByTile[t] = {}
+      })
+
       var currentSightings = []
       var currentPosts = []
       var currentAmbits = {}

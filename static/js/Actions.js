@@ -111,7 +111,7 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
     var south = viewGeoBounds[3]
 
     // TODO TEMPORARY: limiting max range
-    var centroid = [(west + east) / 2, (south + north) /2]
+    var centroid = [(west + east) / 2, (south + north) / 2]
     west = centroid[0] + Math.max(west - centroid[0], -0.1)
     east = centroid[0] + Math.min(east - centroid[0], 0.1)
     north = centroid[1] + Math.min(north - centroid[1], 0.1)
@@ -153,12 +153,14 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
       a[i] = t.x + t.y * tileResolution
     })
 
+    console.log('ok', tileRange)
+
     if (tileRange.length > 0) {
       const goFetch = (featureTypes, results) => {
         var type = featureTypes.shift()
         var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
         if (type === 'ambit_geo') queryString += '&resolution=60'
-        // console.log('querying:', queryString)
+        console.log('querying:', queryString)
         fetch(queryString)
           .then(response => response.json())
           .then(json => {
@@ -167,7 +169,7 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
               // console.log('received ' + json.results.features.length + ' ' + type)
               goFetch(featureTypes, results)
             } else {
-              // console.log('done with query! Received ' + json.results.features.length + ' ' + type)
+              console.log('done with query! Received ' + json.results.features.length + ' ' + type)
               dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
             }
           })
@@ -181,7 +183,8 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
       coordinates,
       viewGeoBounds,
       tilesInView,
-      zoom
+      zoom,
+      tileRange
     })
   }
 }
@@ -227,10 +230,10 @@ export function fetchTotalSightings (id) {
 
 export const RECEIVE_TOTAL_SIGHTINGS = 'RECEIVE_TOTAL_SIGHTINGS'
 
-export function receiveTotalSightings(id, data) {
+export function receiveTotalSightings (id, data) {
   return {
     type: RECEIVE_TOTAL_SIGHTINGS,
-    id, 
+    id,
     data
   }
 }

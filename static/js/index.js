@@ -1,6 +1,8 @@
 
 /*
   MAP:
+  STYLING
+  night
   focus
   UI icons
   preloader
