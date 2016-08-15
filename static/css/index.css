@@ -99,6 +99,15 @@ ul{
     /*overflow-y:scroll; */
   }
 
+    #mapOverlay{
+      width: 35%;
+      height: 100%;
+      position: absolute;
+      background-color: red;
+      pointer-events: none;
+      background: linear-gradient(to right, rgba(4,0,26,0.62) , rgba(4,0,26,0));
+    }
+
   #loadingWheel{
     width: 100%;
     height: 100%;
