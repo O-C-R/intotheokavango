@@ -113,6 +113,8 @@ const okavangoReducer = (
       expedition = state.expeditions[expeditionID]
 
       // initialize feature buckets
+      var members = { ...expedition.members }
+      var featuresByMember = {}
       var featuresByDay = {}
       var dateRange = action.dateRange.map((d) => {
         return Math.floor((new Date(d).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
@@ -123,17 +125,38 @@ const okavangoReducer = (
 
       // initialize features
       features = {}
-      action.data.results.features.forEach((f) => {
+      action.data.forEach((f) => {
         var id = f.id
         features[id] = featureReducer(expedition.features[id], action, f)
+        if (f.properties.FeatureType === 'ambit_geo') {
+          if (!members[f.properties.Member]) {
+            members[f.properties.Member] = {
+              color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+            }
+          }
+        }
       })
 
-      // sort features by tile and time buckets
+      // sort features by day and type
       Object.keys(features).forEach((id) => {
         var feature = features[id]
         var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        var type = feature.properties.FeatureType
         if (!featuresByDay[day]) featuresByDay[day] = {}
-        featuresByDay[day][id] = feature
+        if (!featuresByDay[day][type]) featuresByDay[day][type] = {}
+        featuresByDay[day][type][id] = feature
+
+        var memberID = feature.properties.Member
+        if (!members[memberID]) {
+          members[memberID] = {
+            name: memberID,
+            color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+          }
+        }
+        var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
+        if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
+        featuresByMember[memberID][dayID][id] = feature
       })
 
       Object.keys(featuresByDay).forEach((d) => {
@@ -141,43 +164,48 @@ const okavangoReducer = (
 
         // extending beaon features to entire day
         // pick the two earliest and latest features
-        if (d3.values(featuresByDay[d]).length > 0) {
-          var timeRange = [new Date(), new Date(0)]
-          var featureRange = []
-          d3.values(featuresByDay[d]).forEach((f) => {
-            var dateTime = new Date(f.properties.DateTime)
-            if (timeRange[0].getTime() > dateTime.getTime()) {
-              timeRange[0] = dateTime
-              featureRange[0] = f
-            }
-            if (timeRange[1].getTime() < dateTime.getTime()) {
-              timeRange[1] = dateTime
-              featureRange[1] = f
-            }
-          })
+        for (var type in featuresByDay[d]) {
+          if (d3.values(featuresByDay[d][type]).length > 0) {
+            var timeRange = [new Date(), new Date(0)]
+            var featureRange = []
+            d3.values(featuresByDay[d][type]).forEach((f) => {
+              var dateTime = new Date(f.properties.DateTime)
+              if (timeRange[0].getTime() > dateTime.getTime()) {
+                timeRange[0] = dateTime
+                featureRange[0] = f
+              }
+              if (timeRange[1].getTime() < dateTime.getTime()) {
+                timeRange[1] = dateTime
+                featureRange[1] = f
+              }
+            })
 
-          // clone features with new dates
-          var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
-          var end = new Date(start.getTime() + (1000 * 3600 * 24))
-          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-          featuresByDay[d][id] = Object.assign({}, featureRange[0])
-          featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-            DateTime: start.toString()
-          })
-          id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
-          featuresByDay[d][id] = Object.assign({}, featureRange[1])
-          featuresByDay[d][id].properties = Object.assign({}, featuresByDay[d][id].properties, {
-            DateTime: end.toString()
-          })
+            // clone features with new dates
+            var start = new Date(timeRange[0].getTime() - (timeRange[0].getTime() % (1000 * 3600 * 24)))
+            var end = new Date(start.getTime() + (1000 * 3600 * 24))
+            id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+            featuresByDay[d][type][id] = Object.assign({}, featureRange[0])
+            featuresByDay[d][type][id].properties = Object.assign({}, featuresByDay[d][type][id].properties, {
+              DateTime: start.toString()
+            })
+            id = Date.now() + (Math.floor(Math.random() * 10000) / 10000)
+            featuresByDay[d][type][id] = Object.assign({}, featureRange[1])
+            featuresByDay[d][type][id].properties = Object.assign({}, featuresByDay[d][type][id].properties, {
+              DateTime: end.toString()
+            })
+          }
         }
       })
 
       featuresByDay = Object.assign({}, expedition.featuresByDay, featuresByDay)
-
       days = Object.assign({}, featuresByDay)
-      for (id in days) {
-        days[id] = dayReducer(expedition.days[id], action, featuresByDay[id])
+      for (var d in days) {
+        days[d] = dayReducer(expedition.days[d], action, featuresByDay[d])
       }
+
+      Object.keys(featuresByMember).forEach((k) => {
+        featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
+      })
 
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
@@ -185,7 +213,9 @@ const okavangoReducer = (
           [expeditionID]: Object.assign({}, expedition, {
             days: Object.assign({}, expedition.days, days),
             features: Object.assign({}, expedition.features, features),
-            featuresByDay: featuresByDay
+            featuresByDay: featuresByDay,
+            featuresByMember: Object.assign({}, expedition.featuresByMember, featuresByMember),
+            members
           })
         })
       })
@@ -194,10 +224,8 @@ const okavangoReducer = (
       expeditionID = action.expeditionID
       expedition = state.expeditions[expeditionID]
 
-      var members = { ...expedition.members }
       var tileRange = action.tileRange
       var featuresByTile = {}
-      var featuresByMember = {}
       tileRange.forEach((t, i) => {
         featuresByTile[t] = {}
       })
@@ -234,37 +262,31 @@ const okavangoReducer = (
         if (!featuresByTile[tileID]) featuresByTile[tileID] = {}
         featuresByTile[tileID][id] = feature
 
-        var memberID = feature.properties.Member
-        if (!members[memberID]) {
-          members[memberID] = {
-            name: memberID,
-            color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
-          }
-        }
-        var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
-        if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
-        featuresByMember[memberID][dayID][id] = feature
+        // var memberID = feature.properties.Member
+        // if (!members[memberID]) {
+        //   members[memberID] = {
+        //     name: memberID,
+        //     color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+        //   }
+        // }
+        // var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        // if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
+        // if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
+        // featuresByMember[memberID][dayID][id] = feature
       })
       Object.keys(featuresByTile).forEach((k) => {
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
-      Object.keys(featuresByMember).forEach((k) => {
-        featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
-      })
-
-      // if (action.data.results.features && action.data.results.features.length > 0) {
-      //   console.log('YES', featuresByTile)
-      // }
+      // Object.keys(featuresByMember).forEach((k) => {
+      //   featuresByMember[k] = Object.assign({}, expedition.featuresByMember[k], featuresByMember[k])
+      // })
 
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             features: Object.assign({}, expedition.features, features),
-            featuresByTile: Object.assign({}, expedition.featuresByTile, featuresByTile),
-            featuresByMember: Object.assign({}, expedition.featuresByMember, featuresByMember),
-            members
+            featuresByTile: Object.assign({}, expedition.featuresByTile, featuresByTile)
           })
         })
       })
@@ -419,6 +441,7 @@ const expeditionReducer = (
 
       var currentSightings = []
       var currentPosts = []
+      var currentDays = []
       var currentAmbits = {}
       var currentMembers = []
 
@@ -429,6 +452,8 @@ const expeditionReducer = (
         d3.values(state.featuresByTile[t]).forEach((f) => {
           if (!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
           features[f.properties.FeatureType].push(f)
+          var day = Math.floor((new Date(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+          if (currentDays.indexOf(day) === -1) currentDays.push(day)
         })
 
         if (features.sighting) {
@@ -467,31 +492,18 @@ const expeditionReducer = (
           currentPosts = currentPosts.concat(posts)
         }
 
-        if (features.ambit_geo) {
-          allAmbits = allAmbits.concat(features.ambit_geo)
-          // // sort routes by member
-          // features.ambit_geo
-          // console.log('aga1', features.ambit_geo)
-
-          // features.ambit_geo
-          //   .forEach(f => {
-          //     var memberID = f.properties.Member
-          //     if (!currentAmbits[memberID]) {
-          //       currentAmbits[memberID] = {
-          //         color: state.members[memberID].color,
-          //         coordinates: [],
-          //         dates: []
-          //       }
-          //     }
-          //     if (!currentMembers[memberID]) currentMembers[memberID] = {}
-          //     currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
-          //     currentAmbits[memberID].dates.push(f.properties.DateTime)
-          //   })
-
-          // console.log('okok', currentAmbits)
-
-        }
+        // if (features.ambit_geo) {
+        //   allAmbits = allAmbits.concat(features.ambit_geo)
+        // }
       })
+
+      currentDays
+        .sort((a, b) => {
+          return a - b
+        })
+        .forEach(d => {
+          allAmbits = allAmbits.concat(d3.values(state.featuresByDay[d].ambit_geo))
+        })
 
       allAmbits
         .sort((a, b) => {
@@ -512,12 +524,6 @@ const expeditionReducer = (
         })
 
       currentAmbits = d3.values(currentAmbits)
-      console.log('aga2', currentAmbits)
-
-      // if(currentAmbits[0]){
-        // currentAmbits[0].forEach((f) {
-        // })
-      // }
 
       return Object.assign({}, state, {
         currentSightings,
@@ -573,6 +579,7 @@ const dayReducer = (
     start: new Date(),
     end: new Date(0),
     beacons: {},
+    ambits: {},
     incomplete: true
   },
   action,
@@ -583,11 +590,11 @@ const dayReducer = (
     case actions.RECEIVE_DAY:
       start = new Date()
       end = new Date(0)
+      if (!features.beacon) break
+      var incomplete = Object.keys(features.beacon).length === 0
 
-      var incomplete = Object.keys(features).length === 0
-
-      Object.keys(features).forEach((k) => {
-        var f = features[k]
+      Object.keys(features.beacon).forEach((k) => {
+        var f = features.beacon[k]
         var d = new Date(f.properties.DateTime)
         if (d.getTime() < start.getTime()) start = d
         if (d.getTime() > end.getTime()) end = d
@@ -597,7 +604,8 @@ const dayReducer = (
         isFetching: false,
         start: start,
         end: end,
-        beacons: Object.assign({}, state.features, features),
+        beacons: Object.assign({}, state.beacons, features.beacon),
+        ambits: Object.assign({}, state.ambits, features.ambit),
         incomplete: incomplete
       })
 
@@ -621,11 +629,6 @@ const featureReducer = (
       if (feature.properties.FeatureType === 'sighting') {
         feature.properties.radius = 2 + Math.sqrt(feature.properties.Count) * 2
       }
-
-      if (feature.properties.FeatureType === 'ambit_geo') {
-        feature.properties.radius = 2
-      }
-
       return Object.assign({}, state, feature)
     default:
       break

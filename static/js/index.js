@@ -20,6 +20,11 @@
 
   WILL DO:
   fix timeline graph
+
+  load features by tile
+  get feature days
+  load all ambit_geo in that timespan
+
 */
 
 import 'babel-polyfill'

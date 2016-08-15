@@ -157,7 +157,6 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
       const goFetch = (featureTypes, results) => {
         var type = featureTypes.shift()
         var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-        if (type === 'ambit_geo') queryString += '&resolution=60'
         console.log('querying:', queryString)
         fetch(queryString)
           .then(response => response.json())
@@ -172,7 +171,7 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
             }
           })
       }
-      goFetch(['blog', 'audio', 'image', 'tweet', 'ambit_geo', 'sighting'], [])
+      goFetch(['blog', 'audio', 'image', 'tweet', 'sighting'], [])
     }
 
     return dispatch({
@@ -203,18 +202,16 @@ export function fetchExpeditions () {
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
       .then(() => dispatch(fetchDay()))
-      .then(() => dispatch(startAnimation()))
-      .then(() => {
-        var state = getState()
-        Object.keys(state.expeditions).forEach((id) => {
-          if (id !== state.selectedExpedition) {
-            dispatch(fetchDay(null, null, id))
-          }
-        })
-        dispatch(fetchTotalSightings(state.selectedExpedition))
-      })
-      // .then(() => dispatch(fetchSightingSummary()))
-      // TODO catch errors
+      // .then(() => dispatch(startAnimation()))
+      // .then(() => {
+      //   var state = getState()
+      //   Object.keys(state.expeditions).forEach((id) => {
+      //     if (id !== state.selectedExpedition) {
+      //       dispatch(fetchDay(null, null, id))
+      //     }
+      //   })
+      //   dispatch(fetchTotalSightings(state.selectedExpedition))
+      // })
   }
 }
 
@@ -260,44 +257,60 @@ export function fetchDay (date, initialDate, id) {
       timestampToString(d3.min(daysToFetch)),
       timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
     ]
-    var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&limit=0&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
-    console.log('querystring:', queryString, expeditionDay)
+    // var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&limit=0&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
+    // console.log('querystring:', queryString, expeditionDay)
 
-    return fetch(queryString)
-      .then(response => response.json())
-      .then(json => dispatch(receiveDay(expeditionID, json, range)))
-      .then(() => dispatch(completeDays(expeditionID)))
-      .then(() => {
-        var state = getState()
-        var expedition = state.expeditions[state.selectedExpedition]
-        var days = expedition.days
-        var incompleteDays = []
-        d3.keys(expedition.days).forEach((k) => {
-          if (expedition.days[k].incomplete) incompleteDays.push(k)
-        })
-        if (incompleteDays.length === 0) {
-          // not sure why I need this '|| date'
-          dispatch(updateTime(initialDate || date, false, expeditionID))
-          dispatch(hideLoadingWheel())
-        } else {
-          console.log('incomplete days', incompleteDays)
-          var nextTarget = -1
-          for (var i = 0; i < incompleteDays.length; i++) {
-            var id = incompleteDays[i]
-            for (var j = Math.max(0, id - 1); j < expedition.dayCount; j++) {
-              if (!days[j]) {
-                nextTarget = j
-                break
+    const goFetch = (featureTypes, results) => {
+      var type = featureTypes.shift()
+      var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
+      if (type === 'ambit_geo') queryString += '&resolution=60'
+      console.log('querying:', queryString)
+      fetch(queryString)
+        .then(response => response.json())
+        .then(json => {
+          results = results.concat(json.results.features)
+          if (featureTypes.length > 0) {
+            console.log('received ' + json.results.features.length + ' ' + type)
+            goFetch(featureTypes, results)
+          } else {
+            console.log('done with query! Received ' + json.results.features.length + ' ' + type)
+            dispatch(receiveDay(expeditionID, results, range))
+            dispatch(completeDays(expeditionID))
+            var state = getState()
+            var expedition = state.expeditions[state.selectedExpedition]
+            var days = expedition.days
+            var incompleteDays = []
+            d3.keys(expedition.days).forEach((k) => {
+              if (expedition.days[k].incomplete) incompleteDays.push(k)
+            })
+            if (incompleteDays.length === 0) {
+              // not sure why I need this '|| date'
+              if (!state.animate) dispatch(startAnimation())
+              dispatch(updateTime(initialDate || date, false, expeditionID))
+              dispatch(hideLoadingWheel())
+            } else {
+              console.log('incomplete days', incompleteDays)
+              var nextTarget = -1
+              for (var i = 0; i < incompleteDays.length; i++) {
+                var id = incompleteDays[i]
+                for (var j = Math.max(0, id - 1); j < expedition.dayCount; j++) {
+                  if (!days[j]) {
+                    nextTarget = j
+                    break
+                  }
+                }
+                if (nextTarget > -1) break
+              }
+              if (nextTarget > -1) {
+                nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
+                dispatch(fetchDay(nextTarget, initialDate, expeditionID))
               }
             }
-            if (nextTarget > -1) break
           }
-          if (nextTarget > -1) {
-            nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
-            dispatch(fetchDay(nextTarget, initialDate, expeditionID))
-          }
-        }
-      })
+        })
+    }
+    // goFetch(['beacon', 'ambit_geo'], [])
+    goFetch(['ambit_geo', 'beacon'], [])
   }
 }
 
@@ -355,7 +368,7 @@ export function receiveFeatures (expeditionID, data, tileRange) {
     type: RECEIVE_FEATURES,
     expeditionID,
     data,
-    tileRange,
+    tileRange
   }
 }
 
