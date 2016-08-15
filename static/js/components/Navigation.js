@@ -15,6 +15,7 @@ const Navigation = ({pathName}) => {
         </ul>
       </div>
       <h1>INTO THE OKAVANGO</h1>
+      <img id="logo" src="static/img/logo.svg" alt="Into the Okavango"/>
     </div>
   )
 }

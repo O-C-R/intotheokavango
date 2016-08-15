@@ -56,7 +56,7 @@ class ZoomSelector extends React.Component {
     if (scaleRange < 1) scaleString = Math.round(scaleRange * 1000) + 'm'
 
     return (
-      <div className="selector">
+      <div className="selector controlSelector">
         <div className="column">
           <ul className="buttonRow">
             {buttons}

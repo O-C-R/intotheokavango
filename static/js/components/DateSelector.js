@@ -8,9 +8,12 @@ const DateSelector = ({expeditions, expeditionID, currentDate}) => {
   var dateString = dateToString(currentDate)
 
   return (
-    <div className="dateSelector">
-      <p>DAY {dayCount}</p>
-      <p>{dateString}</p>
+    <div className="dateSelector controlSelector">
+      <p>
+        DAY {dayCount}
+        <br/>
+        {dateString}
+      </p>
     </div>
   )
 }

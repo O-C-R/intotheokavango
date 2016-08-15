@@ -1,4 +1,16 @@
 
+/*
+  font-family: "Gotham A", "Gotham B", arial;
+  font-style: normal;
+  font-weight: 700;
+
+  font-family: "Sentinel SSm A", "Sentinel SSm B", Arial;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+*/
+
+
 html{
   width:100%;
   height:100%;
@@ -15,6 +27,23 @@ body{
   margin:0;
   padding:0;
   color:white;
+  font-family: "Sentinel SSm A", "Sentinel SSm B", Arial;
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  font-size: 16px;
+}
+
+button{
+  font-family: "Sentinel SSm A", "Sentinel SSm B", Arial;
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+p{
+  margin:0;
+  margin-bottom: 15px;
 }
 
 a{
@@ -96,12 +125,11 @@ ul{
   }
 
     #mapOverlay{
-      width: 35%;
+      width: 40%;
       height: 100%;
       position: absolute;
       pointer-events: none;
       background: linear-gradient(to right, rgba(4,0,26,0.62) , rgba(4,0,26,0));
-      opacity: 0;
     }
 
     #nightOverlay{
@@ -132,7 +160,12 @@ ul{
     }
 
       #header h1{
-        padding-top:34px;
+        display:none;
+      }
+
+      #header img{
+        display: block;
+        padding-top:47px;
       }
 
       #navigation{
@@ -277,7 +310,17 @@ ul{
           overflow-x:visible; 
         }
 
-          .yearSelector{}
+          .controlPanel .controlSelector{
+            
+          }
+
+          .playbackSelector{
+            margin-bottom:50px;
+          }
+
+          .yearSelector{
+            margin-bottom:50px;
+          }
 
             .yearSelector button{
               background-color: #F8D143;

@@ -17,7 +17,7 @@ const YearSelector = ({expeditionID, expeditions, onYearChange}) => {
     })
 
   return (
-    <div className="dropdown yearSelector">
+    <div className="dropdown yearSelector controlSelector">
       <button onClick={toggleDropdown} className="dropbtn">{currentExpeditionName}</button>
       <div id="YearSelectorDropdown" className="dropdown-content">
         {expeditionList}

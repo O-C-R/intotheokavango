@@ -1,30 +1,26 @@
 
 /*
-  UI icons
-  Fonts
 
+  Fonts
   notification animations
   disconnect ambit paths when they are more than one day apart
-  skip day as night if there's no beacon or ambit
+  better night
+  preloader
+  round path waypoints
+  introduction
   round paths
   sighting popups
-  CSS STYLING
-  night
-  visual night
-  focus
-  UI icons
-  preloader
-  rollover species
-  animation species
-  timeline interaction / animation
-  introduction
-  feature loading zoomed out
-  round path waypoints
+  CSS LAYOUT STYLING
   endpoint for Jane
+  responsive map
 
   NICE TO HAVE:
+  timeline interaction / animation
+  feature loading zoomed out
+  focus
   fly to next location when there is no beacon or ambit for one day
   perlin noise moving sightings
+  visual night
 */
 
 import 'babel-polyfill'

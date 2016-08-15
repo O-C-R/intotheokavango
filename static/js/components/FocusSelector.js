@@ -8,7 +8,7 @@ const FocusSelector = ({mainFocus, secondaryFocus, onMainFocusChange, onSecondar
   }
 
   return (
-    <div className="focusSelector">
+    <div className="focusSelector controlSelector">
       <p>Focus on:</p>
       <div className="dropdown">
         <button onClick={()=>toggleDropdown(1)} className="dropbtn">{mainFocus}</button>

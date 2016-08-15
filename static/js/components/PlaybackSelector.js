@@ -47,7 +47,7 @@ class PlaybackSelector extends React.Component {
       )
     })
     return (
-      <ul className="playbackSelector buttonRow" onMouseOut={this.onMouseOut}>
+      <ul className="playbackSelector buttonRow controlSelector" onMouseOut={this.onMouseOut}>
         {buttons}
       </ul>
     )
