@@ -1,12 +1,10 @@
 
 /*
   MAP:
-  add blue overlay
+  zoom
   timeline interaction / animation
   introduction
   feature loading zoomed out
-  timeline graph
-  ambit_geo are linked backwards fromd day to day
   color sightings
   round path waypoints
   scale

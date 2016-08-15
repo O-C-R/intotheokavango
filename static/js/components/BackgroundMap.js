@@ -189,6 +189,10 @@ class BackgroundMap extends React.Component {
         this.state.currentDay = currentDay
         this.state.day = day
         this.state.frameCount = 0
+        this.state.viewport = {
+          ...this.state.viewport,
+          zoom: expedition.zoom
+        }
       }
 
       if (!this.state.animate) {

@@ -102,7 +102,7 @@ const okavangoReducer = (
         [id]: expeditionReducer(state.expeditions[id], action)
       }
       return Object.assign({}, state, {
-        mapStateNeedsUpdate: false,
+        mapStateNeedsUpdate: action.target === 'zoom',
         expeditions: Object.assign({}, state.expeditions, expeditions)
       })
 
@@ -271,7 +271,7 @@ const expeditionReducer = (
   state = {
     name: '',
     playback: 'pause',
-    zoom: 10,
+    zoom: 14,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
     tileSize: 10,
@@ -463,8 +463,6 @@ const expeditionReducer = (
       })
 
       currentAmbits = d3.values(currentAmbits)
-
-      // console.log('aga!', currentAmbits)
 
       return Object.assign({}, state, {
         currentSightings,
