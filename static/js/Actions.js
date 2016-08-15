@@ -48,7 +48,6 @@ export function jumpTo (date) {
     // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     if (expedition.days[expeditionDay]) {
-      // dispatch(updateTime(date, true))
       dispatch(updateTime(date, true))
       return dispatch(fetchDay(date))
     } else {

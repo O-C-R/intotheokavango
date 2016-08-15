@@ -155,24 +155,26 @@ const okavangoReducer = (
         if (!featuresByDay[day][type]) featuresByDay[day][type] = {}
         featuresByDay[day][type][id] = feature
 
-        // assign feature to member
-        var memberID = feature.properties.Member
-        if (!members[memberID]) {
-          members[memberID] = {
-            name: memberID,
-            color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+        if (feature.properties.FeatureType === 'ambit_geo') {
+          // assign feature to member
+          var memberID = feature.properties.Member
+          if (!members[memberID]) {
+            members[memberID] = {
+              name: memberID,
+              color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+            }
           }
+          var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+          if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
+          if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
+          featuresByMember[memberID][dayID][id] = feature
+
+          // assign feature to tile
+          var tileCoordinates = coordinatesToTile(feature.geometry.coordinates, expedition.geoBounds)
+          var tileID = tileCoordinates.x + tileCoordinates.y * tileResolution
+          if (!ambitsByTile[tileID]) ambitsByTile[tileID] = {}
+          ambitsByTile[tileID][id] = feature
         }
-        var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
-        if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
-        featuresByMember[memberID][dayID][id] = feature
-        
-        // assign feature to tile
-        var tileCoordinates = coordinatesToTile(feature.geometry.coordinates, expedition.geoBounds)
-        var tileID = tileCoordinates.x + tileCoordinates.y * tileResolution
-        if (!ambitsByTile[tileID]) ambitsByTile[tileID] = {}
-        ambitsByTile[tileID][id] = feature
       })
 
       Object.keys(featuresByDay).forEach((d) => {
@@ -506,18 +508,30 @@ const expeditionReducer = (
           })
           currentPosts = currentPosts.concat(posts)
         }
-
-        // if (features.ambit_geo) {
-        //   allAmbits = allAmbits.concat(features.ambit_geo)
-        // }
       })
 
-      currentDays
+      var paddingDays = []
+      currentDays.forEach(d => {
+        var flag = false
+        for (i = d - 1; i <= d + 1; i++) {
+          if (currentDays.indexOf(i) === -1 && paddingDays.indexOf(i) === -1) {
+            paddingDays.push(i)
+            flag = true
+          }
+        }
+        if (flag) actions.fetchDay(new Date(state.start.getTime() + (1000 * 3600 * 24) * d))
+      })
+      currentDays = currentDays
+        .concat(paddingDays)
+
+      currentDays = currentDays
         .sort((a, b) => {
           return a - b
         })
         .forEach(d => {
-          allAmbits = allAmbits.concat(d3.values(state.featuresByDay[d].ambit_geo))
+          if (state.featuresByDay[d]) {
+            allAmbits = allAmbits.concat(d3.values(state.featuresByDay[d].ambit_geo))
+          }
         })
 
       allAmbits

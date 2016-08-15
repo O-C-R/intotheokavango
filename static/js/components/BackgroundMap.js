@@ -60,7 +60,7 @@ class BackgroundMap extends React.Component {
         return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
       })
       var beaconCount = beacons.length
-      var beaconIndex = -1
+      var beaconIndex
       var timeToNextBeacon = 0
       var ratioBetweenBeacons = 0
       if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
@@ -150,10 +150,6 @@ class BackgroundMap extends React.Component {
         }
       })
 
-      // Object.keys(members).forEach(memberID => {
-      //   if (this.state.frameCount % 30 === 0) console.log(memberID, members[memberID].coordinates)
-      // })
-
       this.setState({
         currentDate,
         animate,
@@ -169,7 +165,6 @@ class BackgroundMap extends React.Component {
         }
       })
 
-      // if (this.state.frameCount % 60 === 0 && expedition.playback !== 'pause') {
       if (this.state.frameCount % 60 === 0) {
         const { unproject } = ViewportMercator({ ...this.state.viewport })
         const nw = unproject([0, 0])
