@@ -18,6 +18,13 @@ const mapStateToProps = (state, ownProps) => {
     props.secondaryFocus = expedition.secondaryFocus
     props.zoom = expedition.zoom
     props.layout = expedition.layout
+    props.viewport = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      longitude: expedition.coordinates[0],
+      latitude: expedition.coordinates[1],
+      zoom: expedition.zoom
+    }
   }
 
   return props

@@ -86,7 +86,7 @@ export function updateTime (currentDate, updateMapState, expeditionID) {
 
 export const UPDATE_MAP = 'UPDATE_MAP'
 
-export function updateMap (currentDate, coordinates, viewGeoBounds) {
+export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
   return function (dispatch, getState) {
     var state = getState()
     var expedition = state.expeditions[state.selectedExpedition]
@@ -180,7 +180,8 @@ export function updateMap (currentDate, coordinates, viewGeoBounds) {
       currentDate,
       coordinates,
       viewGeoBounds,
-      tilesInView
+      tilesInView,
+      zoom
     })
   }
 }

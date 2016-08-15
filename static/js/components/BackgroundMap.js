@@ -168,7 +168,7 @@ class BackgroundMap extends React.Component {
         const nw = unproject([0, 0])
         const se = unproject([window.innerWidth, window.innerHeight])
         const viewGeoBounds = [nw[0], nw[1], se[0], se[1]]
-        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds)
+        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom)
       }
     }
     this.state.animate = animate

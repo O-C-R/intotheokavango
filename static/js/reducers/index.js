@@ -470,7 +470,8 @@ const expeditionReducer = (
         currentMembers,
         currentPosts,
         currentDate: action.currentDate,
-        coordinates: action.coordinates
+        coordinates: action.coordinates,
+        zoom: action.zoom
       })
 
     case actions.RECEIVE_EXPEDITIONS:

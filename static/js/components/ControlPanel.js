@@ -7,7 +7,7 @@ import FocusSelector from './FocusSelector'
 import ZoomSelector from './ZoomSelector'
 import LayoutSelector from './LayoutSelector'
 
-const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange}) => {  
+const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange, viewport}) => {
   if (!expeditionID) return <div className="controlPanel"></div>
 
   if (pathName === '/') pathName = '/map'
@@ -18,7 +18,7 @@ const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playbac
       <DateSelector expeditions={expeditions} expeditionID={expeditionID} currentDate={currentDate} />
       {pathName === '/map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/> : null}
       {pathName === '/map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/> : null}
-      {pathName === '/map' ? <ZoomSelector onZoomChange={onZoomChange}/> : null}
+      {pathName === '/map' ? <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/> : null}
       {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/> : null}
     </div>
   )
@@ -39,7 +39,8 @@ ControlPanel.propTypes = {
   onMainFocusChange: PropTypes.func.isRequired,
   onSecondaryFocusChange: PropTypes.func.isRequired,
   onZoomChange: PropTypes.func.isRequired,
-  onLayoutChange: PropTypes.func.isRequired
+  onLayoutChange: PropTypes.func.isRequired,
+  viewPort: PropTypes.object
 }
 
 export default ControlPanel
