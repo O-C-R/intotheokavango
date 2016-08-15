@@ -11,7 +11,7 @@ const SightingGraph = ({width, height, sightings}) => {
 
   var y = d3.scaleLinear()
     .domain([0, sightings.length - 1])
-    .range([height, 0])
+    .range([0, height])
 
   return (
     <g>
