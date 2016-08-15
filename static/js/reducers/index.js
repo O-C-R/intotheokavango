@@ -12,9 +12,19 @@ const okavangoReducer = (
   },
   action
 ) => {
-  var expeditions, features, id, expeditionID, expedition, tiles, days
+  var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
+    case actions.RECEIVE_TOTAL_SIGHTINGS:
+      id = action.id || state.selectedExpedition
+      return Object.assign({}, state, {
+        expeditions: Object.assign({}, state.expeditions, {
+          [id]: Object.assign({}, state.expeditions[action.id], {
+            totalSightings: action.data.results
+          })
+        })
+      })
+
     case actions.COMPLETE_DAYS:
       id = action.expeditionID || state.selectedExpedition
       return Object.assign({}, state, {
@@ -280,6 +290,7 @@ const expeditionReducer = (
     currentPosts: [],
     currentSightings: [],
     currentAmbits: [],
+    totalSightings: [],
     memberColors: [
       'rgba(253, 191, 111, 1)',
       'rgba(166, 206, 227, 1)',

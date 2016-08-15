@@ -209,9 +209,28 @@ export function fetchExpeditions () {
             dispatch(fetchDay(null, null, id))
           }
         })
+        dispatch(fetchTotalSightings(state.selectedExpedition))
       })
       // .then(() => dispatch(fetchSightingSummary()))
       // TODO catch errors
+  }
+}
+
+export function fetchTotalSightings (id) {
+  return function (dispatch, getState) {
+    return fetch('http://intotheokavango.org/api/sightings?FeatureType=sighting&limit=0&Expedition=' + id)
+      .then(response => response.json())
+      .then(json => dispatch(receiveTotalSightings(id, json)))
+  }
+}
+
+export const RECEIVE_TOTAL_SIGHTINGS = 'RECEIVE_TOTAL_SIGHTINGS'
+
+export function receiveTotalSightings(id, data) {
+  return {
+    type: RECEIVE_TOTAL_SIGHTINGS,
+    id, 
+    data
   }
 }
 
@@ -283,9 +302,16 @@ export function fetchDay (date, initialDate, id) {
 export const SET_EXPEDITION = 'SET_EXPEDITION'
 
 export function setExpedition (id) {
-  return {
-    type: SET_EXPEDITION,
-    id
+  return function (dispatch, getState) {
+    var state = getState()
+    var expedition = state.expeditions[id]
+    if (expedition.totalSightings.length === 0) {
+      dispatch(fetchTotalSightings(id))
+    }
+    dispatch({
+      type: SET_EXPEDITION,
+      id
+    })
   }
 }
 

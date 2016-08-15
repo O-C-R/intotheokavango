@@ -1,6 +1,7 @@
 
 /*
   MAP:
+  add blue overlay
   timeline interaction / animation
   introduction
   feature loading zoomed out
@@ -13,6 +14,7 @@
   preloader
   focus
   endpoint for Jane
+  fix timeline graph
 */
 
 import 'babel-polyfill'

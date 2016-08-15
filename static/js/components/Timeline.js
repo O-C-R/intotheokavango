@@ -2,6 +2,7 @@
 import React, {PropTypes} from 'react'
 import * as d3 from 'd3'
 import autobind from 'autobind-decorator'
+import SightingGraph from './SightingGraph'
 
 class Timeline extends React.Component {
   constructor (props) {
@@ -16,7 +17,8 @@ class Timeline extends React.Component {
       range: [0, 0],
       domain: [0, 0],
       scaleDays: null,
-      scaleTime: null
+      scaleTime: null,
+      totalSightings: []
     }
   }
 
@@ -47,6 +49,8 @@ class Timeline extends React.Component {
 
       const cursorY = (scaleTime(expedition.currentDate.getTime()) - 8)
 
+      var totalSightings = expedition.totalSightings
+
       this.setState({
         ...this.state,
         x,
@@ -57,7 +61,8 @@ class Timeline extends React.Component {
         range,
         domain,
         scaleDays,
-        scaleTime
+        scaleTime,
+        totalSightings
       })
     }
   }
@@ -80,17 +85,28 @@ class Timeline extends React.Component {
     })
   }
 
+  @autobind
+  onMouseOut (e) {
+    const { expedition } = this.props
+    const { scaleTime } = this.state
+    const cursorY = (scaleTime(expedition.currentDate.getTime()) - 8)
+    this.setState({
+      ...this.state,
+      cursorY
+    })
+  }
+
   render () {
     const { expedition } = this.props
     if (!expedition) return <svg id="timeline"></svg>
-    const { height, data, x, range, scaleDays, cursorY } = this.state
+    const { width, height, data, x, range, scaleDays, cursorY, totalSightings, padding } = this.state
 
     const days = data.map((d, i) => {
       return <circle cx={x} cy={scaleDays(i)} r={2} key={i} fill="white"/>
     })
 
     return (
-      <svg id="timeline" style={{height: height + 'px'}} onMouseMove={this.onMouseMove} onClick={this.onClick}>
+      <svg id="timeline" style={{height: height + 'px'}} onMouseOut={this.onMouseOut} onMouseMove={this.onMouseMove} onClick={this.onClick}>
         <filter id="dropshadow" height="120%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
           <feOffset dx="2" dy="0" result="offsetblur"/>
@@ -99,6 +115,9 @@ class Timeline extends React.Component {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+        <g transform={'translate(' + 0 + ',' + padding[1] + ')'} style={{pointerEvents: 'none'}}>
+          <SightingGraph sightings={totalSightings} width={width} height={height - padding[1] * 2}/>
+        </g>
         <line x1={x} x2={x} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
         <g>{ days }</g>
         <g transform={'translate(' + (x - 20) + ',' + cursorY + ')'} style={{pointerEvents: 'none'}}>
