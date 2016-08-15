@@ -1,17 +1,18 @@
 
 /*
   MAP:
-  zoom
+  focus
+  UI icons
+  preloader
+  rollover species
+  animation species
   timeline interaction / animation
   introduction
   feature loading zoomed out
-  color sightings
   round path waypoints
-  scale
-  UI icons
-  preloader
-  focus
   endpoint for Jane
+
+  WILL DO:
   fix timeline graph
 */
 

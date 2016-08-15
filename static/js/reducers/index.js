@@ -1,6 +1,7 @@
 
 import * as actions from '../actions'
 import * as d3 from 'd3'
+import randomColor from 'randomcolor'
 
 const okavangoReducer = (
   state = {
@@ -8,7 +9,8 @@ const okavangoReducer = (
     animate: false,
     isFetching: false,
     selectedExpedition: null,
-    expeditions: {}
+    expeditions: {},
+    speciesColors: {}
   },
   action
 ) => {
@@ -200,9 +202,21 @@ const okavangoReducer = (
         featuresByTile[t] = {}
       })
 
+      const rgbToString = (rgb) => {
+        return rgb.slice(4).slice(0, -1).split(',').map(c => parseInt(c))
+      }
+
       features = {}
       action.data.forEach((f) => {
         var id = f.id
+        if (f.properties.FeatureType === 'sighting') {
+          if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
+          else {
+            var taxClass = f.properties.Taxonomy.Class
+            if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
+            f.properties.color = state.speciesColors[taxClass]
+          }
+        }
         features[id] = featureReducer(expedition.features[id], action, f)
       })
 
