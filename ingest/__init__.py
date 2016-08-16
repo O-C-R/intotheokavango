@@ -84,6 +84,7 @@ def ingest_data(feature_type, feature): # note that this operates on the origina
         feature_id = db.features.insert_one(feature).inserted_id
     except Exception as e:
         log.error(log.exc(e))
+        log.debug(feature)
         return False, "Database error"
     log.info("--> success (%s)" % feature_id)
     return True, feature_id
