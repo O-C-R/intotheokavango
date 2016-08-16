@@ -1,6 +1,7 @@
 *.db
 *.pem
 *.smp
+!config.yaml.smp
 .DS_Store
 .git
 .gitignore

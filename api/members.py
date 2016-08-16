@@ -5,7 +5,7 @@ def assemble(self, search, limit, order, resolution):
     log.info("members.assemble")
     members = {}
     try:
-        results = self.db.features.find(search).distinct('properties.Member')
+        results = self.db.members.find(search).distinct('Name')
         for member in results:
             expeditions = list(self.db.features.find({'properties.Member': member}).distinct('properties.Expedition'))
             members[member] = expeditions

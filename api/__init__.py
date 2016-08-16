@@ -61,6 +61,16 @@ class Api(server.Handler):
         # time to build our search filter
         search = {}
 
+        # special parsing for FeatureType
+        feature_type = self.get_argument('FeatureType', None)
+        if feature_type is not None:
+            if ',' in feature_type:
+                search['$or'] = [{'properties.FeatureType': ft} for ft in feature_type.split(',')]
+            else:
+                search['FeatureType'] = feature_type
+            del self.request.arguments['FeatureType']
+
+
         # special parsing for id
         feature_id = self.get_argument('id', None)
         if feature_id is not None:
@@ -68,7 +78,9 @@ class Api(server.Handler):
                 search['_id'] = ObjectId(feature_id)
             except Exception as e:
                 log.error(log.exc(e))
-                return self.error("Bad dates")          
+                return self.error("Bad ID")        
+            del self.request.arguments['id']
+
 
         # special parsing for startDate and endDate
         start_string = self.get_argument('startDate', None) 
@@ -84,7 +96,11 @@ class Api(server.Handler):
                 search['t_utc'] = {'$gt': start_t, '$lt': end_t}
             except Exception as e:
                 log.error(log.exc(e))
-                return self.error("Bad dates")          
+                return self.error("Bad dates")  
+            del self.request.arguments['startDate']
+            if 'endDate' in self.request.arguments:
+                del self.request.arguments['endDate']        
+
 
         # special parsing for rectangular location
         # expecting bounds (upper left (NW), lower right (SE)): lon_1,lat_1,lon_2,lat_2
@@ -98,6 +114,8 @@ class Api(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad geometry")
+            del self.request.arguments['geoBounds'] 
+
 
         # special parsing for polygonal region
         # expecting an arbitrary polygon
@@ -114,6 +132,8 @@ class Api(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad geometry")
+            del self.request.arguments['region']
+
 
         # special parsing for expeditionDay (overrides startDate / endDate)
         expedition_day = self.get_argument('expeditionDay', None)
@@ -130,6 +150,7 @@ class Api(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.error("Bad day")
+            del self.request.arguments['expeditionDay']
 
         # special parsing for resolution
         resolution = strings.as_numeric(self.request.arguments['resolution'][0]) if 'resolution' in self.request.arguments else 0
@@ -138,12 +159,15 @@ class Api(server.Handler):
         species_search = self.get_argument('speciesSearch', None)
         if species_search is not None:
             search['$text'] = {'$search': species_search}
+            del self.request.arguments['speciesSearch']
+
 
         # get limit and order
         # limit = self.get_argument('limit', 100) # this fails on int arguments, which I think is a tornado bug
         limit = strings.as_numeric(self.request.arguments['limit'][0]) if 'limit' in self.request.arguments else 100
         order = self.request.arguments['order'][0].lower() if 'order' in self.request.arguments else 'ascending'
         order = ASCENDING if order == "ascending" else DESCENDING
+
 
         # get all the rest of the arguments and format as properties    
         try:
@@ -156,8 +180,7 @@ class Api(server.Handler):
                     item = {'$exists': True} if item == '*' else item
                     value[i] = item
                 search[param] = value[0] if len(value) == 1 else value  
-            search = {  ('properties.%s' % (strings.camelcase(param) if param != 't_utc' and param != '_id' else param) if param != 'geometry' and param != '$text' and param != '_id' else param): value for (param, value) in search.items() if param not in ['id', 'region', 'geoBounds', 'startDate', 'endDate', 'expeditionDay', 'limit', 'order', 'resolution', 'speciesSearch']}
-            print(search)
+            search = {  ('properties.%s' % (strings.camelcase(param) if param != 't_utc' and param != '_id' else param) if param != 'geometry' and param != '$text' and param != '$or' and param != '_id' else param): value for (param, value) in search.items() if param not in ['limit', 'order', 'resolution']}
         except Exception as e:
             log.error(log.exc(e))
             return self.error("bad parameters")
@@ -166,17 +189,17 @@ class Api(server.Handler):
         log.info("FILTER %s" % search)
 
         # pass our search to the view module for execution and formatting
-        # try:         
-        result = view.assemble(self, search, limit, order, resolution)   
-        if result is None:
-            return
-        if csv:
-            return self.csv(format_csv(result), "data.csv")
-        results, total, returned = result
-        search = {key.replace('properties.', ''): value for (key, value) in search.items()}
-        return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
-        # except Exception as e:
-        #     return self.error(log.exc(e))
+        try:         
+            result = view.assemble(self, search, limit, order, resolution)   
+            if result is None:
+                return
+            if csv:
+                return self.csv(format_csv(result), "data.csv")
+            results, total, returned = result
+            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+            return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
+        except Exception as e:
+            return self.error(log.exc(e))
 
 def format_csv(data):
     import csv    

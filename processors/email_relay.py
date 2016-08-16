@@ -95,6 +95,7 @@ def main():
                                                     except Exception as e:
                                                         log.error(log.exc(e))
                                                 else: # ingest energy data sample 
+                                                    continue # these are currently useless and numerous
                                                     try:
                                                         url = "%s/ingest/ambit" % config['url']
                                                         log.info("Sending to %s..." % url)
