@@ -16,6 +16,7 @@ def parse(request):
         content = strings.singlespace(body.strip())
 
         label_sets = [  ['t_utc', 'Station', 'Temp', 'Humidity', 'Pressure', 'WindSpeed2m', 'WindDir2m', 'WindGust10m', 'WindGustDir1m', 'DailyRain'],
+                        ['t_utc', 'Station', 'Temp', 'Humidity', 'Pressure', 'WindSpeed2m', 'WindDir2m', 'WindGust10m', 'WindGustDir1m', 'DailyRain', 'Battery'],
                         ['t_utc', 'Station', 'Latitude', 'Longitude', 'Altitude'],
                         ['t_utc', 'Station', 'Battery', 'ORP', 'pH', 'DO', 'Ec', 'Tds', 'Sal', 'Sg', '0', '0', '0', 'WaterT']
                         ]
