@@ -13,8 +13,8 @@ class BackgroundMap extends React.Component {
       animate: false,
       coordinates: [0, 0],
       viewport: {
-        latitude: -22,
-        longitude: 18,
+        latitude: -18.5699229,
+        longitude: 22.115456,
         zoom: 14,
         width: window.innerWidth,
         height: window.innerHeight,
