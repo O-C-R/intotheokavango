@@ -19,6 +19,7 @@ def parse(request):
             success, value = ingest_data("sensor", reading)
             if not success:
                 log.error("--> failed: %s" % value)            
+                return None, value
     except Exception as e:
         log.error("--> failed: %s" % log.exc(e))
         return None, "Unexpected format"   

@@ -47,7 +47,7 @@ def main(): ## called via tweet_grabber.py
                     log.info("--> skipping duplicate blog post")
                     continue
                 log.info("--> %s" % entry)
-                success, value = ingest_data("tweet", entry)
+                success, value = ingest_data("blog", entry)
                 if not success:
                     log.error("--> failed: %s" % value)
                 else:
