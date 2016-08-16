@@ -26,11 +26,11 @@ export default class Okavango extends React.Component {
     return (
       <div id="root">
         <BackgroundMap isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate}/>
-        <div id="mapOverlay"></div>
-        <div id="nightOverlay"></div>
+        <div id="mapOverlay" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}></div>
+        <div id="nightOverlay" style={{opacity: (location.pathname === '/map' || location.pathname === '/' ? 0 : 1)}}></div>
         <Navigation pathName={location.pathname}/>
         <div id="content" style={height}>
-          {isFetching ? 
+          {isFetching ?
           <div id="loadingWheel">
             <div class="wheel"></div>
           </div> : null}

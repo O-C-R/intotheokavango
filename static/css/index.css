@@ -32,6 +32,7 @@ body{
   font-weight: 300;
   letter-spacing: 0.02em;
   font-size: 16px;
+  line-height: 30px;
 }
 
 button{
@@ -53,6 +54,22 @@ a{
 
 h1, h2, h3, h4, h5{
   margin-top:0;
+}
+
+h1{
+  font-family: "Gotham A", "Gotham B", arial;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 52px;
+  line-height: 60px;
+}
+
+h2{
+  font-family: "Gotham A", "Gotham B", arial;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 30px;
 }
 
 ul{
@@ -129,16 +146,17 @@ ul{
       height: 100%;
       position: absolute;
       pointer-events: none;
-      background: linear-gradient(to right, rgba(4,0,26,0.62) , rgba(4,0,26,0));
+      background: linear-gradient(to right, rgba(4,0,26,0.68) , rgba(4,0,26,0));
     }
 
     #nightOverlay{
       width: 100%;
       height: 100%;
       position: absolute;
-      background-color: rgba(4,0,26,0.62);
+      background-color: rgba(4,0,26,0.72);
       pointer-events: none;
       opacity: 0;
+      z-index: -1;
     }
 
   #loadingWheel{
@@ -304,6 +322,11 @@ ul{
         left:0;
         width:5%;
       }
+
+        #timeline.invisible{
+          opacity: 0;
+          pointer-events: none;
+        }
 
       #pageContainer{
         width:100%;
@@ -528,12 +551,14 @@ ul{
 
       #aboutPage{}
 
-      #aboutPage video{
-        width:100%;
+      #aboutPage .vimeo{
         background-color: black;
+        margin-bottom: 50px;
       }
 
-        #aboutPage div.columnWrapper{}
+        #aboutPage div.columnWrapper{
+          margin-bottom: 75px;
+        }
 
         #aboutPage div.columnWrapper div.column{
           display:inline-block;
@@ -549,6 +574,84 @@ ul{
           #aboutPage div.columnWrapper div.column.headline{
             text-align: right;
           }
+
+          #aboutPage div.columnWrapper:not(.credits) div.column:nth-child(2) h2{
+            text-align: right;
+          }
+
+          #aboutPage div.columnWrapper div.column div.goalIcon{
+            float: left;
+            width: 50px;
+            height: 50px;
+            margin-right: 20px;
+            border: 1px solid white;
+            margin-top: 4px;
+            margin: 4px 20px 0 0;
+          }
+
+          #aboutPage div.columnWrapper:not(.credits) div.column:nth-child(2) div.goalIcon{
+            float: right;
+            margin: 4px 0 0 20px;
+          }
+
+            #aboutPage div.credits h2{
+              margin-bottom: 30px;
+              position:relative;
+            }
+
+              #aboutPage div.credits h2 span.job{
+                font-family: "Gotham A", "Gotham B", arial;
+                font-style: normal;
+                font-weight: 700;
+                font-size: 9px;
+                text-transform: uppercase;
+                line-height: 0;
+                margin-top:8px;
+                margin-bottom:8px;
+                display:block;
+                position: absolute;
+                color:rgba(255,255,255,0.75);
+              }
+
+            #aboutPage div.credits p{
+              margin-bottom: 75px;
+              font-size: 16px;
+              line-height: 1.8em;
+              position:relative;
+            }
+
+            #aboutPage div.credits p:last-child{
+              margin-bottom: 0;
+            }
+
+              #aboutPage div.credits p span.job{
+                font-family: "Gotham A", "Gotham B", arial;
+                font-style: normal;
+                font-weight: 700;
+                font-size: 9px;
+                text-transform: uppercase;
+                opacity: 0.75;
+                text-align: right;
+                display: block;
+                float:right;
+                line-height: 2.8em !important;
+              }
+
+              span.explorerBox{
+                display:inline-block;
+                width:5px;
+                height:8px;
+                border: 2px solid #f6d13a;
+                vertical-align: middle;
+                margin-left: 5px;
+                margin-top:-3px;
+              }
+
+              span.explorerBox.legend{
+                margin-left: 0;
+                margin-right: 5px;
+                margin-top:-3px;
+              }
 
 
     #mapbox{

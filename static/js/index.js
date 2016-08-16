@@ -1,24 +1,29 @@
 
 /*
 
+  LOGOS
+
+  ABOUT PAGE
   notification animations
-  disconnect ambit paths when they are more than one day apart
-  better night
-  preloader
-  round path waypoints
   introduction
-  round paths
+  disconnect ambit paths when they are more than one day apart
   sighting popups
-  endpoint for Jane
   responsive map
+  
+  better night
+  round path waypoints
+  endpoint for Jane
+
 
   NICE TO HAVE:
+  change initial map location
   timeline interaction / animation
   feature loading zoomed out
   focus
   fly to next location when there is no beacon or ambit for one day
   perlin noise moving sightings
   visual night
+
 */
 
 import 'babel-polyfill'
