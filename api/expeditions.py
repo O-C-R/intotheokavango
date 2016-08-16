@@ -9,8 +9,11 @@ def assemble(self, search, limit, order, resolution):
         results = self.db.features.find(search).distinct('properties.Expedition')
         for expedition in results:
             start_date = util.parse_date(str(config['start_date'][expedition]), tz=config['local_tz'])
-            last_feature = list(self.db.features.find({'properties.Expedition': expedition, 'properties.t_utc': {'$gt': util.timestamp(start_date)}, 'properties.FeatureType': "beacon"}).sort([('properties.t_utc', DESCENDING)]).limit(1))[0]
-            end_date = util.parse_date(last_feature['properties']['DateTime'], tz=config['local_tz'])
+            try:
+                last_feature = list(self.db.features.find({'properties.Expedition': expedition, 'properties.t_utc': {'$gt': util.timestamp(start_date)}, 'properties.FeatureType': "beacon"}).sort([('properties.t_utc', DESCENDING)]).limit(1))[0]
+                end_date = util.parse_date(last_feature['properties']['DateTime'], tz=config['local_tz'])
+            except IndexError:
+                end_date = util.dt(util.timestamp(), tz=config['local_tz'])
             duration = end_date - start_date
             try:
                 ## there is an okavango hack here that ignores points west of the prime meridian
