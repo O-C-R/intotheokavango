@@ -4,7 +4,7 @@ from ingest import ingest_json_file, ingest_data
 
 def parse(request):
     log.info("databoat.parse")
-    data = ingest_json_file(request)
+    data = ingest_json_body(request)
     try:
         for key, reading in data.items():
             t_local = strings.as_numeric(reading['t_local'])
