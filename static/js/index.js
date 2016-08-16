@@ -9,7 +9,6 @@
   responsive map
 
   better night
-  round path waypoints
   endpoint for Jane
 
   NICE TO HAVE:
