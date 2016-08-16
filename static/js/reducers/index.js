@@ -49,7 +49,6 @@ const okavangoReducer = (
       })
 
     case actions.START:
-      console.log('START!!!')
       return Object.assign({}, state, {
         mapStateNeedsUpdate: true,
         animate: true
@@ -319,7 +318,7 @@ const okavangoReducer = (
 const expeditionReducer = (
   state = {
     name: '',
-    playback: 'pause',
+    playback: 'forward',
     zoom: 14,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],

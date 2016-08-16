@@ -6,12 +6,6 @@ import Timeline from './Timeline'
 import Navigation from './Navigation'
 
 export default class Okavango extends React.Component {
-
-  componentWillReceiveProps (nextProps) {
-    const { setControl } = this.props
-    if (location.pathname !== 'map') setControl('playback', 'pause')
-  }
-
   render () {
     const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate} = this.props
     var height = {height: window.innerHeight - 100}

@@ -28,7 +28,7 @@ class BackgroundMap extends React.Component {
   tick () {
     const {animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
-    if (animate && !isFetching) {
+    if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'

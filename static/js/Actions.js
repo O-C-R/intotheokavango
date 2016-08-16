@@ -180,6 +180,12 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
 export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 
 export function receiveExpeditions (data) {
+  for (var k in data.results) {
+    if (data.results[k].Days < 0) {
+      delete data.results[k]
+    }
+  }
+
   return {
     type: RECEIVE_EXPEDITIONS,
     data

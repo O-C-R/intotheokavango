@@ -7,11 +7,10 @@
   disconnect ambit paths when they are more than one day apart
   sighting popups
   responsive map
-  
+
   better night
   round path waypoints
   endpoint for Jane
-
 
   NICE TO HAVE:
   change initial map location
