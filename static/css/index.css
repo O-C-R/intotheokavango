@@ -328,6 +328,18 @@ ul{
               color:rgba(4,0,26,1);
             }
 
+              .yearSelector button span{
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 5px 4px 0 4px;
+                border-color: #04001a transparent transparent transparent;
+                display: inline-block;
+                margin-left: 10px;
+                vertical-align: middle;
+                padding-bottom: 3px;
+              }
+
           ul.buttonRow{
             border: white 1px solid;
             border-radius: 3px;
