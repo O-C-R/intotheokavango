@@ -30,7 +30,10 @@ export default class Okavango extends React.Component {
         <div id="nightOverlay"></div>
         <Navigation pathName={location.pathname}/>
         <div id="content" style={height}>
-          {isFetching ? <div id="loadingWheel"></div> : null}
+          {isFetching ? 
+          <div id="loadingWheel">
+            <div class="wheel"></div>
+          </div> : null}
           <LightBox active={false}/>
           <Timeline expedition={expedition} jumpTo={jumpTo}/>
           <div id="pageContainer">

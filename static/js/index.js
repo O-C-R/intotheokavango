@@ -1,7 +1,6 @@
 
 /*
 
-  Fonts
   notification animations
   disconnect ambit paths when they are more than one day apart
   better night
@@ -10,7 +9,6 @@
   introduction
   round paths
   sighting popups
-  CSS LAYOUT STYLING
   endpoint for Jane
   responsive map
 
@@ -30,7 +28,7 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
-import createLogger from 'redux-logger'
+// import createLogger from 'redux-logger'
 import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
@@ -42,7 +40,7 @@ import DataPage from './components/DataPage'
 import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
 
-const loggerMiddleware = createLogger()
+// const loggerMiddleware = createLogger()
 
 let store = createStore(
   okavangoApp,
