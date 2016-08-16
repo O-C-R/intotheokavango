@@ -231,8 +231,8 @@ class BackgroundMap extends React.Component {
     const icons = expedition.currentPosts.map(post => {
       const translate = (position) => {
         var coords = project(position)
-        var x = Math.round(coords[0] * 10) / 10
-        var y = Math.round(coords[1] * 10) / 10
+        var x = Math.round(coords[0])
+        var y = Math.round(coords[1])
         return 'translate(' + x + ',' + y + ')'
       }
       return (

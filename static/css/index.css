@@ -670,3 +670,21 @@ ul{
       background-color:black;
       z-index:0;
     }
+
+.notif-enter {
+  opacity: 0.01;
+}
+
+.notif-enter.notif-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.notif-leave {
+  opacity: 1;
+}
+
+.notif-leave.notif-leave-active {
+  opacity: 0.01;
+  transition: opacity 150ms ease-in;
+}

@@ -1,8 +1,6 @@
 
 /*
 
-  test with Brian's server
-  notification animations
   introduction
   disconnect ambit paths when they are more than one day apart
   sighting popups

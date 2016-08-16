@@ -1,6 +1,7 @@
 
 import React, {PropTypes} from 'react'
 import Notification from './Notification'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 const NotificationPanel = ({posts, currentDate}) => {
 
@@ -23,7 +24,6 @@ const NotificationPanel = ({posts, currentDate}) => {
     .map((post, i) => {
       switch (post.type) {
         case 'tweet':
-          console.log('aga!', post.properties)
           var text = post.properties.Text
           if (post.properties.Tweet) text = post.properties.Tweet.text
           return (
@@ -63,7 +63,9 @@ const NotificationPanel = ({posts, currentDate}) => {
     })
   return (
     <div id="notificationPanel">
+      <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={300} transitionLeaveTimeout={150}>
       {notificationItems}
+      </ReactCSSTransitionGroup>
     </div>
   )
 }
