@@ -248,6 +248,15 @@ ul{
       overflow-y: overlay;
     }
 
+      #content div.logos{
+        position:absolute;
+        bottom:28px;
+      }
+
+        #content div.logos a{
+          margin-right:20px;
+        }
+
       #lightBox{
         top: 0;
         position: absolute;

@@ -49,6 +49,7 @@ const okavangoReducer = (
       })
 
     case actions.START:
+      console.log('START!!!')
       return Object.assign({}, state, {
         mapStateNeedsUpdate: true,
         animate: true

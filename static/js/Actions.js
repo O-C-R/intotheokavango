@@ -263,7 +263,7 @@ export function fetchDay (date, initialDate, id, initialize) {
             console.log('received ' + json.results.features.length + ' ' + type)
             goFetch(featureTypes, results)
           } else {
-            console.log('done with query! Received ' + json.results.features.length + ' ' + type)
+            console.log('done with query! Received ' + json.results.features.length + ' ' + type, initialize)
             dispatch(receiveDay(expeditionID, results, range))
             dispatch(completeDays(expeditionID))
             var state = getState()
@@ -293,7 +293,7 @@ export function fetchDay (date, initialDate, id, initialize) {
               }
               if (nextTarget > -1) {
                 nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
-                dispatch(fetchDay(nextTarget, initialDate, expeditionID))
+                dispatch(fetchDay(nextTarget, initialDate, expeditionID, initialize))
               }
             }
           }

@@ -1,9 +1,9 @@
 
 /*
 
+  test with Brian's server
   LOGOS
-
-  ABOUT PAGE
+  pause animation on other pages
   notification animations
   introduction
   disconnect ambit paths when they are more than one day apart

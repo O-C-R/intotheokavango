@@ -181,6 +181,7 @@ class BackgroundMap extends React.Component {
 
   componentWillReceiveProps (nextProps) {
     const {animate, expedition, mapStateNeedsUpdate} = nextProps
+    // console.log('new', animate, this.state.animate)
     if (animate) {
       const currentDate = expedition.currentDate
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1

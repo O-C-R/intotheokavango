@@ -39,6 +39,17 @@ export default class Okavango extends React.Component {
           <div id="pageContainer">
             {children}
           </div>
+          <div class="logos" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}>
+            <a href="http://www.nationalgeographic.com/">
+              <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+            </a>
+            <a href="http://www.o-c-r.org/">
+              <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+            </a>
+            <a href="http://www.wildbirdtrust.com/">
+              <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+            </a>
+          </div>
         </div>
       </div>
     )
