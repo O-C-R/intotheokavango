@@ -40,7 +40,7 @@ def parse(request):
     except Exception as e:
         log.error("Twilio post is malformed: %s" % log.exc(e))
         return None, "Twilio post is malformed"        
-    return data
+    return feature
 
 
 # ## this should be async
