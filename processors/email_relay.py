@@ -2,7 +2,7 @@
 
 import geojson, csv, dateutil, datetime, time, os, zipfile, pytz, xmltodict, json, shutil, urllib, math, subprocess
 from housepy import config, log, util, strings, emailer, net
-from mongo import db
+from mongo import db, DESCENDING
 
 def main():    
     log.info("Checking email...")
