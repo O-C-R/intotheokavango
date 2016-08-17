@@ -30,6 +30,9 @@ def parse(request):
         if 'LocationQuestion' in data:
             data['Location'] = data['LocationQuestion']                    
             del data['LocationQuestion']
+        if 'Location_Question' in data:
+            data['Location'] = data['Location_Question']                    
+            del data['Location_Question']
         if 'GPSLocation' in data:
             data['Location'] = data['GPSLocation']                    
             del data['GPSLocation']
