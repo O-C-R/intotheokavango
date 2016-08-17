@@ -50,7 +50,7 @@ def parse(request):
         feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
 
         # get SpeciesName
-        for alias in ['Species', 'Species_Name', 'Animal', 'SpeciesNameOther', 'Dominant_species']:
+        for alias in ['Species', 'Species_Name', 'Animal', 'SpeciesNameOther', 'Dominant_species', 'Dominant_Species']:
             alias = alias.replace('_', '')
             if alias in feature and len(feature[alias].strip()):
                 feature['SpeciesName'] = strings.titlecase(feature[alias].strip())
