@@ -23,15 +23,16 @@ def parse(request):
         dt = util.parse_date(data['@writeTime'])
         data = data['inputs']
 
-        if 'Date___Time' in data:
-            dt = util.parse_date(data['Date___Time'])
-            del data['Date___Time']
+        for alias in ['Date___Time_Question', 'Date___Time']:
+            if alias in data:
+                dt = util.parse_date(data['Date___Time'])            
+                del data[alias]
         feature['t_utc'] = util.timestamp(dt)
 
         for alias in ['Current_Location', 'LocationQuestion', 'Location_Question', 'GPSLocation']:
-            data['Location'] = data[alias]
-            del data[alias]
-
+            if alias in data:
+                data['Location'] = data[alias]
+                del data[alias]
         if 'Location' in data:
             try:
                 feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
