@@ -18,7 +18,7 @@ class Home(server.Handler):
             except Exception as e:
                 log.error(log.exc(e))
                 return self.not_found()        
-        return self.render("index2.html")
+        return self.render("index3.html")
 
 
 class Upload(server.Handler):
@@ -206,6 +206,13 @@ handlers = [
     (r"/upload/?([^/]*)", Upload),
     (r"/api/?([^/]*)/?([^/]*)", Api),
     (r"/ingest/?([^/]*)", Ingest),
+
+    (r"/map/?([^/]*)", Home),
+    (r"/journal/?([^/]*)", Home),
+    (r"/data/?([^/]*)", Home),
+    (r"/about/?([^/]*)", Home),
+    (r"/share/?([^/]*)", Home),
+    
     (r"/?([^/]*)", Home),    
 ]    
 
