@@ -39,7 +39,8 @@
     "transform": "^1.1.2",
     "transform-loader": "^0.2.3",
     "watchify": "^3.7.0",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
+    "webpack-build": "^1.0.1"
   },
   "dependencies": {
     "autobind-decorator": "^1.3.3",
