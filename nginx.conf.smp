@@ -26,12 +26,11 @@ http {
     keepalive_timeout  65;
     gzip  on;
     proxy_next_upstream error;
-    client_max_body_size 500M;
+    client_max_body_size 100M;
 
     server {        
         listen       80;
         server_name  intotheokavango.org 23.23.124.78;
-        client_max_body_size 100M;
         location / {
             proxy_pass_header Server;   
             proxy_set_header Host $http_host;
