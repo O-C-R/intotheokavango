@@ -71,9 +71,9 @@ class Timeline extends React.Component {
   @autobind
   onClick (e) {
     const { scaleTime, range } = this.state
-    const { jumpTo } = this.props
+    const { jumpTo, expeditionID } = this.props
     var y = e.nativeEvent.offsetY
-    jumpTo(new Date(scaleTime.invert(Math.max(range[0] + 1, Math.min(range[1] - 1, y)))))
+    jumpTo(new Date(scaleTime.invert(Math.max(range[0] + 1, Math.min(range[1] - 1, y)))), expeditionID)
   }
 
   @autobind
@@ -140,6 +140,7 @@ class Timeline extends React.Component {
 
 Timeline.propTypes = {
   expedition: PropTypes.object,
-  jumpTo: PropTypes.func.isRequired
+  jumpTo: PropTypes.func.isRequired,
+  expeditionID: PropTypes.string
 }
 export default Timeline

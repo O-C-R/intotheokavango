@@ -13,6 +13,83 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
+export const SET_PAGE = 'SET_PAGE'
+
+export function setPage () {
+  return {
+    type: SET_PAGE
+  }
+}
+
+export const FETCH_POSTS_BY_DAY = 'FETCH_POSTS_BY_DAY'
+
+export function fetchPostsByDay (_expeditionID, date) {
+  return function (dispatch, getState) {
+    var i
+    var state = getState()
+    if (state.isFetchingPosts > 0) return
+    var expeditionID = _expeditionID || state.selectedExpedition
+    var expedition = state.expeditions[expeditionID]
+    if (!date) date = expedition.currentDate
+    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+
+    var daysToFetch = []
+    if (!expedition.postsByDay[expeditionDay]) {
+      daysToFetch[0] = expeditionDay
+    } else {
+      for (i = expeditionDay - 1; i >= 0; i--) {
+        if (!expedition.postsByDay[i]) {
+          daysToFetch[0] = i
+          break
+        }
+      }
+      for (i = expeditionDay + 1; i < expedition.dayCount; i++) {
+        if (!expedition.postsByDay[i]) {
+          daysToFetch[1] = i
+          break
+        }
+      }
+    }
+
+    daysToFetch.forEach(function (d, i, a) {
+      var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
+      a[i] = t
+    })
+    var range = [
+      timestampToString(d3.min(daysToFetch)),
+      timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
+    ]
+
+    dispatch({
+      type: FETCH_POSTS_BY_DAY,
+      expeditionID: expeditionID,
+      range
+    })
+
+    var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
+    console.log('querying:', queryString)
+    fetch(queryString)
+      .then(response => response.json())
+      .then(json => {
+        var results = json.results.features
+        console.log('done with query! Received ' + results.length + ' features.')
+        dispatch(receivePosts(expeditionID, results, range))
+      })
+  }
+}
+
+export const RECEIVE_POSTS = 'RECEIVE_POSTS'
+
+export function receivePosts (expeditionID, data, timeRange) {
+  return {
+    type: RECEIVE_POSTS,
+    expeditionID,
+    data,
+    timeRange
+  }
+}
+
+
 export const COMPLETE_DAYS = 'COMPLETE_DAYS'
 
 export function completeDays (expeditionID) {
@@ -40,15 +117,13 @@ export function hideLoadingWheel () {
 
 export const JUMP_TO = 'JUMP_TO'
 
-export function jumpTo (date) {
+export function jumpTo (date, expeditionID) {
   return function (dispatch, getState) {
     var state = getState()
-    var expeditionID = state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
-    // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     if (expedition.days[expeditionDay]) {
-      dispatch(updateTime(date, true))
+      dispatch(updateTime(date, true, expeditionID))
       return dispatch(fetchDay(date))
     } else {
       dispatch(showLoadingWheel())
@@ -86,10 +161,10 @@ export function updateTime (currentDate, updateMapState, expeditionID) {
 
 export const UPDATE_MAP = 'UPDATE_MAP'
 
-export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
+export function updateMap (currentDate, coordinates, viewGeoBounds, zoom, expeditionID) {
   return function (dispatch, getState) {
     var state = getState()
-    var expedition = state.expeditions[state.selectedExpedition]
+    var expedition = state.expeditions[expeditionID]
     var tiles = expedition.featuresByTile
     var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
 
@@ -167,6 +242,7 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom) {
 
     return dispatch({
       type: UPDATE_MAP,
+      expeditionID,
       currentDate,
       coordinates,
       viewGeoBounds,
@@ -229,14 +305,13 @@ export function receiveTotalSightings (id, data) {
   }
 }
 
-export function fetchDay (date, initialDate, id, initialize) {
+export function fetchDay (date, initialDate, _expeditionID, initialize) {
   if (!initialDate) initialDate = date
   return function (dispatch, getState) {
     var state = getState()
-    var expeditionID = id || state.selectedExpedition
+    var expeditionID = _expeditionID || state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
     if (!date) date = expedition.currentDate
-    // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
     var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
     var daysToFetch = []
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
@@ -256,7 +331,7 @@ export function fetchDay (date, initialDate, id, initialize) {
     // var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&limit=0&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
     // console.log('querystring:', queryString, expeditionDay)
 
-    const goFetch = (featureTypes, results) => {
+    const goFetch = (featureTypes, results, expeditionID) => {
       var type = featureTypes.shift()
       var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
       if (type === 'ambit_geo') queryString += '&resolution=300'
@@ -267,7 +342,7 @@ export function fetchDay (date, initialDate, id, initialize) {
           results = results.concat(json.results.features)
           if (featureTypes.length > 0) {
             console.log('received ' + json.results.features.length + ' ' + type)
-            goFetch(featureTypes, results)
+            goFetch(featureTypes, results, expeditionID)
           } else {
             console.log('done with query! Received ' + json.results.features.length + ' ' + type, initialize)
             dispatch(receiveDay(expeditionID, results, range))
@@ -299,13 +374,13 @@ export function fetchDay (date, initialDate, id, initialize) {
               }
               if (nextTarget > -1) {
                 nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
-                dispatch(fetchDay(nextTarget, initialDate, expeditionID, initialize))
+                dispatch(fetchDay(nextTarget, null, expeditionID, initialize))
               }
             }
           }
         })
     }
-    goFetch(['ambit_geo', 'beacon'], [])
+    goFetch(['ambit_geo', 'beacon'], [], expeditionID)
   }
 }
 

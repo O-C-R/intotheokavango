@@ -3,15 +3,15 @@ import NavigationItem from './NavigationItem'
 
 // <NavigationItem active={pathName === '/share'}>Share</NavigationItem>
 // <NavigationItem active={pathName === '/data'}>Data</NavigationItem>
-const Navigation = ({pathName}) => {
+// <NavigationItem setPage={setPage} active={pathName === '/' || pathName === '/map'}>Map</NavigationItem>
+// <NavigationItem setPage={setPage} active={pathName === '/journal'}>Journal</NavigationItem>
+const Navigation = ({pathName, setPage}) => {
 
   return(
     <div id="header">
       <div id="navigation">
         <ul>
-          <NavigationItem active={pathName === '/' || pathName === '/map'}>Map</NavigationItem>
-          <NavigationItem active={pathName === '/journal'}>Journal</NavigationItem>
-          <NavigationItem active={pathName === '/about'}>About</NavigationItem>
+          <NavigationItem setPage={setPage} active={pathName === '/' || pathName === '/about'}>About</NavigationItem>
         </ul>
       </div>
       <h1>INTO THE OKAVANGO</h1>
@@ -21,7 +21,8 @@ const Navigation = ({pathName}) => {
 }
 
 Navigation.propTypes = {
-  pathName: PropTypes.string.isRequired
+  pathName: PropTypes.string.isRequired,
+  setPage: PropTypes.func.isRequired
 }
 
 export default Navigation

@@ -1,6 +1,14 @@
 
 /*
 
+  JOURNAL
+    loading of features
+    update currentime
+    link and location buttons
+    reverse timeline
+    show arrow on timeline direction
+  RESPONSIVE
+
   sighting popups
   responsive map
 
@@ -26,6 +34,20 @@
 
   NOTES:
   Medium posts that have nothing to do with Okavango show up in blog query
+
+  JOURNAL DATA LOADING APPROACHES:
+  1 When reaching the extent of the journal content
+    look for bordering days
+    fetch content for those days
+    CONS: tiles might not be loaded entirely so will require second load on map view
+  2 When reaching the extent of the journal content
+    load features for all available 
+    look for beacons in neighboring days
+    load all tiles intersecting with beacons
+    CONS: this could leave tiles out in between beacons
+
+  DATA LOADING:
+    loading stack
 
 */
 
@@ -61,11 +83,11 @@ let store = createStore(
 
 // <Route path="data" component={DataPage}/>
 // <Route path="share" component={SharePage}/>
+    // <Route path="map" component={MapPage}/>
+    // <Route path="journal" component={JournalPageContainer}/>
 const routes = (
   <Route path="/" component={OkavangoContainer}>
-    <IndexRoute component={MapPage}/>
-    <Route path="map" component={MapPage}/>
-    <Route path="journal" component={JournalPageContainer}/>
+    <IndexRoute component={AboutPage}/>
     <Route path="about" component={AboutPage}/>
   </Route>
 )
@@ -82,7 +104,8 @@ var render = function () {
 }
 
 store.subscribe(render)
-store.dispatch(fetchExpeditions())
+// store.dispatch(fetchExpeditions())
+render()
 
 window.onclick = function (event) {
   if (!event.target.matches('.dropbtn')) {

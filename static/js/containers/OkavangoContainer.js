@@ -9,7 +9,8 @@ const mapStateToProps = (state, ownProps) => {
     children: ownProps.children,
     animate: state.animate,
     isFetching: state.isFetching,
-    mapStateNeedsUpdate: state.mapStateNeedsUpdate
+    mapStateNeedsUpdate: state.mapStateNeedsUpdate,
+    expeditionID: state.selectedExpedition
   }
 }
 
@@ -18,14 +19,17 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fetchDay: (currentDate) => {
       return dispatch(actions.fetchDay(currentDate))
     },
-    updateMap: (currentDate, coordinates, viewGeoBounds, zoom) => {
-      return dispatch(actions.updateMap(currentDate, coordinates, viewGeoBounds, zoom))
+    updateMap: (currentDate, coordinates, viewGeoBounds, zoom, expeditionID) => {
+      return dispatch(actions.updateMap(currentDate, coordinates, viewGeoBounds, zoom, expeditionID))
     },
     setControl: (target, mode) => {
       return dispatch(actions.setControl(target, mode))
     },
-    jumpTo: (date) => {
-      return dispatch(actions.jumpTo(date))
+    jumpTo: (date, expeditionID) => {
+      return dispatch(actions.jumpTo(date, expeditionID))
+    },
+    setPage: () => {
+      return dispatch(actions.setPage())
     }
   }
 }

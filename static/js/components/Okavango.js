@@ -7,7 +7,7 @@ import Navigation from './Navigation'
 
 export default class Okavango extends React.Component {
   render () {
-    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate} = this.props
+    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID} = this.props
     var height = {height: window.innerHeight - 100}
 
     // const nightOpacity = () => {
@@ -24,17 +24,17 @@ export default class Okavango extends React.Component {
 
     return (
       <div id="root">
-        <BackgroundMap isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate}/>
+        <BackgroundMap expeditionID={expeditionID} isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate}/>
         <div id="mapOverlay" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}></div>
         <div id="nightOverlay" style={{opacity: (location.pathname === '/map' || location.pathname === '/' ? 0 : 1)}}></div>
-        <Navigation pathName={location.pathname}/>
+        <Navigation setPage={setPage} pathName={location.pathname}/>
         <div id="content" style={height}>
           {isFetching ?
           <div id="loadingWheel">
             <div class="wheel"></div>
           </div> : null}
           <LightBox active={false}/>
-          <Timeline expedition={expedition} jumpTo={jumpTo}/>
+          <Timeline expeditionID={expeditionID} expedition={expedition} jumpTo={jumpTo}/>
           <div id="pageContainer">
             {children}
           </div>
@@ -59,10 +59,12 @@ Okavango.propTypes = {
   animate: PropTypes.bool,
   children: PropTypes.node.isRequired,
   expedition: PropTypes.object,
+  expeditionID: PropTypes.string,
   updateMap: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
   jumpTo: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
-  mapStateNeedsUpdate: PropTypes.bool.isRequired
+  mapStateNeedsUpdate: PropTypes.bool.isRequired,
+  setPage: PropTypes.func.isRequired
 }

@@ -10,8 +10,8 @@ const mapStateToProps = (state, ownProps) => {
   if (!expedition) return { posts: [] }
   
   return {
+    expedition: expedition,
     posts: d3.values(expedition.features).map(p => {
-
       var key = p.id
       var type = p.properties.FeatureType
       var date = new Date(p.properties.DateTime)
@@ -71,7 +71,11 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {}
+  return {
+    fetchPostsByDay: () => {
+      return dispatch(actions.fetchPostsByDay())
+    }
+  }
 }
 
 const JournalPageContainer = connect(

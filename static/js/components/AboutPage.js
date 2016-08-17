@@ -10,8 +10,8 @@ const AboutPage = () => {
         <div className="columnWrapper">
           <div className="column headline">
             <p>
-              120 days, 1,500 miles, 3 countries,<br/>
-              2 rivers, 31 adventurers, 100% open data.<br/>
+              18 days, 345 kilometers,<br/>
+              1 river, 31 adventurers, 100% open data.<br/>
               Join us in real-time as we explore
             </p>
             <h1>
@@ -20,7 +20,7 @@ const AboutPage = () => {
           </div>
           <div className="column">
             <p>
-              The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unstudied. Starting in May a team of Ba’Yei, scientists, engineers and adventurers will journey a 1500 miles down the Cuito River, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
+              The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unstudied. A team of Ba’Yei, scientists, engineers and adventurers will journey a 345 kilometers down the Cuito River, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
             </p>
             <p>
               This site displays data which is uploaded daily, via satellite, by the expedition team. Data is also available through a public API, allowing anyone to remix, analyze or visualize the collected information.
@@ -32,14 +32,14 @@ const AboutPage = () => {
             <div class="goalIcon"><img src="static/img/iconIntroUnderstand.png"/></div>
             <h2>UNDERSTAND<br/>THE WILDERNESS</h2>
             <p>
-              To effectively protect the Okavango and its catchments it is essential to gain knowledge and insight into the functioning of the system as a whole. Starting in 2011 the Okavango Wilderness Project has conducted yearly transects of the Delta, gathering unique data and immersing the expedition members in the ebb and flow of this pristine wilderness. In 2015 the expedition will be extended to include a transect of one of the Delta’s feeder rivers, the Cuito. With its source deep in the remote highlands of Angola, this is one of the least known places on Earth. Travelling down the river, the team will collect data on insects, fish, birds, reptiles and mammals, as well as conduct water quality assessments and landscape surveys.
+              To effectively protect the Okavango and its catchments it is essential to gain knowledge and insight into the functioning of the system as a whole. Starting in 2011 the Okavango Wilderness Project has conducted yearly transects of the Delta, gathering unique data and immersing the expedition members in the ebb and flow of this pristine wilderness. Traveling down the river, the team will collect data on insects, fish, birds, reptiles and mammals, as well as conduct water quality assessments and landscape surveys.
             </p>
           </div>
           <div className="column">
             <div class="goalIcon"><img src="static/img/iconIntroPreserve.png"/></div>
             <h2>RAISE AWARENESS<br/>AND PRESERVE</h2>
             <p>
-              Although the Okavango itself is protected as a UNESCO World Heritage Site, its catchment and water supply in Angola and Namibia remain vulnerable to human interference. By gathering and freely disseminating information about the functioning and health of the entire system the 2015 expedition aims to raise the levels of both understanding and awareness of this unique and fragile system.
+              Although the Okavango itself is protected as a UNESCO World Heritage Site, its catchment and water supply in Angola and Namibia remain vulnerable to human interference. By gathering and freely disseminating information about the functioning and health of the entire system the 2016 expedition aims to raise the levels of both understanding and awareness of this unique and fragile system.
             </p>
             <p>
               Once base-line data on the system becomes freely available effective measures can then be implemented to insure the continued health and survival of this great African wilderness.

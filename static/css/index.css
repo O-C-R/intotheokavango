@@ -450,7 +450,8 @@ ul{
 
         #feed{
           width: 60%;
-          margin-left: 17%;
+          padding: 0 27%;
+          margin-left: -10%;
         }
 
           #feed div.post{

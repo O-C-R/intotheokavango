@@ -26,7 +26,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick () {
-    const {animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
+    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
     if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
       // increment time
@@ -171,7 +171,7 @@ class BackgroundMap extends React.Component {
         const nw = unproject([0, 0])
         const se = unproject([window.innerWidth, window.innerHeight])
         const viewGeoBounds = [nw[0], nw[1], se[0], se[1]]
-        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom)
+        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom, expeditionID)
       }
     }
     this.state.animate = animate
@@ -312,8 +312,9 @@ class BackgroundMap extends React.Component {
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
 
+      // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (location.pathname === '/map' ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}

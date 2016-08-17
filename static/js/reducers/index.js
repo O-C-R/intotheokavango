@@ -10,15 +10,75 @@ const okavangoReducer = (
     isFetching: false,
     selectedExpedition: null,
     expeditions: {},
-    speciesColors: {}
+    speciesColors: {},
+    isFetchingPosts: 0
   },
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
+    case actions.SET_PAGE:
+      return state
+    case actions.RECEIVE_POSTS:
+      // console.log('RECEIVED', action.data)
+      expeditionID = action.expeditionID
+      expedition = state.expeditions[expeditionID]
+
+      // initializing days
+      var timeRange = action.timeRange
+      var postsByDay = {}
+      var start = new Date(timeRange[0])
+      var end = new Date(timeRange[1])
+      var startDay = Math.floor((start.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+      var endDay = Math.floor((end.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+      for (i = startDay; i <= endDay; i++) {
+        postsByDay[i] = {}
+      }
+
+      features = {}
+      action.data.forEach((f) => {
+        var id = f.id
+        if (f.geometry) {
+          features[id] = featureReducer(expedition.features[id], action, f)
+        }
+      })
+
+      Object.keys(features).forEach((id) => {
+        var feature = features[id]
+        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        if (!postsByDay[day]) postsByDay[day] = {}
+        postsByDay[day][id] = feature
+      })
+      Object.keys(postsByDay).forEach((k) => {
+        postsByDay[k] = Object.assign({}, expedition.postsByDay[k], postsByDay[k])
+      })
+
+      return Object.assign({}, state, {
+        isFetchingPosts: state.isFetchingPosts - 1,
+        mapStateNeedsUpdate: false,
+        expeditions: Object.assign({}, state.expeditions, {
+          [expeditionID]: Object.assign({}, expedition, {
+            features: Object.assign({}, expedition.features, features),
+            postsByDay: Object.assign({}, expedition.postsByDay, postsByDay)
+          })
+        })
+      })
+
+      return state
+
+
+    case actions.FETCH_POSTS_BY_DAY:
+      id = action.expeditionID
+      return Object.assign({}, state, {
+        isFetchingPosts: state.isFetchingPosts + 1,
+        expeditions: Object.assign({}, state.expeditions, {
+          [id]: expeditionReducer(state.expeditions[id], action)
+        })
+      })
+
     case actions.RECEIVE_TOTAL_SIGHTINGS:
-      id = action.id || state.selectedExpedition
+      id = action.id
       return Object.assign({}, state, {
         expeditions: Object.assign({}, state.expeditions, {
           [id]: Object.assign({}, state.expeditions[action.id], {
@@ -28,7 +88,7 @@ const okavangoReducer = (
       })
 
     case actions.COMPLETE_DAYS:
-      id = action.expeditionID || state.selectedExpedition
+      id = action.expeditionID
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
@@ -55,7 +115,7 @@ const okavangoReducer = (
       })
 
     case actions.UPDATE_TIME:
-      expeditionID = action.expeditionID || state.selectedExpedition
+      expeditionID = action.expeditionID
       return Object.assign({}, state, {
         mapStateNeedsUpdate: action.updateMapState,
         expeditions: Object.assign({}, state.expeditions, {
@@ -64,7 +124,7 @@ const okavangoReducer = (
       })
 
     case actions.UPDATE_MAP:
-      expeditionID = action.expeditionID || state.selectedExpedition
+      expeditionID = action.expeditionID
       return Object.assign({}, state, {
         mapStateNeedsUpdate: true,
         expeditions: Object.assign({}, state.expeditions, {
@@ -340,6 +400,7 @@ const expeditionReducer = (
     featuresByTile: {},
     ambitsByTile: {},
     featuresByDay: {},
+    postsByDay: {},
     featuresByMember: {},
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
@@ -365,9 +426,22 @@ const expeditionReducer = (
   action,
   data
 ) => {
+  var i
   switch (action.type) {
+    case actions.FETCH_POSTS_BY_DAY:
+      var postsByDay = []
+      var start = new Date(action.range[0])
+      var end = new Date(action.range[1])
+      var startDay = Math.floor((start.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      var endDay = Math.floor((end.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      for (i = startDay; i <= endDay; i++) {
+        postsByDay[i] = {}
+      }
+      return Object.assign({}, state, {
+        postsByDay: Object.assign({}, state.postsByDay, postsByDay)
+      })
+
     case actions.COMPLETE_DAYS:
-      var i
       var days = Object.assign({}, state.days)
 
       // add mock days at both ends of the expedition
@@ -662,6 +736,9 @@ const featureReducer = (
   feature
 ) => {
   switch (action.type) {
+    case actions.RECEIVE_POSTS:
+      feature.properties.scatter = [((Math.random() * 2) - 1) * 0.00075, ((Math.random() * 2) - 1) * 0.00075]
+      return Object.assign({}, state, feature)
     case actions.RECEIVE_DAY:
       return Object.assign({}, state, feature)
     case actions.RECEIVE_FEATURES:
