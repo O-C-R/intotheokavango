@@ -35,7 +35,7 @@ def main():
             log.info("--> %s attachments" % len(message['attachments']))
             for attachment in message['attachments']:
                 try:
-                    path = os.path.join(os.path.dirname(__file__), "..", "uploads", "%s-%s_%s" % (util.timestamp(), m, attachment['filename'].lower()))
+                    path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads", "%s-%s_%s" % (util.timestamp(), m, attachment['filename'].lower())))
                     def write_file():
                         with open(path, 'wb') as f:
                             f.write(attachment['data'])                    
