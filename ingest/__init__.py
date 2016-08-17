@@ -237,7 +237,7 @@ def verify_expedition(data):
         db = Application.instance.db
     except AttributeError:
         from mongo import db        
-    for wrong in ['TeamMember', 'teamMember', 'Person', 'person', 'member', 'Collectors', 'Collector', 'collectors', 'collector']:
+    for wrong in ['Team_Member', 'TeamMember', 'teamMember', 'Person', 'person', 'member', 'Collectors', 'Collector', 'collectors', 'collector']:
         if wrong in data['properties']:
             if 'Member' not in data['properties']:
                 data['properties']['Member'] = data['properties'][wrong]

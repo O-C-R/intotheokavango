@@ -16,24 +16,22 @@ def parse(request):
     try:
         log.info("--> parsing XML")
         data = data['instance']
-        feature = {'FeatureType': "spoor"}
+        feature = {'FeatureType': "sighting"}
         log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         # feature['Member'] = data['@dm:submitting_user'].split(' ')[0] # let TeamMember override this
 
         dt = util.parse_date(data['@writeTime'])
         data = data['inputs']
+
         if 'Date___Time' in data:
             dt = util.parse_date(data['Date___Time'])
             del data['Date___Time']
-        if 'Current_Location' in data:
-            data['Location'] = data['Current_Location']  
-            del data['Current_Location']
-        if 'LocationQuestion' in data:
-            data['Location'] = data['LocationQuestion']                    
-            del data['LocationQuestion']
-        if 'GPSLocation' in data:
-            data['Location'] = data['GPSLocation']                    
-            del data['GPSLocation']
+        feature['t_utc'] = util.timestamp(dt)
+
+        for alias in ['Current_Location', 'LocationQuestion', 'Location_Question', 'GPSLocation']:
+            data['Location'] = data[alias]
+            del data[alias]
+
         if 'Location' in data:
             try:
                 feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
@@ -42,11 +40,14 @@ def parse(request):
                 del data['Location']
             except Exception as e:
                 log.error(log.exc(e))
-        feature['t_utc'] = util.timestamp(dt)
+
         for key, value in data.items():
             if 'Image' in key:
                 continue
             feature[key.replace('_', '')] = value
+
+        # purge blanks
+        feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
 
     except Exception as e:
         log.error(log.exc(e))
