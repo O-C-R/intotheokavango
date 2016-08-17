@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /edit/
+Disallow: /ingest/
+Disallow: /static/
+Disallow: /upload/
