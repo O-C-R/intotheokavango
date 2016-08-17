@@ -7,6 +7,7 @@ def assemble(self, search, limit, order, resolution):
     expeditions = {}
     try:
         results = self.db.features.find(search).distinct('properties.Expedition')
+        results = [result for result in results if result in config['start_date']]
         for expedition in results:
             start_date = util.parse_date(str(config['start_date'][expedition]), tz=config['local_tz'])
             try:
