@@ -25,7 +25,7 @@ def parse(request):
 
         for alias in ['Date___Time_Question', 'Date___Time']:
             if alias in data:
-                dt = util.parse_date(data['Date___Time'])            
+                dt = util.parse_date(data[alias])            
                 del data[alias]
         feature['t_utc'] = util.timestamp(dt)
 
