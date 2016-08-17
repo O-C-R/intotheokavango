@@ -227,21 +227,23 @@ class BackgroundMap extends React.Component {
 
   @autobind
   drawPosts (project) {
-    const { expedition } = this.props
-    const icons = expedition.currentPosts.map(post => {
-      const translate = (position) => {
-        var coords = project(position)
-        var x = Math.round(coords[0])
-        var y = Math.round(coords[1])
-        return 'translate(' + x + ',' + y + ')'
-      }
-      return (
-        <g transform={ translate(post.position) } key={post.id}>
-          <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
-        </g>
-      )
-    })
-    return icons
+    // const { expedition } = this.props
+    // console.log('aga!', expedition.currentPosts.length)
+    // const icons = expedition.currentPosts.map(post => {
+    //   const translate = (position) => {
+    //     var coords = project(position)
+    //     var x = Math.round(coords[0])
+    //     var y = Math.round(coords[1])
+    //     return 'translate(' + x + ',' + y + ')'
+    //   }
+    //   return (
+    //     <g transform={ translate(post.position) } key={post.id}>
+    //       <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
+    //     </g>
+    //   )
+    // })
+    return ''
+    // return icons
   }
 
   @autobind

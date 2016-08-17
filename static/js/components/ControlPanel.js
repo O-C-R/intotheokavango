@@ -13,13 +13,13 @@ const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playbac
   if (pathName === '/') pathName = '/map'
 
   // {pathName === '/map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/> : null}
+  // {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/> : null}
   return (
     <div className="controlPanel">
       <YearSelector expeditions={expeditions} expeditionID={expeditionID} onYearChange={onYearChange}/>
       <DateSelector expeditions={expeditions} expeditionID={expeditionID} currentDate={currentDate} />
       {pathName === '/map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/> : null}
       {pathName === '/map' ? <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/> : null}
-      {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/> : null}
     </div>
   )
 }

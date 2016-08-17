@@ -238,7 +238,7 @@ const okavangoReducer = (
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
             days: Object.assign({}, expedition.days, days),
-            features: Object.assign({}, expedition.features, features),
+            // features: Object.assign({}, expedition.features, features),
             featuresByDay: featuresByDay,
             featuresByMember: Object.assign({}, expedition.featuresByMember, featuresByMember),
             ambitsByTile: Object.assign({}, expedition.ambitsByTile, ambitsByTile),
@@ -293,6 +293,13 @@ const okavangoReducer = (
         featuresByTile[k] = Object.assign({}, expedition.featuresByTile[k], featuresByTile[k])
       })
 
+      for (var k in features) {
+        var feature = features[k]
+        if (feature.properties.FeatureType === 'sighting') {
+          delete features[k]
+        }
+      }
+
       return Object.assign({}, state, {
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
@@ -319,6 +326,7 @@ const expeditionReducer = (
   state = {
     name: '',
     playback: 'forward',
+    layout: 'rows',
     zoom: 14,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],

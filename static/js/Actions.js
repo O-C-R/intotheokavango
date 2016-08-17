@@ -181,7 +181,7 @@ export const RECEIVE_EXPEDITIONS = 'RECEIVE_EXPEDITIONS'
 
 export function receiveExpeditions (data) {
   for (var k in data.results) {
-    if (data.results[k].Days < 0) {
+    if (data.results[k].Days < 1) {
       delete data.results[k]
     }
   }

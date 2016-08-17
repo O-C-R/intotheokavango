@@ -1,15 +1,18 @@
 
 /*
 
-  introduction
-  disconnect ambit paths when they are more than one day apart
   sighting popups
   responsive map
 
+  introduction
+  disconnect ambit paths when they are more than one day apart
+
   better night
   endpoint for Jane
+  change animation speed based on framerate
 
   NICE TO HAVE:
+  render features in webGL
   change initial map location
   timeline interaction / animation
   feature loading zoomed out
@@ -17,6 +20,12 @@
   fly to next location when there is no beacon or ambit for one day
   perlin noise moving sightings
   visual night
+
+  KNOWN BUGS:
+  pinterest extension breaks journal
+
+  NOTES:
+  Medium posts that have nothing to do with Okavango show up in blog query
 
 */
 
@@ -34,7 +43,8 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 
 import OkavangoContainer from './containers/OkavangoContainer'
 import MapPage from './components/MapPage'
-import JournalPage from './components/JournalPage'
+import JournalPageContainer from './containers/JournalPageContainer'
+// import JournalPage from './components/JournalPage'
 import DataPage from './components/DataPage'
 import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
@@ -49,14 +59,14 @@ let store = createStore(
   )
 )
 
+// <Route path="data" component={DataPage}/>
+// <Route path="share" component={SharePage}/>
 const routes = (
   <Route path="/" component={OkavangoContainer}>
     <IndexRoute component={MapPage}/>
     <Route path="map" component={MapPage}/>
-    <Route path="journal" component={JournalPage}/>
-    <Route path="data" component={DataPage}/>
+    <Route path="journal" component={JournalPageContainer}/>
     <Route path="about" component={AboutPage}/>
-    <Route path="share" component={SharePage}/>
   </Route>
 )
 

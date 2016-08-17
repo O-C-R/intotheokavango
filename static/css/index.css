@@ -459,6 +459,7 @@ ul{
             align-items: flex-start;
             justify-content: space-between;
             width: 100%;
+            margin-bottom: 50px;
           }
 
             #feed div.post div.type{
@@ -479,6 +480,10 @@ ul{
               flex-basis: 85%;
             }
 
+              #feed div.post div.content img{
+                width: 100%;
+              }
+
               #feed div.post div.content p.message{
                 margin: 0 0 15px 0;
               }
@@ -495,10 +500,23 @@ ul{
               }
 
                 #feed div.post div.meta div.separator{
-                  background-color: white;
+                  background-color: #999;
                   flex: 10 0 auto;
                   height: 1px;
                   padding: 0;
+                  margin-bottom: 5px;
+                }
+
+                #feed div.post div.meta div p{
+                  font-family: "Gotham A", "Gotham B", arial;
+                  font-style: normal;
+                  font-weight: 700;
+                  font-size: 13px;
+                  text-transform: uppercase;
+                  line-height: 0;
+                  color: #999;
+                  vertical-align: baseline;
+                  margin-bottom: 5px;
                 }
 
 

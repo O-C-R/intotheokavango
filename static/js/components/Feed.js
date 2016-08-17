@@ -3,25 +3,18 @@ import React, {PropTypes} from 'react'
 import Post from './Post'
 
 const Feed = ({posts}) => {
-  var format = 'full'
-  var posts = posts.map(function(post, i){
-
-    var meta = {
-      'type':post.type,
-      'date':post.date,
-      'location':post.location,
-      'link':post.link
-    }
-
+  const format = 'full'
+  const postFeed = posts.map(post => {
     return (
-      <Post format={format} meta={meta} key={i}>
+      <Post format={format} data={post} key={post.key}>
         {post.content}
       </Post>
     )
   })
+
   return (
     <div id="feed">
-      {posts}
+      {postFeed}
     </div>
   )
 }
