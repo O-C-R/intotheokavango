@@ -60,7 +60,7 @@ module.exports = {
     historyApiFallback: true
   },
   output: {
-    path: __dirname + '',
+    path: __dirname + '/static/js/',
     filename: 'index-babel.js'
   },
   stylus: {
