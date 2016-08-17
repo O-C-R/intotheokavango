@@ -26,6 +26,7 @@ http {
     keepalive_timeout  65;
     gzip  on;
     proxy_next_upstream error;
+    client_max_body_size 500M;
 
     server {        
         listen       80;
