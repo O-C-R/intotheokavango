@@ -19,23 +19,20 @@ def parse(request):
         feature = {'FeatureType': "sighting"}
         log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         # feature['Member'] = data['@dm:submitting_user'].split(' ')[0] # let TeamMember override this
+
         dt = util.parse_date(data['@writeTime'])
         data = data['inputs']
-        if 'Date___Time' in data:
-            dt = util.parse_date(data['Date___Time'])
-            del data['Date___Time']
-        if 'Current_Location' in data:
-            data['Location'] = data['Current_Location']  
-            del data['Current_Location']
-        if 'LocationQuestion' in data:
-            data['Location'] = data['LocationQuestion']                    
-            del data['LocationQuestion']
-        if 'Location_Question' in data:
-            data['Location'] = data['Location_Question']                    
-            del data['Location_Question']
-        if 'GPSLocation' in data:
-            data['Location'] = data['GPSLocation']                    
-            del data['GPSLocation']
+
+        for alias in ['Date___Time_Question', 'Date___Time']:
+            if alias in data:
+                dt = util.parse_date(data[alias])            
+                del data[alias]
+        feature['t_utc'] = util.timestamp(dt)
+
+        for alias in ['Current_Location', 'LocationQuestion', 'Location_Question', 'GPSLocation']:
+            if alias in data:
+                data['Location'] = data[alias]
+                del data[alias]
         if 'Location' in data:
             try:
                 feature['Latitude'] = data['Location'].split(',')[0].replace("lat=", '').strip()
@@ -44,38 +41,33 @@ def parse(request):
                 del data['Location']
             except Exception as e:
                 log.error(log.exc(e))
-        feature['t_utc'] = util.timestamp(dt)
+
         for key, value in data.items():
             if 'Image' in key:
                 continue
             feature[key.replace('_', '')] = value
+
+        # purge blanks
+        feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
+
+        # get SpeciesName
+        for alias in ['Species', 'Species_Name', 'Animal', 'SpeciesNameOther', 'Dominant_species', 'Dominant_Species']:
+            alias = alias.replace('_', '')
+            if alias in feature and len(feature[alias].strip()):
+                feature['SpeciesName'] = strings.titlecase(feature[alias].strip())
+                del feature[alias]        
+        if 'SpeciesName' not in feature:
+            log.error("Missing SpeciesName")
+            return None, "Missing SpeciesName"
+
+        if 'Count' not in feature and 'count' not in feature:
+            feature['Count'] = 1
+        log.debug(json.dumps(feature, indent=4))        
+
     except Exception as e:
         log.error(log.exc(e))
         return None, "Unexpected fields"
 
-    # purge blanks
-    feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
-    if 'SpeciesNameOther' in feature and len(feature['SpeciesNameOther'].strip()):
-        feature['SpeciesName'] = strings.titlecase(feature['SpeciesNameOther'])    
-        del feature['SpeciesNameOther']
-    if 'Species' in feature and len(feature['Species'].strip()):
-        feature['SpeciesName'] = strings.titlecase(feature['Species'].strip())    
-        del feature['Species']
-    if 'Species_Name' in feature and len(feature['Species_Name'].strip()):
-        feature['SpeciesName'] = strings.titlecase(feature['Species_Name'])    
-        del feature['Species_Name']
-    if 'Animal' in feature and len(feature['Animal'].strip()):
-        feature['SpeciesName'] = strings.titlecase(feature['Animal'])    
-        del feature['Animal']        
-    if 'SpeciesName' not in feature:
-        log.error("Missing SpeciesName")
-        return None, "Missing SpeciesName"
-    else:
-        feature['SpeciesName'] = strings.titlecase(feature['SpeciesName'])
-
-    if 'Count' not in feature and 'count' not in feature:
-        feature['Count'] = 1
-    log.debug(json.dumps(feature, indent=4))        
     feature['Taxonomy'] = get_taxonomy(feature['SpeciesName']) 
 
     log.info("Saving image file...")
