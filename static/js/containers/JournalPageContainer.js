@@ -75,12 +75,10 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     checkFeedContent: () => {
-      console.log('aga scroll')
       return dispatch(actions.checkFeedContent())
     }
   }
 }
-
 
 const JournalPageContainer = connect(
   mapStateToProps,

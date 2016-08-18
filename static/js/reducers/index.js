@@ -11,13 +11,18 @@ const okavangoReducer = (
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
-    // isFetchingPosts: 0
+    contentActive: false
   },
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
+    case actions.ENABLE_CONTENT:
+      return {
+        ...state,
+        contentActive: true
+      }
     case actions.RECEIVE_POSTS:
       // console.log('RECEIVED', action.data)
       expeditionID = action.expeditionID
@@ -386,6 +391,8 @@ const expeditionReducer = (
     name: '',
     playback: 'forward',
     layout: 'rows',
+    initialZoom: 4,
+    targetZoom: 14,
     zoom: 14,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
@@ -650,7 +657,9 @@ const expeditionReducer = (
       })
 
     case actions.RECEIVE_EXPEDITIONS:
-      var dayCount = data.Days + 1
+      // var dayCount = data.Days + 1
+      // removing +1 here because we receive beacons before any other features on current day
+      var dayCount = data.Days
       var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
       var currentDate = new Date(end.getTime() - (1000 * 3600 * 24))

@@ -40,12 +40,12 @@ class Timeline extends React.Component {
       }
 
       const range = [0 + padding[1], height - padding[1]]
-      const domain = [0, dayCount - 1]
+      const domain = [dayCount - 1, 0]
       const scaleDays = d3.scaleLinear()
         .domain(domain)
         .range(range)
       const scaleTime = d3.scaleLinear()
-        .domain([startDate.getTime(), startDate.getTime() + (dayCount - 1) * (1000 * 3600 * 24)])
+        .domain([startDate.getTime() + (dayCount - 1) * (1000 * 3600 * 24), startDate.getTime()])
         .range(range)
 
       const cursorY = this.state.mouseOver ? this.state.cursorY : (scaleTime(expedition.currentDate.getTime()) - 8)

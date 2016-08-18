@@ -246,7 +246,13 @@ ul{
     #content{
       padding:0 5%;
       overflow-y: overlay;
+      transition: opacity 0.8s;
     }
+
+      #content.hidden{
+        opacity:0.01;
+        pointer-events: none;
+      }
 
       #content div.logos{
         position:absolute;
@@ -548,6 +554,7 @@ ul{
               .notification .content img{
                 width:100%;
                 height:auto;
+                display: block;
               }
 
             .notification .type{
@@ -689,6 +696,34 @@ ul{
       background-color:black;
       z-index:0;
     }
+
+      #mapbox svg {
+        font-family: "Gotham A", "Gotham B", arial;
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+    #IntroductionBox {
+      position: absolute;
+      bottom: 36%;
+      width: 44%;
+      left: 0;
+      padding: 0 28%;
+    }
+
+      #IntroductionBox p{
+        text-align: center;
+        font-size: 18px;
+        position:absolute;
+        text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        width:44%;
+        top:0;
+      }
+
+      #IntroductionBox p span{
+        color: #F8D143;
+      }
 
 .notif-enter {
   opacity: 0.01;

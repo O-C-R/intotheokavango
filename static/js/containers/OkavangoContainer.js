@@ -10,7 +10,8 @@ const mapStateToProps = (state, ownProps) => {
     animate: state.animate,
     isFetching: state.isFetching,
     mapStateNeedsUpdate: state.mapStateNeedsUpdate,
-    expeditionID: state.selectedExpedition
+    expeditionID: state.selectedExpedition,
+    contentActive: state.contentActive
   }
 }
 
@@ -30,6 +31,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     setPage: () => {
       return dispatch(actions.setPage())
+    },
+    enableContent: () => {
+      return dispatch(actions.enableContent())
     }
   }
 }

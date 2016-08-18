@@ -5,6 +5,7 @@ import * as d3 from 'd3'
 import * as utils from '../utils'
 import ViewportMercator from 'viewport-mercator-project'
 import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
+import { lerp } from '../utils'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -15,7 +16,7 @@ class BackgroundMap extends React.Component {
       viewport: {
         latitude: -18.5699229,
         longitude: 22.115456,
-        zoom: 14,
+        zoom: 4,
         width: window.innerWidth,
         height: window.innerHeight,
         startDragLngLat: null,
@@ -25,7 +26,9 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  tick () {
+  tick (pastFrameDate) {
+    const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
+    const currentFrameDate = Date.now()
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
     if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
@@ -92,8 +95,8 @@ class BackgroundMap extends React.Component {
       var currentBeacon = beacons[beaconIndex + (forward ? 0 : 0)]
       var nextBeacon = beacons[beaconIndex + (forward ? 1 : -1)]
       var coordinates = [
-        utils.lerp(currentBeacon.geometry.coordinates[0], nextBeacon.geometry.coordinates[0], ratioBetweenBeacons),
-        utils.lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
+        lerp(currentBeacon.geometry.coordinates[0], nextBeacon.geometry.coordinates[0], ratioBetweenBeacons),
+        lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
       ]
 
        // look for most current ambit_geo
@@ -142,14 +145,15 @@ class BackgroundMap extends React.Component {
           var currentAmbits = ambits[currentID]
           var nextAmbit = ambits[nextID]
           member.coordinates = [
-            utils.lerp(currentAmbits.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
-            utils.lerp(currentAmbits.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
+            lerp(currentAmbits.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
+            lerp(currentAmbits.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
           ]
         } else {
-          // console.log(this.state.frameCount, memberID)
-          member.coordinates = [0, 0]
+          member.coordinates = [-180, 90]
         }
       })
+
+      var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
 
       this.setState({
         currentDate,
@@ -162,7 +166,8 @@ class BackgroundMap extends React.Component {
         viewport: {
           ...this.state.viewport,
           longitude: coordinates[0],
-          latitude: coordinates[1]
+          latitude: coordinates[1],
+          zoom: zoom
         }
       })
 
@@ -176,7 +181,7 @@ class BackgroundMap extends React.Component {
     }
     this.state.animate = animate
     this.state.frameCount++
-    requestAnimationFrame(this.tick)
+    requestAnimationFrame(() => { this.tick(currentFrameDate) })
   }
 
   componentWillReceiveProps (nextProps) {
@@ -193,16 +198,17 @@ class BackgroundMap extends React.Component {
         this.state.currentDay = currentDay
         this.state.day = day
         this.state.frameCount = 0
-        this.state.viewport = {
-          ...this.state.viewport,
-          zoom: expedition.zoom
-        }
       }
 
       if (!this.state.animate) {
         this.state.animate = animate
+        this.state.viewport = {
+          ...this.state.viewport,
+          zoom: expedition.initialZoom,
+          targetZoom: expedition.targetZoom
+        }
         console.log('starting animation')
-        this.tick()
+        this.tick(Math.round(Date.now() - (1000 / 60)))
       }
     }
   }
@@ -227,23 +233,23 @@ class BackgroundMap extends React.Component {
 
   @autobind
   drawPosts (project) {
-    // const { expedition } = this.props
-    // console.log('aga!', expedition.currentPosts.length)
-    // const icons = expedition.currentPosts.map(post => {
-    //   const translate = (position) => {
-    //     var coords = project(position)
-    //     var x = Math.round(coords[0])
-    //     var y = Math.round(coords[1])
-    //     return 'translate(' + x + ',' + y + ')'
-    //   }
-    //   return (
-    //     <g transform={ translate(post.position) } key={post.id}>
-    //       <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
-    //     </g>
-    //   )
-    // })
-    return ''
-    // return icons
+    return '' // TRIMMING
+    const { expedition } = this.props
+    // console.log(expedition.currentPosts.length)
+    const icons = expedition.currentPosts.map(post => {
+      const translate = (position) => {
+        var coords = project(position)
+        var x = Math.round(coords[0])
+        var y = Math.round(coords[1])
+        return 'translate(' + x + ',' + y + ')'
+      }
+      return (
+        <g transform={ translate(post.position) } key={post.id}>
+          <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
+        </g>
+      )
+    })
+    return icons
   }
 
   @autobind
@@ -262,7 +268,7 @@ class BackgroundMap extends React.Component {
       return (
         <g transform={ translate(member) } key={memberID}>
           <path fill="rgba(4,0,26,0.7)" d="M27,13.8C27,22.2,13.5,34,13.5,34S0,22.2,0,13.8C0,6.3,6,0.3,13.5,0.3S27,6.3,27,13.8z"/>
-          <text x={7.5} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
+          <text style={{textAnchor: 'middle'}} x={13.5} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
         </g>
       )
     })
@@ -296,30 +302,30 @@ class BackgroundMap extends React.Component {
     return paths
   }
 
-  @autobind
-  onChangeViewport (newViewport) {
-    newViewport.width = window.innerWidth
-    newViewport.height = window.innerHeight
-    this.setState({
-      ...this.state,
-      viewport: newViewport
-    })
-  }
+  // @autobind
+  // onChangeViewport (newViewport) {
+  //   newViewport.width = window.innerWidth
+  //   newViewport.height = window.innerHeight
+  //   this.setState({
+  //     ...this.state,
+  //     viewport: newViewport
+  //   })
+  // }
 
   render () {
     const { expedition } = this.props
     const { viewport } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
-    const MAPBOX_STYLE = 'mapbox://styles/iaaaan/ciodi8ggn0002a6nf5mb3i4y4'
+    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
 
       // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+          // onChangeViewport={this.onChangeViewport}
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
           mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-          onChangeViewport={this.onChangeViewport}
         >
           {expedition
           ? <div>
@@ -338,7 +344,6 @@ class BackgroundMap extends React.Component {
                   data: expedition.currentSightings
                 })
               ]}
-              // onAfterRender={(aga) => {/*console.log('aga', aga)*/}}
             />
           </div>
           : ''}

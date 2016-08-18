@@ -1,6 +1,22 @@
 
 /*
 
+  The Okavango Delta is one of the world’s last great wetland wildernesses. A team of Ba’Yei, scientists, engineers and adventurers is journeying a 345 kilometers crossing the delta, finding new species and exploring new ground. Join us in real-time as we explore the beating heart of our planet.
+
+  RELEASE
+    introduction
+    sighting popup
+    animate timeline cursor and direction
+    update about page
+    sighting graph
+    mobile
+    limit notification height
+
+    deep linking of features
+    performance
+    disable map motion for now
+    endpoint for Jane
+
   JOURNAL
     loading of features
     update currentime

@@ -33,9 +33,9 @@ class Feed extends React.Component {
 
     return (
       <div id="feed" onWheel={checkFeedContent}>
-        {postFeed}
       </div>
     )
+        // {postFeed}
   }
 }
 

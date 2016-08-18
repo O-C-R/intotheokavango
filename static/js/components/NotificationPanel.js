@@ -25,22 +25,30 @@ const NotificationPanel = ({posts, currentDate}) => {
       switch (post.type) {
         case 'tweet':
           var text = post.properties.Text
+          text = text.split(' ').slice(0, text.split(' ').length - 1).join(' ')
           if (post.properties.Tweet) text = post.properties.Tweet.text
+          var images = post.properties.Images
+            .filter((img, j) => {
+              return j === 0
+            })
+            .map((img, j) => {
+              return <img src={img.Url} width="100%" key={j}/>
+            })
           return (
-            <Notification type={post.type} key={i}>
+            <Notification type={post.type} key={post.id}>
               <p>{text}</p>
-              <div className="images">{post.properties.Images}</div>
+              <div className="images">{images}</div>
             </Notification>
           )
         case 'audio':
           return (
-            <Notification type={post.type} key={i}>
+            <Notification type={post.type} key={post.id}>
               <div className="title">{post.properties.Title}</div>
             </Notification>
           )
         case 'blog':
           return (
-            <Notification type={post.type} key={i}>
+            <Notification type={post.type} key={post.id}>
               <div className="title">{post.properties.Title}</div>
             </Notification>
           )
@@ -55,7 +63,7 @@ const NotificationPanel = ({posts, currentDate}) => {
             height = post.properties.Size[1]
           }
           return (
-            <Notification type={post.type} key={i} >
+            <Notification type={post.type} key={post.id} >
               <img className="image" src={post.properties.Url} width={width} height={height}/>
             </Notification>
           )
