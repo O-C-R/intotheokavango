@@ -183,11 +183,13 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        features[id] = featureReducer(expedition.features[id], action, f)
-        if (f.properties.FeatureType === 'ambit_geo') {
-          if (!members[f.properties.Member]) {
-            members[f.properties.Member] = {
-              color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+        if (f.properties.Team === 'RiverMain') {
+          features[id] = featureReducer(expedition.features[id], action, f)
+          if (f.properties.FeatureType === 'ambit_geo') {
+            if (!members[f.properties.Member]) {
+              members[f.properties.Member] = {
+                color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+              }
             }
           }
         }
@@ -319,15 +321,17 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if (f.properties.FeatureType === 'sighting') {
-          if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
-          else {
-            var taxClass = f.properties.Taxonomy.Class
-            if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
-            f.properties.color = state.speciesColors[taxClass]
+        if (f.properties.Team === 'RiverMain') {
+          if (f.properties.FeatureType === 'sighting') {
+            if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
+            else {
+              var taxClass = f.properties.Taxonomy.Class
+              if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
+              f.properties.color = state.speciesColors[taxClass]
+            }
           }
+          features[id] = featureReducer(expedition.features[id], action, f)
         }
-        features[id] = featureReducer(expedition.features[id], action, f)
       })
 
       var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
