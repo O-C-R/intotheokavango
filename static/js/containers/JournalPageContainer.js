@@ -24,8 +24,8 @@ const mapStateToProps = (state, ownProps) => {
       if (type === 'tweet') {
         if (expeditionID !== 'okavango_14') {
           content = p.properties.Text
-          images = p.properties.Images.map(i => { return i.Url })
-          link = p.properties.Url
+          images = p.properties.Images.map(i => { return i.Url.replace('http://','https://') })
+          link = p.properties.Url.replace('http://','https://')
         } else {
           content = p.properties.Tweet.text
         }
@@ -34,12 +34,12 @@ const mapStateToProps = (state, ownProps) => {
       if (type === 'image') {
         if (expeditionID !== 'okavango_14') {
           content = p.properties.Notes
-          images = [p.properties.Url]
+          images = [p.properties.Url.replace('http://','https://')]
           link = p.properties.InstagramID
           dimensions = p.properties.Dimensions
         } else {
           content = p.properties.Notes
-          images = [p.properties.Url]
+          images = [p.properties.Url.replace('http://','https://')]
           link = p.properties.InstagramID
           dimensions = p.properties.Size
         }
@@ -48,12 +48,12 @@ const mapStateToProps = (state, ownProps) => {
       if (type === 'blog') {
         title = p.properties.Title
         content = p.properties.Summary
-        link = p.properties.Url
+        link = p.properties.Url.replace('http://','https://')
       }
 
       if (type === 'audio') {
         title = p.properties.Title
-        link = p.properties.SoundCloudURL
+        link = p.properties.SoundCloudURL.replace('http://','https://')
       }
 
       return {

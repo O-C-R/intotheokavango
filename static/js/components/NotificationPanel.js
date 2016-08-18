@@ -37,7 +37,7 @@ const NotificationPanel = ({posts, currentDate}) => {
               return j === 0
             })
             .map((img, j) => {
-              return <img src={img.Url} width="100%" key={j}/>
+              return <img src={img.Url.replace('http://','https://')} width="100%" key={j}/>
             })
           return (
             <Notification type={post.type} key={post.id}>
@@ -69,13 +69,15 @@ const NotificationPanel = ({posts, currentDate}) => {
           }
           return (
             <Notification type={post.type} key={post.id} >
-              <img className="image" src={post.properties.Url} width={width} height={height}/>
+              <img className="image" src={post.properties.Url.replace('http://','https://')} width={width} height={height}/>
             </Notification>
           )
       }
     })
 
-  var height = window.innerWidth > 768 ? {height: window.innerWidth - 100} : {}
+  var height = window.innerWidth > 768 ? {height: window.innerHeight - 100} : {}
+  console.log('WAT', height)
+  console.log('test')
 
   return (
     <div id="notificationPanel" style={height}>
