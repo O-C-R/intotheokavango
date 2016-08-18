@@ -13,10 +13,15 @@ const NotificationPanel = ({posts, currentDate}) => {
   }
 
   if (!posts) posts = []
-  const notificationItems = posts
+  var notificationItems = posts
     .filter(post => {
       var d = new Date(post.properties.DateTime)
       return d.getTime() >= start && d.getTime() < end
+    })
+
+  notificationItems = notificationItems
+    .filter((post, i) => {
+      return window.innerWidth > 768 || i === notificationItems.length - 1
     })
     .sort((a, b) => {
       return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
@@ -36,7 +41,7 @@ const NotificationPanel = ({posts, currentDate}) => {
             })
           return (
             <Notification type={post.type} key={post.id}>
-              <p>{text}</p>
+              <p style={{position:window.innerWidth > 768 || post.properties.Images.length === 0 ? 'relative' : 'absolute'}}>{text}</p>
               <div className="images">{images}</div>
             </Notification>
           )
@@ -69,8 +74,11 @@ const NotificationPanel = ({posts, currentDate}) => {
           )
       }
     })
+
+  var height = window.innerWidth > 768 ? {height: window.innerWidth - 100} : {}
+
   return (
-    <div id="notificationPanel">
+    <div id="notificationPanel" style={height}>
       <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={300} transitionLeaveTimeout={150}>
       {notificationItems}
       </ReactCSSTransitionGroup>

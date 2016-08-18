@@ -11,7 +11,8 @@ const mapStateToProps = (state, ownProps) => {
     isFetching: state.isFetching,
     mapStateNeedsUpdate: state.mapStateNeedsUpdate,
     expeditionID: state.selectedExpedition,
-    contentActive: state.contentActive
+    contentActive: state.contentActive,
+    initialPage: state.initialPage
   }
 }
 

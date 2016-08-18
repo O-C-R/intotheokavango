@@ -259,6 +259,11 @@ ul{
         bottom:28px;
       }
 
+      #content #aboutPage div.logos{
+        bottom:0;
+        position:relative;
+      }
+
         #content div.logos a{
           margin-right:20px;
         }
@@ -374,6 +379,14 @@ ul{
 
           .playbackSelector{
             margin-bottom:50px;
+          }
+
+          .dateSelector{
+            font-family: "Gotham A", "Gotham B", arial;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
           }
 
           .yearSelector{
@@ -532,6 +545,7 @@ ul{
           top:100px;
           right:5%;
           width:28.5%;
+          overflow: hidden;
         }
 
           .notification{
@@ -742,3 +756,120 @@ ul{
   opacity: 0.01;
   transition: opacity 150ms ease-in;
 }
+
+@media (max-width: 768px) {
+
+  #header {
+    height:120px;
+  }
+
+    #logo {
+      padding-top:30px !important;
+    }
+
+    #navigation {
+      text-align: center;
+      padding-top: 64px;
+    }
+
+      #navigation ul {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+      }
+
+        #navigation li {
+          width: auto;
+          margin: 0;
+        }
+
+          #navigation li a{
+            padding-bottom: 0;
+          }
+
+  .controlPanel {
+    width: 90%;
+    top: 120px;
+  }
+
+    .controlPanel div.dateSelector{
+      position: absolute;
+      right: 0;
+      top: -5px;
+      text-align: right;
+      line-height: 22px;
+    }
+
+    .controlPanel ul.playbackSelector{
+      width: 164px;
+    }
+
+  #feed {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+    #feed div.post div.type img{
+      margin: 0;
+    }
+
+  #aboutPage div.column{
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    text-align: left;
+  }
+
+  #aboutPage div.column.headline{
+    text-align: center !important;
+  }
+
+    #aboutPage div.columnWrapper:not(.credits) div.column:nth-child(2) h2 {
+      text-align: left;
+    }
+
+    #aboutPage div.columnWrapper:not(.credits) div.column:nth-child(2) div.goalIcon {
+      float: left;
+      margin: 4px 20px 0 0;
+    }
+
+    #aboutPage div.columnWrapper.credits div.column:nth-child(2) {
+      margin-top:50px !important;
+    }
+
+    #notificationPanel {
+      bottom: 35px;
+      margin: 0;
+      top: initial;
+      width: 90%;
+      z-index: 100;
+    }
+
+      #notificationPanel div.notification{
+        margin-bottom: 0;
+      }
+
+        #notificationPanel div.notification div.content p{
+          position: absolute;
+          bottom: 0;
+          width: 76%;
+          padding: 2%;
+        }
+
+  #IntroductionBox {
+    bottom: initial;
+    top: 20%;
+    width: 65%;
+  }
+}
+
+
+
+
+
+
+
+
+
+

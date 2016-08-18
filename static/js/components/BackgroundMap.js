@@ -29,7 +29,7 @@ class BackgroundMap extends React.Component {
   tick (pastFrameDate) {
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
     const currentFrameDate = Date.now()
-    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
+    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
     var b1, b2
     if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
       // increment time
@@ -40,10 +40,10 @@ class BackgroundMap extends React.Component {
         if (expedition.playback === 'fastBackward' || expedition.playback === 'backward') dateOffset = -1 * offset
         if (expedition.playback === 'forward' || expedition.playback === 'fastForward') dateOffset = offset
       } else {
-        if (expedition.playback === 'fastBackward') dateOffset = -20000
-        if (expedition.playback === 'backward') dateOffset = -2000
-        if (expedition.playback === 'forward') dateOffset = 2000
-        if (expedition.playback === 'fastForward') dateOffset = 20000
+        if (expedition.playback === 'fastBackward') dateOffset = -25000
+        if (expedition.playback === 'backward') dateOffset = -4000
+        if (expedition.playback === 'forward') dateOffset = 4000
+        if (expedition.playback === 'fastForward') dateOffset = 25000
       }
       var currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime() + 1, this.state.currentDate.getTime() + dateOffset))))
 
@@ -154,6 +154,7 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
+      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
       this.setState({
         currentDate,
@@ -359,7 +360,8 @@ BackgroundMap.propTypes = {
   updateMap: PropTypes.func.isRequired,
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
-  mapStateNeedsUpdate: PropTypes.bool.isRequired
+  mapStateNeedsUpdate: PropTypes.bool.isRequired,
+  initialPage: PropTypes.string.isRequired
 }
 
 export default BackgroundMap

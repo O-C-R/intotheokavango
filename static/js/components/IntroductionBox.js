@@ -7,6 +7,7 @@ class IntroductionBox extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      completed: false,
       contentEnabled: false,
       startDate: 0,
       currentPosts: [],
@@ -31,6 +32,12 @@ class IntroductionBox extends React.Component {
   tick () {
     const { enableContent } = this.props
     const { posts, startDate } = this.state
+
+    if (!(location.pathname === '/' || location.pathname === '/map')) {
+      this.state.completed = true
+      return
+    }
+
     const now = Date.now() - startDate
     var currentPosts = []
     posts.forEach(p => {
@@ -45,7 +52,7 @@ class IntroductionBox extends React.Component {
     }
 
     var flag = true
-    if ( currentPosts.length !== this.state.currentPosts.length) flag = false
+    if (currentPosts.length !== this.state.currentPosts.length) flag = false
     else {
       for (var i = 0; i < Math.max(currentPosts.length, this.state.currentPosts.length); i++) {
         if (currentPosts[i] !== this.state.currentPosts[i]) {
@@ -61,7 +68,10 @@ class IntroductionBox extends React.Component {
         currentPosts: currentPosts
       })
     }
-    if (now > posts[posts.length - 1].timeRange[1]) return
+    if (now > posts[posts.length - 1].timeRange[1]) {
+      this.state.completed = true
+      return
+    }
     requestAnimationFrame(this.tick)
   }
 
@@ -75,16 +85,25 @@ class IntroductionBox extends React.Component {
   }
 
   render () {
-    const { currentPosts } = this.state
+    const { currentPosts, completed } = this.state
     const posts = currentPosts.map(p => {
       return p.content
     })
 
+    const container = () => {
+      if (completed) return ''
+      else {
+        return (
+          <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={500} transitionLeaveTimeout={200}>
+            {posts}
+          </ReactCSSTransitionGroup>
+        )
+      }
+    }
+
     return (
       <div id="IntroductionBox">
-        <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={500} transitionLeaveTimeout={200}>
-          {posts}
-        </ReactCSSTransitionGroup>
+        {container()}
       </div>
     )
   }

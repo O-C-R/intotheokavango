@@ -11,7 +11,8 @@ const okavangoReducer = (
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
-    contentActive: false
+    contentActive: !(location.pathname === '/' || location.pathname === '/map'),
+    initialPage: location.pathname
   },
   action
 ) => {
@@ -327,6 +328,7 @@ const okavangoReducer = (
       action.data.forEach((f) => {
         var id = f.id
         if (f.properties.Team === 'RiverMain') {
+          var flag = true
           if (f.properties.FeatureType === 'sighting') {
             if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
             else {
@@ -335,7 +337,10 @@ const okavangoReducer = (
               f.properties.color = state.speciesColors[taxClass]
             }
           }
-          features[id] = featureReducer(expedition.features[id], action, f)
+          if (f.properties.FeatureType === 'tweet' && f.properties.Text && f.properties.Text[0] === '@') flag = false
+          if (flag) {
+            features[id] = featureReducer(expedition.features[id], action, f)
+          }
         }
       })
 
@@ -392,8 +397,8 @@ const expeditionReducer = (
     playback: 'forward',
     layout: 'rows',
     initialZoom: 4,
-    targetZoom: 14,
-    zoom: 14,
+    targetZoom: 15,
+    zoom: 15,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
     tileSize: 10,
@@ -657,12 +662,13 @@ const expeditionReducer = (
       })
 
     case actions.RECEIVE_EXPEDITIONS:
-      // var dayCount = data.Days + 1
+      var dayCount = data.Days + 1
       // removing +1 here because we receive beacons before any other features on current day
-      var dayCount = data.Days
+      // var dayCount = data.Days
       var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
-      var currentDate = new Date(end.getTime() - (1000 * 3600 * 24))
+      // currentDate is 2 days before last beacon
+      var currentDate = new Date(end.getTime() - 2 * (1000 * 3600 * 24))
 
       var name = data.Name
 

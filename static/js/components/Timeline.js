@@ -105,7 +105,7 @@ class Timeline extends React.Component {
     const { width, height, data, x, range, scaleDays, cursorY, totalSightings, padding } = this.state
 
     const days = data.map((d, i) => {
-      return <circle cx={x} cy={scaleDays(i)} r={2} key={i} fill="white"/>
+      return <circle cx={x} cy={scaleDays(i)} r={3} key={i} fill="white"/>
     })
 
     return (

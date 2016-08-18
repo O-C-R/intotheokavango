@@ -388,7 +388,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
     var daysToFetch = []
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
-    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
+    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount) daysToFetch.push(expeditionDay + 1)
 
     if (daysToFetch.length === 0) return
 
