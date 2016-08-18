@@ -13,11 +13,36 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
-export const SET_PAGE = 'SET_PAGE'
+export const SET_PAGE = 'SET_PATH'
 
 export function setPage () {
-  return {
-    type: SET_PAGE
+  return (dispatch, getState) => {
+    if (location.pathname === '/journal') dispatch(checkFeedContent())
+  }
+}
+
+export function checkFeedContent () {
+  return (dispatch, getState) => {
+    const state = getState()
+    const expeditionID = state.selectedExpedition
+    const expedition = state.expeditions[expeditionID]
+    const dayCount = expedition.dayCount
+    const posts = d3.values(expedition.features)
+    const postsByDay = expedition.postsByDay
+    const contentHeight = d3.select('#content').node().offsetHeight
+    const scrollTop = d3.select('#content').node().scrollTop
+
+    const feedElement = d3.select('#feed').node()
+    if (location.pathname === '/journal' && feedElement) {
+      const feedHeight = feedElement.offsetHeight
+      if ((posts.length === 0) || feedHeight < contentHeight || (scrollTop <= 100 && !postsByDay[dayCount]) || (scrollTop >= feedHeight - contentHeight - 100 && !postsByDay[0])) {
+        dispatch(fetchPostsByDay(expeditionID, expedition.currentDate))
+      }
+    } else {
+      if ((posts.length === 0) || (scrollTop <= 100 && !postsByDay[dayCount])) {
+        dispatch(fetchPostsByDay(expeditionID, expedition.currentDate))
+      }
+    }
   }
 }
 
@@ -27,7 +52,7 @@ export function fetchPostsByDay (_expeditionID, date) {
   return function (dispatch, getState) {
     var i
     var state = getState()
-    if (state.isFetchingPosts > 0) return
+    // if (state.isFetchingPosts > 0) return
     var expeditionID = _expeditionID || state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
     if (!date) date = expedition.currentDate
@@ -51,6 +76,8 @@ export function fetchPostsByDay (_expeditionID, date) {
       }
     }
 
+    if (daysToFetch.length === 0) return
+
     daysToFetch.forEach(function (d, i, a) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
       a[i] = t
@@ -73,7 +100,10 @@ export function fetchPostsByDay (_expeditionID, date) {
       .then(json => {
         var results = json.results.features
         console.log('done with query! Received ' + results.length + ' features.')
-        dispatch(receivePosts(expeditionID, results, range))
+        return dispatch(receivePosts(expeditionID, results, range))
+      })
+      .then(() => {
+        dispatch(checkFeedContent())
       })
   }
 }
@@ -283,6 +313,9 @@ export function fetchExpeditions () {
           }
         })
         dispatch(fetchTotalSightings(state.selectedExpedition))
+        if (location.pathname === '/journal') {
+          dispatch(checkFeedContent())
+        }
       })
   }
 }

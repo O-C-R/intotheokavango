@@ -1,5 +1,6 @@
 
 import React, {PropTypes} from 'react'
+import { dateToString } from '../utils'
 
 const Post = ({format, data}) => {
 
@@ -11,10 +12,7 @@ const Post = ({format, data}) => {
       var value = (function () {
         if (m === 'date') {
           var d = new Date(data.date)
-          var mo = d.getMonth()
-          var da = d.getDate()
-          var s = mo + ' / ' + da
-          return (<p>{s}</p>)
+          return (<p>{dateToString(d, true)}</p>)
         } else if (format === 'full') {
           return (<img width="16" height="16" key={i} src={'/static/img/icon-' + m + '.png'}/>)
         }

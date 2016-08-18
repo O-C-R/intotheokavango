@@ -1,5 +1,5 @@
 
-export function dateToString (d) {
+export function dateToString (d, short) {
   var month = d.getUTCMonth() + 1
   var day = d.getUTCDate()
   var hour = d.getUTCHours() + ''
@@ -20,6 +20,7 @@ export function dateToString (d) {
   if (month === 10) monthString = 'October'
   if (month === 11) monthString = 'November'
   if (month === 12) monthString = 'December'
+  if (short) monthString = monthString.slice(0, 3)
 
   return monthString + ' ' + day + ', ' + hour + ':' + minute
 }

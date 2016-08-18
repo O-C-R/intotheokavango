@@ -2,14 +2,19 @@
 import React, {PropTypes} from 'react'
 import Feed from './Feed'
 import ControlPanelContainer from '../containers/ControlPanelContainer.js'
+// import autobind from 'autobind-decorator'
 
-const JournalPage = ({posts, fetchPostsByDay, expedition}) => {
-  return (
-    <div className='page' id="journalPage">
-      <ControlPanelContainer pathName={location.pathname}/>
-      <Feed posts={posts} fetchPostsByDay={fetchPostsByDay} expedition={expedition}/>
-    </div>
-  )
+class JournalPage extends React.Component {
+  
+  render () {
+    const {posts, fetchPostsByDay, expedition} = this.props
+    return (
+      <div className='page' id="journalPage">
+        <ControlPanelContainer pathName={location.pathname}/>
+        <Feed posts={posts} fetchPostsByDay={fetchPostsByDay} expedition={expedition}/>
+      </div>
+    )
+  }
 }
 
 JournalPage.propTypes = {

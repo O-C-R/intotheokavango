@@ -314,7 +314,7 @@ class BackgroundMap extends React.Component {
 
       // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}

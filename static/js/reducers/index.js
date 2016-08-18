@@ -18,8 +18,6 @@ const okavangoReducer = (
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
-    case actions.SET_PAGE:
-      return state
     case actions.RECEIVE_POSTS:
       // console.log('RECEIVED', action.data)
       expeditionID = action.expeditionID
@@ -64,9 +62,6 @@ const okavangoReducer = (
           })
         })
       })
-
-      return state
-
 
     case actions.FETCH_POSTS_BY_DAY:
       id = action.expeditionID

@@ -4,6 +4,8 @@ import JournalPage from '../components/JournalPage'
 import * as actions from '../actions.js'
 import * as d3 from 'd3'
 
+
+
 const mapStateToProps = (state, ownProps) => {
   const expeditionID = state.selectedExpedition
   const expedition = state.expeditions[expeditionID]
@@ -77,6 +79,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }
   }
 }
+
 
 const JournalPageContainer = connect(
   mapStateToProps,

@@ -8,6 +8,7 @@
     reverse timeline
     show arrow on timeline direction
   RESPONSIVE
+    layout doesnt deal well with window resize
 
   sighting popups
   responsive map
@@ -81,14 +82,14 @@ let store = createStore(
   )
 )
 
-// <Route path="data" component={DataPage}/>
-// <Route path="share" component={SharePage}/>
-    // <Route path="map" component={MapPage}/>
-    // <Route path="journal" component={JournalPageContainer}/>
 const routes = (
   <Route path="/" component={OkavangoContainer}>
-    <IndexRoute component={AboutPage}/>
+    <IndexRoute component={MapPage}/>
+    <Route path="map" component={MapPage}/>
+    <Route path="journal" component={JournalPageContainer}/>
+    <Route path="data" component={DataPage}/>
     <Route path="about" component={AboutPage}/>
+    <Route path="share" component={SharePage}/>
   </Route>
 )
 
@@ -104,8 +105,7 @@ var render = function () {
 }
 
 store.subscribe(render)
-// store.dispatch(fetchExpeditions())
-render()
+store.dispatch(fetchExpeditions())
 
 window.onclick = function (event) {
   if (!event.target.matches('.dropbtn')) {
