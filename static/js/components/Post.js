@@ -3,7 +3,6 @@ import React, {PropTypes} from 'react'
 import { dateToString } from '../utils'
 
 const Post = ({format, data}) => {
-
   if (format === 'full') {
     var metaTypes = ['date']
     if (data.location) metaTypes.push('location')
@@ -67,7 +66,7 @@ const Post = ({format, data}) => {
     }
 
     return (
-      <div className="post">
+      <div className={'post ' + data.key}>
         <div className="type">
           <img width="16" height="16" src={'/static/img/icon-' + data.type+'.png'}/>
         </div>

@@ -11,7 +11,7 @@ const okavangoReducer = (
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
-    isFetchingPosts: 0
+    // isFetchingPosts: 0
   },
   action
 ) => {
@@ -53,7 +53,7 @@ const okavangoReducer = (
       })
 
       return Object.assign({}, state, {
-        isFetchingPosts: state.isFetchingPosts - 1,
+        // isFetchingPosts: state.isFetchingPosts - 1,
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
@@ -66,7 +66,7 @@ const okavangoReducer = (
     case actions.FETCH_POSTS_BY_DAY:
       id = action.expeditionID
       return Object.assign({}, state, {
-        isFetchingPosts: state.isFetchingPosts + 1,
+        // isFetchingPosts: state.isFetchingPosts + 1,
         expeditions: Object.assign({}, state.expeditions, {
           [id]: expeditionReducer(state.expeditions[id], action)
         })
@@ -425,13 +425,14 @@ const expeditionReducer = (
   switch (action.type) {
     case actions.FETCH_POSTS_BY_DAY:
       var postsByDay = []
-      var start = new Date(action.range[0])
-      var end = new Date(action.range[1])
-      var startDay = Math.floor((start.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
-      var endDay = Math.floor((end.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
-      for (i = startDay; i <= endDay; i++) {
-        postsByDay[i] = {}
-      }
+      // var start = new Date(action.range[0])
+      // var end = new Date(action.range[1])
+      // var startDay = Math.floor((start.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      // var endDay = Math.floor((end.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      // for (i = startDay; i <= endDay; i++) {
+      action.daysToFetch.forEach((d) => {
+        postsByDay[d] = 'loading'
+      })
       return Object.assign({}, state, {
         postsByDay: Object.assign({}, state.postsByDay, postsByDay)
       })

@@ -7,11 +7,11 @@ import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 class JournalPage extends React.Component {
   
   render () {
-    const {posts, fetchPostsByDay, expedition} = this.props
+    const {posts, checkFeedContent, expedition} = this.props
     return (
       <div className='page' id="journalPage">
         <ControlPanelContainer pathName={location.pathname}/>
-        <Feed posts={posts} fetchPostsByDay={fetchPostsByDay} expedition={expedition}/>
+        <Feed posts={posts} checkFeedContent={checkFeedContent} expedition={expedition}/>
       </div>
     )
   }
@@ -20,7 +20,7 @@ class JournalPage extends React.Component {
 JournalPage.propTypes = {
   posts: PropTypes.array.isRequired,
   expedition: PropTypes.object,
-  fetchPostsByDay: PropTypes.func.isRequired
+  checkFeedContent: PropTypes.func.isRequired
 }
 
 export default JournalPage

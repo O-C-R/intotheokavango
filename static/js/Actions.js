@@ -31,9 +31,34 @@ export function checkFeedContent () {
     const postsByDay = expedition.postsByDay
     const contentHeight = d3.select('#content').node().offsetHeight
     const scrollTop = d3.select('#content').node().scrollTop
-
     const feedElement = d3.select('#feed').node()
-    if (location.pathname === '/journal' && feedElement) {
+    const viewRange = [scrollTop, scrollTop + contentHeight]
+
+    if (feedElement) {
+      const postElements = d3.select(feedElement).selectAll('div.post')._groups[0]
+      var visibleDays = []
+      var visibleElements = []
+      if (postElements) {
+        postElements.forEach((p) => {
+          var postRange = [p.offsetTop - 100, p.offsetTop + p.offsetHeight - 100]
+          if ((viewRange[0] > postRange[0] && viewRange[0] <= postRange[1]) || (viewRange[0] <= postRange[0] && viewRange[1] > postRange[0]) || (viewRange[1] > postRange[0] && viewRange[1] <= postRange[1])) {
+            visibleElements.push(p.className.split(' ')[1])
+          }
+        })
+      }
+      visibleElements.forEach(p => {
+        var feature = expedition.features[p]
+        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+      })
+      for (var i = 0; i < visibleDays.length - 1; i++) {
+        if (Math.abs(visibleDays[i] - visibleDays[i + 1])) {
+          console.log('querying gap in posts:', i)
+          dispatch(fetchPostsByDay(expeditionID, null, i))
+          break
+        }
+      }
+
       const feedHeight = feedElement.offsetHeight
       if ((posts.length === 0) || feedHeight < contentHeight || (scrollTop <= 100 && !postsByDay[dayCount]) || (scrollTop >= feedHeight - contentHeight - 100 && !postsByDay[0])) {
         dispatch(fetchPostsByDay(expeditionID, expedition.currentDate))
@@ -48,49 +73,55 @@ export function checkFeedContent () {
 
 export const FETCH_POSTS_BY_DAY = 'FETCH_POSTS_BY_DAY'
 
-export function fetchPostsByDay (_expeditionID, date) {
+export function fetchPostsByDay (_expeditionID, date, expeditionDay) {
   return function (dispatch, getState) {
     var i
     var state = getState()
     // if (state.isFetchingPosts > 0) return
     var expeditionID = _expeditionID || state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
-    if (!date) date = expedition.currentDate
-    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    if (!expeditionDay) {
+      if (!date) date = expedition.currentDate
+      expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    }
 
     var daysToFetch = []
-    if (!expedition.postsByDay[expeditionDay]) {
-      daysToFetch[0] = expeditionDay
-    } else {
+
+    if (!expedition.postsByDay[expeditionDay]) daysToFetch.push(expeditionDay)
+    else if (expedition.postsByDay[expeditionDay] === 'loading') return
+    else {
       for (i = expeditionDay - 1; i >= 0; i--) {
+        if (expedition.postsByDay[i] === 'loading') break
         if (!expedition.postsByDay[i]) {
+          daysToFetch.push(i)
           daysToFetch[0] = i
           break
         }
       }
       for (i = expeditionDay + 1; i < expedition.dayCount; i++) {
+        if (expedition.postsByDay[i] === 'loading') break
         if (!expedition.postsByDay[i]) {
-          daysToFetch[1] = i
+          daysToFetch.push(i)
           break
         }
       }
     }
 
     if (daysToFetch.length === 0) return
-
-    daysToFetch.forEach(function (d, i, a) {
+    const datesToFetch = []
+    daysToFetch.forEach(function (d, i) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
-      a[i] = t
+      datesToFetch[i] = t
     })
     var range = [
-      timestampToString(d3.min(daysToFetch)),
-      timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
+      timestampToString(d3.min(datesToFetch)),
+      timestampToString(d3.max(datesToFetch) + (1000 * 3600 * 24))
     ]
 
     dispatch({
       type: FETCH_POSTS_BY_DAY,
       expeditionID: expeditionID,
-      range
+      daysToFetch
     })
 
     var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]

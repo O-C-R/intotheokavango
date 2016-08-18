@@ -74,8 +74,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    fetchPostsByDay: () => {
-      return dispatch(actions.fetchPostsByDay())
+    checkFeedContent: () => {
+      console.log('aga scroll')
+      return dispatch(actions.checkFeedContent())
     }
   }
 }

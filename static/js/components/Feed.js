@@ -9,27 +9,30 @@ class Feed extends React.Component {
     super(props)
   }
 
-
-  // componentWillUpdate () {
-  //   this.onScroll()
-  // }
-
-  
+  @autobind 
+  aga () {
+    console.log('aga scroll!')
+  }
 
   render () {
-    const { posts } = this.props
+    const { posts, checkFeedContent } = this.props
 
     const format = 'full'
-    const postFeed = posts.slice(0).reverse().map(post => {
-      return (
-        <Post format={format} data={post} key={post.key}>
-          {post.content}
-        </Post>
-      )
-    })
+    const postFeed = posts
+      .slice(0)
+      .sort((a, b) => {
+        return b.date - a.date
+      })
+      .map(post => {
+        return (
+          <Post format={format} data={post} key={post.key}>
+            {post.content}
+          </Post>
+        )
+      })
 
     return (
-      <div id="feed">
+      <div id="feed" onWheel={checkFeedContent}>
         {postFeed}
       </div>
     )
@@ -39,7 +42,7 @@ class Feed extends React.Component {
 Feed.propTypes = {
   posts: PropTypes.array.isRequired,
   expedition: PropTypes.object,
-  fetchPostsByDay: PropTypes.func.isRequired
+  checkFeedContent: PropTypes.func.isRequired
 }
 
 export default Feed
