@@ -13,67 +13,136 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
-export const SET_PAGE = 'SET_PAGE'
+export const ENABLE_CONTENT = 'ENABLE_CONTENT'
+
+export function enableContent () {
+  return {
+    type: ENABLE_CONTENT
+  }
+}
+
+export const SET_PAGE = 'SET_PATH'
 
 export function setPage () {
-  return {
-    type: SET_PAGE
+  return (dispatch, getState) => {
+    if (location.pathname === '/journal') dispatch(checkFeedContent())
+  }
+}
+
+export function checkFeedContent () {
+  return (dispatch, getState) => {
+    const state = getState()
+    const expeditionID = state.selectedExpedition
+    const expedition = state.expeditions[expeditionID]
+    const dayCount = expedition.dayCount
+    const posts = d3.values(expedition.features)
+    const postsByDay = expedition.postsByDay
+    const contentHeight = d3.select('#content').node().offsetHeight
+    const scrollTop = d3.select('#content').node().scrollTop
+    const feedElement = d3.select('#feed').node()
+    const viewRange = [scrollTop, scrollTop + contentHeight]
+
+    if (feedElement) {
+      const postElements = d3.select(feedElement).selectAll('div.post')._groups[0]
+      var visibleDays = []
+      var visibleElements = []
+      if (postElements) {
+        postElements.forEach((p) => {
+          var postRange = [p.offsetTop - 100, p.offsetTop + p.offsetHeight - 100]
+          if ((viewRange[0] > postRange[0] && viewRange[0] <= postRange[1]) || (viewRange[0] <= postRange[0] && viewRange[1] > postRange[0]) || (viewRange[1] > postRange[0] && viewRange[1] <= postRange[1])) {
+            visibleElements.push(p.className.split(' ')[1])
+          }
+        })
+      }
+      visibleElements.forEach(p => {
+        var feature = expedition.features[p]
+        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+      })
+      for (var i = 0; i < visibleDays.length - 1; i++) {
+        if (Math.abs(visibleDays[i] - visibleDays[i + 1])) {
+          // console.log('querying gap in posts:', i)
+          dispatch(fetchPostsByDay(expeditionID, null, i))
+          break
+        }
+      }
+
+      const feedHeight = feedElement.offsetHeight
+      if ((posts.length === 0) || feedHeight < contentHeight || (scrollTop <= 100 && !postsByDay[dayCount]) || (scrollTop >= feedHeight - contentHeight - 100 && !postsByDay[0])) {
+        dispatch(fetchPostsByDay(expeditionID, expedition.currentDate))
+      }
+    } else {
+      if ((posts.length === 0) || (scrollTop <= 100 && !postsByDay[dayCount])) {
+        dispatch(fetchPostsByDay(expeditionID, expedition.currentDate))
+      }
+    }
   }
 }
 
 export const FETCH_POSTS_BY_DAY = 'FETCH_POSTS_BY_DAY'
 
-export function fetchPostsByDay (_expeditionID, date) {
+export function fetchPostsByDay (_expeditionID, date, expeditionDay) {
   return function (dispatch, getState) {
     var i
     var state = getState()
-    if (state.isFetchingPosts > 0) return
+    // if (state.isFetchingPosts > 0) return
     var expeditionID = _expeditionID || state.selectedExpedition
     var expedition = state.expeditions[expeditionID]
-    if (!date) date = expedition.currentDate
-    var expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    if (!expeditionDay) {
+      if (!date) date = expedition.currentDate
+      expeditionDay = Math.floor((date.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+    }
 
     var daysToFetch = []
-    if (!expedition.postsByDay[expeditionDay]) {
-      daysToFetch[0] = expeditionDay
-    } else {
+
+    if (!expedition.postsByDay[expeditionDay]) daysToFetch.push(expeditionDay)
+    else if (expedition.postsByDay[expeditionDay] === 'loading') return
+    else {
       for (i = expeditionDay - 1; i >= 0; i--) {
+        if (expedition.postsByDay[i] === 'loading') break
         if (!expedition.postsByDay[i]) {
+          daysToFetch.push(i)
           daysToFetch[0] = i
           break
         }
       }
       for (i = expeditionDay + 1; i < expedition.dayCount; i++) {
+        if (expedition.postsByDay[i] === 'loading') break
         if (!expedition.postsByDay[i]) {
-          daysToFetch[1] = i
+          daysToFetch.push(i)
           break
         }
       }
     }
 
-    daysToFetch.forEach(function (d, i, a) {
+    if (daysToFetch.length === 0) return
+    const datesToFetch = []
+    daysToFetch.forEach(function (d, i) {
       var t = expedition.start.getTime() + d * (1000 * 3600 * 24)
-      a[i] = t
+      datesToFetch[i] = t
     })
     var range = [
-      timestampToString(d3.min(daysToFetch)),
-      timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
+      timestampToString(d3.min(datesToFetch)),
+      timestampToString(d3.max(datesToFetch) + (1000 * 3600 * 24))
     ]
 
     dispatch({
       type: FETCH_POSTS_BY_DAY,
       expeditionID: expeditionID,
-      range
+      daysToFetch
     })
 
-    var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
-    console.log('querying:', queryString)
+    var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
+    console.log('querying posts:', queryString)
     fetch(queryString)
       .then(response => response.json())
       .then(json => {
         var results = json.results.features
-        console.log('done with query! Received ' + results.length + ' features.')
-        dispatch(receivePosts(expeditionID, results, range))
+        console.log('done with post query! Received:' + results.length + ' features.')
+        return dispatch(receivePosts(expeditionID, results, range))
+      })
+      .then(() => {
+        dispatch(checkFeedContent())
       })
   }
 }
@@ -229,13 +298,13 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom, expedi
     })
 
     if (tileRange.length > 0) {
-      var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet,sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-      console.log('querying:', queryString)
+      var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet,sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
+      console.log('querying features by tile:', queryString)
       fetch(queryString)
         .then(response => response.json())
         .then(json => {
           var results = json.results.features
-          console.log('done with query! Received ' + results.length + ' features.')
+          console.log('done with feature query! Received ' + results.length + ' features.')
           dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
         })
     }
@@ -271,25 +340,28 @@ export function receiveExpeditions (data) {
 export function fetchExpeditions () {
   return function (dispatch, getState) {
     dispatch(requestExpeditions())
-    return fetch('http://intotheokavango.org/api/expeditions')
+    return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
       .then(() => dispatch(fetchDay(null, null, null, true)))
       .then(() => {
         var state = getState()
-        Object.keys(state.expeditions).forEach((id) => {
-          if (id !== state.selectedExpedition) {
-            dispatch(fetchDay(null, null, id, false))
-          }
-        })
+        // Object.keys(state.expeditions).forEach((id) => {
+        //   if (id !== state.selectedExpedition) {
+        //     dispatch(fetchDay(null, null, id, false))
+        //   }
+        // })
         dispatch(fetchTotalSightings(state.selectedExpedition))
+        if (location.pathname === '/journal') {
+          dispatch(checkFeedContent())
+        }
       })
   }
 }
 
 export function fetchTotalSightings (id) {
   return function (dispatch, getState) {
-    return fetch('http://intotheokavango.org/api/sightings?FeatureType=sighting&limit=0&Expedition=' + id)
+    return fetch('https://intotheokavango.org/api/sightings?FeatureType=sighting&limit=0&Expedition=' + id)
       .then(response => response.json())
       .then(json => dispatch(receiveTotalSightings(id, json)))
   }
@@ -316,7 +388,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
     var daysToFetch = []
     if (!expedition.days[expeditionDay - 1] && expeditionDay - 1 >= 0) daysToFetch.push(expeditionDay - 1)
     if (!expedition.days[expeditionDay]) daysToFetch.push(expeditionDay)
-    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount - 1) daysToFetch.push(expeditionDay + 1)
+    if (!expedition.days[expeditionDay + 1] && expeditionDay + 1 < expedition.dayCount) daysToFetch.push(expeditionDay + 1)
 
     if (daysToFetch.length === 0) return
 
@@ -328,12 +400,10 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
       timestampToString(d3.min(daysToFetch)),
       timestampToString(d3.max(daysToFetch) + (1000 * 3600 * 24))
     ]
-    // var queryString = 'http://intotheokavango.org/api/features?FeatureType=beacon&limit=0&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
-    // console.log('querystring:', queryString, expeditionDay)
 
     const goFetch = (featureTypes, results, expeditionID) => {
       var type = featureTypes.shift()
-      var queryString = 'http://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
+      var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
       if (type === 'ambit_geo') queryString += '&resolution=300'
       console.log('querying:', queryString)
       fetch(queryString)

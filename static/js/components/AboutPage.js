@@ -20,7 +20,7 @@ const AboutPage = () => {
           </div>
           <div className="column">
             <p>
-              The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unstudied. A team of Ba’Yei, scientists, engineers and adventurers will journey a 345 kilometers down the Cuito River, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
+              The Okavango Delta is one of the world’s last great wetland wildernesses. Although the Delta has been awarded UNESCO WHS Status its catchments in the highlands of Angola are still unprotected and largely unstudied. A team of Ba’Yei, scientists, engineers and adventurers will journey a 345 kilometers crossing the river, finding new species, exploring new ground, and taking the pulse of this mighty river that brings life-giving water to the Jewel of the Kalahari.
             </p>
             <p>
               This site displays data which is uploaded daily, via satellite, by the expedition team. Data is also available through a public API, allowing anyone to remix, analyze or visualize the collected information.
@@ -52,23 +52,41 @@ const AboutPage = () => {
               EXPEDITION TEAM<br/><span class="job"><span class="explorerBox legend"></span> National Geographic Emerging Explorers</span>
             </h2>
             <p>
-              Alex Paullin <span class="job">Camp Logistics</span><br/>Brian House <span class="job">Sound Artist</span><br/>Chris Boyes <span class="job">Expedition Leader</span><br/>Giles Trevethick <span class="job">Research Coordinator</span><br/>Gobonamang Kgetho <span class="job">Poler</span><br/>Gregg Treinish<span class="explorerBox"></span> <span class="job">Sensor Network Deployment</span><br/>James Kydd <span class="job">Expedition photographer</span><br/>Jer Thorp<span class="explorerBox"></span> <span class="job">Data Artist</span><br/>John Hilton <span class="job">Expedition Director</span><br/>Karen Ross <span class="job">Botswana WHS Bid Leader</span><br/>Kgalalela Mpetsang <span class="job">Poler</span><br/>Leillamang Kgetho <span class="job">Poler</span><br/>Maans Booysen <span class="job">Ornithology</span><br/>Pieter Hugo <span class="job">Camp Logistics</span><br/>Shah Selbe<span class="explorerBox"></span> <span class="job">Expedition Technologist</span><br/>Steve Boyes<span class="explorerBox"></span> <span class="job">Project Leader</span><br/>Topho Retiyo <span class="job">Poler</span><br/>Water Setlabosha <span class="job">Poler</span><br/>
+              Steve Boyes <span class="job">Project Leader & Birds</span><br/>
+              John Hilton <span class="job">Project Director</span><br/>
+              Chris Boyes <span class="job">Expeditions Leader</span><br/>
+              Adjany Costa <span class="job">Assistant Director & 2nd Fish</span><br/>
+              Kyle Gordon <span class="job">Expedition Logistics</span><br/>
+              Gotz Neef <span class="job">Scienetific Collections & Leader Invertebrates</span><br/>
+              Kerllen Costa <span class="job">Plants & Mammals</span><br/>
+              Luke Manson <span class="job">Expedition Logistics</span><br/>
+              Ninda Baptista <span class="job">Reptiles</span><br/>
+              Rachel Sussman <span class="job">Photographer</span><br/>
+              Neil Gelinas <span class="job">Filmmaker</span><br/>
+              Jer Thorp <span class="job">Data</span><br/>
+              Shah Selbe <span class="job">Tech</span><br/>
+              Mia Maestro <span class="job">Photographer</span><br/>
+              Water <span class="job">Poler</span><br/>
+              GB <span class="job">Poler</span><br/>
+              Schnapps <span class="job">Poler</span><br/>
+              Tom <span class="job">Poler</span><br/>
+              Ralph <span class="job">Poler</span><br/>
+              Judge <span class="job">Poler</span><br/>
+              Comet <span class="job">Poler</span><br/>
             </p>
           </div>
           <div className="column">
-            <h2>
-              SCIENTIFIC TEAM
-            </h2>
-            <p>
-              Adjany Costa <span class="job">Ichthyologist and Ornithologist</span><br/>Bill Branch <span class="job">Herpetologist</span><br/>David Goyder <span class="job">Botanist - Kew Gardens</span><br/>Gotz Neef <span class="job">Botanist & Entomologist</span><br/>Matt Janks <span class="job">Botanist</span><br/>Nigel Barker <span class="job">Botanist</span><br/>Nkosinathi Mazungula <span class="job">Ichthyologist</span><br/>Paul Skelton <span class="job">Ichthyologist</span><br/>Francisco Maiato <span class="job">Botanist</span><br/>
-            </p>
-            <h2>
-              DOCUMENTARY TEAM
-            </h2>
-            <p>
-              Alexandra Fuller<span class="job">Writer</span><br/>Cory Richards<span class="job">Photographer</span><br/>Mark Stone <span class="job">Assistant</span><br/>Neil Gelinas <span class="job">Filmmaker</span>
-            </p>
-
+            <div class="logos">
+              <a href="http://www.nationalgeographic.com/">
+                <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+              </a>
+              <a href="http://www.o-c-r.org/">
+                <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+              </a>
+              <a href="http://www.wildbirdtrust.com/">
+                <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+              </a>
+            </div>
           </div>
         </div>
       </div>
