@@ -15,7 +15,10 @@ def parse(request):
         if path[-4:] == "json":
             try:
                 with open(path) as f:
-                    datas = json.loads(f.read())
+                    content = f.read()
+                    log.debug("--> loaded file")
+                    datas = json.loads(content)
+                    log.debug("--> decoded json")
             except Exception as e:
                 log.error(log.exc(e))
                 return None, "Could not parse JSON"
