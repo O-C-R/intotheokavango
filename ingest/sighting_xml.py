@@ -54,7 +54,7 @@ def parse(request):
         for alias in ['Species', 'Species_Name', 'Animal', 'SpeciesNameOther', 'Dominant_species', 'Dominant_Species']:
             alias = alias.replace('_', '')
             if alias in feature and len(feature[alias].strip()):
-                feature['SpeciesName'] = strings.titlecase(feature[alias].strip())
+                feature['SpeciesName'] = strings.titlecase(feature[alias].replace('_', ' ').strip())
                 if alias != 'SpeciesName':
                     del feature[alias]        
         if 'SpeciesName' not in feature:
