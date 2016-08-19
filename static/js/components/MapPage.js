@@ -5,8 +5,9 @@ import NotificationPanelContainer from '../containers/NotificationPanelContainer
 import ControlPanelContainer from '../containers/ControlPanelContainer.js'
 
 const MapPage = () => {
+  var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
   return (
-    <div className='page' id="mapPage">
+    <div className='page' id="mapPage" style={height}>
       <ControlPanelContainer pathName={location.pathname}/>
       <NotificationPanelContainer/>
     </div>

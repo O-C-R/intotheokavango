@@ -4,35 +4,25 @@ import BackgroundMap from './BackgroundMap'
 import LightBox from './LightBox'
 import Timeline from './Timeline'
 import Navigation from './Navigation'
+import IntroductionBox from './IntroductionBox'
 
 export default class Okavango extends React.Component {
   render () {
-    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID} = this.props
-    var height = {height: window.innerHeight - 100}
-
-    // const nightOpacity = () => {
-    //   console.log('opacity')
-    //   if (!expedition) return { opacity: 0 }
-    //   var currentDate = expedition.currentDate.getTime() + 2 * (1000 * 3600)
-    //   var currentTime = currentDate % (1000 * 3600 * 24)
-    //   var opacity = Math.floor(currentTime / (1000 * 3600 * 24) * 100)
-    //   console.log('opacity', opacity)
-    //   return {
-    //     { opacity: opacity + '%' }
-    //   }
-    // }
+    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage} = this.props
+    var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
 
     return (
       <div id="root">
-        <BackgroundMap expeditionID={expeditionID} isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate}/>
+        <BackgroundMap initialPage={initialPage} expeditionID={expeditionID} isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate}/>
         <div id="mapOverlay" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}></div>
         <div id="nightOverlay" style={{opacity: (location.pathname === '/map' || location.pathname === '/' ? 0 : 1)}}></div>
         <Navigation setPage={setPage} pathName={location.pathname}/>
-        <div id="content" style={height}>
-          {isFetching ?
-          <div id="loadingWheel">
-            <div class="wheel"></div>
-          </div> : null}
+        <div id="content" style={height} className={contentActive ? '' : 'hidden'}>
+          {isFetching ? (
+            <div id="loadingWheel">
+              <div class="wheel"></div>
+            </div>
+          ) : null}
           <LightBox active={false}/>
           <Timeline expeditionID={expeditionID} expedition={expedition} jumpTo={jumpTo}/>
           <div id="pageContainer">
@@ -50,6 +40,7 @@ export default class Okavango extends React.Component {
             </a>
           </div>
         </div>
+        <IntroductionBox enableContent={enableContent}/>
       </div>
     )
   }
@@ -66,5 +57,8 @@ Okavango.propTypes = {
   jumpTo: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
-  setPage: PropTypes.func.isRequired
+  setPage: PropTypes.func.isRequired,
+  contentActive: PropTypes.bool.isRequired,
+  enableContent: PropTypes.func.isRequired,
+  initialPage: PropTypes.string.isRequired
 }

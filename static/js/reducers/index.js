@@ -11,15 +11,19 @@ const okavangoReducer = (
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
-    isFetchingPosts: 0
+    contentActive: !(location.pathname === '/' || location.pathname === '/map'),
+    initialPage: location.pathname
   },
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
-    case actions.SET_PAGE:
-      return state
+    case actions.ENABLE_CONTENT:
+      return {
+        ...state,
+        contentActive: true
+      }
     case actions.RECEIVE_POSTS:
       // console.log('RECEIVED', action.data)
       expeditionID = action.expeditionID
@@ -55,7 +59,7 @@ const okavangoReducer = (
       })
 
       return Object.assign({}, state, {
-        isFetchingPosts: state.isFetchingPosts - 1,
+        // isFetchingPosts: state.isFetchingPosts - 1,
         mapStateNeedsUpdate: false,
         expeditions: Object.assign({}, state.expeditions, {
           [expeditionID]: Object.assign({}, expedition, {
@@ -65,13 +69,10 @@ const okavangoReducer = (
         })
       })
 
-      return state
-
-
     case actions.FETCH_POSTS_BY_DAY:
       id = action.expeditionID
       return Object.assign({}, state, {
-        isFetchingPosts: state.isFetchingPosts + 1,
+        // isFetchingPosts: state.isFetchingPosts + 1,
         expeditions: Object.assign({}, state.expeditions, {
           [id]: expeditionReducer(state.expeditions[id], action)
         })
@@ -188,11 +189,13 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        features[id] = featureReducer(expedition.features[id], action, f)
-        if (f.properties.FeatureType === 'ambit_geo') {
-          if (!members[f.properties.Member]) {
-            members[f.properties.Member] = {
-              color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+        if (f.properties.Team === 'RiverMain') {
+          features[id] = featureReducer(expedition.features[id], action, f)
+          if (f.properties.FeatureType === 'ambit_geo') {
+            if (!members[f.properties.Member]) {
+              members[f.properties.Member] = {
+                color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+              }
             }
           }
         }
@@ -324,15 +327,21 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if (f.properties.FeatureType === 'sighting') {
-          if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
-          else {
-            var taxClass = f.properties.Taxonomy.Class
-            if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
-            f.properties.color = state.speciesColors[taxClass]
+        if (f.properties.Team === 'RiverMain') {
+          var flag = true
+          if (f.properties.FeatureType === 'sighting') {
+            if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
+            else {
+              var taxClass = f.properties.Taxonomy.Class
+              if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
+              f.properties.color = state.speciesColors[taxClass]
+            }
+          }
+          if (f.properties.FeatureType === 'tweet' && f.properties.Text && f.properties.Text[0] === '@') flag = false
+          if (flag) {
+            features[id] = featureReducer(expedition.features[id], action, f)
           }
         }
-        features[id] = featureReducer(expedition.features[id], action, f)
       })
 
       var tileResolution = Math.floor((expedition.geoBounds[2] - expedition.geoBounds[0]) * 111 / 10)
@@ -387,7 +396,9 @@ const expeditionReducer = (
     name: '',
     playback: 'forward',
     layout: 'rows',
-    zoom: 14,
+    initialZoom: 4,
+    targetZoom: 15,
+    zoom: 15,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
     tileSize: 10,
@@ -430,13 +441,14 @@ const expeditionReducer = (
   switch (action.type) {
     case actions.FETCH_POSTS_BY_DAY:
       var postsByDay = []
-      var start = new Date(action.range[0])
-      var end = new Date(action.range[1])
-      var startDay = Math.floor((start.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
-      var endDay = Math.floor((end.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
-      for (i = startDay; i <= endDay; i++) {
-        postsByDay[i] = {}
-      }
+      // var start = new Date(action.range[0])
+      // var end = new Date(action.range[1])
+      // var startDay = Math.floor((start.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      // var endDay = Math.floor((end.getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+      // for (i = startDay; i <= endDay; i++) {
+      action.daysToFetch.forEach((d) => {
+        postsByDay[d] = 'loading'
+      })
       return Object.assign({}, state, {
         postsByDay: Object.assign({}, state.postsByDay, postsByDay)
       })
@@ -651,9 +663,12 @@ const expeditionReducer = (
 
     case actions.RECEIVE_EXPEDITIONS:
       var dayCount = data.Days + 1
+      // removing +1 here because we receive beacons before any other features on current day
+      // var dayCount = data.Days
       var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
-      var currentDate = new Date(end.getTime() - (1000 * 3600 * 24))
+      // currentDate is 2 days before last beacon
+      var currentDate = new Date(end.getTime() - 2 * (1000 * 3600 * 24))
 
       var name = data.Name
 

@@ -1,6 +1,26 @@
 
 /*
 
+  The Okavango Delta is one of the world’s last great wetland wildernesses. A team of Ba’Yei, scientists, engineers and adventurers is journeying a 345 kilometers crossing the delta, finding new species and exploring new ground. Join us in real-time as we explore the beating heart of our planet.
+
+  RELEASE
+    round sightings location
+    add grid journal
+    mobile
+    sighting popup
+    update about page
+    rollover on member markers
+    add year selection
+
+    add skip button to intro
+    animate timeline cursor and direction
+    sighting graph
+
+    deep linking of features
+    performance
+    disable map motion for now
+    endpoint for Jane
+
   JOURNAL
     loading of features
     update currentime
@@ -8,6 +28,7 @@
     reverse timeline
     show arrow on timeline direction
   RESPONSIVE
+    layout doesnt deal well with window resize
 
   sighting popups
   responsive map
@@ -81,14 +102,14 @@ let store = createStore(
   )
 )
 
-// <Route path="data" component={DataPage}/>
-// <Route path="share" component={SharePage}/>
-    // <Route path="map" component={MapPage}/>
-    // <Route path="journal" component={JournalPageContainer}/>
 const routes = (
   <Route path="/" component={OkavangoContainer}>
-    <IndexRoute component={AboutPage}/>
+    <IndexRoute component={MapPage}/>
+    <Route path="map" component={MapPage}/>
+    <Route path="journal" component={JournalPageContainer}/>
+    <Route path="data" component={DataPage}/>
     <Route path="about" component={AboutPage}/>
+    <Route path="share" component={SharePage}/>
   </Route>
 )
 
@@ -104,8 +125,7 @@ var render = function () {
 }
 
 store.subscribe(render)
-// store.dispatch(fetchExpeditions())
-render()
+store.dispatch(fetchExpeditions())
 
 window.onclick = function (event) {
   if (!event.target.matches('.dropbtn')) {
