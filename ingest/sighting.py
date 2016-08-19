@@ -14,7 +14,7 @@ def parse(request):
     for path in paths:
         if path[-4:] == "json":
             try:
-                with open(path) as f:
+                with open(path, encoding='utf-8') as f:
                     content = f.read()
                     log.debug("--> loaded file")
                     datas = json.loads(content)
