@@ -43,8 +43,6 @@ def parse(request):
                 log.error(log.exc(e))
 
         for key, value in data.items():
-            if 'Image' in key:
-                continue
             feature[key.replace('_', '')] = value
 
         # purge blanks

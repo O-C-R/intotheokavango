@@ -55,7 +55,8 @@ def parse(request):
             alias = alias.replace('_', '')
             if alias in feature and len(feature[alias].strip()):
                 feature['SpeciesName'] = strings.titlecase(feature[alias].strip())
-                del feature[alias]        
+                if alias != 'SpeciesName':
+                    del feature[alias]        
         if 'SpeciesName' not in feature:
             log.error("Missing SpeciesName")
             return None, "Missing SpeciesName"
