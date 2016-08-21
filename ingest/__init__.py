@@ -305,7 +305,7 @@ def ingest_json_file(request):
     """Generic method for ingesting a JSON file"""
     path = save_file(request)    
     try:
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             data = json.loads(f.read())
     except Exception as e:
         log.error(log.exc(e))
