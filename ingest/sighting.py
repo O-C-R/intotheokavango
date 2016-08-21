@@ -52,7 +52,8 @@ def parse(request):
         if 'Count' not in data and 'count' not in data:
             data['Count'] = 1
         log.debug(json.dumps(data, indent=4))
-        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+        # data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+        data['Taxonomy'] = None
 
 
         # process the image
