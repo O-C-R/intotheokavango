@@ -7,88 +7,66 @@
 
 $(document).ready(function() {
 
-    $('#add-button').on('click', function () {
-        console.log('click');
-                var data = new FormData();
-                var files = $("#File").get(0).files;
-                if (files.length == 0) return;
-                var progressElem = $('#progressCounter');
+    $('#add-button').on('click', function () {        
 
-                // Add the uploaded file content to the form data collection
-                data.append('ImageCount', files.length);
-                for (var i = 0; i < files.length; i++) {
-                    console.log("ADDING IMAGE " + files[i])
-                    data.append("image-" + i, files[i]);
-                    data.append("image-" + i + "-ResourceURL", files[i].name);
-                }
+        var j = $('#upload').serializeJSON();
+        var files = $("#File").get(0).files;
+        if (!files.length) return
+        j.ResourceURLs = [files[0].name];
 
-                var j = $('#upload').serializeJSON();
-                j.ResourceURLs = [files[0].name];
-                j.SoundType = $('#SoundType').val();
+        var dateString = $('#date').val() + " , " + $('#time').val();
+        var date = moment().format();
+        j.t_utc = Math.floor((new Date(date)).getTime() / 1000);
 
-                var dateString = $('#date').val() + " , " + $('#time').val();
-                var date = moment().format();
-                j.t_utc = Math.floor((new Date(date)).getTime() / 1000);
+        console.log(j);
+        var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
 
-                //j.t_utc = Math.floor((new Date()).getTime() / 1000);
+        var data = new FormData();
+        data.append("hasJSON", true);
+        data.append("json", jsonBlob, "metadata.json");
+        data.append("audio", files[0]);
+        data.append("audio-ResourceURL", files[0].name);
 
-                var jsonBlob = new Blob([JSON.stringify(j)], {type : 'text/json'});
-                console.log(jsonBlob);
+        var progressElem = $('#progressCounter');
+        $('#message').text('Uploading...');                
+        var ajaxRequest = $.ajax({
+            type: "POST",
+            url: "/ingest/audio",
+            contentType: false,
+            processData: false,
+            data: data,
 
-                data.append("hasJSON", true);
-                data.append("json", jsonBlob, "metadata.json");
-                data.append("TeamMember", $("#TeamMember").val());
-
-
-                var myReader = new FileReader();
-                myReader.onload = function(event){
-                    console.log(myReader.result);
-                };
-                myReader.readAsText(jsonBlob);
-
-                // Make Ajax request with the contentType = false, and processDate = false
-                var ajaxRequest = $.ajax({
-                    type: "POST",
-                    url: "/ingest/audio",
-                    contentType: false,
-                    processData: false,
-                    data: data,
-
-                    error: function (xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status);
-                        console.log(error);
-                        console.log(data);
-                        $('#message').html(xhr['responseText']);                        
-                    },
-                    xhr: function() {
-                        var xhr = new window.XMLHttpRequest();
-                        xhr.upload.addEventListener("progress", function(evt) {
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                progressElem.html(Math.round(percentComplete * 100) + "%");
-                                //console.log("percent loaded: " + percentComplete);
-                            }
-                        }, false);
-
-                        return xhr;
+            error: function (xhr, status, error) {
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                console.log(data);
+                $('#message').html(xhr['responseText']);                        
+            },
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        console.log(percentComplete);
+                        progressElem.html(Math.round(percentComplete * 100) + "%");
+                        //console.log("percent loaded: " + percentComplete);
                     }
-                });
+                }, false);
 
-                ajaxRequest.done(function (xhr, textStatus) {
-                    console.log(textStatus);
-                    $('#message').html(textStatus);
-                    if (textStatus == 'success') {
-                        $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
-                    }
-                });
+                return xhr;
+            }            
+        });
 
-
-            });
-
-})
-
-
+        ajaxRequest.done(function (xhr, textStatus) {
+            console.log(textStatus);
+            $('#message').html(textStatus);
+            if (textStatus == 'success') {
+                $(':input','#upload').not(':button, :submit, :reset, :hidden').val('').removeAttr('checked').removeAttr('selected');
+            }
+        });
+    });
+});
 	
 </script>
 
@@ -104,16 +82,19 @@ $(document).ready(function() {
     <label for="photo">File</label>
     <input type="file" name="File" id="File" value="">
 
+    <label for="Title">Title</label>
+    <input type="text" name="Title" id="Title" value="">
+
     <label for="SoundType">Sound type</label>
     <input type="text" name="SoundType" id="SoundType" value="Field Recording">
 
     <label for="TeamMember">Member</label>
     <input type="text" name="TeamMember" id="TeamMember" value="">
 
-    <label for="Date">Date</label>
+    <label for="date">Date</label>
     <input type="date" name="Date" id="date" value="">
 
-    <label for="Time">Time</label>
+    <label for="time">Time</label>
     <input type="time" name="Time" id="time" value="">
 
     <label for="Notes">Notes</label>
