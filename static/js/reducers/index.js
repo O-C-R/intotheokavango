@@ -574,8 +574,8 @@ const expeditionReducer = (
           var sightings = features.sighting.map((f) => {
             return {
               position: {
-                x: f.geometry.coordinates[0] + f.properties.scatter[0],
-                y: f.geometry.coordinates[1] + f.properties.scatter[1],
+                x: f.geometry.coordinates[0],
+                y: f.geometry.coordinates[1],
                 z: 0
               },
               radius: f.properties.radius,
@@ -595,8 +595,8 @@ const expeditionReducer = (
           var posts = allPosts.map((f) => {
             return {
               position: [
-                f.geometry.coordinates[0] + f.properties.scatter[0],
-                f.geometry.coordinates[1] + f.properties.scatter[1]
+                f.geometry.coordinates[0],
+                f.geometry.coordinates[1]
               ],
               type: f.properties.FeatureType,
               id: f.id,
