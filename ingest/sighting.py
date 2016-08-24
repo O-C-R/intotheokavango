@@ -14,8 +14,11 @@ def parse(request):
     for path in paths:
         if path[-4:] == "json":
             try:
-                with open(path) as f:
-                    datas = json.loads(f.read())
+                with open(path, encoding='utf-8') as f:
+                    content = f.read()
+                    log.debug("--> loaded file")
+                    datas = json.loads(content)
+                    log.debug("--> decoded json")
             except Exception as e:
                 log.error(log.exc(e))
                 return None, "Could not parse JSON"
@@ -49,7 +52,8 @@ def parse(request):
         if 'Count' not in data and 'count' not in data:
             data['Count'] = 1
         log.debug(json.dumps(data, indent=4))
-        data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+        # data['Taxonomy'] = get_taxonomy(data['SpeciesName'])
+        data['Taxonomy'] = None
 
 
         # process the image

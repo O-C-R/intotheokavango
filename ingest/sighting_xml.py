@@ -4,7 +4,7 @@ from housepy import config, log, util, strings
 from ingest.sighting import get_taxonomy
 
 def parse(request):
-    log.info("sighting.parse")
+    log.info("sighting_xml.parse")
 
     try:
         content = ingest_plain_body(request)
@@ -16,7 +16,7 @@ def parse(request):
     try:
         log.info("--> parsing XML")
         data = data['instance']
-        feature = {'FeatureType': "sighting"}
+        feature = {'FeatureType': "sighting", 'Delivery': "devicemagic"}
         log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
         # feature['Member'] = data['@dm:submitting_user'].split(' ')[0] # let TeamMember override this
 
@@ -54,8 +54,9 @@ def parse(request):
         for alias in ['Species', 'Species_Name', 'Animal', 'SpeciesNameOther', 'Dominant_species', 'Dominant_Species']:
             alias = alias.replace('_', '')
             if alias in feature and len(feature[alias].strip()):
-                feature['SpeciesName'] = strings.titlecase(feature[alias].strip())
-                del feature[alias]        
+                feature['SpeciesName'] = strings.titlecase(feature[alias].replace('_', ' ').strip())
+                if alias != 'SpeciesName':
+                    del feature[alias]        
         if 'SpeciesName' not in feature:
             log.error("Missing SpeciesName")
             return None, "Missing SpeciesName"
