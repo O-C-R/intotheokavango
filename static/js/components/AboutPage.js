@@ -54,25 +54,24 @@ const AboutPage = () => {
             <p>
               Adjany Costa <span class="job">Assistant Director & 2nd Fish</span><br/>
               Chris Boyes <span class="job">Expeditions Leader</span><br/>
-              Comet <span class="job">Poler</span><br/>
-              Gobonamang Kgetho <span class="job">Poler</span><br/>
+              Gobonamang "GB" Kgetho <span class="job">Poler</span><br/>
               Gotz Neef <span class="job">Scienetific Collections & Leader Invertebrates</span><br/>
               Jer Thorp <span class="job">Data</span><br/>
               John Hilton <span class="job">Project Director</span><br/>
-              Judge <span class="job">Poler</span><br/>
               Kerllen Costa <span class="job">Plants & Mammals</span><br/>
               Kyle Gordon <span class="job">Expedition Logistics</span><br/>
-              Leillamang Kgetho <span class="job">Poler</span><br/>
+              Leilamang "Schnapps" Kgetho <span class="job">Poler</span><br/>
               Luke Manson <span class="job">Expedition Logistics</span><br/>
               Mia Maestro <span class="job">Photographer</span><br/>
+              Motiemang “Judge” Xhikabora <span class="job">Poler</span><br/>
               Neil Gelinas <span class="job">Filmmaker</span><br/>
               Ninda Baptista <span class="job">Reptiles</span><br/>
+              Nkeletsang “Ralph” Moshupa <span class="job">Poler</span><br/>
               Rachel Sussman <span class="job">Photographer</span><br/>
-              Ralph <span class="job">Poler</span><br/>
               Shah Selbe <span class="job">Tech</span><br/>
               Steve Boyes <span class="job">Project Leader & Birds</span><br/>
-              Tom <span class="job">Poler</span><br/>
-              Water Setlabosha<span class="job">Poler</span><br/>
+              Topho "Tom" Retiyo <span class="job">Poler</span><br/>
+              Tumeleto "Water" Setlabosha<span class="job">Poler</span><br/>
             </p>
           </div>
           <div className="column">
