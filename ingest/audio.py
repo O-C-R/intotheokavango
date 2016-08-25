@@ -31,6 +31,8 @@ def parse(request):
     for path in paths:
         if path[-4:] != "json":
             break
+    if path[-4:] == "json":
+        return None, "Missing audio file"
 
     if 'TeamMember' in data:
         data['Member'] = data['TeamMember']
