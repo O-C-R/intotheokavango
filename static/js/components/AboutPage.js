@@ -52,27 +52,27 @@ const AboutPage = () => {
               EXPEDITION TEAM<br/><span class="job"><span class="explorerBox legend"></span> National Geographic Emerging Explorers</span>
             </h2>
             <p>
-              Steve Boyes <span class="job">Project Leader & Birds</span><br/>
-              John Hilton <span class="job">Project Director</span><br/>
-              Chris Boyes <span class="job">Expeditions Leader</span><br/>
               Adjany Costa <span class="job">Assistant Director & 2nd Fish</span><br/>
-              Kyle Gordon <span class="job">Expedition Logistics</span><br/>
+              Chris Boyes <span class="job">Expeditions Leader</span><br/>
+              Comet <span class="job">Poler</span><br/>
+              Gobonamang Kgetho <span class="job">Poler</span><br/>
               Gotz Neef <span class="job">Scienetific Collections & Leader Invertebrates</span><br/>
+              Jer Thorp <span class="job">Data</span><br/>
+              John Hilton <span class="job">Project Director</span><br/>
+              Judge <span class="job">Poler</span><br/>
               Kerllen Costa <span class="job">Plants & Mammals</span><br/>
+              Kyle Gordon <span class="job">Expedition Logistics</span><br/>
+              Leillamang Kgetho <span class="job">Poler</span><br/>
               Luke Manson <span class="job">Expedition Logistics</span><br/>
+              Mia Maestro <span class="job">Photographer</span><br/>
+              Neil Gelinas <span class="job">Filmmaker</span><br/>
               Ninda Baptista <span class="job">Reptiles</span><br/>
               Rachel Sussman <span class="job">Photographer</span><br/>
-              Neil Gelinas <span class="job">Filmmaker</span><br/>
-              Jer Thorp <span class="job">Data</span><br/>
-              Shah Selbe <span class="job">Tech</span><br/>
-              Mia Maestro <span class="job">Photographer</span><br/>
-              Water <span class="job">Poler</span><br/>
-              GB <span class="job">Poler</span><br/>
-              Schnapps <span class="job">Poler</span><br/>
-              Tom <span class="job">Poler</span><br/>
               Ralph <span class="job">Poler</span><br/>
-              Judge <span class="job">Poler</span><br/>
-              Comet <span class="job">Poler</span><br/>
+              Shah Selbe <span class="job">Tech</span><br/>
+              Steve Boyes <span class="job">Project Leader & Birds</span><br/>
+              Tom <span class="job">Poler</span><br/>
+              Water Setlabosha<span class="job">Poler</span><br/>
             </p>
           </div>
           <div className="column">
