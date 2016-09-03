@@ -61,7 +61,6 @@ export function checkFeedContent () {
       })
       for (var i = 0; i < visibleDays.length - 1; i++) {
         if (Math.abs(visibleDays[i] - visibleDays[i + 1])) {
-          // console.log('querying gap in posts:', i)
           dispatch(fetchPostsByDay(expeditionID, null, i))
           break
         }
@@ -133,12 +132,12 @@ export function fetchPostsByDay (_expeditionID, date, expeditionDay) {
     })
 
     var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
-    console.log('querying posts:', queryString)
+    // console.log('querying posts:', queryString)
     fetch(queryString)
       .then(response => response.json())
       .then(json => {
         var results = json.results.features
-        console.log('done with post query! Received:' + results.length + ' features.')
+        // console.log('done with post query! Received:' + results.length + ' features.')
         return dispatch(receivePosts(expeditionID, results, range))
       })
       .then(() => {
@@ -299,12 +298,12 @@ export function updateMap (currentDate, coordinates, viewGeoBounds, zoom, expedi
 
     if (tileRange.length > 0) {
       var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet,sighting&Expedition=' + state.selectedExpedition + '&geoBounds=' + queryGeoBounds.toString()
-      console.log('querying features by tile:', queryString)
+      // console.log('querying features by tile:', queryString)
       fetch(queryString)
         .then(response => response.json())
         .then(json => {
           var results = json.results.features
-          console.log('done with feature query! Received ' + results.length + ' features.')
+          // console.log('done with feature query! Received ' + results.length + ' features.')
           dispatch(receiveFeatures(state.selectedExpedition, results, tileRange))
         })
     }
@@ -405,16 +404,16 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
       var type = featureTypes.shift()
       var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
       if (type === 'ambit_geo') queryString += '&resolution=30'
-      console.log('querying:', queryString)
+      // console.log('querying:', queryString)
       fetch(queryString)
         .then(response => response.json())
         .then(json => {
           results = results.concat(json.results.features)
           if (featureTypes.length > 0) {
-            console.log('received ' + json.results.features.length + ' ' + type)
+            // console.log('received ' + json.results.features.length + ' ' + type)
             goFetch(featureTypes, results, expeditionID)
           } else {
-            console.log('done with query! Received ' + json.results.features.length + ' ' + type, initialize)
+            // console.log('done with query! Received ' + json.results.features.length + ' ' + type, initialize)
             dispatch(receiveDay(expeditionID, results, range))
             dispatch(completeDays(expeditionID))
             var state = getState()
@@ -430,7 +429,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               dispatch(updateTime(initialDate || date, false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
-              console.log('incomplete days', incompleteDays)
+              // console.log('incomplete days', incompleteDays)
               var nextTarget = -1
               for (var i = 0; i < incompleteDays.length; i++) {
                 var id = incompleteDays[i]

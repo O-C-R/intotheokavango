@@ -1,8 +1,6 @@
 
 /*
 
-  The Okavango Delta is one of the world’s last great wetland wildernesses. A team of Ba’Yei, scientists, engineers and adventurers is journeying a 345 kilometers crossing the delta, finding new species and exploring new ground. Join us in real-time as we explore the beating heart of our planet.
-
   RELEASE
     round sightings location
     add grid journal
@@ -49,7 +47,7 @@
   fly to next location when there is no beacon or ambit for one day
   perlin noise moving sightings
   visual night
-
+s
   KNOWN BUGS:
   pinterest extension breaks journal
 
@@ -93,6 +91,8 @@ import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
 
 // const loggerMiddleware = createLogger()
+
+document.getElementById('root').remove()
 
 let store = createStore(
   okavangoApp,

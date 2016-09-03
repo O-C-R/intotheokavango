@@ -76,8 +76,6 @@ const NotificationPanel = ({posts, currentDate}) => {
     })
 
   var height = window.innerWidth > 768 ? {height: window.innerHeight - 100} : {}
-  console.log('WAT', height)
-  console.log('test')
 
   return (
     <div id="notificationPanel" style={height}>

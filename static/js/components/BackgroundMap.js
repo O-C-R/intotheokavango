@@ -208,7 +208,7 @@ class BackgroundMap extends React.Component {
           zoom: expedition.initialZoom,
           targetZoom: expedition.targetZoom
         }
-        console.log('starting animation')
+        // console.log('starting animation')
         this.tick(Math.round(Date.now() - (1000 / 60)))
       }
     }
