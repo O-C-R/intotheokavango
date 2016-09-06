@@ -262,6 +262,7 @@ ul{
       #content #aboutPage div.logos{
         bottom:0;
         position:relative;
+        line-height:50px;
       }
 
         #content div.logos a{

@@ -79,6 +79,9 @@ const AboutPage = () => {
               <a href="http://www.nationalgeographic.com/">
                 <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
               </a>
+              <a href="http://conservify.org/">
+                <img src="static/img/conservify.png" alt="Conservify Logo" height="35px"/>
+              </a>
               <a href="http://www.o-c-r.org/">
                 <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
               </a>
