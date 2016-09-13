@@ -403,7 +403,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
     const goFetch = (featureTypes, results, expeditionID) => {
       var type = featureTypes.shift()
       var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
-      if (type === 'ambit_geo') queryString += '&resolution=1'
+      if (type === 'ambit_geo') queryString += '&resolution=5'
       // console.log('querying:', queryString)
       fetch(queryString)
         .then(response => response.json())
