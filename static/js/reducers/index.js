@@ -190,11 +190,13 @@ const okavangoReducer = (
       action.data.forEach((f) => {
         var id = f.id
         if (f.properties.Team === 'RiverMain') {
-          features[id] = featureReducer(expedition.features[id], action, f)
-          if (f.properties.FeatureType === 'ambit_geo') {
-            if (!members[f.properties.Member]) {
-              members[f.properties.Member] = {
-                color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+          if(f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'GB' || f.properties.Member === 'Jer' || f.properties.Member === 'Shah'){
+            features[id] = featureReducer(expedition.features[id], action, f)
+            if (f.properties.FeatureType === 'ambit_geo') {
+              if (!members[f.properties.Member]) {
+                members[f.properties.Member] = {
+                  color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
+                }
               }
             }
           }

@@ -342,7 +342,7 @@ export function fetchExpeditions () {
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(null, null, null, true)))
+      .then(() => dispatch(fetchDay(new Date('2016-08-30 00:00:00+00:00'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {
@@ -403,7 +403,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
     const goFetch = (featureTypes, results, expeditionID) => {
       var type = featureTypes.shift()
       var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
-      if (type === 'ambit_geo') queryString += '&resolution=30'
+      if (type === 'ambit_geo') queryString += '&resolution=1'
       // console.log('querying:', queryString)
       fetch(queryString)
         .then(response => response.json())
@@ -426,7 +426,8 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
             if (incompleteDays.length === 0) {
               // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
-              dispatch(updateTime(initialDate || date, false, expeditionID))
+              // dispatch(updateTime(initialDate || date, false, expeditionID))
+              dispatch(updateTime(new Date('2016-08-30 00:00:00+00:00'), false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)
