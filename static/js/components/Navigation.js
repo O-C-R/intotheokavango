@@ -10,6 +10,7 @@ const Navigation = ({pathName, setPage}) => {
         <ul>
           <NavigationItem setPage={setPage} active={pathName === '/' || pathName === '/map'}>Map</NavigationItem>
           <NavigationItem setPage={setPage} active={pathName === '/journal'}>Journal</NavigationItem>
+          <NavigationItem setPage={setPage} active={pathName === '/data'}>Data</NavigationItem>
           <NavigationItem setPage={setPage} active={pathName === '/about'}>About</NavigationItem>
         </ul>
       </div>

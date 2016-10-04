@@ -47,6 +47,11 @@ p{
   margin-bottom: 15px;
 }
 
+em{
+  font-style: italic;
+  color: #8EF285;
+}
+
 a{
   color:white;
   text-decoration: none;
@@ -70,6 +75,28 @@ h2{
   font-weight: 700;
   font-size: 18px;
   line-height: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+h3{
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-family: "Gotham A", "Gotham B", arial;
+  letter-spacing: 0.05em;
+}
+
+h4{
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-family: "Gotham A", "Gotham B", arial;
+  color: white;
+  font-size: 11px;
+  letter-spacing: 0.05em;
 }
 
 ul{
@@ -594,15 +621,44 @@ ul{
 
       #dataPage{}
 
+      #dataPage code{
+        font-family: arial;
+        border: 1px solid #6A709E;
+        padding: 4px 6px;
+        border-radius: 3px;
+        font-weight: lighter;
+        font-size: 13px;
+        margin: 0 5px;
+        letter-spacing: 0.025em;
+      }
+
       #dataPage #APIIndex{
         position:absolute;
         width:15%;
       }
 
+        #dataPage #APIIndex h3{
+          margin: 0;
+          color: #6A709E;
+        }
+
+        #dataPage #APIIndex h4{
+          margin: 0;
+          color: #6A709E;
+        }
+
       #dataPage #dataPageContent{
         width: 49%;
         margin-left: 25.6%;
       }
+
+        #dataPage #dataPageContent h2{
+          margin: 50px 0 25px 0;
+        }
+
+        #dataPage #dataPageContent p{
+          margin-bottom: 25px;
+        }
 
       #aboutPage{}
 

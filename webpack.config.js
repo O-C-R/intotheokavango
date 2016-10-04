@@ -60,8 +60,8 @@ module.exports = {
     historyApiFallback: true
   },
   output: {
-    path: __dirname + '',
-    filename: 'index-babel.js'
+    path: __dirname,
+    filename: '/static/js/index-babel.js'
   },
   stylus: {
     use: [require('nib')()],
@@ -71,5 +71,12 @@ module.exports = {
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({ minimize: true, comments: false, mangle: false, sourcemap: false }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': (function(){
+          return JSON.stringify(process.env.NODE_ENV)
+        })()
+      }
+    })
   ]
 }

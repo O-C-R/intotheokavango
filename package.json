@@ -2,7 +2,8 @@
   "name": "my-project-name",
   "version": "0.1.0",
   "scripts": {
-    "server": "webpack-dev-server --inline --hot"
+    "start": "webpack-dev-server --inline --hot",
+    "build": "NODE_ENV=production webpack"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",
