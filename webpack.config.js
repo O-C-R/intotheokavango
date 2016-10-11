@@ -1,11 +1,24 @@
-var debug = process.env.NODE_ENV !== 'production'
+var development = process.env.NODE_ENV !== 'production'
 var webpack = require('webpack')
 var path = require('path')
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+function isExternal(module) {
+  var userRequest = module.userRequest;
+
+  if (typeof userRequest !== 'string') {
+    return false;
+  }
+
+  return userRequest.indexOf('bower_components') >= 0 ||
+         userRequest.indexOf('node_modules') >= 0 ||
+         userRequest.indexOf('libraries') >= 0;
+}
 
 module.exports = {
   context: path.join(__dirname, ''),
-  devtool: debug ? 'inline-sourcemap' : null,
-  entry: ['babel-polyfill', './static/js/index.js'],
+  devtool: development ? 'inline-sourcemap' : null,
+  entry: ['./static/js/index.js'],
   resolve: {
     alias: {
       'webworkify': 'webworkify-webpack',
@@ -17,6 +30,10 @@ module.exports = {
       /node_modules\/sinon\//
     ],
     loaders: [
+      {
+        test: /\.hbs$/,
+        loader: 'handlebars-loader'
+      },
       {
         test: /\.json$/,
         loader: 'json-loader'
@@ -60,16 +77,35 @@ module.exports = {
     historyApiFallback: true
   },
   output: {
-    path: __dirname,
-    filename: '/static/js/index-babel.js'
+    path: path.join(__dirname),
+    filename: '[name].'+(development ? '[hash]' : '[chunkhash]')+'.js'
   },
   stylus: {
     use: [require('nib')()],
     import: ['~nib/lib/nib/index.styl']
   },
-  plugins: debug ? [] : [
+  plugins: development ? [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors',
+      minChunks: function(module) {
+        return isExternal(module);
+      }
+    }),
+    new HtmlWebpackPlugin({
+      'title': 'INTO THE OKAVANGO',
+      'filename': 'index.html',
+      'template': 'templates/index.hbs',
+      'hash': true
+    })
+  ] : [
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendors',
+      minChunks: function(module) {
+        return isExternal(module);
+      }
+    }),
     new webpack.optimize.UglifyJsPlugin({ minimize: true, comments: false, mangle: false, sourcemap: false }),
     new webpack.DefinePlugin({
       'process.env': {
@@ -77,6 +113,12 @@ module.exports = {
           return JSON.stringify(process.env.NODE_ENV)
         })()
       }
+    }),
+    new HtmlWebpackPlugin({
+      'title': 'INTO THE OKAVANGO',
+      'filename': 'index.html',
+      'template': 'templates/index.hbs',
+      'hash': true
     })
   ]
 }
