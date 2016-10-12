@@ -1,16 +1,8 @@
 import React, { PropTypes } from 'react'
-import MapGL, { SVGOverlay } from 'react-map-gl'
 import autobind from 'autobind-decorator'
-import * as d3 from 'd3'
-import * as utils from '../utils'
-import ViewportMercator from 'viewport-mercator-project'
-// import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
-import { lerp } from '../utils'
 import ReactPIXI from 'react-pixi'
-import PIXIStage, { Sprite } from './PixiStage'
-// import PIXI from 'pixi.js'
 
-class BackgroundMap extends React.Component {
+class Sighting extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -318,21 +310,14 @@ class BackgroundMap extends React.Component {
   //   })
   // }
 
-  @autobind
-  redrawSightings ({ project }) {
-    return expedition.currentSightings.map(sighting => {
-      const { position, color, radius } = sighting
-      const coords = project(position)
-      return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius} height={radius} key={1} />
-    })
-  }
-
   render () {
     const { expedition } = this.props
     const { viewport } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
 
+      // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+          // onChangeViewport={this.onChangeViewport}
     return (
       <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
         <MapGL
@@ -342,19 +327,17 @@ class BackgroundMap extends React.Component {
         >
           {expedition
           ? <div>
-            
-            {/*
             <SVGOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
-            */}
-
-            <PIXIStage width={window.innerWidth} height={window.innerHeight}>
-              { this.redrawSightings }
-            </PIXIStage>;
-            
+            <WebGLOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              {...{ width, height, latitude, longitude, zoom, simulationTime }}
+              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
+            />
             {/*
             <DeckGLOverlay
               {...viewport}
@@ -368,7 +351,6 @@ class BackgroundMap extends React.Component {
               ]}
             />
             */}
-
           </div>
           : ''}
         </MapGL>
@@ -377,7 +359,7 @@ class BackgroundMap extends React.Component {
   }
 }
 
-BackgroundMap.propTypes = {
+Sighting.propTypes = {
   animate: PropTypes.bool.isRequired,
   expedition: PropTypes.object,
   updateMap: PropTypes.func.isRequired,
@@ -388,4 +370,4 @@ BackgroundMap.propTypes = {
   contentActive: PropTypes.bool
 }
 
-export default BackgroundMap
+export default Sighting
