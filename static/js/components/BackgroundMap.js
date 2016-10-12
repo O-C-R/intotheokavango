@@ -11,6 +11,7 @@ class BackgroundMap extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      contentActive: false,
       animate: false,
       coordinates: [0, 0],
       viewport: {
@@ -154,7 +155,7 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
+      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
 
       this.setState({
         currentDate,
@@ -164,6 +165,7 @@ class BackgroundMap extends React.Component {
         beaconIndex,
         timeToNextBeacon,
         members,
+        contentActive: this.props.contentActive,
         viewport: {
           ...this.state.viewport,
           longitude: coordinates[0],
@@ -361,7 +363,8 @@ BackgroundMap.propTypes = {
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
-  initialPage: PropTypes.string.isRequired
+  initialPage: PropTypes.string.isRequired,
+  contentActive: PropTypes.bool
 }
 
 export default BackgroundMap
