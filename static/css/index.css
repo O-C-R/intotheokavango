@@ -801,6 +801,29 @@ ul{
         color: #F8D143;
       }
 
+      #IntroductionBox #skip-button{
+        position: absolute;
+        left: 50%;
+        top: 130px;
+        transform: translate(-50%);
+        border: 1px solid white;
+        padding: 0 15px;
+        height: 30px;
+        border-radius: 3px;
+        background-color: rgba(4,0,26,0.3);
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: "Gotham A", "Gotham B", arial;
+        font-style: normal;
+        font-weight: 700;
+      }
+
+        #IntroductionBox #skip-button:hover{
+          background-color: white;
+          color: rgba(4,0,26,1);
+        }
+
 .notif-enter {
   opacity: 0.01;
 }
