@@ -5,7 +5,6 @@ import autobind from 'autobind-decorator'
 
 class IntroductionBox extends React.Component {
   constructor (props) {
-
     super(props)
     this.state = {
       complete: false,
@@ -23,8 +22,7 @@ class IntroductionBox extends React.Component {
         },
         {
           content: <p key="2">Join us in real-time as we explore<br/><span>the beating heart of our planet.</span></p>,
-          // timeRange: [13000, 21000]
-          timeRange: [13000, 210000]
+          timeRange: [13000, 21000]
         }
       ]
     }
