@@ -319,13 +319,17 @@ class BackgroundMap extends React.Component {
   // }
 
   @autobind
-  redrawSightings ({ project }) {
-    return expedition.currentSightings.map(sighting => {
+  redrawGLOverlay ({ project }) {
+    const { expedition } = this.props
+    const sightings = expedition.currentSightings.map(sighting => {
       const { position, color, radius } = sighting
       const coords = project(position)
+      // console.log(coords, position)
       return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius} height={radius} key={1} />
     })
+
   }
+
 
   render () {
     const { expedition } = this.props
@@ -349,11 +353,24 @@ class BackgroundMap extends React.Component {
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
-            */}
-
+            
             <PIXIStage width={window.innerWidth} height={window.innerHeight}>
               { this.redrawSightings }
             </PIXIStage>;
+
+            <WebGLOverlay
+              {...mapStateProps}
+              {...{ width, height, latitude, longitude, zoom, simulationTime }}
+              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
+            />
+            
+            */}
+
+            <WebGLOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              redraw={ this.redrawGLOverlay }
+            />
             
             {/*
             <DeckGLOverlay
