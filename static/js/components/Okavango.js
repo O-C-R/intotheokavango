@@ -14,7 +14,7 @@ export default class Okavango extends React.Component {
     return (
       <div id="root">
         <BackgroundMap initialPage={initialPage} expeditionID={expeditionID} isFetching={isFetching} animate={animate} expedition={expedition} updateMap={updateMap} fetchDay={fetchDay} setControl={setControl} mapStateNeedsUpdate={mapStateNeedsUpdate} contentActive={contentActive}/>
-        <div id="mapOverlay" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}></div>
+        {/*<div id="mapOverlay" style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}></div>*/}
         <div id="nightOverlay" style={{opacity: (location.pathname === '/map' || location.pathname === '/' ? 0 : 1)}}></div>
         <Navigation setPage={setPage} pathName={location.pathname}/>
         <div id="content" style={height} className={contentActive ? '' : 'hidden'}>
