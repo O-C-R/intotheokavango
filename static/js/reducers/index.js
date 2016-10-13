@@ -43,7 +43,10 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if (f.geometry) {
+        var flag = true
+        if (!f.geometry) flag = false
+        if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
+        if (flag) {
           features[id] = featureReducer(expedition.features[id], action, f)
         }
       })
@@ -340,6 +343,7 @@ const okavangoReducer = (
             }
           }
           if (f.properties.FeatureType === 'tweet' && f.properties.Text && f.properties.Text[0] === '@') flag = false
+          if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
           if (flag) {
             features[id] = featureReducer(expedition.features[id], action, f)
           }

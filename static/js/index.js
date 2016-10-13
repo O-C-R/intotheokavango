@@ -2,7 +2,6 @@
 /*
 
   GENERAL
-    add skip to intro
     expedition year selection
     deep linking
     Fix intro
@@ -19,7 +18,6 @@
     permalinks and location buttons
     grid visualization
   API
-    Documentation
     Data explorer
 
 */

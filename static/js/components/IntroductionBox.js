@@ -7,7 +7,7 @@ class IntroductionBox extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      completed: false,
+      complete: false,
       contentEnabled: false,
       startDate: 0,
       currentPosts: [],
@@ -29,12 +29,20 @@ class IntroductionBox extends React.Component {
   }
 
   @autobind
+  skip () {
+    const { enableContent } = this.props
+    this.state.complete = true
+    this.state.contentEnabled = true
+    enableContent()
+  }
+
+  @autobind
   tick () {
     const { enableContent } = this.props
     const { posts, startDate } = this.state
 
     if (!(location.pathname === '/' || location.pathname === '/map')) {
-      this.state.completed = true
+      this.state.complete = true
       return
     }
 
@@ -69,7 +77,7 @@ class IntroductionBox extends React.Component {
       })
     }
     if (now > posts[posts.length - 1].timeRange[1]) {
-      this.state.completed = true
+      this.state.complete = true
       return
     }
     requestAnimationFrame(this.tick)
@@ -85,32 +93,33 @@ class IntroductionBox extends React.Component {
   }
 
   render () {
-    const { currentPosts, completed } = this.state
+    const { currentPosts, complete } = this.state
+    const { animate } = this.props
     const posts = currentPosts.map(p => {
       return p.content
     })
 
     const container = () => {
-      if (completed) return ''
-      else {
-        return (
-          <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={500} transitionLeaveTimeout={200}>
-            {posts}
-          </ReactCSSTransitionGroup>
-        )
-      }
+      return (
+        <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={500} transitionLeaveTimeout={200}>
+          {posts}
+        </ReactCSSTransitionGroup>
+      )
     }
 
+    if (complete || !animate) return <div></div>
     return (
       <div id="IntroductionBox">
         {container()}
+        <div id="skip-button" onClick={this.skip}>SKIP</div>
       </div>
     )
   }
 }
 
 IntroductionBox.propTypes = {
-  enableContent: PropTypes.func.isRequired
+  enableContent: PropTypes.func.isRequired,
+  animate: PropTypes.bool.isRequired
 }
 
 export default IntroductionBox
