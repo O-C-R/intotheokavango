@@ -322,24 +322,86 @@ class BackgroundMap extends React.Component {
   redrawGLOverlay ({ project }) {
     return () => {
       const { expedition } = this.props
-      const { currentGeoBounds, zoom } = expedition
+      const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
       const north = currentGeoBounds[1] + (currentGeoBounds[1] - currentGeoBounds[3]) * 0.25
       const east = currentGeoBounds[2] + (currentGeoBounds[2] - currentGeoBounds[0]) * 0.25
       const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
-      if (zoom < 14) return null
-      return expedition.currentSightings
-        .filter((sighting, i) => {
-          const { position } = sighting
-          return position.x >= west && position.x < east && position.y >= south && position.y < north
-        })
-        .map((sighting, i) => {
-          const { position, color, radius } = sighting
-          // if (i === 0) console.log('')
-          const coords = project([position.x, position.y])
-          return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-        })
+      const gb = [west, north, east, south]
+
+      let children = []
+      if (expedition.zoom < 14) return children
+      children = this.renderSightings(children, project, expedition, gb)
+      children = this.renderAmbits(children, project, expedition, gb)
+      return children
     }
+  }
+
+  @autobind
+  renderSightings (children, project, expedition, gb) {
+    return children.concat(expedition.currentSightings
+      .filter((sighting, i) => {
+        const { position } = sighting
+        return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
+      })
+      .map((sighting, i) => {
+        const { position, color, radius } = sighting
+        const coords = project([position.x, position.y])
+        return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
+      }))
+  }
+
+  @autobind
+  renderAmbits (children, project, expedition, gb) {
+
+    // return children.concat(expedition.currentAmbits
+    //   .map((route, i) => {
+    //     return route.coordinates
+    //       .filter((point, j) => {
+    //         return point[0] >= gb[0] && point[0] < gb[2] && point[1] >= gb[3] && point[1] < gb[1]
+    //       })
+    //       .map(project)
+    //       .map(point => [point[0], point[1]])
+    //       .map(point => {
+            
+    //       })
+    //     // return member.filter((sighting, i) => {
+    //     //   const { position } = sighting
+    //     //   return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
+    //     // })
+    //     // .map((sighting, i) => {
+    //     //   const { position, color, radius } = sighting
+    //     //   const coords = project([position.x, position.y])
+    //     //   return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
+    //     // }))
+        
+    //   })
+
+    // return children.concat(expedition.currentAmbits)
+
+    // const paths = expedition.currentAmbits.map((route, index) => {
+    //   const points = route.coordinates.map(project).map(
+    //     p => [p[0], p[1]]
+    //   )
+    //   return (
+    //     <g key={ index }>
+    //       <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
+    //         <g style={ {pointerEvents: 'visibleStroke'} }>
+    //           <path
+    //             style={{
+    //               fill: 'none',
+    //               stroke: route.color,
+    //               strokeWidth: 2
+    //             }}
+    //             d={ `M${points.join('L')}`}
+    //           />
+    //         </g>
+    //       </g>
+    //     </g>
+    //   )
+    // })
+
+    return children
   }
 
   render () {
