@@ -1,16 +1,8 @@
 import React, { PropTypes } from 'react'
-import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
-import * as d3 from 'd3'
-import ViewportMercator from 'viewport-mercator-project'
-import { lerp, rgb2hex } from '../utils'
-import { Sprite } from 'react-pixi'
-import WebGLOverlay from './WebGLOverlay'
-// import MapGL, { SVGOverlay } from 'react-map-gl'
-// import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
-// import PIXI from 'pixi.js'
+import ReactPIXI from 'react-pixi'
 
-class BackgroundMap extends React.Component {
+class Sighting extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -318,98 +310,14 @@ class BackgroundMap extends React.Component {
   //   })
   // }
 
-  @autobind
-  redrawGLOverlay ({ project }) {
-    return () => {
-      const { expedition } = this.props
-      const { currentGeoBounds } = expedition
-      const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
-      const north = currentGeoBounds[1] + (currentGeoBounds[1] - currentGeoBounds[3]) * 0.25
-      const east = currentGeoBounds[2] + (currentGeoBounds[2] - currentGeoBounds[0]) * 0.25
-      const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
-      const gb = [west, north, east, south]
-
-      let children = []
-      if (expedition.zoom < 14) return children
-      children = this.renderSightings(children, project, expedition, gb)
-      children = this.renderAmbits(children, project, expedition, gb)
-      return children
-    }
-  }
-
-  @autobind
-  renderSightings (children, project, expedition, gb) {
-    return children.concat(expedition.currentSightings
-      .filter((sighting, i) => {
-        const { position } = sighting
-        return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
-      })
-      .map((sighting, i) => {
-        const { position, color, radius } = sighting
-        const coords = project([position.x, position.y])
-        return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-      }))
-  }
-
-  @autobind
-  renderAmbits (children, project, expedition, gb) {
-
-    // return children.concat(expedition.currentAmbits
-    //   .map((route, i) => {
-    //     return route.coordinates
-    //       .filter((point, j) => {
-    //         return point[0] >= gb[0] && point[0] < gb[2] && point[1] >= gb[3] && point[1] < gb[1]
-    //       })
-    //       .map(project)
-    //       .map(point => [point[0], point[1]])
-    //       .map(point => {
-            
-    //       })
-    //     // return member.filter((sighting, i) => {
-    //     //   const { position } = sighting
-    //     //   return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
-    //     // })
-    //     // .map((sighting, i) => {
-    //     //   const { position, color, radius } = sighting
-    //     //   const coords = project([position.x, position.y])
-    //     //   return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-    //     // }))
-        
-    //   })
-
-    // return children.concat(expedition.currentAmbits)
-
-    // const paths = expedition.currentAmbits.map((route, index) => {
-    //   const points = route.coordinates.map(project).map(
-    //     p => [p[0], p[1]]
-    //   )
-    //   return (
-    //     <g key={ index }>
-    //       <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
-    //         <g style={ {pointerEvents: 'visibleStroke'} }>
-    //           <path
-    //             style={{
-    //               fill: 'none',
-    //               stroke: route.color,
-    //               strokeWidth: 2
-    //             }}
-    //             d={ `M${points.join('L')}`}
-    //           />
-    //         </g>
-    //       </g>
-    //     </g>
-    //   )
-    // })
-
-    return children
-  }
-
   render () {
     const { expedition } = this.props
     const { viewport } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
 
+      // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+          // onChangeViewport={this.onChangeViewport}
     return (
       <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
         <MapGL
@@ -419,32 +327,17 @@ class BackgroundMap extends React.Component {
         >
           {expedition
           ? <div>
-            
-            {/*
             <SVGOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
-            
-            <PIXIStage width={window.innerWidth} height={window.innerHeight}>
-              { this.redrawSightings }
-            </PIXIStage>;
-
-            <WebGLOverlay
-              {...mapStateProps}
-              {...{ width, height, latitude, longitude, zoom, simulationTime }}
-              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
-            />
-            
-            */}
-
             <WebGLOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
-              redraw={ this.redrawGLOverlay }
+              {...{ width, height, latitude, longitude, zoom, simulationTime }}
+              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
             />
-            
             {/*
             <DeckGLOverlay
               {...viewport}
@@ -458,7 +351,6 @@ class BackgroundMap extends React.Component {
               ]}
             />
             */}
-
           </div>
           : ''}
         </MapGL>
@@ -467,7 +359,7 @@ class BackgroundMap extends React.Component {
   }
 }
 
-BackgroundMap.propTypes = {
+Sighting.propTypes = {
   animate: PropTypes.bool.isRequired,
   expedition: PropTypes.object,
   updateMap: PropTypes.func.isRequired,
@@ -478,4 +370,4 @@ BackgroundMap.propTypes = {
   contentActive: PropTypes.bool
 }
 
-export default BackgroundMap
+export default Sighting
