@@ -322,20 +322,18 @@ const okavangoReducer = (
         featuresByTile[t] = {}
       })
 
-      const rgbToString = (rgb) => {
-        return rgb.slice(4).slice(0, -1).split(',').map(c => parseInt(c))
-      }
-
       features = {}
       action.data.forEach((f) => {
         var id = f.id
         if (f.properties.Team === 'RiverMain') {
           var flag = true
           if (f.properties.FeatureType === 'sighting') {
-            if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
+            if (!f.properties.Taxonomy) f.properties.color = 0xb4b4b4
             else {
               var taxClass = f.properties.Taxonomy.Class
-              if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
+              if (!state.speciesColors[taxClass]) {
+                state.speciesColors[taxClass] = parseInt(randomColor({ luminosity: 'light', format: 'hex' }).slice(1), 16)
+              }
               f.properties.color = state.speciesColors[taxClass]
             }
           }
@@ -418,6 +416,7 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
+    currentGeoBounds: [0, 0],
     currentPosts: [],
     currentSightings: [],
     currentAmbits: [],
@@ -544,7 +543,7 @@ const expeditionReducer = (
 
     case actions.UPDATE_MAP:
 
-      // initializing featuresByTile entries so they won't be queries multiple times
+      // initializing featuresByTile entries so they won't be queried multiple times
       action.tileRange.forEach(t => {
         if (!state.featuresByTile[t]) state.featuresByTile[t] = {}
       })
@@ -654,12 +653,13 @@ const expeditionReducer = (
       currentAmbits = d3.values(currentAmbits)
 
       return Object.assign({}, state, {
-        currentSightings,
+        coordinates: action.coordinates,
         currentAmbits,
+        currentDate: action.currentDate,
+        currentGeoBounds: action.viewGeoBounds,
         currentMembers,
         currentPosts,
-        currentDate: action.currentDate,
-        coordinates: action.coordinates,
+        currentSightings,
         zoom: action.zoom
       })
 

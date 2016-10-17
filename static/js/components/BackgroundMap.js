@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react'
-import MapGL, { SVGOverlay } from 'react-map-gl'
+import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
-import * as utils from '../utils'
 import ViewportMercator from 'viewport-mercator-project'
+import { lerp, rgb2hex } from '../utils'
+import { Sprite } from 'react-pixi'
+import WebGLOverlay from './WebGLOverlay'
+// import MapGL, { SVGOverlay } from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
-import { lerp } from '../utils'
-import ReactPIXI from 'react-pixi'
-import PIXIStage, { Sprite } from './PixiStage'
 // import PIXI from 'pixi.js'
 
 class BackgroundMap extends React.Component {
@@ -320,16 +320,27 @@ class BackgroundMap extends React.Component {
 
   @autobind
   redrawGLOverlay ({ project }) {
-    const { expedition } = this.props
-    const sightings = expedition.currentSightings.map(sighting => {
-      const { position, color, radius } = sighting
-      const coords = project(position)
-      // console.log(coords, position)
-      return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius} height={radius} key={1} />
-    })
-
+    return () => {
+      const { expedition } = this.props
+      const { currentGeoBounds, zoom } = expedition
+      const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
+      const north = currentGeoBounds[1] + (currentGeoBounds[1] - currentGeoBounds[3]) * 0.25
+      const east = currentGeoBounds[2] + (currentGeoBounds[2] - currentGeoBounds[0]) * 0.25
+      const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
+      if (zoom < 14) return null
+      return expedition.currentSightings
+        .filter((sighting, i) => {
+          const { position } = sighting
+          return position.x >= west && position.x < east && position.y >= south && position.y < north
+        })
+        .map((sighting, i) => {
+          const { position, color, radius } = sighting
+          // if (i === 0) console.log('')
+          const coords = project([position.x, position.y])
+          return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
+        })
+    }
   }
-
 
   render () {
     const { expedition } = this.props

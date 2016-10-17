@@ -28,3 +28,7 @@ export function dateToString (d, short) {
 export function lerp (start, end, ratio) {
   return start + (end - start) * ratio
 }
+
+export function rgb2hex (rgb) {
+  return ((rgb[0] * 255 << 16) + (rgb[1] * 255 << 8) + rgb[2] * 255)
+}
