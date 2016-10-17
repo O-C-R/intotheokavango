@@ -24,28 +24,22 @@ export default class WebGLOverlay extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-
     const { project } = ViewportMercator(nextProps)
-    // if (!this.state.children) {
-    // if (Math.random() < 0.01) {
-      // var dd = Date.now()
-      const renderChildren = nextProps.redraw({ project })
+    const renderChildren = nextProps.redraw({ project })
 
-      if (!renderChildren) {
-        this.setState({
-          ...this.state,
-          children: null
-        })
-        return
-      }
-
+    if (!renderChildren) {
       this.setState({
         ...this.state,
-        children: renderChildren(project),
-        renderChildren
+        children: null
       })
-      // console.log('agalol', Date.now() - dd)
-    // }
+      return
+    }
+
+    this.setState({
+      ...this.state,
+      children: renderChildren(project),
+      renderChildren
+    })
   }
 
   render () {
