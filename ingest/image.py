@@ -37,6 +37,8 @@ def parse(request):
         data['Notes'] = None
     if 'Member' in data and data['Member'].lower() == "gopro":
         data['Member'] = None
+    if 'ResourceURLs' in data:
+        del data['ResourceURLs']
 
     # process the image -- add the same metadata for each one, and update with the image's data
     images = []
