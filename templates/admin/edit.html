@@ -34,7 +34,7 @@ $(document).ready(function() {
         if (!feature.length) return;
         $.ajax({
             type: "POST",
-            url: "//edit/{{ feature_id }}",
+            url: "/edit/{{ feature_id }}",
             data: {feature: feature},
             error: function (xhr, status, error) {
                 console.log(xhr);
