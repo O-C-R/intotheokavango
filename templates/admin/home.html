@@ -11,7 +11,7 @@
             if (!member.length) return;
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {new_member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -31,7 +31,7 @@
             if (!team.length) return;
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {new_team: team},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -51,7 +51,7 @@
             var member = $(this).attr('id');            
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {team: team, member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -70,7 +70,7 @@
             var satellite = $(this).attr('id');     
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {team: team, satellite: satellite},
                 error: function (xhr, status, error) {
                     console.log(xhr);
@@ -89,7 +89,7 @@
             var ambit = $(this).attr('id');     
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {ambit: ambit, member: member},
                 error: function (xhr, status, error) {
                     console.log(xhr);

@@ -12,7 +12,7 @@
             if (!confirm("Really delete " + member + " and reassign all her/his features to " + target + "? This cannot be undone.")) return
             $.ajax({
                 type: "POST",
-                url: "/admin",
+                url: "//admin",
                 data: {reassign_member: member, target: target},
                 error: function (xhr, status, error) {
                     console.log(xhr);
