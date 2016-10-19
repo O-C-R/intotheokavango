@@ -1,17 +1,5 @@
-// based on CanvasOverlay from https://github.com/uber/react-map-gl/blob/master/src/overlays/canvas.react.js
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-// import { Stage, Sprite } from 'react-pixi'
-// import autobind from 'autobind-decorator'
-
-// import ReactTHREE, {
-//   Renderer,
-//   Scene,
-//   OrthographicCamera,
-//   DirectionalLight,
-//   AmbientLight
-// } from 'react-three'
-// import THREE from 'three'
 
 import THREE from '../react-three-renderer/node_modules/three'
 import React3 from '../react-three-renderer'
@@ -57,7 +45,8 @@ export default class WebGLOverlay extends Component {
     ].join('\n')
 
     var particleGeometry = {
-      position: new THREE.BufferAttribute(new Float32Array( [
+      count: 1000,
+      position: new THREE.BufferAttribute(new Float32Array([
         50, -50,  1.0,
          25, 50,  1.0,
          100,  1.0,  1.0,
@@ -65,31 +54,34 @@ export default class WebGLOverlay extends Component {
         -1.0,  1.0,  1.0,
         -1.0, -1.0,  1.0
       ]), 3),
-      index: new THREE.BufferAttribute(new Uint16Array( [
+      index: new THREE.BufferAttribute(new Uint16Array([
         0,
         1,
         2,
         3,
         4,
-        5
-      ]), 1),
-      size: new THREE.BufferAttribute(new Float32Array( [
-        1,
-        2,
-        0.5,
-        0.2,
-        1,
-        0.2
-      ]), 1),
+        5]), 1)
+      // position: new THREE.BufferAttribute(new Float32Array(3 * 1000), 3),
+      // index: new THREE.BufferAttribute(new Uint16Array(1 * 1000), 1),
+      // size: new THREE.BufferAttribute(new Float32Array(1 * 1000), 1),
+      // color: new THREE.BufferAttribute(new Float32Array(4 * 1000), 4)
     }
+
+    // for (var i = 0; i < particleGeometry.count; i++) {
+    //   particleGeometry.position.array[i * 3 + 0] = -200 + Math.random() * 400
+    //   particleGeometry.position.array[i * 3 + 1] = -200 + Math.random() * 400
+    //   particleGeometry.position.array[i * 3 + 2] = 1
+
+    //   particleGeometry.index.array[i] = i
+    // }
+    // particleGeometry.position.needsUpdate = true
+    // particleGeometry.index.needsUpdate = true
 
     this.state = {
       particleGeometry,
-      // particleAttributes: particleAttributes,
       renderParticles: () => {},
-      // sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png'),
       vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+      fragmentShader: fragmentShader
     }
   }
 
@@ -97,55 +89,22 @@ export default class WebGLOverlay extends Component {
     const { project } = ViewportMercator(nextProps)
     const renderParticles = nextProps.redraw({ project })
 
-    if (!renderParticles) {
-      this.setState({
-        ...this.state,
-        particles: null
-      })
-      return
-    }
+    // if (!renderParticles) {
+    //   this.setState({
+    //     ...this.state,
+    //     particleGeometry: null
+    //   })
+    //   return
+    // }
 
-    this.setState({
-      ...this.state,
-      particles: renderParticles(project),
-      renderParticles
-    })
+    // this.setState({
+    //   ...this.state,
+    //   particleGeometry: renderParticles(this.state.particleGeometry),
+    //   renderParticles
+    // })
   }
 
-  // render () {
-  //   return (
-  //     <Stage width={window.innerWidth} height={window.innerHeight} transparent={true} backgroundColor={0x000000} children={this.state.children}/>
-  //   )
-  // }
-
-  // render () {
-  //   const { project } = ViewportMercator(this.props)
-  //   const { width, height, longitude, latitude } = this.props
-
-  //   const point = project([longitude, latitude])
-  //   const startPoint = project([this.state.longitude, this.state.latitude])
-  //   const left = point[0] - startPoint[0]
-  //   const top = 0 - (point[1] - startPoint[1])
-
-  //   // const cameraProps = {
-  //   //   left: 0,
-  //   //   right: width,
-  //   //   top: height,
-  //   //   bottom: 0,
-  //   //   near: 1,
-  //   //   far: 5000,
-  //   //   position: new THREE.Vector3(left, top, 600),
-  //   //   lookat: new THREE.Vector3(left, top, 0)
-  //   // }
-
-  //   return (
-  //     <div></div>
-
-  //   )
-  // }
-
   render () {
-
     const { project } = ViewportMercator(this.props)
     const { width, height, longitude, latitude } = this.props
 
@@ -172,6 +131,7 @@ export default class WebGLOverlay extends Component {
         onAnimate={this._onAnimate}
         alpha={true}
       >
+                {/*size={this.state.particleGeometry.size}*/}
         <scene>
           <orthographicCamera
             name="camera"
@@ -182,11 +142,9 @@ export default class WebGLOverlay extends Component {
               <bufferGeometry
                 position={this.state.particleGeometry.position}
                 index={this.state.particleGeometry.index}
-                size={this.state.particleGeometry.size}
               />
               <pointsMaterial
                 size={20.0}
-                depthTest={false}
                 transparent={true}
                 alphaTest={0.5}
               >
