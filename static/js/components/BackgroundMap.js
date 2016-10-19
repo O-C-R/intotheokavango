@@ -4,11 +4,12 @@ import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
 import { lerp, rgb2hex } from '../utils'
-import { Sprite } from 'react-pixi'
+// import { Sprite } from 'react-pixi'
 import WebGLOverlay from './WebGLOverlay'
 // import MapGL, { SVGOverlay } from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 // import PIXI from 'pixi.js'
+import THREE from 'three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -329,26 +330,65 @@ class BackgroundMap extends React.Component {
       const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
       const gb = [west, north, east, south]
 
-      let children = []
-      if (expedition.zoom < 14) return children
-      children = this.renderSightings(children, project, expedition, gb)
-      children = this.renderAmbits(children, project, expedition, gb)
-      return children
+      if (expedition.zoom < 14) {
+        return {
+          position: new THREE.BufferAttribute(new Float32Array(0), 3),
+          normal: new THREE.BufferAttribute(new Float32Array(0), 3),
+          size: new THREE.BufferAttribute(new Float32Array(0), 1),
+          color: new THREE.BufferAttribute(new Float32Array(0), 4),
+          index: new THREE.BufferAttribute(new Float32Array(0), 4)
+        }
+      }
+      return this.renderSightings(project, expedition, gb)
     }
   }
 
   @autobind
-  renderSightings (children, project, expedition, gb) {
-    return children.concat(expedition.currentSightings
+  renderSightings (project, expedition, gb) {
+    const sightings = expedition.currentSightings
       .filter((sighting, i) => {
         const { position } = sighting
         return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
       })
-      .map((sighting, i) => {
-        const { position, color, radius } = sighting
-        const coords = project([position.x, position.y])
-        return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-      }))
+
+    let particles = {
+      position: new THREE.BufferAttribute(new Float32Array(3 * sightings.length), 3),
+      // normal: new THREE.BufferAttribute(new Float32Array(3 * sightings.length), 3),
+      size: new THREE.BufferAttribute(new Float32Array(1 * sightings.length), 1),
+      // color: new THREE.BufferAttribute(new Float32Array(4 * sightings.length), 4),
+      index: new THREE.BufferAttribute(new Float32Array(1 * sightings.length), 1)
+    }
+
+    sightings.forEach((sighting, i) => {
+      const { position, radius } = sighting
+      const coords = project([position.x, position.y])
+      const color = new THREE.Color(sighting.color)
+      // return new THREE.Vector3(coords[0], coords[1], 0 )
+      // return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
+
+      particles.position.array[i * 3 + 0] = coords[0]
+      particles.position.array[i * 3 + 1] = coords[1]
+      particles.position.array[i * 3 + 2] = 0
+
+      // particles.normal.array[i * 3 + 0] = 0
+      // particles.normal.array[i * 3 + 1] = 0
+      // particles.normal.array[i * 3 + 2] = 0
+
+      // particles.color.array[i * 4 + 0] = 1
+      // particles.color.array[i * 4 + 1] = 0
+      // particles.color.array[i * 4 + 2] = 0
+      // particles.color.array[i * 4 + 2] = 1
+
+      // particles.size.array[i] = radius * 2
+
+      particles.index.array[i] = i
+      // particles.positions = particles.positions.concat([coords[0], coords[1], 0])
+      // particles.colors = particles.colors.concat([color.r, color.g, color.b, 1])
+      // particles.sizes = particles.sizes.concat(radius * 2)
+    })
+
+    return particles
+
   }
 
   @autobind
