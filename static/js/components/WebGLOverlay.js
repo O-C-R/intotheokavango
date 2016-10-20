@@ -1,8 +1,10 @@
-// based on CanvasOverlay from https://github.com/uber/react-map-gl/blob/master/src/overlays/canvas.react.js
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
-import { Stage, Sprite } from 'react-pixi'
-// import autobind from 'autobind-decorator'
+
+import THREE from '../react-three-renderer/node_modules/three'
+import React3 from '../react-three-renderer'
+
+import autobind from 'autobind-decorator'
 
 const PROP_TYPES = {
   width: PropTypes.number.isRequired,
@@ -17,36 +19,121 @@ const PROP_TYPES = {
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
+
+    const vertexShader = [
+      'attribute vec4 customColor;',
+      'attribute vec4 color;',
+      'varying vec4 vColor;',
+      'void main() {',
+      '    vColor = color;',
+      '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
+      '    gl_PointSize = float( position.z );',
+      '    gl_Position = projectionMatrix * mvPosition;',
+      '}'
+    ].join('\n')
+
+    const fragmentShader = [
+      'varying vec4 vColor;',
+      'uniform sampler2D texture;',
+      'void main() {',
+      '    gl_FragColor = vColor * texture2D( texture, gl_PointCoord );',
+      '}'
+    ].join('\n')
+
+    var particleGeometry = {
+      count: 1000,
+      position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+      color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
+      index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
+    }
+
+    for (var i = 0; i < particleGeometry.count; i++) {
+      particleGeometry.index.array[i] = i
+    }
+
     this.state = {
-      children: null,
-      renderChildren: () => {}
+      particleGeometry,
+      renderParticles: () => {},
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png')
     }
   }
 
   componentWillReceiveProps (nextProps) {
     const { project } = ViewportMercator(nextProps)
-    const renderChildren = nextProps.redraw({ project })
+    const renderParticles = nextProps.redraw({ project })
 
-    if (!renderChildren) {
+    if (!renderParticles) {
       this.setState({
         ...this.state,
-        children: null
+        particles: null
       })
       return
     }
 
     this.setState({
       ...this.state,
-      children: renderChildren(project),
-      renderChildren
+      particles: renderParticles(this.state.particleGeometry),
+      renderParticles
     })
   }
 
   render () {
+    const { project } = ViewportMercator(this.props)
+    const { width, height, longitude, latitude } = this.props
+
+    const point = project([longitude, latitude])
+    const startPoint = project([this.state.longitude, this.state.latitude])
+    const left = point[0] - startPoint[0]
+    const top = 0 - (point[1] - startPoint[1])
+    const cameraProps = {
+      left: 0,
+      right: width,
+      top: 0,
+      bottom: height,
+      near: 1,
+      far: 5000,
+      position: new THREE.Vector3(left, top, 600),
+      lookAt: new THREE.Vector3(left, top, 0)
+    }
     return (
-      <Stage width={window.innerWidth} height={window.innerHeight} transparent={true} backgroundColor={0x000000} children={this.state.children}/>
+      <React3
+        mainCamera="camera"
+        width={width}
+        height={height}
+        onAnimate={this._onAnimate}
+        alpha={true}
+      >
+        <scene>
+          <orthographicCamera
+            name="camera"
+            {... cameraProps}
+          />
+          { this.state.particles &&
+            <points>
+              <bufferGeometry
+                position={this.state.particleGeometry.position}
+                index={this.state.particleGeometry.index}
+                color={this.state.particleGeometry.color}
+              />
+
+              <shaderMaterial
+                alphaTest={0.5}
+                vertexShader={this.state.vertexShader}
+                fragmentShader={this.state.fragmentShader}
+                uniforms={
+                  {texture: { type: 't', value: this.state.sightingTexture }}
+                }
+              >
+              </shaderMaterial>
+            </points>
+          }
+        </scene>
+      </React3>
     )
   }
+
 }
 
 WebGLOverlay.propTypes = PROP_TYPES

@@ -1,14 +1,15 @@
 import React, { PropTypes } from 'react'
-import MapGL from 'react-map-gl'
+// import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
 import { lerp, rgb2hex } from '../utils'
-import { Sprite } from 'react-pixi'
+// import { Sprite } from 'react-pixi'
 import WebGLOverlay from './WebGLOverlay'
-// import MapGL, { SVGOverlay } from 'react-map-gl'
+import MapGL, { SVGOverlay } from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 // import PIXI from 'pixi.js'
+import THREE from 'three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -230,9 +231,11 @@ class BackgroundMap extends React.Component {
         <g>
           {this.drawMembers(project)}
         </g>
+        {/*
         <g>
           {this.drawPosts(project)}
         </g>
+      */}
       </g>
     )
   }
@@ -319,8 +322,8 @@ class BackgroundMap extends React.Component {
   // }
 
   @autobind
-  redrawGLOverlay ({ project }) {
-    return () => {
+  redrawGLOverlay ({ project } ) {
+    return (particleGeometry) => {
       const { expedition } = this.props
       const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
@@ -329,26 +332,49 @@ class BackgroundMap extends React.Component {
       const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
       const gb = [west, north, east, south]
 
-      let children = []
-      if (expedition.zoom < 14) return children
-      children = this.renderSightings(children, project, expedition, gb)
-      children = this.renderAmbits(children, project, expedition, gb)
-      return children
+      if (expedition.zoom < 14) {
+        return particleGeometry
+      } else {
+        return this.renderSightings(particleGeometry, project, expedition, gb)
+      }
     }
   }
 
   @autobind
-  renderSightings (children, project, expedition, gb) {
-    return children.concat(expedition.currentSightings
+  renderSightings (particleGeometry, project, expedition, gb) {
+    const sightings = expedition.currentSightings
       .filter((sighting, i) => {
         const { position } = sighting
         return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
       })
-      .map((sighting, i) => {
-        const { position, color, radius } = sighting
+
+    for (var i = 0; i < particleGeometry.count; i++) {
+      const sighting = sightings[i]
+      if (sighting) {
+        const { position, radius } = sighting
         const coords = project([position.x, position.y])
-        return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-      }))
+        const color = new THREE.Color(sighting.color)
+        particleGeometry.position.array[i * 3 + 0] = coords[0]
+        particleGeometry.position.array[i * 3 + 1] = coords[1]
+        particleGeometry.position.array[i * 3 + 2] = radius * 2
+        particleGeometry.color.array[i * 4 + 0] = color.r
+        particleGeometry.color.array[i * 4 + 1] = color.g
+        particleGeometry.color.array[i * 4 + 2] = color.b
+        particleGeometry.color.array[i * 4 + 3] = 1
+      } else {
+        particleGeometry.position.array[i * 3 + 0] = 0
+        particleGeometry.position.array[i * 3 + 1] = 0
+        particleGeometry.position.array[i * 3 + 2] = 0
+        particleGeometry.color.array[i * 4 + 0] = 0
+        particleGeometry.color.array[i * 4 + 1] = 0
+        particleGeometry.color.array[i * 4 + 2] = 0
+        particleGeometry.color.array[i * 4 + 3] = 0
+      }
+    }
+
+    particleGeometry.position.needsUpdate = true
+    particleGeometry.color.needsUpdate = true
+    return particleGeometry
   }
 
   @autobind
@@ -420,13 +446,13 @@ class BackgroundMap extends React.Component {
           {expedition
           ? <div>
             
-            {/*
             <SVGOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
             
+            {/*
             <PIXIStage width={window.innerWidth} height={window.innerHeight}>
               { this.redrawSightings }
             </PIXIStage>;
