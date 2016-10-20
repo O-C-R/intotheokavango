@@ -24,13 +24,10 @@ export default class WebGLOverlay extends Component {
       'attribute vec4 customColor;',
       'attribute vec4 color;',
       'varying vec4 vColor;',
-      // 'attribute float customSize;',
-      'attribute float customSize;',
       'void main() {',
       '    vColor = color;',
       '    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
-      // '    gl_PointSize = customSize * ( 500.0 / length( mvPosition.xyz ) );',
-      '    gl_PointSize = 50.0 * ( 500.0 / length( mvPosition.xyz ) );',
+      '    gl_PointSize = float( normal.x );',
       '    gl_Position = projectionMatrix * mvPosition;',
       '}'
     ].join('\n')
@@ -40,7 +37,6 @@ export default class WebGLOverlay extends Component {
       'uniform sampler2D texture;',
       'void main() {',
       '    gl_FragColor = vColor * texture2D( texture, gl_PointCoord );',
-      // '    gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );',
       '}'
     ].join('\n')
 
@@ -49,7 +45,7 @@ export default class WebGLOverlay extends Component {
       position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
       color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
       index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
-      size: new THREE.BufferAttribute(new Float32Array(1000 * 1), 1)
+      normal: new THREE.BufferAttribute(new Float32Array(1000 * 1), 1)
     }
 
     for (var i = 0; i < particleGeometry.count; i++) {
@@ -103,7 +99,6 @@ export default class WebGLOverlay extends Component {
       lookAt: new THREE.Vector3(left, top, 0)
     }
 
-                // size={this.state.particleGeometry.size}
     return (
       <React3
         mainCamera="camera"
@@ -112,7 +107,6 @@ export default class WebGLOverlay extends Component {
         onAnimate={this._onAnimate}
         alpha={true}
       >
-                {/*size={this.state.particleGeometry.size}*/}
         <scene>
           <orthographicCamera
             name="camera"
@@ -124,6 +118,7 @@ export default class WebGLOverlay extends Component {
                 position={this.state.particleGeometry.position}
                 index={this.state.particleGeometry.index}
                 color={this.state.particleGeometry.color}
+                normal={this.state.particleGeometry.normal}
               />
 
               <shaderMaterial
@@ -135,32 +130,8 @@ export default class WebGLOverlay extends Component {
                 }
               >
               </shaderMaterial>
-              {/*
-              <pointsMaterial
-                size={20.0}
-                transparent={true}
-                alphaTest={0.5}
-              >
-                <texture url={'static/img/sighting.png'}/>
-              </pointsMaterial>
-              */}
             </points>
           }
-          {
-          <mesh
-            rotation={this.state.cubeRotation}
-          >
-            <planeGeometry
-              width={0.5}
-              height={0.5}
-              widthSegments={1}
-              heightSegments={1}
-            />
-            <meshBasicMaterial
-              color={0xffff00}
-            />
-          </mesh>
-        }
         </scene>
       </React3>
     )
