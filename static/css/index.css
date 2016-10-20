@@ -183,7 +183,7 @@ ul{
       background-color: rgba(4,0,26,0.72);
       pointer-events: none;
       opacity: 0;
-      z-index: -1;
+      z-index: 0;
     }
 
   #loadingWheel{
@@ -379,6 +379,7 @@ ul{
       #pageContainer{
         width:100%;
         height:100%;
+        position:relative;
       }
 
 
