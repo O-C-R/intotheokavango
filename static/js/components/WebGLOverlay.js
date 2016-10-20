@@ -46,25 +46,13 @@ export default class WebGLOverlay extends Component {
 
     var particleGeometry = {
       count: 1000,
-      position: new THREE.BufferAttribute(new Float32Array([
-        50, -50,  1.0,
-         25, 50,  1.0,
-         100,  1.0,  1.0,
-         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0, -1.0,  1.0
-      ]), 3),
-      index: new THREE.BufferAttribute(new Uint16Array([
-        0,
-        1,
-        2,
-        3,
-        4,
-        5]), 1)
-      // position: new THREE.BufferAttribute(new Float32Array(3 * 1000), 3),
-      // index: new THREE.BufferAttribute(new Uint16Array(1 * 1000), 1),
-      // size: new THREE.BufferAttribute(new Float32Array(1 * 1000), 1),
-      // color: new THREE.BufferAttribute(new Float32Array(4 * 1000), 4)
+      position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+      index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
+      size: new THREE.BufferAttribute(new Float32Array(1000 * 1), 1)
+    }
+
+    for (var i = 0; i < particleGeometry.count; i++) {
+      particleGeometry.index.array[i] = i
     }
 
     // for (var i = 0; i < particleGeometry.count; i++) {
@@ -89,19 +77,19 @@ export default class WebGLOverlay extends Component {
     const { project } = ViewportMercator(nextProps)
     const renderParticles = nextProps.redraw({ project })
 
-    // if (!renderParticles) {
-    //   this.setState({
-    //     ...this.state,
-    //     particleGeometry: null
-    //   })
-    //   return
-    // }
+    if (!renderParticles) {
+      this.setState({
+        ...this.state,
+        particles: null
+      })
+      return
+    }
 
-    // this.setState({
-    //   ...this.state,
-    //   particleGeometry: renderParticles(this.state.particleGeometry),
-    //   renderParticles
-    // })
+    this.setState({
+      ...this.state,
+      particles: renderParticles(this.state.particleGeometry),
+      renderParticles
+    })
   }
 
   render () {
@@ -123,6 +111,7 @@ export default class WebGLOverlay extends Component {
       lookAt: new THREE.Vector3(left, top, 0)
     }
 
+                // size={this.state.particleGeometry.size}
     return (
       <React3
         mainCamera="camera"

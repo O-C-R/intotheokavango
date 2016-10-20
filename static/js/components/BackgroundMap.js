@@ -346,31 +346,24 @@ class BackgroundMap extends React.Component {
         return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
       })
 
-    sightings
-      .forEach((sighting, i) => {
+    for (var i = 0; i < particleGeometry.count; i++) {
+      const sighting = sightings[i]
+      if (sighting) {
         const { position, radius } = sighting
         const coords = project([position.x, position.y])
         const color = new THREE.Color(sighting.color)
-
         particleGeometry.position.array[i * 3 + 0] = coords[0]
         particleGeometry.position.array[i * 3 + 1] = coords[1]
-        particleGeometry.position.array[i * 3 + 2] = 1
+        particleGeometry.position.array[i * 3 + 2] = 0
+      } else {
+        particleGeometry.position.array[i * 3 + 0] = 0
+        particleGeometry.position.array[i * 3 + 1] = 0
+        particleGeometry.position.array[i * 3 + 2] = 0
+      }
+    }
 
-        // particleGeometry.color.array[i * 4 + 0] = 1
-        // particleGeometry.color.array[i * 4 + 1] = 0
-        // particleGeometry.color.array[i * 4 + 2] = 1
-        // particleGeometry.color.array[i * 4 + 2] = 1
-
-        // particleGeometry.size.array[i] = radius * 2
-      })
-
-    if(sightings.length > 0) console.log('lol', particleGeometry.position)
     particleGeometry.position.needsUpdate = true
-    // particleGeometry.color.needsUpdate = true
-    // particleGeometry.size.needsUpdate = true
-
     return particleGeometry
-
   }
 
   @autobind

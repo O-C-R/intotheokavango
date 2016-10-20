@@ -29,37 +29,35 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
-// import createLogger from 'redux-logger'
 import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 
 import OkavangoContainer from './containers/OkavangoContainer'
 import MapPage from './components/MapPage'
-import JournalPageContainer from './containers/JournalPageContainer'
-// import JournalPage from './components/JournalPage'
-import DataPage from './components/DataPage'
-import AboutPage from './components/AboutPage'
-import SharePage from './components/SharePage'
-
-// const loggerMiddleware = createLogger()
+// import JournalPageContainer from './containers/JournalPageContainer'
+// import DataPage from './components/DataPage'
+// import AboutPage from './components/AboutPage'
+// import SharePage from './components/SharePage'
 
 document.getElementById('root').remove()
 
 let store = createStore(
   okavangoApp,
   applyMiddleware(
-    thunkMiddleware,  )
+    thunkMiddleware)
 )
 
 const routes = (
   <Route path="/" component={OkavangoContainer}>
     <IndexRoute component={MapPage}/>
     <Route path="map" component={MapPage}/>
+    {/*
     <Route path="journal" component={JournalPageContainer}/>
     <Route path="data" component={DataPage}/>
     <Route path="about" component={AboutPage}/>
     <Route path="share" component={SharePage}/>
+    */}
   </Route>
 )
 
