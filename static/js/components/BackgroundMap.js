@@ -321,7 +321,8 @@ class BackgroundMap extends React.Component {
 
   @autobind
   redrawGLOverlay ({ project }) {
-    return () => {
+    return (particleGeometry) => {
+
       const { expedition } = this.props
       const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
@@ -331,63 +332,41 @@ class BackgroundMap extends React.Component {
       const gb = [west, north, east, south]
 
       if (expedition.zoom < 14) {
-        return {
-          position: new THREE.BufferAttribute(new Float32Array(0), 3),
-          normal: new THREE.BufferAttribute(new Float32Array(0), 3),
-          size: new THREE.BufferAttribute(new Float32Array(0), 1),
-          color: new THREE.BufferAttribute(new Float32Array(0), 4),
-          index: new THREE.BufferAttribute(new Float32Array(0), 4)
-        }
+        return particleGeometry
+      } else {
+        return this.renderSightings(particleGeometry, project, expedition, gb)
       }
-      return this.renderSightings(project, expedition, gb)
     }
   }
 
   @autobind
-  renderSightings (project, expedition, gb) {
+  renderSightings (particleGeometry, project, expedition, gb) {
     const sightings = expedition.currentSightings
       .filter((sighting, i) => {
         const { position } = sighting
         return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
       })
 
-    let particles = {
-      position: new THREE.BufferAttribute(new Float32Array(3 * sightings.length), 3),
-      // normal: new THREE.BufferAttribute(new Float32Array(3 * sightings.length), 3),
-      size: new THREE.BufferAttribute(new Float32Array(1 * sightings.length), 1),
-      // color: new THREE.BufferAttribute(new Float32Array(4 * sightings.length), 4),
-      index: new THREE.BufferAttribute(new Float32Array(1 * sightings.length), 1)
+    for (var i = 0; i < particleGeometry.count; i++) {
+      const sighting = sightings[i]
+      if (sighting) {
+        const { position, radius } = sighting
+        const coords = project([position.x, position.y])
+        const color = new THREE.Color(sighting.color)
+        particleGeometry.position.array[i * 3 + 0] = coords[0]
+        particleGeometry.position.array[i * 3 + 1] = coords[1]
+        particleGeometry.position.array[i * 3 + 2] = 0
+      } else {
+        particleGeometry.position.array[i * 3 + 0] = 0
+        particleGeometry.position.array[i * 3 + 1] = 0
+        particleGeometry.position.array[i * 3 + 2] = 0
+      }
     }
 
-    sightings.forEach((sighting, i) => {
-      const { position, radius } = sighting
-      const coords = project([position.x, position.y])
-      const color = new THREE.Color(sighting.color)
-      // return new THREE.Vector3(coords[0], coords[1], 0 )
-      // return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
+    // if (Math.random() < 0.01) console.log('aga', particleGeometry.position.array)
 
-      particles.position.array[i * 3 + 0] = coords[0]
-      particles.position.array[i * 3 + 1] = coords[1]
-      particles.position.array[i * 3 + 2] = 0
-
-      // particles.normal.array[i * 3 + 0] = 0
-      // particles.normal.array[i * 3 + 1] = 0
-      // particles.normal.array[i * 3 + 2] = 0
-
-      // particles.color.array[i * 4 + 0] = 1
-      // particles.color.array[i * 4 + 1] = 0
-      // particles.color.array[i * 4 + 2] = 0
-      // particles.color.array[i * 4 + 2] = 1
-
-      // particles.size.array[i] = radius * 2
-
-      particles.index.array[i] = i
-      // particles.positions = particles.positions.concat([coords[0], coords[1], 0])
-      // particles.colors = particles.colors.concat([color.r, color.g, color.b, 1])
-      // particles.sizes = particles.sizes.concat(radius * 2)
-    })
-
-    return particles
+    particleGeometry.position.needsUpdate = true
+    return particleGeometry
 
   }
 
