@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react'
-import MapGL from 'react-map-gl'
+// import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
 import { lerp, rgb2hex } from '../utils'
 // import { Sprite } from 'react-pixi'
 import WebGLOverlay from './WebGLOverlay'
-// import MapGL, { SVGOverlay } from 'react-map-gl'
+import MapGL, { SVGOverlay } from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 // import PIXI from 'pixi.js'
 import THREE from 'three'
@@ -231,9 +231,11 @@ class BackgroundMap extends React.Component {
         <g>
           {this.drawMembers(project)}
         </g>
+        {/*
         <g>
           {this.drawPosts(project)}
         </g>
+      */}
       </g>
     )
   }
@@ -444,13 +446,13 @@ class BackgroundMap extends React.Component {
           {expedition
           ? <div>
             
-            {/*
             <SVGOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
             
+            {/*
             <PIXIStage width={window.innerWidth} height={window.innerHeight}>
               { this.redrawSightings }
             </PIXIStage>;
