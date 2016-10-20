@@ -354,12 +354,11 @@ class BackgroundMap extends React.Component {
         const color = new THREE.Color(sighting.color)
         particleGeometry.position.array[i * 3 + 0] = coords[0]
         particleGeometry.position.array[i * 3 + 1] = coords[1]
-        particleGeometry.position.array[i * 3 + 2] = 0
+        particleGeometry.position.array[i * 3 + 2] = radius * 2
         particleGeometry.color.array[i * 4 + 0] = color.r
         particleGeometry.color.array[i * 4 + 1] = color.g
         particleGeometry.color.array[i * 4 + 2] = color.b
         particleGeometry.color.array[i * 4 + 3] = 1
-        particleGeometry.normal.array[i * 3 + 0] = radius * 2
       } else {
         particleGeometry.position.array[i * 3 + 0] = 0
         particleGeometry.position.array[i * 3 + 1] = 0
@@ -368,13 +367,11 @@ class BackgroundMap extends React.Component {
         particleGeometry.color.array[i * 4 + 1] = 0
         particleGeometry.color.array[i * 4 + 2] = 0
         particleGeometry.color.array[i * 4 + 3] = 0
-        particleGeometry.normal.array[i * 3 + 0] = 0
       }
     }
 
     particleGeometry.position.needsUpdate = true
     particleGeometry.color.needsUpdate = true
-    particleGeometry.normal.needsUpdate = true
     return particleGeometry
   }
 

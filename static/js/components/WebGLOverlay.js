@@ -26,8 +26,8 @@ export default class WebGLOverlay extends Component {
       'varying vec4 vColor;',
       'void main() {',
       '    vColor = color;',
-      '    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
-      '    gl_PointSize = float( normal.x );',
+      '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
+      '    gl_PointSize = float( position.z );',
       '    gl_Position = projectionMatrix * mvPosition;',
       '}'
     ].join('\n')
@@ -45,7 +45,6 @@ export default class WebGLOverlay extends Component {
       position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
       color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
       index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
-      normal: new THREE.BufferAttribute(new Float32Array(1000 * 1), 1)
     }
 
     for (var i = 0; i < particleGeometry.count; i++) {
@@ -98,7 +97,6 @@ export default class WebGLOverlay extends Component {
       position: new THREE.Vector3(left, top, 600),
       lookAt: new THREE.Vector3(left, top, 0)
     }
-
     return (
       <React3
         mainCamera="camera"
@@ -118,7 +116,6 @@ export default class WebGLOverlay extends Component {
                 position={this.state.particleGeometry.position}
                 index={this.state.particleGeometry.index}
                 color={this.state.particleGeometry.color}
-                normal={this.state.particleGeometry.normal}
               />
 
               <shaderMaterial
