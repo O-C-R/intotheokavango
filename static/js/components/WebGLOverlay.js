@@ -22,11 +22,12 @@ export default class WebGLOverlay extends Component {
 
     const vertexShader = [
       'attribute vec4 customColor;',
-      // 'varying vec4 vColor;',
+      'attribute vec4 color;',
+      'varying vec4 vColor;',
       // 'attribute float customSize;',
       'attribute float customSize;',
       'void main() {',
-      // '    vColor = customColor;',
+      '    vColor = color;',
       '    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
       // '    gl_PointSize = customSize * ( 500.0 / length( mvPosition.xyz ) );',
       '    gl_PointSize = 50.0 * ( 500.0 / length( mvPosition.xyz ) );',
@@ -35,11 +36,10 @@ export default class WebGLOverlay extends Component {
     ].join('\n')
 
     const fragmentShader = [
-      'uniform sampler2D texture;',
       'varying vec4 vColor;',
+      'uniform sampler2D texture;',
       'void main() {',
-      '    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);',
-      // '    gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );',
+      '    gl_FragColor = vColor * texture2D( texture, gl_PointCoord );',
       // '    gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );',
       '}'
     ].join('\n')
@@ -47,6 +47,7 @@ export default class WebGLOverlay extends Component {
     var particleGeometry = {
       count: 1000,
       position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+      color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
       index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
       size: new THREE.BufferAttribute(new Float32Array(1000 * 1), 1)
     }
@@ -55,21 +56,12 @@ export default class WebGLOverlay extends Component {
       particleGeometry.index.array[i] = i
     }
 
-    // for (var i = 0; i < particleGeometry.count; i++) {
-    //   particleGeometry.position.array[i * 3 + 0] = -200 + Math.random() * 400
-    //   particleGeometry.position.array[i * 3 + 1] = -200 + Math.random() * 400
-    //   particleGeometry.position.array[i * 3 + 2] = 1
-
-    //   particleGeometry.index.array[i] = i
-    // }
-    // particleGeometry.position.needsUpdate = true
-    // particleGeometry.index.needsUpdate = true
-
     this.state = {
       particleGeometry,
       renderParticles: () => {},
       vertexShader: vertexShader,
-      fragmentShader: fragmentShader
+      fragmentShader: fragmentShader,
+      sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png')
     }
   }
 
@@ -131,7 +123,19 @@ export default class WebGLOverlay extends Component {
               <bufferGeometry
                 position={this.state.particleGeometry.position}
                 index={this.state.particleGeometry.index}
+                color={this.state.particleGeometry.color}
               />
+
+              <shaderMaterial
+                alphaTest={0.5}
+                vertexShader={this.state.vertexShader}
+                fragmentShader={this.state.fragmentShader}
+                uniforms={
+                  {texture: { type: 't', value: this.state.sightingTexture }}
+                }
+              >
+              </shaderMaterial>
+              {/*
               <pointsMaterial
                 size={20.0}
                 transparent={true}
@@ -139,6 +143,7 @@ export default class WebGLOverlay extends Component {
               >
                 <texture url={'static/img/sighting.png'}/>
               </pointsMaterial>
+              */}
             </points>
           }
           {

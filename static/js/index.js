@@ -1,6 +1,8 @@
 
 /*
 
+  Upgrade react-three-renderer to NPM version
+
   GENERAL
     expedition year selection
     deep linking
@@ -35,10 +37,10 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 
 import OkavangoContainer from './containers/OkavangoContainer'
 import MapPage from './components/MapPage'
-// import JournalPageContainer from './containers/JournalPageContainer'
-// import DataPage from './components/DataPage'
-// import AboutPage from './components/AboutPage'
-// import SharePage from './components/SharePage'
+import JournalPageContainer from './containers/JournalPageContainer'
+import DataPage from './components/DataPage'
+import AboutPage from './components/AboutPage'
+import SharePage from './components/SharePage'
 
 document.getElementById('root').remove()
 
@@ -52,12 +54,10 @@ const routes = (
   <Route path="/" component={OkavangoContainer}>
     <IndexRoute component={MapPage}/>
     <Route path="map" component={MapPage}/>
-    {/*
     <Route path="journal" component={JournalPageContainer}/>
     <Route path="data" component={DataPage}/>
     <Route path="about" component={AboutPage}/>
     <Route path="share" component={SharePage}/>
-    */}
   </Route>
 )
 
