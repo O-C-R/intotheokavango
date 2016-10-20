@@ -320,9 +320,8 @@ class BackgroundMap extends React.Component {
   // }
 
   @autobind
-  redrawGLOverlay ({ project }) {
+  redrawGLOverlay ({ project } ) {
     return (particleGeometry) => {
-
       const { expedition } = this.props
       const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
@@ -363,11 +362,8 @@ class BackgroundMap extends React.Component {
       }
     }
 
-    // if (Math.random() < 0.01) console.log('aga', particleGeometry.position.array)
-
     particleGeometry.position.needsUpdate = true
     return particleGeometry
-
   }
 
   @autobind
