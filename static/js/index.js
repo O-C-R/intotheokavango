@@ -9,11 +9,11 @@
     Fix intro
     animate timeline cursor and direction
   MAP
+    webGL paths
+    move 360 videos to side
     popup cycle
     round sightings location
-    sighting labels
     rollover member markers
-    webGL paths
     map interactions
   JOURNAL
     bind timeline

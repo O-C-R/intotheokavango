@@ -246,7 +246,7 @@ class Post extends React.Component {
           </div>
           {
             data.type === '360Image' &&
-            <div>
+            <div className="actions">
               <div
                 className="button close"
                 onMouseOver={() => {
