@@ -9,11 +9,6 @@ class Feed extends React.Component {
     super(props)
   }
 
-  @autobind 
-  aga () {
-    console.log('aga scroll!')
-  }
-
   render () {
     const { posts, checkFeedContent } = this.props
 

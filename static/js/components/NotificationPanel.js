@@ -15,6 +15,9 @@ const NotificationPanel = ({posts, currentDate}) => {
   if (!posts) posts = []
   var notificationItems = posts
     .filter(post => {
+      return post.type !== 'image' || post.properties.Make !== 'RICOH'
+    })
+    .filter(post => {
       var d = new Date(post.properties.DateTime)
       return d.getTime() >= start && d.getTime() < end
     })
