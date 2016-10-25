@@ -12,13 +12,38 @@ const okavangoReducer = (
     expeditions: {},
     speciesColors: {},
     contentActive: !(location.pathname === '/' || location.pathname === '/map'),
-    initialPage: location.pathname
+    initialPage: location.pathname,
+    lightBoxActive: false,
+    lightBoxID: ''
   },
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
+    case actions.CLOSE_LIGHTBOX:
+      return {
+        ...state,
+        lightBoxActive: false,
+        lightBoxID: ''
+      }
+    case actions.SHOW_360_PICTURE:
+      return {
+        ...state,
+        lightBoxActive: true,
+        lightBoxPost: action.post
+      }
+    case actions.HIDE_360_PICTURE:
+      return {
+        ...state,
+        lightBoxActive: false,
+        lightBoxID: ''
+      }
+    case actions.SET_PAGE:
+      return {
+        ...state,
+        lightBoxActive: false
+      }
     case actions.ENABLE_CONTENT:
       return {
         ...state,
@@ -45,7 +70,7 @@ const okavangoReducer = (
         var id = f.id
         var flag = true
         if (!f.geometry) flag = false
-        if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
+        if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
         if (flag) {
           features[id] = featureReducer(expedition.features[id], action, f)
         }
@@ -341,7 +366,7 @@ const okavangoReducer = (
             }
           }
           if (f.properties.FeatureType === 'tweet' && f.properties.Text && f.properties.Text[0] === '@') flag = false
-          if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
+          // if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
           if (flag) {
             features[id] = featureReducer(expedition.features[id], action, f)
           }
@@ -420,6 +445,7 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
+    current360Images: [],
     currentGeoBounds: [0, 0],
     currentPosts: [],
     currentSightings: [],
@@ -553,6 +579,7 @@ const expeditionReducer = (
       })
 
       var currentSightings = []
+      var current360Images = []
       var currentPosts = []
       var currentDays = []
       var currentAmbits = {}
@@ -585,11 +612,26 @@ const expeditionReducer = (
               },
               radius: f.properties.radius,
               color: f.properties.color,
-              type: f.properties.FeatureType
+              type: f.properties.FeatureType,
+              date: new Date(f.properties.DateTime),
+              name: f.properties.SpeciesName,
+              count: f.properties.Count
             }
           })
           currentSightings = currentSightings.concat(sightings)
         }
+
+        if (features.image) {
+          var images = features.image.filter(i => {
+            return i.properties.Make === 'RICOH'
+          })
+          current360Images = current360Images.concat(images)
+        }
+
+        current360Images.forEach((image, i) => {
+          image.properties.next = current360Images[i - 1]
+          image.properties.previous = current360Images[i + 1]
+        })
 
         var allPosts = []
         if (features.tweet) allPosts = allPosts.concat(features.tweet)
@@ -664,6 +706,7 @@ const expeditionReducer = (
         currentMembers,
         currentPosts,
         currentSightings,
+        current360Images,
         zoom: action.zoom
       })
 

@@ -9,7 +9,7 @@ import WebGLOverlay from './WebGLOverlay'
 import MapGL, { SVGOverlay } from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 // import PIXI from 'pixi.js'
-import THREE from 'three'
+import THREE from '../react-three-renderer/node_modules/three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -159,7 +159,8 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
+      // if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
+      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
       this.setState({
         currentDate,
@@ -323,7 +324,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   redrawGLOverlay ({ project } ) {
-    return (particleGeometry) => {
+    return (geometries) => {
       const { expedition } = this.props
       const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
@@ -333,11 +334,52 @@ class BackgroundMap extends React.Component {
       const gb = [west, north, east, south]
 
       if (expedition.zoom < 14) {
-        return particleGeometry
+        return geometries
       } else {
-        return this.renderSightings(particleGeometry, project, expedition, gb)
+        return {
+          ...geometries,
+          sightings: this.renderSightings(geometries.sightings, project, expedition, gb),
+          pictures360: this.render360Images(geometries.pictures360, project, expedition, gb)
+        }
       }
     }
+  }
+
+  @autobind
+  render360Images (particleGeometry, project, expedition, gb) {
+
+    const images = expedition.current360Images
+      .filter(image => {
+        const coords = image.geometry.coordinates
+        return coords[0] >= gb[0] && coords[0] < gb[2] && coords[1] >= gb[3] && coords[1] < gb[1]
+      })
+
+    for (var i = 0; i < particleGeometry.count; i++) {
+      const image = images[i]
+      if (image) {
+        const coords = project([image.geometry.coordinates[0], image.geometry.coordinates[1]])
+        particleGeometry.position.array[i * 3 + 0] = coords[0]
+        particleGeometry.position.array[i * 3 + 1] = coords[1]
+        particleGeometry.position.array[i * 3 + 2] = 0
+        particleGeometry.color.array[i * 4 + 0] = 0.62
+        particleGeometry.color.array[i * 4 + 1] = 0.6
+        particleGeometry.color.array[i * 4 + 2] = 0.7
+        particleGeometry.color.array[i * 4 + 3] = 1
+      } else {
+        particleGeometry.position.array[i * 3 + 0] = 0
+        particleGeometry.position.array[i * 3 + 1] = 0
+        particleGeometry.position.array[i * 3 + 2] = 0
+        particleGeometry.color.array[i * 4 + 0] = 0
+        particleGeometry.color.array[i * 4 + 1] = 0
+        particleGeometry.color.array[i * 4 + 2] = 0
+        particleGeometry.color.array[i * 4 + 3] = 0
+      }
+    }
+
+    particleGeometry.position.needsUpdate = true
+    particleGeometry.color.needsUpdate = true
+    particleGeometry.data = images
+    return particleGeometry
   }
 
   @autobind
@@ -374,6 +416,7 @@ class BackgroundMap extends React.Component {
 
     particleGeometry.position.needsUpdate = true
     particleGeometry.color.needsUpdate = true
+    particleGeometry.data = sightings
     return particleGeometry
   }
 
@@ -431,13 +474,13 @@ class BackgroundMap extends React.Component {
   }
 
   render () {
-    const { expedition } = this.props
-    const { viewport } = this.state
+    const { expedition, show360Picture, lightBoxActive } = this.props
+    const { viewport, currentDate } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
 
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
+      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map' || location.pathname === '/') ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
@@ -468,7 +511,9 @@ class BackgroundMap extends React.Component {
             <WebGLOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
-              redraw={ this.redrawGLOverlay }
+              redraw={this.redrawGLOverlay}
+              show360Picture={show360Picture}
+              currentDate={currentDate}
             />
             
             {/*
@@ -501,7 +546,9 @@ BackgroundMap.propTypes = {
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
   initialPage: PropTypes.string.isRequired,
-  contentActive: PropTypes.bool
+  contentActive: PropTypes.bool,
+  show360Picture: PropTypes.func.isRequired,
+  lightBoxActive: PropTypes.bool.isRequired
 }
 
 export default BackgroundMap

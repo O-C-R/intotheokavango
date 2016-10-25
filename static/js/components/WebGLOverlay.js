@@ -20,43 +20,82 @@ export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
 
-    const vertexShader = [
-      'attribute vec4 customColor;',
-      'attribute vec4 color;',
-      'varying vec4 vColor;',
-      'void main() {',
-      '    vColor = color;',
-      '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
-      '    gl_PointSize = float( position.z );',
-      '    gl_Position = projectionMatrix * mvPosition;',
-      '}'
-    ].join('\n')
-
-    const fragmentShader = [
-      'varying vec4 vColor;',
-      'uniform sampler2D texture;',
-      'void main() {',
-      '    gl_FragColor = vColor * texture2D( texture, gl_PointCoord );',
-      '}'
-    ].join('\n')
-
-    var particleGeometry = {
-      count: 1000,
-      position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
-      color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
-      index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
+    var particles = {
+      sightings: {
+        count: 1000,
+        position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+        color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
+        index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
+        data: [],
+        vertexShader: [
+          'attribute vec4 color;',
+          'varying vec4 vColor;',
+          'void main() {',
+          '    vColor = color;',
+          '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
+          '    gl_PointSize = float( position.z );',
+          '    gl_Position = projectionMatrix * mvPosition;',
+          '}'
+        ].join('\n'),
+        fragmentShader: [
+          'varying vec4 vColor;',
+          'uniform sampler2D texture;',
+          'vec4 vFragColor;',
+          'void main() {',
+          '    vFragColor = vColor * texture2D( texture, gl_PointCoord );',
+          '    if (vFragColor.w > 0.25) {',
+          '      gl_FragColor = vFragColor;',
+          '    } else {',
+          '      discard;',
+          '    }',
+          '}'
+        ].join('\n')
+      },
+      pictures360: {
+        count: 1000,
+        position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
+        color: new THREE.BufferAttribute(new Float32Array(1000 * 4), 4),
+        index: new THREE.BufferAttribute(new Uint16Array(1000 * 1), 1),
+        data: [],
+        vertexShader: [
+          'attribute vec4 color;',
+          'varying vec4 vColor;',
+          'void main() {',
+          '    vColor = color;',
+          '    vec4 mvPosition = modelViewMatrix * vec4( position.xy, 0.0 , 1.0 );',
+          '    gl_PointSize = 20.0;',
+          '    gl_Position = projectionMatrix * mvPosition;',
+          '}'
+        ].join('\n'),
+        fragmentShader: [
+          'varying vec4 vColor;',
+          'uniform sampler2D texture;',
+          'vec4 vFragColor;',
+          'void main() {',
+          '    vFragColor = vColor * texture2D( texture, gl_PointCoord );',
+          '    if (vFragColor.w > 0.35) {',
+          '      gl_FragColor = vFragColor;',
+          '    } else {',
+          '      discard;',
+          '    }',
+          '}'
+        ].join('\n')
+      }
     }
 
-    for (var i = 0; i < particleGeometry.count; i++) {
-      particleGeometry.index.array[i] = i
+    for (var k in particles) {
+      for (var i = 0; i < particles[k].count; i++) {
+        particles[k].index.array[i] = i
+      }
     }
 
     this.state = {
-      particleGeometry,
+      particles,
       renderParticles: () => {},
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
-      sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png')
+      sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png'),
+      picture360Texture: new THREE.TextureLoader().load('static/img/picture360.png'),
+      mousePosition: [0, 0],
+      hoveredPicture: -1
     }
   }
 
@@ -72,16 +111,63 @@ export default class WebGLOverlay extends Component {
       return
     }
 
+    const particles = renderParticles(this.state.particles)
+    var hoveredPicture = -1
+    if (this.state.mousePosition[0] > 0 || this.state.mousePosition[1] > 0) {
+      const positions = particles.pictures360.position.array
+      for (var i = 0; i < particles.pictures360.count; i ++) {
+        const pos = [positions[i * 3 + 0], positions[i * 3 + 1]]
+        const dist = Math.sqrt(Math.pow(this.state.mousePosition[0] - pos[0], 2) + Math.pow(this.state.mousePosition[1] - pos[1], 2))
+        if (dist < 15) {
+          particles.pictures360.color.array[i * 4 + 0] = 1
+          particles.pictures360.color.array[i * 4 + 1] = 1
+          particles.pictures360.color.array[i * 4 + 2] = 1
+          particles.pictures360.color.array[i * 4 + 3] = 1
+          hoveredPicture = i
+          particles.pictures360.color.needsUpdate = true
+          break
+        }
+        if (particles.pictures360.color.array[i * 4 + 3] === 0) break
+      }
+    }
+
     this.setState({
       ...this.state,
-      particles: renderParticles(this.state.particleGeometry),
-      renderParticles
+      particles,
+      renderParticles,
+      hoveredPicture
     })
+  }
+
+  @autobind
+  onMouseMove (event) {
+    this.setState({
+      ...this.state,
+      mousePosition: [event.pageX, event.pageY]
+    })
+  }
+
+  @autobind
+  onMouseOut (event) {
+    this.setState({
+      ...this.state,
+      mousePosition: [0, 0]
+    })
+  }
+
+  @autobind
+  onClick (event) {
+    const { show360Picture } = this.props
+    const { particles } = this.state
+    if (this.state.hoveredPicture > -1) {
+      show360Picture(this.state.particles.pictures360.data[this.state.hoveredPicture])
+    }
   }
 
   render () {
     const { project } = ViewportMercator(this.props)
-    const { width, height, longitude, latitude } = this.props
+    const { width, height, longitude, latitude, currentDate } = this.props
+    const { particles } = this.state
 
     const point = project([longitude, latitude])
     const startPoint = project([this.state.longitude, this.state.latitude])
@@ -97,43 +183,116 @@ export default class WebGLOverlay extends Component {
       position: new THREE.Vector3(left, top, 600),
       lookAt: new THREE.Vector3(left, top, 0)
     }
-    return (
-      <React3
-        mainCamera="camera"
-        width={width}
-        height={height}
-        onAnimate={this._onAnimate}
-        alpha={true}
-      >
-        <scene>
-          <orthographicCamera
-            name="camera"
-            {... cameraProps}
-          />
-          { this.state.particles &&
-            <points>
-              <bufferGeometry
-                position={this.state.particleGeometry.position}
-                index={this.state.particleGeometry.index}
-                color={this.state.particleGeometry.color}
-              />
 
-              <shaderMaterial
-                alphaTest={0.5}
-                vertexShader={this.state.vertexShader}
-                fragmentShader={this.state.fragmentShader}
-                uniforms={
-                  {texture: { type: 't', value: this.state.sightingTexture }}
-                }
+    // console.log('aga', particles.sightings.data )
+
+    const sightingLabels = particles.sightings.data
+      .map((p, i) => {
+        var x = particles.sightings.position.array[i * 3 + 0]
+        var y = particles.sightings.position.array[i * 3 + 1]
+        if (x >= window.innerWidth / 3 && x < 2 * window.innerWidth / 3 && y >= window.innerHeight / 3 && y < 2 * window.innerHeight / 3) {
+        // if ((currentDate.getTime() - p.date.getTime()) < 200000 && (currentDate.getTime() - p.date.getTime()) > -200000) {
+          return (
+            <div
+              key={i}
+              className={'sighting-label'}
+              style={{
+                left: x,
+                top: y
+              }}
+            >
+              <div
+                className="arrow-box"
               >
-              </shaderMaterial>
-            </points>
-          }
-        </scene>
-      </React3>
+                {p.count + ' ' + p.name}
+              </div>
+            </div>
+          )
+        } else {
+          return null
+        }
+      })
+
+    return (
+      <div>
+        <div
+          className={'hitbox' + (this.state.hoveredPicture > -1 ? ' hover' : '')}
+          onMouseMove={this.onMouseMove}
+          onMouseOut={this.onMouseOut}
+          onClick={this.onClick}
+        >
+        </div>
+        <div
+          id="html-renderer"
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%'
+          }}
+        >
+         {sightingLabels}
+        </div>
+        <div id="three-renderer"
+        >
+          <React3
+            mainCamera="camera"
+            width={width}
+            height={height}
+            onAnimate={this._onAnimate}
+            alpha={true}
+            antialias={true}
+          >
+            <scene>
+              <orthographicCamera
+                name="camera"
+                {... cameraProps}
+              />
+              { particles &&
+                <points>
+                  <bufferGeometry
+                    position={particles.sightings.position}
+                    index={particles.sightings.index}
+                    color={particles.sightings.color}
+                  />
+                  <shaderMaterial
+                    alphaTest={0.5}
+                    vertexShader={particles.sightings.vertexShader}
+                    fragmentShader={particles.sightings.fragmentShader}
+                    uniforms={
+                      {texture: { type: 't', value: this.state.sightingTexture }}
+                    }
+                  >
+                  </shaderMaterial>
+                </points>
+              }
+              { particles &&
+                <points>
+                  <bufferGeometry
+                    position={particles.pictures360.position}
+                    index={particles.pictures360.index}
+                    color={particles.pictures360.color}
+                  />
+                  <shaderMaterial
+                    alphaTest={0.5}
+                    vertexShader={particles.pictures360.vertexShader}
+                    fragmentShader={particles.pictures360.fragmentShader}
+                    uniforms={
+                      {texture: { type: 't', value: this.state.picture360Texture }}
+                    }
+                  >
+                  </shaderMaterial>
+                </points>
+              }
+            </scene>
+          </React3>
+        </div>
+      </div>
     )
   }
 
 }
 
-WebGLOverlay.propTypes = PROP_TYPES
+WebGLOverlay.propTypes = {
+  show360Picture: PropTypes.func.isRequired,
+  currentDate: PropTypes.object
+}
