@@ -188,14 +188,17 @@ export default class WebGLOverlay extends Component {
 
     const sightingLabels = particles.sightings.data
       .map((p, i) => {
-        if ((currentDate.getTime() - p.date.getTime()) < 200000 && (currentDate.getTime() - p.date.getTime()) > -200000) {
+        var x = particles.sightings.position.array[i * 3 + 0]
+        var y = particles.sightings.position.array[i * 3 + 1]
+        if (x >= window.innerWidth / 3 && x < 2 * window.innerWidth / 3 && y >= window.innerHeight / 3 && y < 2 * window.innerHeight / 3) {
+        // if ((currentDate.getTime() - p.date.getTime()) < 200000 && (currentDate.getTime() - p.date.getTime()) > -200000) {
           return (
             <div
               key={i}
               className={'sighting-label'}
               style={{
-                top: particles.sightings.position.array[i * 3 + 1],
-                left: particles.sightings.position.array[i * 3 + 0],
+                left: x,
+                top: y
               }}
             >
               <div
@@ -227,7 +230,7 @@ export default class WebGLOverlay extends Component {
             height: '100%'
           }}
         >
-         {sightingLabels} 
+         {sightingLabels}
         </div>
         <div id="three-renderer"
         >
