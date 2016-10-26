@@ -477,7 +477,7 @@ class BackgroundMap extends React.Component {
     const { expedition, show360Picture, lightBoxActive } = this.props
     const { viewport, currentDate } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
-    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
+    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
 
     return (
       <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map' || location.pathname === '/') ? 0 : -100)}}>
@@ -488,13 +488,13 @@ class BackgroundMap extends React.Component {
         >
           {expedition
           ? <div>
-            
+            {/*
             <SVGOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
               redraw={ this.redrawSVGOverlay }
             />
-            
+            */}
             {/*
             <PIXIStage width={window.innerWidth} height={window.innerHeight}>
               { this.redrawSightings }
@@ -505,7 +505,6 @@ class BackgroundMap extends React.Component {
               {...{ width, height, latitude, longitude, zoom, simulationTime }}
               redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
             />
-            
             */}
 
             <WebGLOverlay
@@ -515,7 +514,6 @@ class BackgroundMap extends React.Component {
               show360Picture={show360Picture}
               currentDate={currentDate}
             />
-            
             {/*
             <DeckGLOverlay
               {...viewport}

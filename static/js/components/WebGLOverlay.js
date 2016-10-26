@@ -247,6 +247,31 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 {... cameraProps}
               />
+              <lineSegments>
+                <geometry
+                  vertices={[
+                    new THREE.Vector3(100, 100, 0),
+                    new THREE.Vector3(50, 50, 0),
+                    new THREE.Vector3(150, 5, 0),
+                    new THREE.Vector3(200, 300, 0)
+                  ]}
+                  colors={[
+                    new THREE.Color(0x00ff00),
+                    new THREE.Color(0xff00ff),
+                    new THREE.Color(0xff00ff),
+                    new THREE.Color(0xffff00)
+                  ]}
+                >
+                </geometry>
+                <lineBasicMaterial
+                  linewidth={5}
+                  opacity={1}
+                  transparent={true}
+                  vertexColors={THREE.VertexColors}
+                >
+                </lineBasicMaterial>
+              </lineSegments>
+
               { particles &&
                 <points>
                   <bufferGeometry
