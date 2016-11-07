@@ -818,8 +818,10 @@ ul{
             font-family: "Gotham A", "Gotham B", arial;
             font-style: normal;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 9px;
             text-transform: uppercase;
+            line-height: 16px;
+            height: 16px;
           }
 
             .arrow-box:after, .arrow-box:before {
@@ -836,8 +838,8 @@ ul{
             .arrow-box:after {
               border-color: rgba(4,0,26,0);
               border-right-color: rgba(4,0,26,0.7);
-              border-width: 16px;
-              margin-top: -16px;
+              border-width: 8px;
+              margin-top: -8px;
             }
             .arrow-box:before {
               border-color: rgba(4,0,26,0);

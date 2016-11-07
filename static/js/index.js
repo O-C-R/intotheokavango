@@ -31,6 +31,7 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
+
 import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'

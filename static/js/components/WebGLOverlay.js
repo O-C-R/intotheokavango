@@ -6,21 +6,15 @@ import React3 from '../react-three-renderer'
 
 import autobind from 'autobind-decorator'
 
-const PROP_TYPES = {
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
-  latitude: PropTypes.number.isRequired,
-  longitude: PropTypes.number.isRequired,
-  zoom: PropTypes.number.isRequired,
-  redraw: PropTypes.func.isRequired,
-  isDragging: PropTypes.bool.isRequired
-}
-
 export default class WebGLOverlay extends Component {
   constructor (props) {
     super(props)
 
-    var particles = {
+    const paths = {
+      ambitGeo: []
+    }
+
+    const particles = {
       sightings: {
         count: 1000,
         position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
@@ -90,8 +84,9 @@ export default class WebGLOverlay extends Component {
     }
 
     this.state = {
+      paths,
       particles,
-      renderParticles: () => {},
+      render () {},
       sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png'),
       picture360Texture: new THREE.TextureLoader().load('static/img/picture360.png'),
       mousePosition: [0, 0],
@@ -100,10 +95,10 @@ export default class WebGLOverlay extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { project } = ViewportMercator(nextProps)
-    const renderParticles = nextProps.redraw({ project })
+    const { unproject } = ViewportMercator(nextProps)
+    const render = nextProps.redraw({ unproject })
 
-    if (!renderParticles) {
+    if (!render) {
       this.setState({
         ...this.state,
         particles: null
@@ -111,7 +106,8 @@ export default class WebGLOverlay extends Component {
       return
     }
 
-    const particles = renderParticles(this.state.particles)
+    const { particles, paths } = render(this.state.particles, this.state.paths)
+
     var hoveredPicture = -1
     if (this.state.mousePosition[0] > 0 || this.state.mousePosition[1] > 0) {
       const positions = particles.pictures360.position.array
@@ -134,7 +130,8 @@ export default class WebGLOverlay extends Component {
     this.setState({
       ...this.state,
       particles,
-      renderParticles,
+      paths,
+      render,
       hoveredPicture
     })
   }
@@ -158,7 +155,7 @@ export default class WebGLOverlay extends Component {
   @autobind
   onClick (event) {
     const { show360Picture } = this.props
-    const { particles } = this.state
+    // const { particles } = this.state
     if (this.state.hoveredPicture > -1) {
       show360Picture(this.state.particles.pictures360.data[this.state.hoveredPicture])
     }
@@ -166,8 +163,8 @@ export default class WebGLOverlay extends Component {
 
   render () {
     const { project } = ViewportMercator(this.props)
-    const { width, height, longitude, latitude, currentDate } = this.props
-    const { particles } = this.state
+    const { width, height, longitude, latitude } = this.props
+    const { particles, paths } = this.state
 
     const point = project([longitude, latitude])
     const startPoint = project([this.state.longitude, this.state.latitude])
@@ -183,8 +180,6 @@ export default class WebGLOverlay extends Component {
       position: new THREE.Vector3(left, top, 600),
       lookAt: new THREE.Vector3(left, top, 0)
     }
-
-    // console.log('aga', particles.sightings.data )
 
     const sightingLabels = particles.sightings.data
       .map((p, i) => {
@@ -212,6 +207,26 @@ export default class WebGLOverlay extends Component {
           return null
         }
       })
+
+    const lines = paths.ambitGeo.map((p, i) => {
+
+      return (
+        <line key={i}>
+          <geometry
+            vertices={p.vertices}
+            dynamic={true}
+          >
+          </geometry>
+          <lineBasicMaterial
+            linewidth={2}
+            opacity={0.7}
+            transparent={true}
+            color={p.color}
+          >
+          </lineBasicMaterial>
+        </line>
+      )
+    })
 
     return (
       <div>
@@ -247,31 +262,7 @@ export default class WebGLOverlay extends Component {
                 name="camera"
                 {... cameraProps}
               />
-              <lineSegments>
-                <geometry
-                  vertices={[
-                    new THREE.Vector3(100, 100, 0),
-                    new THREE.Vector3(50, 50, 0),
-                    new THREE.Vector3(150, 5, 0),
-                    new THREE.Vector3(200, 300, 0)
-                  ]}
-                  colors={[
-                    new THREE.Color(0x00ff00),
-                    new THREE.Color(0xff00ff),
-                    new THREE.Color(0xff00ff),
-                    new THREE.Color(0xffff00)
-                  ]}
-                >
-                </geometry>
-                <lineBasicMaterial
-                  linewidth={5}
-                  opacity={1}
-                  transparent={true}
-                  vertexColors={THREE.VertexColors}
-                >
-                </lineBasicMaterial>
-              </lineSegments>
-
+              { lines }
               { particles &&
                 <points>
                   <bufferGeometry
@@ -280,7 +271,6 @@ export default class WebGLOverlay extends Component {
                     color={particles.sightings.color}
                   />
                   <shaderMaterial
-                    alphaTest={0.5}
                     vertexShader={particles.sightings.vertexShader}
                     fragmentShader={particles.sightings.fragmentShader}
                     uniforms={
@@ -298,7 +288,6 @@ export default class WebGLOverlay extends Component {
                     color={particles.pictures360.color}
                   />
                   <shaderMaterial
-                    alphaTest={0.5}
                     vertexShader={particles.pictures360.vertexShader}
                     fragmentShader={particles.pictures360.fragmentShader}
                     uniforms={
@@ -319,5 +308,12 @@ export default class WebGLOverlay extends Component {
 
 WebGLOverlay.propTypes = {
   show360Picture: PropTypes.func.isRequired,
-  currentDate: PropTypes.object
+  currentDate: PropTypes.object,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  latitude: PropTypes.number.isRequired,
+  longitude: PropTypes.number.isRequired,
+  zoom: PropTypes.number.isRequired,
+  redraw: PropTypes.func.isRequired,
+  isDragging: PropTypes.bool.isRequired
 }

@@ -3,10 +3,10 @@ import React, { PropTypes } from 'react'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
-import { lerp, rgb2hex } from '../utils'
+import { lerp } from '../utils'
 // import { Sprite } from 'react-pixi'
 import WebGLOverlay from './WebGLOverlay'
-import MapGL, { SVGOverlay } from 'react-map-gl'
+import MapGL from 'react-map-gl'
 // import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
 // import PIXI from 'pixi.js'
 import THREE from '../react-three-renderer/node_modules/three'
@@ -159,8 +159,8 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      // if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
-      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
+      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
+      // if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
       this.setState({
         currentDate,
@@ -226,9 +226,11 @@ class BackgroundMap extends React.Component {
     const { expedition } = this.props
     return (
       <g>
-        <g>
-          {this.drawAmbits(project)}
-        </g>
+        {/*
+          <g>
+            {this.drawAmbits(project)}
+          </g>
+        */}
         <g>
           {this.drawMembers(project)}
         </g>
@@ -239,27 +241,6 @@ class BackgroundMap extends React.Component {
       */}
       </g>
     )
-  }
-
-  @autobind
-  drawPosts (project) {
-    return '' // TRIMMING
-    const { expedition } = this.props
-    // console.log(expedition.currentPosts.length)
-    const icons = expedition.currentPosts.map(post => {
-      const translate = (position) => {
-        var coords = project(position)
-        var x = Math.round(coords[0])
-        var y = Math.round(coords[1])
-        return 'translate(' + x + ',' + y + ')'
-      }
-      return (
-        <g transform={ translate(post.position) } key={post.id}>
-          <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
-        </g>
-      )
-    })
-    return icons
   }
 
   @autobind
@@ -286,45 +267,9 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  drawAmbits (project) {
-    const { expedition } = this.props
-    const paths = expedition.currentAmbits.map((route, index) => {
-      const points = route.coordinates.map(project).map(
-        p => [p[0], p[1]]
-      )
-      return (
-        <g key={ index }>
-          <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
-            <g style={ {pointerEvents: 'visibleStroke'} }>
-              <path
-                style={{
-                  fill: 'none',
-                  stroke: route.color,
-                  strokeWidth: 2
-                }}
-                d={ `M${points.join('L')}`}
-              />
-            </g>
-          </g>
-        </g>
-      )
-    })
-    return paths
-  }
-
-  // @autobind
-  // onChangeViewport (newViewport) {
-  //   newViewport.width = window.innerWidth
-  //   newViewport.height = window.innerHeight
-  //   this.setState({
-  //     ...this.state,
-  //     viewport: newViewport
-  //   })
-  // }
-
-  @autobind
-  redrawGLOverlay ({ project } ) {
-    return (geometries) => {
+  redrawGLOverlay ({ unproject } ) {
+    const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
+    return (particles, paths) => {
       const { expedition } = this.props
       const { currentGeoBounds } = expedition
       const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
@@ -334,19 +279,69 @@ class BackgroundMap extends React.Component {
       const gb = [west, north, east, south]
 
       if (expedition.zoom < 14) {
-        return geometries
+        return {
+          particles,
+          paths
+        }
       } else {
         return {
-          ...geometries,
-          sightings: this.renderSightings(geometries.sightings, project, expedition, gb),
-          pictures360: this.render360Images(geometries.pictures360, project, expedition, gb)
+          particles: {
+            ...particles,
+            // pictures360: this.render360Images(particles.pictures360, screenBounds, expedition, gb),
+            sightings: this.renderSightings(particles.sightings, screenBounds, expedition, gb)
+          },
+          paths: {
+            ambitGeo: this.renderAmbitGeo(paths.ambitGeo, screenBounds, expedition, gb)
+          }
         }
       }
     }
   }
 
   @autobind
-  render360Images (particleGeometry, project, expedition, gb) {
+  mapToScreen (p, screenBounds) {
+    return [
+      0 + (window.innerWidth - 0) * ((p[0] - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0])),
+      0 + (window.innerHeight - 0) * ((p[1] - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
+    ]
+  }
+
+  @autobind
+  renderAmbitGeo (pathGeometry, screenBounds, expedition, gb) {
+    const checkGeoBounds = (p, gb) => {
+      return p[0] >= gb[0] && p[0] < gb[2] && p[1] >= gb[3] && p[1] < gb[1]
+    }
+
+    return expedition.currentAmbits.map(route => {
+
+      const vertices = route.coordinates
+        .filter((p, i) => {
+          if (route.coordinates[i - 1] && checkGeoBounds(route.coordinates[i - 1], gb)) return true
+          if (checkGeoBounds(route.coordinates[i], gb)) return true
+          if (route.coordinates[i + 1] && checkGeoBounds(route.coordinates[i + 1], gb)) return true
+          return false
+        })
+        .map(p => {
+          return this.mapToScreen(p, screenBounds)
+        })
+        .map((p, i) => {
+          return new THREE.Vector3(p[0], p[1], 0)
+        })
+
+      var lastVertex = vertices[vertices.length - 1].clone()
+      for (let i = vertices.length; i < 200; i ++) {
+        vertices[i] = lastVertex
+      }
+
+      return {
+        color: route.color,
+        vertices
+      }
+    })
+  }
+
+  @autobind
+  render360Images (particleGeometry, screenBounds, expedition, gb) {
 
     const images = expedition.current360Images
       .filter(image => {
@@ -357,7 +352,7 @@ class BackgroundMap extends React.Component {
     for (var i = 0; i < particleGeometry.count; i++) {
       const image = images[i]
       if (image) {
-        const coords = project([image.geometry.coordinates[0], image.geometry.coordinates[1]])
+        const coords = this.mapToScreen([image.geometry.coordinates[0], image.geometry.coordinates[1]], screenBounds)
         particleGeometry.position.array[i * 3 + 0] = coords[0]
         particleGeometry.position.array[i * 3 + 1] = coords[1]
         particleGeometry.position.array[i * 3 + 2] = 0
@@ -383,7 +378,7 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  renderSightings (particleGeometry, project, expedition, gb) {
+  renderSightings (particleGeometry, screenBounds, expedition, gb) {
     const sightings = expedition.currentSightings
       .filter((sighting, i) => {
         const { position } = sighting
@@ -394,7 +389,7 @@ class BackgroundMap extends React.Component {
       const sighting = sightings[i]
       if (sighting) {
         const { position, radius } = sighting
-        const coords = project([position.x, position.y])
+        const coords = this.mapToScreen([position.x, position.y], screenBounds)
         const color = new THREE.Color(sighting.color)
         particleGeometry.position.array[i * 3 + 0] = coords[0]
         particleGeometry.position.array[i * 3 + 1] = coords[1]
@@ -418,59 +413,6 @@ class BackgroundMap extends React.Component {
     particleGeometry.color.needsUpdate = true
     particleGeometry.data = sightings
     return particleGeometry
-  }
-
-  @autobind
-  renderAmbits (children, project, expedition, gb) {
-
-    // return children.concat(expedition.currentAmbits
-    //   .map((route, i) => {
-    //     return route.coordinates
-    //       .filter((point, j) => {
-    //         return point[0] >= gb[0] && point[0] < gb[2] && point[1] >= gb[3] && point[1] < gb[1]
-    //       })
-    //       .map(project)
-    //       .map(point => [point[0], point[1]])
-    //       .map(point => {
-            
-    //       })
-    //     // return member.filter((sighting, i) => {
-    //     //   const { position } = sighting
-    //     //   return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
-    //     // })
-    //     // .map((sighting, i) => {
-    //     //   const { position, color, radius } = sighting
-    //     //   const coords = project([position.x, position.y])
-    //     //   return <Sprite image={'static/img/sighting.png'} x={coords[0]} y={coords[1]} width={radius * 2} height={radius * 2} key={i} tint={color} />
-    //     // }))
-        
-    //   })
-
-    // return children.concat(expedition.currentAmbits)
-
-    // const paths = expedition.currentAmbits.map((route, index) => {
-    //   const points = route.coordinates.map(project).map(
-    //     p => [p[0], p[1]]
-    //   )
-    //   return (
-    //     <g key={ index }>
-    //       <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
-    //         <g style={ {pointerEvents: 'visibleStroke'} }>
-    //           <path
-    //             style={{
-    //               fill: 'none',
-    //               stroke: route.color,
-    //               strokeWidth: 2
-    //             }}
-    //             d={ `M${points.join('L')}`}
-    //           />
-    //         </g>
-    //       </g>
-    //     </g>
-    //   )
-    // })
-
-    return children
   }
 
   render () {
