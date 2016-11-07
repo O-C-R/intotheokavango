@@ -1,7 +1,8 @@
 
 /*
 
-  Upgrade react-three-renderer to NPM version
+  popup cycle
+  move 360 videos to side
 
   GENERAL
     expedition year selection
@@ -9,9 +10,7 @@
     Fix intro
     animate timeline cursor and direction
   MAP
-    webGL paths
-    move 360 videos to side
-    popup cycle
+    separate normal map interaction vs introduction
     round sightings location
     rollover member markers
     map interactions
@@ -21,6 +20,8 @@
     grid visualization
   API
     Data explorer
+  MIST
+    Upgrade react-three-renderer to NPM version
 
 */
 
@@ -31,6 +32,7 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
+
 import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
