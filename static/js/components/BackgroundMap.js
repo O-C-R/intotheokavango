@@ -222,51 +222,6 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  redrawSVGOverlay ({ project }) {
-    const { expedition } = this.props
-    return (
-      <g>
-        {/*
-          <g>
-            {this.drawAmbits(project)}
-          </g>
-        */}
-        <g>
-          {this.drawMembers(project)}
-        </g>
-        {/*
-        <g>
-          {this.drawPosts(project)}
-        </g>
-      */}
-      </g>
-    )
-  }
-
-  @autobind
-  drawMembers (project) {
-    const { members } = this.state
-    // if (this.state.frameCount % 60 === 0) console.log(members)
-    if (!members || members.length === 0) return ''
-    const markers = Object.keys(members).map(memberID => {
-      var member = members[memberID]
-      const translate = (member) => {
-        var coords = project(member.coordinates)
-        var x = Math.round((coords[0] - 27 / 2) * 10) / 10
-        var y = Math.round((coords[1] - 34) * 10) / 10
-        return 'translate(' + x + ',' + y + ')'
-      }
-      return (
-        <g transform={ translate(member) } key={memberID}>
-          <path fill="rgba(4,0,26,0.7)" d="M27,13.8C27,22.2,13.5,34,13.5,34S0,22.2,0,13.8C0,6.3,6,0.3,13.5,0.3S27,6.3,27,13.8z"/>
-          <text style={{textAnchor: 'middle'}} x={13.5} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
-        </g>
-      )
-    })
-    return markers
-  }
-
-  @autobind
   redrawGLOverlay ({ unproject } ) {
     const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
     return (particles, paths) => {
@@ -288,11 +243,12 @@ class BackgroundMap extends React.Component {
           particles: {
             ...particles,
             // pictures360: this.render360Images(particles.pictures360, screenBounds, expedition, gb),
-            sightings: this.renderSightings(particles.sightings, screenBounds, expedition, gb)
+            sightings: this.renderSightings(particles.sightings, screenBounds, expedition, gb),
+            members: this.renderMembers(particles.members, screenBounds, expedition, gb)
           },
           paths: {
             ambitGeo: this.renderAmbitGeo(paths.ambitGeo, screenBounds, expedition, gb)
-          }
+          },
         }
       }
     }
@@ -415,6 +371,20 @@ class BackgroundMap extends React.Component {
     return particleGeometry
   }
 
+  @autobind
+  renderMembers (geometry, screenBounds, expedition, gb) {
+    if (!this.state.members) return geometry
+    const members = Object.keys(this.state.members).map(name => {
+      const member = this.state.members[name]
+      const position = this.mapToScreen(member.coordinates, screenBounds)
+      return {
+        name,
+        position
+      }
+    })
+    return members
+  }
+
   render () {
     const { expedition, show360Picture, lightBoxActive } = this.props
     const { viewport, currentDate } = this.state
@@ -430,25 +400,6 @@ class BackgroundMap extends React.Component {
         >
           {expedition
           ? <div>
-            {/*
-            <SVGOverlay
-              {...viewport}
-              startDragLngLat={[0, 0]}
-              redraw={ this.redrawSVGOverlay }
-            />
-            */}
-            {/*
-            <PIXIStage width={window.innerWidth} height={window.innerHeight}>
-              { this.redrawSightings }
-            </PIXIStage>;
-
-            <WebGLOverlay
-              {...mapStateProps}
-              {...{ width, height, latitude, longitude, zoom, simulationTime }}
-              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
-            />
-            */}
-
             <WebGLOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
@@ -456,20 +407,6 @@ class BackgroundMap extends React.Component {
               show360Picture={show360Picture}
               currentDate={currentDate}
             />
-            {/*
-            <DeckGLOverlay
-              {...viewport}
-              startDragLngLat={[0, 0]}
-              layers={[
-                new ScatterplotLayer({
-                  ...viewport,
-                  id: 'sightings',
-                  data: expedition.currentSightings
-                })
-              ]}
-            />
-            */}
-
           </div>
           : ''}
         </MapGL>

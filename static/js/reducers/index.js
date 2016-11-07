@@ -694,17 +694,17 @@ const expeditionReducer = (
           return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
         })
         .forEach(f => {
-          var memberID = f.properties.Member
-          if (!currentAmbits[memberID]) {
-            currentAmbits[memberID] = {
-              color: state.members[memberID].color,
+          var name = f.properties.Member
+          if (!currentAmbits[name]) {
+            currentAmbits[name] = {
+              color: state.members[name].color,
               coordinates: [],
               dates: []
             }
           }
-          if (!currentMembers[memberID]) currentMembers[memberID] = {}
-          currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
-          currentAmbits[memberID].dates.push(f.properties.DateTime)
+          if (!currentMembers[name]) currentMembers[name] = {}
+          currentAmbits[name].coordinates.push(f.geometry.coordinates)
+          currentAmbits[name].dates.push(f.properties.DateTime)
         })
 
       currentAmbits = d3.values(currentAmbits)

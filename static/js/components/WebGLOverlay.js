@@ -15,6 +15,7 @@ export default class WebGLOverlay extends Component {
     }
 
     const particles = {
+      members: [],
       sightings: {
         count: 1000,
         position: new THREE.BufferAttribute(new Float32Array(1000 * 3), 3),
@@ -181,6 +182,31 @@ export default class WebGLOverlay extends Component {
       lookAt: new THREE.Vector3(left, top, 0)
     }
 
+    const memberMarkers = particles.members
+      .map((m, i) => {
+        var x = Math.round((m.position[0] - 27 / 2) * 10) / 10
+        var y = Math.round((m.position[1] - 34) * 10) / 10
+        return (
+          <div
+            key={m.name}
+            className={'member-marker'}
+            style={{
+              left: x,
+              top: y
+            }}
+          >
+            <img
+              src="static/img/member.svg"
+              width={27}
+              height={32}
+            />
+            <span>
+              {m.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )
+      })
+
     const sightingLabels = particles.sightings.data
       .map((p, i) => {
         var x = particles.sightings.position.array[i * 3 + 0]
@@ -246,6 +272,7 @@ export default class WebGLOverlay extends Component {
           }}
         >
          {sightingLabels}
+         {memberMarkers}
         </div>
         <div id="three-renderer"
         >

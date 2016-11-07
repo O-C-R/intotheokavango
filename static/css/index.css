@@ -802,6 +802,22 @@ ul{
         /*pointer-events: none;*/
       }
 
+        #mapbox div.overlays #html-renderer div.member-marker{
+          position: absolute;
+          font-family: "Gotham A", "Gotham B", arial;
+          font-style: normal;
+          font-weight: 700;
+          font-size: 14px;
+        }
+
+          #mapbox div.overlays #html-renderer div.member-marker span{
+            text-align: center;
+            width: 100%;
+            left: 0;
+            top: -2px;
+            position: absolute;
+          }
+
         #mapbox div.overlays #html-renderer div.sighting-label{
           position: absolute;
           width: auto;
