@@ -813,7 +813,7 @@ ul{
             background: rgba(4,0,26,0.7);
             border: 4px solid #transparent;
             padding: 0 8px;
-            transform: translate(32px, -50%);
+            transform: translate(16px, -50%);
             color: white;
             font-family: "Gotham A", "Gotham B", arial;
             font-style: normal;
