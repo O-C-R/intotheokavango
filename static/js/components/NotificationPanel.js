@@ -2,8 +2,6 @@
 import React, {PropTypes} from 'react'
 import ReactDOM from 'react-dom'
 import Notification from './Notification'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
-import autobind from 'autobind-decorator'
 
 class NotificationPanel extends React.Component {
   constructor (props) {
