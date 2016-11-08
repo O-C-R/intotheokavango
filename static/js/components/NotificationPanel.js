@@ -107,6 +107,7 @@ class NotificationPanel extends React.Component {
         return window.innerWidth > 768 || currentNotifications.indexOf(post) === currentNotifications.length - 1
       })
       .map((post, i) => {
+        const active = currentNotifications.indexOf(post) > -1
         switch (post.type) {
           case 'tweet':
             var text = post.properties.Text
@@ -117,13 +118,13 @@ class NotificationPanel extends React.Component {
                 return j === 0
               })
               .map((img, j) => {
-                return <img src={img.Url.replace('http://', 'https://')} width="100%" key={j}/>
+                return <img src={active ? img.Url.replace('http://', 'https://') : '#'} width="100%" key={j}/>
               })
             return (
               <Notification
                 type={post.type}
                 key={post.id}
-                active={currentNotifications.indexOf(post) > -1}
+                active={active}
                 id={post.id}
               >
                 <p style={{position: window.innerWidth > 768 || post.properties.Images.length === 0 ? 'relative' : 'absolute'}}>{text}</p>
@@ -136,7 +137,7 @@ class NotificationPanel extends React.Component {
                 type={post.type}
                 key={post.id}
                 id={post.id}
-                active={currentNotifications.indexOf(post) > -1}
+                active={active}
               >
                 <div className="title">{post.properties.Title}</div>
               </Notification>
@@ -147,7 +148,7 @@ class NotificationPanel extends React.Component {
                 type={post.type}
                 key={post.id}
                 id={post.id}
-                active={currentNotifications.indexOf(post) > -1}
+                active={active}
               >
                 <div className="title">{post.properties.Title}</div>
               </Notification>
@@ -169,7 +170,7 @@ class NotificationPanel extends React.Component {
                 id={post.id}
                 active={currentNotifications.indexOf(post) > -1}
               >
-                <img className="image" src={post.properties.Url.replace('http://', 'https://')} width={width} height={height}/>
+                <img className="image" src={active ? post.properties.Url.replace('http://', 'https://') : '#'} width={width} height={height}/>
               </Notification>
             )
         }
