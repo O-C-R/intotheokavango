@@ -22,9 +22,13 @@
   MISC
     Upgrade react-three-renderer to NPM version
   CODE
+    optimize with shouldComponentUpdate
     switch state and props to immutable.js
     properly set key props
     swith to sylus
+    replace vars with consts or lets
+  BACKEND
+    provide thumbnail for images
 
 */
 

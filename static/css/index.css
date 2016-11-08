@@ -597,65 +597,71 @@ ul{
           pointer-events: none;
         }
 
-          #notificationPanel div.scrollableContainer {
+          #notificationPanel div.notifications{
             position: absolute;
-            transition: top 0.3s;
+            bottom: 0;
+            width: 100%;
           }
 
-            .notification{
-              background-color:rgba(4,0,26,0.7);
-              border-radius: 3px;
-              margin-bottom:15px;
-              pointer-events: auto;
-              border-bottom-left-radius: 3px; 
-              border-top-left-radius: 3px; 
-              font-size: 13px;
-              line-height: 25px;
-              transition: opacity 0.15s;
+            #notificationPanel div.scrollableContainer {
+              position: absolute;
+              transition: top 0.3s;
             }
 
-              .notification.inactive{
-                opacity: 0;
+              .notification{
+                background-color:rgba(4,0,26,0.7);
+                border-radius: 3px;
+                margin-bottom:15px;
+                pointer-events: auto;
+                border-bottom-left-radius: 3px; 
+                border-top-left-radius: 3px; 
+                font-size: 13px;
+                line-height: 25px;
+                transition: opacity 0.15s;
               }
 
-              .notification .content{
-                display: inline-block;
-                width: 80%;
-                vertical-align: top;
-              }
-
-                .notification .content p{
-                  padding:15px;
-                  margin:0;
+                .notification.inactive{
+                  opacity: 0;
                 }
 
-                .notification .content div.title{
-                  padding:15px;
-                  margin:0;
-                }
-
-                .notification .content img{
-                  width:100%;
-                  height:auto;
-                  display: block;
-                  border-bottom-left-radius: 3px; 
-                  border-top-left-radius: 3px; 
-                }
-
-              .notification .type{
-                display: inline-block;
-                width: 20%;
-                text-align: center;
-              }
-
-                .notification .type img{
+                .notification .content{
                   display: inline-block;
-                  vertical-align: middle;
-                  margin:15px 0;
-                  border:1px solid white;
-                  border-radius: 3px;
-                  padding:8px;
+                  width: 80%;
+                  vertical-align: top;
                 }
+
+                  .notification .content p{
+                    padding:15px;
+                    margin:0;
+                  }
+
+                  .notification .content div.title{
+                    padding:15px;
+                    margin:0;
+                  }
+
+                  .notification .content img{
+                    width:100%;
+                    height:auto;
+                    display: block;
+                    border-bottom-left-radius: 3px; 
+                    border-top-left-radius: 3px; 
+                  }
+
+                .notification .type{
+                  display: inline-block;
+                  width: 20%;
+                  text-align: center;
+                }
+
+                  .notification .type img{
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin:15px 0;
+                    border:1px solid white;
+                    border-radius: 3px;
+                    padding:8px;
+                  }
 
       #dataPage{}
 

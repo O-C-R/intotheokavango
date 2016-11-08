@@ -2,6 +2,7 @@
 import React, {PropTypes} from 'react'
 import ReactDOM from 'react-dom'
 import Notification from './Notification'
+// import PanoramicPanel from './PanoramicPanel'
 
 class NotificationPanel extends React.Component {
   constructor (props) {
@@ -175,17 +176,26 @@ class NotificationPanel extends React.Component {
         }
       })
 
-    var height = window.innerWidth > 768 ? {height: window.innerHeight - 110} : {}
+    const height = window.innerWidth > 768 ? {height: window.innerHeight - 110} : {}
 
     return (
-      <div id="notificationPanel" style={height}>
-        <div
-          className="scrollableContainer"
-          style={{
-            top: this.state.posY
-          }}
-        >
-          {notificationItems}
+      <div>
+        <div id="notificationPanel" style={height}>
+          { /* window.innerWidth > 768 && <PanoramicPanel/> */ }
+          <div class="notifications"
+            style={{
+              height: height.height * (1)
+            }}
+          >
+            <div
+              className="scrollableContainer"
+              style={{
+                top: this.state.posY
+              }}
+            >
+              {notificationItems}
+            </div>
+          </div>
         </div>
       </div>
     )
