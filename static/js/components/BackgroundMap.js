@@ -1,20 +1,17 @@
 import React, { PropTypes } from 'react'
-// import MapGL from 'react-map-gl'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
 import { lerp } from '../utils'
-// import { Sprite } from 'react-pixi'
 import WebGLOverlay from './WebGLOverlay'
 import MapGL from 'react-map-gl'
-// import { DeckGLOverlay, ScatterplotLayer } from '../deck.gl'
-// import PIXI from 'pixi.js'
 import THREE from '../react-three-renderer/node_modules/three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      frameCount: 0,
       contentActive: false,
       animate: false,
       coordinates: [0, 0],
@@ -32,6 +29,7 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick (pastFrameDate) {
+    let newState = {}
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
     const currentFrameDate = Date.now()
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
@@ -162,7 +160,8 @@ class BackgroundMap extends React.Component {
       if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
       // if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
-      this.setState({
+      newState = {
+        ...newState,
         currentDate,
         animate,
         currentDay,
@@ -177,7 +176,7 @@ class BackgroundMap extends React.Component {
           latitude: coordinates[1],
           zoom: zoom
         }
-      })
+      }
 
       if (this.state.frameCount % 60 === 0) {
         const { unproject } = ViewportMercator({ ...this.state.viewport })
@@ -187,9 +186,20 @@ class BackgroundMap extends React.Component {
         updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom, expeditionID)
       }
     }
-    this.state.animate = animate
-    this.state.frameCount++
+
+    this.setState({
+      ...this.state,
+      ...newState,
+      animate,
+      frameCount: this.state.frameCount + 1
+    })
+
     requestAnimationFrame(() => { this.tick(currentFrameDate) })
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+
+    return !!(this.props.expedition && this.props.expedition.playback !== 'pause' && nextState.frameCount !== this.state.frameCount)
   }
 
   componentWillReceiveProps (nextProps) {
