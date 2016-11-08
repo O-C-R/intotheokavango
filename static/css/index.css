@@ -592,54 +592,70 @@ ul{
           position:absolute;
           top:10px;
           right:0;
-          width:28.5%;
+          width:30%;
           overflow: hidden;
           pointer-events: none;
         }
 
-          .notification{
-            background-color:rgba(4,0,26,0.7);
-            border-radius: 3px;
-            margin-bottom:15px;
-            pointer-events: normal;
+          #notificationPanel div.scrollableContainer {
+            position: absolute;
+            transition: top 0.3s;
           }
 
-            .notification .content{
-              display: inline-block;
-              width: 80%;
-              vertical-align: top;
+            .notification{
+              background-color:rgba(4,0,26,0.7);
+              border-radius: 3px;
+              margin-bottom:15px;
+              pointer-events: auto;
+              border-bottom-left-radius: 3px; 
+              border-top-left-radius: 3px; 
+              font-size: 13px;
+              line-height: 25px;
+              transition: opacity 0.15s;
             }
 
-              .notification .content p{
-                padding:15px;
-                margin:0;
+              .notification.inactive{
+                opacity: 0;
               }
 
-              .notification .content div.title{
-                padding:15px;
-                margin:0;
-              }
-
-              .notification .content img{
-                width:100%;
-                height:auto;
-                display: block;
-              }
-
-            .notification .type{
-              display: inline-block;
-              width: 20%;
-              text-align: center;
-            }
-
-              .notification .type img{
+              .notification .content{
                 display: inline-block;
-                vertical-align: middle;
-                margin:15px 0;
-                border:1px solid white;
-                border-radius: 3px;
-                padding:8px;
+                width: 80%;
+                vertical-align: top;
               }
+
+                .notification .content p{
+                  padding:15px;
+                  margin:0;
+                }
+
+                .notification .content div.title{
+                  padding:15px;
+                  margin:0;
+                }
+
+                .notification .content img{
+                  width:100%;
+                  height:auto;
+                  display: block;
+                  border-bottom-left-radius: 3px; 
+                  border-top-left-radius: 3px; 
+                }
+
+              .notification .type{
+                display: inline-block;
+                width: 20%;
+                text-align: center;
+              }
+
+                .notification .type img{
+                  display: inline-block;
+                  vertical-align: middle;
+                  margin:15px 0;
+                  border:1px solid white;
+                  border-radius: 3px;
+                  padding:8px;
+                }
 
       #dataPage{}
 
@@ -972,7 +988,7 @@ ul{
 
 .notif-leave.notif-leave-active {
   opacity: 0.01;
-  transition: opacity 150ms ease-in;
+  transition: opacity 300ms ease-in;
 }
 
 @media (max-width: 768px) {
@@ -1064,16 +1080,20 @@ ul{
       z-index: 100;
     }
 
-      #notificationPanel div.notification{
-        margin-bottom: 0;
+      #notificationPanel div.scrollableContainer {
+        position: relative;
       }
 
-        #notificationPanel div.notification div.content p{
-          position: absolute;
-          bottom: 0;
-          width: 76%;
-          padding: 2%;
+        #notificationPanel div.notification{
+          margin-bottom: 0;
         }
+
+          #notificationPanel div.notification div.content p{
+            position: absolute;
+            bottom: 0;
+            width: 76%;
+            padding: 2%;
+          }
 
   #IntroductionBox {
     bottom: initial;

@@ -1,7 +1,6 @@
 
 /*
 
-  popup cycle
   move 360 videos to side
 
   GENERAL
@@ -20,8 +19,12 @@
     grid visualization
   API
     Data explorer
-  MIST
+  MISC
     Upgrade react-three-renderer to NPM version
+  CODE
+    switch state and props to immutable.js
+    properly set key props
+    swith to sylus
 
 */
 
