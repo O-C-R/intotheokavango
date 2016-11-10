@@ -239,7 +239,7 @@ class Post extends React.Component {
               data.type !== '360Image' &&
               <div className="meta">
                 {meta}
-                <div className="share"><img width="16" height="16" src="static/img/icon-share.png"/></div>
+                <div className="share"><img width="16" height="16" src="/static/img/icon-share.png"/></div>
                 <div className="separator"></div>
               </div>
             }

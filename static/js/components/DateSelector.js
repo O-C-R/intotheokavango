@@ -10,7 +10,7 @@ const DateSelector = ({expeditions, expeditionID, currentDate}) => {
   return (
     <div className="dateSelector controlSelector">
       <p>
-        DAY {dayCount}
+        DAY {dayCount + 1}
         <br/>
         {dateString}
       </p>

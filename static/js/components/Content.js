@@ -35,7 +35,7 @@ const Content = ({currentPage, onNavClick}) => {
 }
 
 Content.propTypes = {
-  currentPage : PropTypes.string.isRequired,
+  currentPage : PropTypes.string.isRequired
 }
 
 export default Content

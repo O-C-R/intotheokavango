@@ -118,7 +118,8 @@ module.exports = {
       'title': 'INTO THE OKAVANGO',
       'filename': 'index.html',
       'template': 'templates/index.hbs',
-      'hash': true
+      'hash': true,
+      inject: false
     })
   ]
 }

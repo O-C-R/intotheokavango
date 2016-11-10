@@ -8,7 +8,7 @@ import IntroductionBox from './IntroductionBox'
 
 export default class Okavango extends React.Component {
   render () {
-    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage, show360Picture, lightBoxActive, lightBoxPost, closeLightBox} = this.props
+    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage, show360Picture, lightBoxActive, lightBoxPost, closeLightBox, location} = this.props
     var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
 
     return (
@@ -26,18 +26,18 @@ export default class Okavango extends React.Component {
           contentActive={contentActive}
           show360Picture={show360Picture}
           lightBoxActive={lightBoxActive}
+          query={location.query}
         />
         <div
           id="nightOverlay"
           style={{
-            opacity: (location.pathname === '/map' || location.pathname === '/') && !lightBoxActive ? 0 : 1,
+            opacity: location.pathname.indexOf('/map') > -1 && !lightBoxActive ? 0 : 1,
             zIndex: lightBoxActive ? 1 : 0
           }}
         >
         </div>
         <Navigation
           setPage={setPage}
-          pathName={location.pathname}
         />
         <div
           id="content"
@@ -59,7 +59,7 @@ export default class Okavango extends React.Component {
           />
           <div
             id="pageContainer"
-            className={location.pathname === '/map' || location.pathname === '/' ? 'disabled' : ''}
+            className={location.pathname.indexOf('/map') > -1 ? 'disabled' : ''}
           >
             <LightBox
               active={lightBoxActive}
@@ -71,13 +71,13 @@ export default class Okavango extends React.Component {
           </div>
           <div
             class="logos"
-            style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}
+            style={{display: (location.pathname.indexOf('/map') > -1 ? 'block' : 'none')}}
           >
             <a
               href="http://www.nationalgeographic.com/"
             >
               <img
-                src="static/img/natgeoLogo.svg"
+                src="/static/img/natgeoLogo.svg"
                 alt="National Geographic Logo"
                 height="35px"
               />
@@ -86,7 +86,7 @@ export default class Okavango extends React.Component {
               href="http://conservify.org/"
             >
               <img
-                src="static/img/conservify.png"
+                src="/static/img/conservify.png"
                 alt="Conservify Logo"
                 height="35px"
               />
@@ -95,7 +95,7 @@ export default class Okavango extends React.Component {
               href="http://www.o-c-r.org/"
             >
               <img
-                src="static/img/ocrLogo.svg"
+                src="/static/img/ocrLogo.svg"
                 alt="The Office for Creative Research Logo"
                 height="35px"
               />
@@ -104,7 +104,7 @@ export default class Okavango extends React.Component {
               href="http://www.wildbirdtrust.com/"
             >
               <img
-                src="static/img/wbtLogo.png"
+                src="/static/img/wbtLogo.png"
                 alt="Wild Bird Trust Logo"
                 height="35px"
               />

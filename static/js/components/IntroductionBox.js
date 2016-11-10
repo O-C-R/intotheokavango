@@ -41,7 +41,7 @@ class IntroductionBox extends React.Component {
     const { enableContent } = this.props
     const { posts, startDate } = this.state
 
-    if (!(location.pathname === '/' || location.pathname === '/map')) {
+    if (location.pathname.indexOf('/map') === -1) {
       this.state.complete = true
       return
     }

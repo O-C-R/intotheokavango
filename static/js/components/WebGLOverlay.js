@@ -88,8 +88,8 @@ export default class WebGLOverlay extends Component {
       paths,
       particles,
       render () {},
-      sightingTexture: new THREE.TextureLoader().load('static/img/sighting.png'),
-      picture360Texture: new THREE.TextureLoader().load('static/img/picture360.png'),
+      sightingTexture: new THREE.TextureLoader().load('/static/img/sighting.png'),
+      picture360Texture: new THREE.TextureLoader().load('/static/img/picture360.png'),
       mousePosition: [0, 0],
       hoveredPicture: -1
     }
@@ -196,7 +196,7 @@ export default class WebGLOverlay extends Component {
             }}
           >
             <img
-              src="static/img/member.svg"
+              src="/static/img/member.svg"
               width={27}
               height={32}
             />

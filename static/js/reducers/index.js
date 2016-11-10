@@ -11,7 +11,7 @@ const okavangoReducer = (
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
-    contentActive: !(location.pathname === '/' || location.pathname === '/map'),
+    contentActive: location.pathname.indexOf('/map') === -1,
     initialPage: location.pathname,
     lightBoxActive: false,
     lightBoxID: ''

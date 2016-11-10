@@ -109,13 +109,14 @@ class Timeline extends React.Component {
     })
 
     return (
-      <svg 
-        id="timeline" 
-        className={location.pathname === '/data' || location.pathname === '/about' ? 'invisible' : 'visible'} 
-        style={{height: height + 'px'}} 
-        onMouseOut={this.onMouseOut} 
-        onMouseMove={this.onMouseMove} 
-        onClick={this.onClick}>
+      <svg
+        id="timeline"
+        className={location.pathname.indexOf('/about') > -1 || location.pathname.indexOf('/data') > -1 ? 'invisible' : 'visible'}
+        style={{height: height + 'px'}}
+        onMouseOut={this.onMouseOut}
+        onMouseMove={this.onMouseMove}
+        onClick={this.onClick}
+      >
         <filter id="dropshadow" height="120%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
           <feOffset dx="2" dy="0" result="offsetblur"/>

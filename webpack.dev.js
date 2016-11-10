@@ -2,18 +2,6 @@ var webpack = require('webpack')
 var path = require('path')
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-function isExternal(module) {
-  var userRequest = module.userRequest;
-
-  if (typeof userRequest !== 'string') {
-    return false;
-  }
-
-  return userRequest.indexOf('bower_components') >= 0 ||
-         userRequest.indexOf('node_modules') >= 0 ||
-         userRequest.indexOf('libraries') >= 0;
-}
-
 module.exports = {
   cache: true,
   context: path.join(__dirname, ''),
@@ -103,7 +91,8 @@ module.exports = {
       'title': 'INTO THE OKAVANGO',
       'filename': 'index.html',
       'template': 'templates/index.hbs',
-      'hash': true
+      'hash': true,
+      inject: false
     })
   ]
 }

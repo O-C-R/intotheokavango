@@ -6,6 +6,7 @@ import { lerp } from '../utils'
 import WebGLOverlay from './WebGLOverlay'
 import MapGL from 'react-map-gl'
 import THREE from '../react-three-renderer/node_modules/three'
+import { Router } from 'react-router'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
@@ -34,7 +35,7 @@ class BackgroundMap extends React.Component {
     const currentFrameDate = Date.now()
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
     var b1, b2
-    if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
+    if (animate && !isFetching && location.pathname.indexOf('/map') > -1) {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
@@ -157,8 +158,7 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
-      // if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
+      if (!(initialPage.indexOf('/map') > -1) || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
 
       newState = {
         ...newState,
@@ -183,6 +183,14 @@ class BackgroundMap extends React.Component {
         const nw = unproject([0, 0])
         const se = unproject([window.innerWidth, window.innerHeight])
         const viewGeoBounds = [nw[0], nw[1], se[0], se[1]]
+        // console.log(Router)
+        // Router.merge(this.props.query, {filter: 'value'})
+        // console.log(this.props.query)
+
+        // this.props.query = 'foo=bar'
+
+        
+
         updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom, expeditionID)
       }
     }
@@ -402,7 +410,7 @@ class BackgroundMap extends React.Component {
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
 
     return (
-      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map' || location.pathname === '/') ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (!lightBoxActive && location.pathname.indexOf('/map') > -1 ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
@@ -435,7 +443,8 @@ BackgroundMap.propTypes = {
   initialPage: PropTypes.string.isRequired,
   contentActive: PropTypes.bool,
   show360Picture: PropTypes.func.isRequired,
-  lightBoxActive: PropTypes.bool.isRequired
+  lightBoxActive: PropTypes.bool.isRequired,
+  query: PropTypes.object.isRequired
 }
 
 export default BackgroundMap

@@ -7,7 +7,7 @@ const Notification = ({children, type, active, id}) => {
         {children}
       </div>
       <div className="type">
-        <img width="16" height="16" src={'static/img/icon-' + type + '.png'}/>
+        <img width="16" height="16" src={'/static/img/icon-' + type + '.png'}/>
       </div>
     </div>
   )

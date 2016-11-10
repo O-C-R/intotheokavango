@@ -1,7 +1,6 @@
 
 import fetch from 'isomorphic-fetch'
 import * as d3 from 'd3'
-// import { animate } from './animation'
 
 function timestampToString (t) {
   var d = new Date(t)
@@ -46,7 +45,7 @@ export function setPage () {
       type: SET_PAGE,
       location: location.pathname
     })
-    if (location.pathname === '/journal') dispatch(checkFeedContent())
+    if (location.pathname.indexOf('/journal') > -1) dispatch(checkFeedContent())
   }
 }
 
@@ -357,22 +356,32 @@ export function receiveExpeditions (data) {
   }
 }
 
-export function fetchExpeditions () {
+export function fetchExpeditions (parameters) {
   return function (dispatch, getState) {
+
+    const startDate = parameters.date ? new Date(parseInt(parameters.date)) : new Date('2016-08-20 09:30:00+00:00') 
+
     dispatch(requestExpeditions())
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
+      .then(json => {
+        return {
+          ...json,
+          results: {
+            ...json.results,
+            okavango_16: {
+              ...json.results.okavango_16,
+              Days: 18
+            }
+          }
+        }
+      })
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(new Date('2016-08-20 09:30:00+00:00'), null, null, true)))
+      .then(() => dispatch(fetchDay(startDate, null, null, true)))
       .then(() => {
         var state = getState()
-        // Object.keys(state.expeditions).forEach((id) => {
-        //   if (id !== state.selectedExpedition) {
-        //     dispatch(fetchDay(null, null, id, false))
-        //   }
-        // })
         dispatch(fetchTotalSightings(state.selectedExpedition))
-        if (location.pathname === '/journal') {
+        if (location.pathname.indexOf('/journal') > -1) {
           dispatch(checkFeedContent())
         }
       })
@@ -383,6 +392,16 @@ export function fetchTotalSightings (id) {
   return function (dispatch, getState) {
     return fetch('https://intotheokavango.org/api/sightings?FeatureType=sighting&limit=0&Expedition=' + id)
       .then(response => response.json())
+      .then(json => {
+        if (id !== 'okavango_16') {
+          return json
+        } else {
+          return {
+            ...json,
+            results: json.results.slice(0, 20)
+          }
+        }
+      })
       .then(json => dispatch(receiveTotalSightings(id, json)))
   }
 }
@@ -445,10 +464,8 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               if (expedition.days[k].incomplete) incompleteDays.push(k)
             })
             if (incompleteDays.length === 0) {
-              // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
-              // dispatch(updateTime(initialDate || date, false, expeditionID))
-              dispatch(updateTime(new Date('2016-08-20 09:30:00+00:00'), false, expeditionID))
+              dispatch(updateTime(initialDate, false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)
@@ -465,7 +482,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               }
               if (nextTarget > -1) {
                 nextTarget = new Date(expedition.start.getTime() + nextTarget * (1000 * 3600 * 24))
-                dispatch(fetchDay(nextTarget, null, expeditionID, initialize))
+                dispatch(fetchDay(nextTarget, initialDate, expeditionID, initialize))
               }
             }
           }

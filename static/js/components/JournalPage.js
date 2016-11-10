@@ -10,7 +10,7 @@ class JournalPage extends React.Component {
     const {posts, checkFeedContent, expedition} = this.props
     return (
       <div className='page' id="journalPage">
-        <ControlPanelContainer pathName={location.pathname}/>
+        <ControlPanelContainer/>
         <Feed posts={posts} checkFeedContent={checkFeedContent} expedition={expedition}/>
       </div>
     )

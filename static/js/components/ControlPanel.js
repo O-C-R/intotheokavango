@@ -10,22 +10,20 @@ import LayoutSelector from './LayoutSelector'
 const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playback, mainFocus, secondaryFocus, zoom, layout, onYearChange, onPlaybackChange, onMainFocusChange, onSecondaryFocusChange, onZoomChange, onLayoutChange, viewport}) => {
   if (!expeditionID) return <div className="controlPanel"></div>
 
-  if (pathName === '/') pathName = '/map'
-
   // {pathName === '/map' ? <FocusSelector mainFocus={mainFocus} secondaryFocus={secondaryFocus} onMainFocusChange={onMainFocusChange} onSecondaryFocusChange={onSecondaryFocusChange}/> : null}
   // {pathName === '/journal' ? <LayoutSelector mode={layout} onLayoutChange={onLayoutChange}/> : null}
       // <YearSelector expeditions={expeditions} expeditionID={expeditionID} onYearChange={onYearChange}/>
+
   return (
     <div className="controlPanel">
       <DateSelector expeditions={expeditions} expeditionID={expeditionID} currentDate={currentDate} />
-      {pathName === '/map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/> : null}
-      {pathName === '/map' && window.innerWidth > 768 ? <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/> : null}
+      {location.pathname.indexOf('/map') > -1 && <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/>}
+      {location.pathname.indexOf('/map') > -1 && window.innerWidth > 768 && <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/>}
     </div>
   )
 }
 
 ControlPanel.propTypes = {
-  pathName: PropTypes.string.isRequired,
   expeditionID: PropTypes.string,
   expeditions: PropTypes.object,
   currentDate: PropTypes.object,

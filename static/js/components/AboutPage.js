@@ -29,14 +29,14 @@ const AboutPage = () => {
         </div>
         <div className="columnWrapper">
           <div className="column">
-            <div class="goalIcon"><img src="static/img/iconIntroUnderstand.png"/></div>
+            <div class="goalIcon"><img src="/static/img/iconIntroUnderstand.png"/></div>
             <h2>UNDERSTAND<br/>THE WILDERNESS</h2>
             <p>
               To effectively protect the Okavango and its catchments it is essential to gain knowledge and insight into the functioning of the system as a whole. Starting in 2011 the Okavango Wilderness Project has conducted yearly transects of the Delta, gathering unique data and immersing the expedition members in the ebb and flow of this pristine wilderness. Traveling down the river, the team will collect data on insects, fish, birds, reptiles and mammals, as well as conduct water quality assessments and landscape surveys.
             </p>
           </div>
           <div className="column">
-            <div class="goalIcon"><img src="static/img/iconIntroPreserve.png"/></div>
+            <div class="goalIcon"><img src="/static/img/iconIntroPreserve.png"/></div>
             <h2>RAISE AWARENESS<br/>AND PRESERVE</h2>
             <p>
               Although the Okavango itself is protected as a UNESCO World Heritage Site, its catchment and water supply in Angola and Namibia remain vulnerable to human interference. By gathering and freely disseminating information about the functioning and health of the entire system the 2016 expedition aims to raise the levels of both understanding and awareness of this unique and fragile system.
@@ -77,16 +77,16 @@ const AboutPage = () => {
           <div className="column">
             <div class="logos">
               <a href="http://www.nationalgeographic.com/">
-                <img src="static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
+                <img src="/static/img/natgeoLogo.svg" alt="National Geographic Logo" height="35px"/>
               </a>
               <a href="http://conservify.org/">
-                <img src="static/img/conservify.png" alt="Conservify Logo" height="35px"/>
+                <img src="/static/img/conservify.png" alt="Conservify Logo" height="35px"/>
               </a>
               <a href="http://www.o-c-r.org/">
-                <img src="static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
+                <img src="/static/img/ocrLogo.svg" alt="The Office for Creative Research Logo" height="35px"/>
               </a>
               <a href="http://www.wildbirdtrust.com/">
-                <img src="static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
+                <img src="/static/img/wbtLogo.png" alt="Wild Bird Trust Logo" height="35px"/>
               </a>
             </div>
           </div>
