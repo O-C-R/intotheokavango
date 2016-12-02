@@ -21,7 +21,7 @@ def parse(request):
 def main(): ## called via instagram_grabber.py
     photos = []
     try:
-        response = requests.get("https://api.instagram.com/v1/tags/%s/media/recent?client_id=%s" % (settings['hashtag'], settings['client_id'])).json()
+        response = requests.get("https://api.instagram.com/v1/tags/%s/media/recent?access_token=%s" % (settings['hashtag'], settings['access_token'])).json()
         if 'data' not in response:
             return
         photos = response['data']
