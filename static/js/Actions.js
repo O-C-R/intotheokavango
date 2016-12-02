@@ -13,6 +13,23 @@ function timestampToString (t) {
   return year + '-' + month + '-' + date
 }
 
+export const CLOSE_LIGHTBOX = 'CLOSE_LIGHTBOX'
+
+export function closeLightBox () {
+  return {
+    type: CLOSE_LIGHTBOX
+  }
+}
+
+export const SHOW_360_PICTURE = 'SHOW_360_PICTURE'
+
+export function show360Picture (post) {
+  return {
+    type: SHOW_360_PICTURE,
+    post
+  }
+}
+
 export const ENABLE_CONTENT = 'ENABLE_CONTENT'
 
 export function enableContent () {
@@ -25,6 +42,10 @@ export const SET_PAGE = 'SET_PATH'
 
 export function setPage () {
   return (dispatch, getState) => {
+    dispatch({
+      type: SET_PAGE,
+      location: location.pathname
+    })
     if (location.pathname === '/journal') dispatch(checkFeedContent())
   }
 }
@@ -342,7 +363,7 @@ export function fetchExpeditions () {
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(new Date('2016-08-30 00:00:00+00:00'), null, null, true)))
+      .then(() => dispatch(fetchDay(new Date('2016-08-30 09:30:00+00:00'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {
@@ -403,7 +424,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
     const goFetch = (featureTypes, results, expeditionID) => {
       var type = featureTypes.shift()
       var queryString = 'https://intotheokavango.org/api/features?limit=0&FeatureType=' + type + '&Expedition=' + expeditionID + '&startDate=' + range[0] + '&endDate=' + range[1]
-      if (type === 'ambit_geo') queryString += '&resolution=5'
+      if (type === 'ambit_geo') queryString += '&resolution=2'
       // console.log('querying:', queryString)
       fetch(queryString)
         .then(response => response.json())
@@ -427,7 +448,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
               // dispatch(updateTime(initialDate || date, false, expeditionID))
-              dispatch(updateTime(new Date('2016-08-30 00:00:00+00:00'), false, expeditionID))
+              dispatch(updateTime(new Date('2016-08-30 09:30:00+00:00'), false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)

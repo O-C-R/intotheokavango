@@ -1,17 +1,11 @@
 import React, { PropTypes } from 'react'
 import autobind from 'autobind-decorator'
-import * as d3 from 'd3'
-import ViewportMercator from 'viewport-mercator-project'
-import { lerp } from '../utils'
-import WebGLOverlay from './WebGLOverlay'
-import MapGL from 'react-map-gl'
-import THREE from '../react-three-renderer/node_modules/three'
+import ReactPIXI from 'react-pixi'
 
-class BackgroundMap extends React.Component {
+class Sighting extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      frameCount: 0,
       contentActive: false,
       animate: false,
       coordinates: [0, 0],
@@ -29,7 +23,6 @@ class BackgroundMap extends React.Component {
 
   @autobind
   tick (pastFrameDate) {
-    let newState = {}
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
     const currentFrameDate = Date.now()
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
@@ -157,11 +150,9 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      // if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
-      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
+      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
 
-      newState = {
-        ...newState,
+      this.setState({
         currentDate,
         animate,
         currentDay,
@@ -176,7 +167,7 @@ class BackgroundMap extends React.Component {
           latitude: coordinates[1],
           zoom: zoom
         }
-      }
+      })
 
       if (this.state.frameCount % 60 === 0) {
         const { unproject } = ViewportMercator({ ...this.state.viewport })
@@ -186,20 +177,9 @@ class BackgroundMap extends React.Component {
         updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom, expeditionID)
       }
     }
-
-    this.setState({
-      ...this.state,
-      ...newState,
-      animate,
-      frameCount: this.state.frameCount + 1
-    })
-
+    this.state.animate = animate
+    this.state.frameCount++
     requestAnimationFrame(() => { this.tick(currentFrameDate) })
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-
-    return !!(this.props.expedition && this.props.expedition.playback !== 'pause' && nextState.frameCount !== this.state.frameCount)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -232,177 +212,114 @@ class BackgroundMap extends React.Component {
   }
 
   @autobind
-  redrawGLOverlay ({ unproject } ) {
-    const screenBounds = [[0, 0], [window.innerWidth, window.innerHeight]].map(unproject)
-    return (particles, paths) => {
-      const { expedition } = this.props
-      const { currentGeoBounds } = expedition
-      const west = currentGeoBounds[0] + (currentGeoBounds[0] - currentGeoBounds[2]) * 0.25
-      const north = currentGeoBounds[1] + (currentGeoBounds[1] - currentGeoBounds[3]) * 0.25
-      const east = currentGeoBounds[2] + (currentGeoBounds[2] - currentGeoBounds[0]) * 0.25
-      const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
-      const gb = [west, north, east, south]
-
-      if (expedition.zoom < 14) {
-        return {
-          particles,
-          paths
-        }
-      } else {
-        return {
-          particles: {
-            ...particles,
-            // pictures360: this.render360Images(particles.pictures360, screenBounds, expedition, gb),
-            sightings: this.renderSightings(particles.sightings, screenBounds, expedition, gb),
-            members: this.renderMembers(particles.members, screenBounds, expedition, gb)
-          },
-          paths: {
-            ambitGeo: this.renderAmbitGeo(paths.ambitGeo, screenBounds, expedition, gb)
-          },
-        }
-      }
-    }
+  redrawSVGOverlay ({ project }) {
+    const { expedition } = this.props
+    return (
+      <g>
+        <g>
+          {this.drawAmbits(project)}
+        </g>
+        <g>
+          {this.drawMembers(project)}
+        </g>
+        <g>
+          {this.drawPosts(project)}
+        </g>
+      </g>
+    )
   }
 
   @autobind
-  mapToScreen (p, screenBounds) {
-    return [
-      0 + (window.innerWidth - 0) * ((p[0] - screenBounds[0][0]) / (screenBounds[1][0] - screenBounds[0][0])),
-      0 + (window.innerHeight - 0) * ((p[1] - screenBounds[0][1]) / (screenBounds[1][1] - screenBounds[0][1]))
-    ]
-  }
-
-  @autobind
-  renderAmbitGeo (pathGeometry, screenBounds, expedition, gb) {
-    const checkGeoBounds = (p, gb) => {
-      return p[0] >= gb[0] && p[0] < gb[2] && p[1] >= gb[3] && p[1] < gb[1]
-    }
-
-    return expedition.currentAmbits.map(route => {
-
-      const vertices = route.coordinates
-        .filter((p, i) => {
-          if (route.coordinates[i - 1] && checkGeoBounds(route.coordinates[i - 1], gb)) return true
-          if (checkGeoBounds(route.coordinates[i], gb)) return true
-          if (route.coordinates[i + 1] && checkGeoBounds(route.coordinates[i + 1], gb)) return true
-          return false
-        })
-        .map(p => {
-          return this.mapToScreen(p, screenBounds)
-        })
-        .map((p, i) => {
-          return new THREE.Vector3(p[0], p[1], 0)
-        })
-
-      var lastVertex = vertices[vertices.length - 1].clone()
-      for (let i = vertices.length; i < 200; i ++) {
-        vertices[i] = lastVertex
+  drawPosts (project) {
+    return '' // TRIMMING
+    const { expedition } = this.props
+    // console.log(expedition.currentPosts.length)
+    const icons = expedition.currentPosts.map(post => {
+      const translate = (position) => {
+        var coords = project(position)
+        var x = Math.round(coords[0])
+        var y = Math.round(coords[1])
+        return 'translate(' + x + ',' + y + ')'
       }
-
-      return {
-        color: route.color,
-        vertices
-      }
+      return (
+        <g transform={ translate(post.position) } key={post.id}>
+          <image xlinkHref={'/static/img/icon-map-' + post.type + '.png'} x={-12} y={-24} height={31} width={24} />
+        </g>
+      )
     })
+    return icons
   }
 
   @autobind
-  render360Images (particleGeometry, screenBounds, expedition, gb) {
-
-    const images = expedition.current360Images
-      .filter(image => {
-        const coords = image.geometry.coordinates
-        return coords[0] >= gb[0] && coords[0] < gb[2] && coords[1] >= gb[3] && coords[1] < gb[1]
-      })
-
-    for (var i = 0; i < particleGeometry.count; i++) {
-      const image = images[i]
-      if (image) {
-        const coords = this.mapToScreen([image.geometry.coordinates[0], image.geometry.coordinates[1]], screenBounds)
-        particleGeometry.position.array[i * 3 + 0] = coords[0]
-        particleGeometry.position.array[i * 3 + 1] = coords[1]
-        particleGeometry.position.array[i * 3 + 2] = 0
-        particleGeometry.color.array[i * 4 + 0] = 0.62
-        particleGeometry.color.array[i * 4 + 1] = 0.6
-        particleGeometry.color.array[i * 4 + 2] = 0.7
-        particleGeometry.color.array[i * 4 + 3] = 1
-      } else {
-        particleGeometry.position.array[i * 3 + 0] = 0
-        particleGeometry.position.array[i * 3 + 1] = 0
-        particleGeometry.position.array[i * 3 + 2] = 0
-        particleGeometry.color.array[i * 4 + 0] = 0
-        particleGeometry.color.array[i * 4 + 1] = 0
-        particleGeometry.color.array[i * 4 + 2] = 0
-        particleGeometry.color.array[i * 4 + 3] = 0
+  drawMembers (project) {
+    const { members } = this.state
+    // if (this.state.frameCount % 60 === 0) console.log(members)
+    if (!members || members.length === 0) return ''
+    const markers = Object.keys(members).map(memberID => {
+      var member = members[memberID]
+      const translate = (member) => {
+        var coords = project(member.coordinates)
+        var x = Math.round((coords[0] - 27 / 2) * 10) / 10
+        var y = Math.round((coords[1] - 34) * 10) / 10
+        return 'translate(' + x + ',' + y + ')'
       }
-    }
-
-    particleGeometry.position.needsUpdate = true
-    particleGeometry.color.needsUpdate = true
-    particleGeometry.data = images
-    return particleGeometry
-  }
-
-  @autobind
-  renderSightings (particleGeometry, screenBounds, expedition, gb) {
-    const sightings = expedition.currentSightings
-      .filter((sighting, i) => {
-        const { position } = sighting
-        return position.x >= gb[0] && position.x < gb[2] && position.y >= gb[3] && position.y < gb[1]
-      })
-
-    for (var i = 0; i < particleGeometry.count; i++) {
-      const sighting = sightings[i]
-      if (sighting) {
-        const { position, radius } = sighting
-        const coords = this.mapToScreen([position.x, position.y], screenBounds)
-        const color = new THREE.Color(sighting.color)
-        particleGeometry.position.array[i * 3 + 0] = coords[0]
-        particleGeometry.position.array[i * 3 + 1] = coords[1]
-        particleGeometry.position.array[i * 3 + 2] = radius * 2
-        particleGeometry.color.array[i * 4 + 0] = color.r
-        particleGeometry.color.array[i * 4 + 1] = color.g
-        particleGeometry.color.array[i * 4 + 2] = color.b
-        particleGeometry.color.array[i * 4 + 3] = 1
-      } else {
-        particleGeometry.position.array[i * 3 + 0] = 0
-        particleGeometry.position.array[i * 3 + 1] = 0
-        particleGeometry.position.array[i * 3 + 2] = 0
-        particleGeometry.color.array[i * 4 + 0] = 0
-        particleGeometry.color.array[i * 4 + 1] = 0
-        particleGeometry.color.array[i * 4 + 2] = 0
-        particleGeometry.color.array[i * 4 + 3] = 0
-      }
-    }
-
-    particleGeometry.position.needsUpdate = true
-    particleGeometry.color.needsUpdate = true
-    particleGeometry.data = sightings
-    return particleGeometry
-  }
-
-  @autobind
-  renderMembers (geometry, screenBounds, expedition, gb) {
-    if (!this.state.members) return geometry
-    const members = Object.keys(this.state.members).map(name => {
-      const member = this.state.members[name]
-      const position = this.mapToScreen(member.coordinates, screenBounds)
-      return {
-        name,
-        position
-      }
+      return (
+        <g transform={ translate(member) } key={memberID}>
+          <path fill="rgba(4,0,26,0.7)" d="M27,13.8C27,22.2,13.5,34,13.5,34S0,22.2,0,13.8C0,6.3,6,0.3,13.5,0.3S27,6.3,27,13.8z"/>
+          <text style={{textAnchor: 'middle'}} x={13.5} y={19} fill={'white'} >{memberID.slice(0, 1).toUpperCase()}</text>
+        </g>
+      )
     })
-    return members
+    return markers
   }
+
+  @autobind
+  drawAmbits (project) {
+    const { expedition } = this.props
+    const paths = expedition.currentAmbits.map((route, index) => {
+      const points = route.coordinates.map(project).map(
+        p => [p[0], p[1]]
+      )
+      return (
+        <g key={ index }>
+          <g style={ {pointerEvents: 'click', cursor: 'pointer'} }>
+            <g style={ {pointerEvents: 'visibleStroke'} }>
+              <path
+                style={{
+                  fill: 'none',
+                  stroke: route.color,
+                  strokeWidth: 2
+                }}
+                d={ `M${points.join('L')}`}
+              />
+            </g>
+          </g>
+        </g>
+      )
+    })
+    return paths
+  }
+
+  // @autobind
+  // onChangeViewport (newViewport) {
+  //   newViewport.width = window.innerWidth
+  //   newViewport.height = window.innerHeight
+  //   this.setState({
+  //     ...this.state,
+  //     viewport: newViewport
+  //   })
+  // }
 
   render () {
-    const { expedition, show360Picture, lightBoxActive } = this.props
-    const { viewport, currentDate } = this.state
+    const { expedition } = this.props
+    const { viewport } = this.state
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ'
-    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
+    const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9'
 
+      // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
+          // onChangeViewport={this.onChangeViewport}
     return (
-      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map' || location.pathname === '/') ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
@@ -410,13 +327,30 @@ class BackgroundMap extends React.Component {
         >
           {expedition
           ? <div>
+            <SVGOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              redraw={ this.redrawSVGOverlay }
+            />
             <WebGLOverlay
               {...viewport}
               startDragLngLat={[0, 0]}
-              redraw={this.redrawGLOverlay}
-              show360Picture={show360Picture}
-              currentDate={currentDate}
+              {...{ width, height, latitude, longitude, zoom, simulationTime }}
+              redraw={redrawWebGL(longitude, latitude, heading, zoom, simulationTime)}
             />
+            {/*
+            <DeckGLOverlay
+              {...viewport}
+              startDragLngLat={[0, 0]}
+              layers={[
+                new ScatterplotLayer({
+                  ...viewport,
+                  id: 'sightings',
+                  data: expedition.currentSightings
+                })
+              ]}
+            />
+            */}
           </div>
           : ''}
         </MapGL>
@@ -425,7 +359,7 @@ class BackgroundMap extends React.Component {
   }
 }
 
-BackgroundMap.propTypes = {
+Sighting.propTypes = {
   animate: PropTypes.bool.isRequired,
   expedition: PropTypes.object,
   updateMap: PropTypes.func.isRequired,
@@ -433,9 +367,7 @@ BackgroundMap.propTypes = {
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
   initialPage: PropTypes.string.isRequired,
-  contentActive: PropTypes.bool,
-  show360Picture: PropTypes.func.isRequired,
-  lightBoxActive: PropTypes.bool.isRequired
+  contentActive: PropTypes.bool
 }
 
-export default BackgroundMap
+export default Sighting

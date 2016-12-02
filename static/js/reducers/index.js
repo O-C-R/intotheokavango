@@ -12,13 +12,38 @@ const okavangoReducer = (
     expeditions: {},
     speciesColors: {},
     contentActive: !(location.pathname === '/' || location.pathname === '/map'),
-    initialPage: location.pathname
+    initialPage: location.pathname,
+    lightBoxActive: false,
+    lightBoxID: ''
   },
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
 
   switch (action.type) {
+    case actions.CLOSE_LIGHTBOX:
+      return {
+        ...state,
+        lightBoxActive: false,
+        lightBoxID: ''
+      }
+    case actions.SHOW_360_PICTURE:
+      return {
+        ...state,
+        lightBoxActive: true,
+        lightBoxPost: action.post
+      }
+    case actions.HIDE_360_PICTURE:
+      return {
+        ...state,
+        lightBoxActive: false,
+        lightBoxID: ''
+      }
+    case actions.SET_PAGE:
+      return {
+        ...state,
+        lightBoxActive: false
+      }
     case actions.ENABLE_CONTENT:
       return {
         ...state,
@@ -45,7 +70,7 @@ const okavangoReducer = (
         var id = f.id
         var flag = true
         if (!f.geometry) flag = false
-        if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
+        if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
         if (flag) {
           features[id] = featureReducer(expedition.features[id], action, f)
         }
@@ -145,7 +170,8 @@ const okavangoReducer = (
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
-          latestExpedition = id
+          // latestExpedition = id
+          latestExpedition = 'okavango_16'
         }
       })
 
@@ -325,25 +351,23 @@ const okavangoReducer = (
         featuresByTile[t] = {}
       })
 
-      const rgbToString = (rgb) => {
-        return rgb.slice(4).slice(0, -1).split(',').map(c => parseInt(c))
-      }
-
       features = {}
       action.data.forEach((f) => {
         var id = f.id
         if (f.properties.Team === 'RiverMain') {
           var flag = true
           if (f.properties.FeatureType === 'sighting') {
-            if (!f.properties.Taxonomy) f.properties.color = rgbToString('rgb(180,180,180)')
+            if (!f.properties.Taxonomy) f.properties.color = 0xb4b4b4
             else {
               var taxClass = f.properties.Taxonomy.Class
-              if (!state.speciesColors[taxClass]) state.speciesColors[taxClass] = rgbToString(randomColor({ luminosity: 'light', format: 'rgb' }))
+              if (!state.speciesColors[taxClass]) {
+                state.speciesColors[taxClass] = parseInt(randomColor({ luminosity: 'light', format: 'hex' }).slice(1), 16)
+              }
               f.properties.color = state.speciesColors[taxClass]
             }
           }
           if (f.properties.FeatureType === 'tweet' && f.properties.Text && f.properties.Text[0] === '@') flag = false
-          if (f.properties.FeatureType === 'image' && f.properties.Model.toLowerCase() === 'ricoh theta 360') flag = false
+          // if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
           if (flag) {
             features[id] = featureReducer(expedition.features[id], action, f)
           }
@@ -422,23 +446,36 @@ const expeditionReducer = (
     mainFocus: 'Explorers',
     secondaryFocus: 'Steve',
     coordinates: [0, 0],
+    current360Images: [],
+    currentGeoBounds: [0, 0],
     currentPosts: [],
     currentSightings: [],
     currentAmbits: [],
     totalSightings: [],
-    memberColors: [
-      'rgba(253, 191, 111, 1)',
-      'rgba(166, 206, 227, 1)',
-      'rgba(178, 223, 138, 1)',
-      'rgba(251, 154, 153, 1)',
-      'rgba(202, 178, 214, 1)',
-      'rgba(252, 234, 151, 1)',
-      'rgba(180, 240, 209, 1)',
-      'rgba(191, 191, 255, 1)',
-      'rgba(255, 171, 213, 1)'
-    ],
     members: {},
-    currentMembers: []
+    currentMembers: [],
+    memberColors: [
+      0xFDBF6F,
+      0xA6CEE3,
+      0xB2DF8A,
+      0xFB9A99,
+      0xCAB2D6,
+      0xFCEA97,
+      0xB4F0D1,
+      0xBFBFFF,
+      0xFFABD5
+    ]
+    // memberColors: [
+    //   'rgba(253, 191, 111, 1)',
+    //   'rgba(166, 206, 227, 1)',
+    //   'rgba(178, 223, 138, 1)',
+    //   'rgba(251, 154, 153, 1)',
+    //   'rgba(202, 178, 214, 1)',
+    //   'rgba(252, 234, 151, 1)',
+    //   'rgba(180, 240, 209, 1)',
+    //   'rgba(191, 191, 255, 1)',
+    //   'rgba(255, 171, 213, 1)'
+    // ],
   },
   action,
   data
@@ -548,12 +585,13 @@ const expeditionReducer = (
 
     case actions.UPDATE_MAP:
 
-      // initializing featuresByTile entries so they won't be queries multiple times
+      // initializing featuresByTile entries so they won't be queried multiple times
       action.tileRange.forEach(t => {
         if (!state.featuresByTile[t]) state.featuresByTile[t] = {}
       })
 
       var currentSightings = []
+      var current360Images = []
       var currentPosts = []
       var currentDays = []
       var currentAmbits = {}
@@ -586,11 +624,26 @@ const expeditionReducer = (
               },
               radius: f.properties.radius,
               color: f.properties.color,
-              type: f.properties.FeatureType
+              type: f.properties.FeatureType,
+              date: new Date(f.properties.DateTime),
+              name: f.properties.SpeciesName,
+              count: f.properties.Count
             }
           })
           currentSightings = currentSightings.concat(sightings)
         }
+
+        if (features.image) {
+          var images = features.image.filter(i => {
+            return i.properties.Make === 'RICOH'
+          })
+          current360Images = current360Images.concat(images)
+        }
+
+        current360Images.forEach((image, i) => {
+          image.properties.next = current360Images[i - 1]
+          image.properties.previous = current360Images[i + 1]
+        })
 
         var allPosts = []
         if (features.tweet) allPosts = allPosts.concat(features.tweet)
@@ -642,28 +695,30 @@ const expeditionReducer = (
           return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
         })
         .forEach(f => {
-          var memberID = f.properties.Member
-          if (!currentAmbits[memberID]) {
-            currentAmbits[memberID] = {
-              color: state.members[memberID].color,
+          var name = f.properties.Member
+          if (!currentAmbits[name]) {
+            currentAmbits[name] = {
+              color: state.members[name].color,
               coordinates: [],
               dates: []
             }
           }
-          if (!currentMembers[memberID]) currentMembers[memberID] = {}
-          currentAmbits[memberID].coordinates.push(f.geometry.coordinates)
-          currentAmbits[memberID].dates.push(f.properties.DateTime)
+          if (!currentMembers[name]) currentMembers[name] = {}
+          currentAmbits[name].coordinates.push(f.geometry.coordinates)
+          currentAmbits[name].dates.push(f.properties.DateTime)
         })
 
       currentAmbits = d3.values(currentAmbits)
 
       return Object.assign({}, state, {
-        currentSightings,
+        coordinates: action.coordinates,
         currentAmbits,
+        currentDate: action.currentDate,
+        currentGeoBounds: action.viewGeoBounds,
         currentMembers,
         currentPosts,
-        currentDate: action.currentDate,
-        coordinates: action.coordinates,
+        currentSightings,
+        current360Images,
         zoom: action.zoom
       })
 

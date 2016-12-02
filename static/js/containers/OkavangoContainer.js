@@ -12,7 +12,73 @@ const mapStateToProps = (state, ownProps) => {
     mapStateNeedsUpdate: state.mapStateNeedsUpdate,
     expeditionID: state.selectedExpedition,
     contentActive: state.contentActive,
-    initialPage: state.initialPage
+    initialPage: state.initialPage,
+    lightBoxActive: state.lightBoxActive,
+    lightBoxPost: state.lightBoxPost ? formatPost(state.lightBoxPost, state.selectedExpedition) : null
+  }
+}
+
+const formatPost = (p, expeditionID) => {
+  var key = p.id
+  var type = p.properties.FeatureType
+  var date = new Date(p.properties.DateTime)
+  var location = p.geometry.coordinates
+  var author = p.properties.Member
+  var title, content, images, link, dimensions, next, previous
+
+  if (type === 'tweet') {
+    if (expeditionID !== 'okavango_14') {
+      content = p.properties.Text
+      images = p.properties.Images.map(i => { return i.Url.replace('http://', 'https://') })
+      link = p.properties.Url.replace('http://', 'https://')
+    } else {
+      content = p.properties.Tweet.text
+    }
+  }
+
+  if (type === 'image') {
+    if (expeditionID !== 'okavango_14') {
+      content = p.properties.Notes
+      images = [p.properties.Url.replace('http://', 'https://')]
+      link = p.properties.InstagramID
+      dimensions = p.properties.Dimensions
+    } else {
+      content = p.properties.Notes
+      images = [p.properties.Url.replace('http://', 'https://')]
+      link = p.properties.InstagramID
+      dimensions = p.properties.Size
+    }
+    if (p.properties.Make === 'RICOH') {
+      type = '360Image'
+      next = p.properties.next
+      previous = p.properties.previous
+    }
+  }
+
+  if (type === 'blog') {
+    title = p.properties.Title
+    content = p.properties.Summary
+    link = p.properties.Url.replace('http://', 'https://')
+  }
+
+  if (type === 'audio') {
+    title = p.properties.Title
+    link = p.properties.SoundCloudURL.replace('http://', 'https://')
+  }
+
+  return {
+    key,
+    type,
+    title,
+    content,
+    images,
+    link,
+    date,
+    location,
+    author,
+    dimensions,
+    next,
+    previous
   }
 }
 
@@ -35,6 +101,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     enableContent: () => {
       return dispatch(actions.enableContent())
+    },
+    show360Picture: (post) => {
+      return dispatch(actions.show360Picture(post))
+    },
+    closeLightBox: () => {
+      return dispatch(actions.closeLightBox())
     }
   }
 }

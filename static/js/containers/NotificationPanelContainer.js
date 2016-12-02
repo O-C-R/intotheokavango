@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => {
   if (expedition) {
     return {
       posts: expedition.currentPosts,
-      currentDate: expedition.currentDate
+      currentDate: expedition.currentDate,
+      playback: expedition.playback
     }
   } else {
     return {}

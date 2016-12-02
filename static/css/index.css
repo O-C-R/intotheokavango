@@ -183,6 +183,7 @@ ul{
       background-color: rgba(4,0,26,0.72);
       pointer-events: none;
       opacity: 0;
+      transition: opacity 0.3s;
       z-index: 0;
     }
 
@@ -302,67 +303,51 @@ ul{
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(4,0,26,0.7);
         z-index:50;
       }
 
-        #lightBox div.contentWrapper{
-          position: relative;
-          margin: auto;
-          width: 60%;
-          margin-top: 100px;
-        }
-
-        #lightBox div.contentWrapper div.post{
-          display: flex;
-          flex-flow: row nowrap;
-        }
-
-          #lightBox div.contentWrapper div.post div.type{
-            flex: 1 0 auto;
-            flex-basis: 9.5%;
+          @keyframes interaction-helper-animation {
+            0%   {opacity: 0;}
+            5%   {opacity: 1;}
+            80%  {opacity: 1;}
+            100% {opacity: 0;}
           }
 
-            #lightBox div.contentWrapper div.post div.type img{
-              display: block;
-              margin: auto;
-              padding: 8px;
-              border: 1px solid white;
-              border-radius: 3px;
-            }
-
-            #lightBox div.contentWrapper div.post div.type div.meta{
-              margin: auto;
-              text-align: center;
-            }
-
-          #lightBox div.contentWrapper div.post div.content{
-            flex: 0 1 auto;
-            flex-basis: 74%;
+          #lightBox div.post div.interaction-helper{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            pointer-events: none;
+            font-family: "Gotham A", "Gotham B", arial;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            animation-name: interaction-helper-animation;
+            animation-duration: 2.5s;
+            opacity: 0;
           }
 
-            #lightBox div.contentWrapper div.post div.content img{
-              display: block;
-              width:100%;
+            #lightBox div.post div.interaction-helper.hidden{
+              opacity: 0;
             }
 
-          #lightBox div.contentWrapper div.post div.actions{
-            flex: 1 0 auto;
-            flex-basis: 9.5%;
-          }
-
-            #lightBox div.contentWrapper div.post div.actions div{
-              margin:auto;
+            #lightBox div.post div.interaction-helper div{
+              transform: translate(-50%, -90%);
             }
 
-              #lightBox div.contentWrapper div.post div.actions div img{
+              #lightBox div.post div.interaction-helper div img{
                 display: block;
+                width: auto;
                 margin: auto;
-                padding: 8px;
-                border: 1px solid white;
-                border-radius: 3px;
-                margin-bottom: 15px;
               }
+
+          #lightBox div.post div.content canvas{
+            cursor: move;
+            cursor: grab;
+            cursor: -moz-grab;
+            cursor: -webkit-grab;
+          }
 
       #timeline{
         position:absolute;
@@ -380,6 +365,10 @@ ul{
         width:100%;
         height:100%;
         position:relative;
+      }
+
+      #pageContainer.disabled{
+        pointer-events: none;
       }
 
 
@@ -400,6 +389,7 @@ ul{
         .controlPanel{
           position:absolute;
           overflow-x:visible; 
+          pointer-events: auto;
         }
 
           .controlPanel .controlSelector{
@@ -511,22 +501,32 @@ ul{
             margin-bottom: 50px;
           }
 
-            #feed div.post div.type{
-              order: 0;
+            #feed div.post div.type, #feed div.post div.button{
               flex-basis: 10%;
+              margin-bottom: 15px;
             }
 
-              #feed div.post div.type img{
+              #feed div.post div.type img, #feed div.post div.button img{
                 display: block;
                 margin: auto;
                 padding: 8px;
                 border: 1px solid white;
                 border-radius: 3px;
+                pointer-events: none;
               }
 
+              #feed div.post div.button{
+                cursor: pointer;
+                pointer-events: auto;
+              }
+
+                  #feed div.post div.button:hover img{
+                    background-color: white;
+                  }
+
             #feed div.post div.content{
-              order: 1;
               flex-basis: 85%;
+              pointer-events: auto;
             }
 
               #feed div.post div.content img{
@@ -569,56 +569,93 @@ ul{
                 }
 
 
-        #notificationPanel{
-          position:absolute;
-          top:100px;
-          right:5%;
-          width:28.5%;
-          overflow: hidden;
+        #lightBox #feed{
+          width: 100%;
+          padding: 0;
+          margin-left: 0;
         }
 
-          .notification{
-            background-color:rgba(4,0,26,0.7);
-            border-radius: 3px;
-            margin-bottom:15px;
+          #lightBox #feed div.post{
+            margin-bottom: 0;
           }
 
-            .notification .content{
-              display: inline-block;
-              width: 80%;
-              vertical-align: top;
+            #lightBox #feed div.post div.type, #lightBox #feed div.post div.actions{
+              flex-basis: 6%;
             }
 
-              .notification .content p{
-                padding:15px;
-                margin:0;
-              }
-
-              .notification .content div.title{
-                padding:15px;
-                margin:0;
-              }
-
-              .notification .content img{
-                width:100%;
-                height:auto;
-                display: block;
-              }
-
-            .notification .type{
-              display: inline-block;
-              width: 20%;
-              text-align: center;
+            #lightBox #feed div.post div.content{
+              margin-bottom: 25px;
+              pointer-events: auto;
             }
 
-              .notification .type img{
+        #notificationPanel{
+          position:absolute;
+          top:10px;
+          right:0;
+          width:30%;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+          #notificationPanel div.scrollableContainer {
+            position: absolute;
+            transition: top 0.3s;
+          }
+
+            .notification{
+              background-color:rgba(4,0,26,0.7);
+              border-radius: 3px;
+              margin-bottom:15px;
+              pointer-events: auto;
+              border-bottom-left-radius: 3px; 
+              border-top-left-radius: 3px; 
+              font-size: 13px;
+              line-height: 25px;
+              transition: opacity 0.15s;
+            }
+
+              .notification.inactive{
+                opacity: 0;
+              }
+
+              .notification .content{
                 display: inline-block;
-                vertical-align: middle;
-                margin:15px 0;
-                border:1px solid white;
-                border-radius: 3px;
-                padding:8px;
+                width: 80%;
+                vertical-align: top;
               }
+
+                .notification .content p{
+                  padding:15px;
+                  margin:0;
+                }
+
+                .notification .content div.title{
+                  padding:15px;
+                  margin:0;
+                }
+
+                .notification .content img{
+                  width:100%;
+                  height:auto;
+                  display: block;
+                  border-bottom-left-radius: 3px; 
+                  border-top-left-radius: 3px; 
+                }
+
+              .notification .type{
+                display: inline-block;
+                width: 20%;
+                text-align: center;
+              }
+
+                .notification .type img{
+                  display: inline-block;
+                  vertical-align: middle;
+                  margin:15px 0;
+                  border:1px solid white;
+                  border-radius: 3px;
+                  padding:8px;
+                }
 
       #dataPage{}
 
@@ -771,7 +808,6 @@ ul{
       width:100%;
       height:100%;
       background-color:black;
-      z-index:0 !important;
     }
 
       #mapbox div.mapboxgl-canvas-container{
@@ -779,8 +815,83 @@ ul{
       }
 
       #mapbox div.overlays{
-        pointer-events: none;
+        /*pointer-events: none;*/
       }
+
+        #mapbox div.overlays #html-renderer div.member-marker{
+          position: absolute;
+          font-family: "Gotham A", "Gotham B", arial;
+          font-style: normal;
+          font-weight: 700;
+          font-size: 14px;
+        }
+
+          #mapbox div.overlays #html-renderer div.member-marker span{
+            text-align: center;
+            width: 100%;
+            left: 0;
+            top: -2px;
+            position: absolute;
+          }
+
+        #mapbox div.overlays #html-renderer div.sighting-label{
+          position: absolute;
+          width: auto;
+          height: 16px;
+        }
+
+          #mapbox div.overlays #html-renderer div.sighting-label div.arrow-box{
+            position: relative;
+            background: rgba(4,0,26,0.7);
+            border: 4px solid #transparent;
+            padding: 0 8px;
+            transform: translate(16px, -50%);
+            color: white;
+            font-family: "Gotham A", "Gotham B", arial;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            line-height: 16px;
+            height: 16px;
+          }
+
+            .arrow-box:after, .arrow-box:before {
+              right: 100%;
+              top: 50%;
+              border: solid transparent;
+              content: " ";
+              height: 0;
+              width: 0;
+              position: absolute;
+              pointer-events: none;
+            }
+
+            .arrow-box:after {
+              border-color: rgba(4,0,26,0);
+              border-right-color: rgba(4,0,26,0.7);
+              border-width: 8px;
+              margin-top: -8px;
+            }
+            .arrow-box:before {
+              border-color: rgba(4,0,26,0);
+              border-right-color: #transparent;
+              border-width: 22px;
+              margin-top: -22px;
+            }
+
+
+        #mapbox div.hitbox{
+          position:absolute;
+          z-index: 100;
+          pointer-events: auto;
+          width: 100%;
+          height: 90%;
+        }
+
+          #mapbox div.hitbox.hover{
+            cursor: pointer;
+          }
 
       #mapbox div.mapboxgl-control-container{
         width: 100%;
@@ -877,7 +988,7 @@ ul{
 
 .notif-leave.notif-leave-active {
   opacity: 0.01;
-  transition: opacity 150ms ease-in;
+  transition: opacity 300ms ease-in;
 }
 
 @media (max-width: 768px) {
@@ -969,16 +1080,20 @@ ul{
       z-index: 100;
     }
 
-      #notificationPanel div.notification{
-        margin-bottom: 0;
+      #notificationPanel div.scrollableContainer {
+        position: relative;
       }
 
-        #notificationPanel div.notification div.content p{
-          position: absolute;
-          bottom: 0;
-          width: 76%;
-          padding: 2%;
+        #notificationPanel div.notification{
+          margin-bottom: 0;
         }
+
+          #notificationPanel div.notification div.content p{
+            position: absolute;
+            bottom: 0;
+            width: 76%;
+            padding: 2%;
+          }
 
   #IntroductionBox {
     bottom: initial;

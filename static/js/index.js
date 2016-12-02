@@ -1,17 +1,17 @@
 
 /*
 
+  move 360 videos to side
+
   GENERAL
     expedition year selection
     deep linking
     Fix intro
     animate timeline cursor and direction
   MAP
-    popup cycle
+    separate normal map interaction vs introduction
     round sightings location
-    sighting labels
     rollover member markers
-    webGL paths
     map interactions
   JOURNAL
     bind timeline
@@ -19,9 +19,14 @@
     grid visualization
   API
     Data explorer
+  MISC
+    Upgrade react-three-renderer to NPM version
+  CODE
+    switch state and props to immutable.js
+    properly set key props
+    swith to sylus
 
 */
-
 
 import 'babel-polyfill'
 
@@ -30,7 +35,7 @@ import ReactDOM from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
-// import createLogger from 'redux-logger'
+
 import { fetchExpeditions } from './actions'
 import okavangoApp from './reducers'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
@@ -38,7 +43,6 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 import OkavangoContainer from './containers/OkavangoContainer'
 import MapPage from './components/MapPage'
 import JournalPageContainer from './containers/JournalPageContainer'
-// import JournalPage from './components/JournalPage'
 import DataPage from './components/DataPage'
 import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
@@ -58,7 +62,7 @@ document.getElementById('root').remove()
 let store = createStore(
   okavangoApp,
   applyMiddleware(
-    thunkMiddleware,  )
+    thunkMiddleware)
 )
 
 const routes = (
