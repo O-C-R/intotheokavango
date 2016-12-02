@@ -170,7 +170,8 @@ const okavangoReducer = (
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
-          latestExpedition = id
+          // latestExpedition = id
+          latestExpedition = 'okavango_16'
         }
       })
 

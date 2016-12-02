@@ -157,8 +157,8 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
-      // if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
+      // if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
+      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
       newState = {
         ...newState,
