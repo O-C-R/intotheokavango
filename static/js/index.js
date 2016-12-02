@@ -47,6 +47,16 @@ import DataPage from './components/DataPage'
 import AboutPage from './components/AboutPage'
 import SharePage from './components/SharePage'
 
+// const loggerMiddleware = createLogger()
+
+// This hack allows saving 20% weight on tiles for browsers other than Chrome
+(function (open) {
+  XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
+    url = url.replace(/(\.png\?access)|(\.jpg\?access)|(\.jpeg\?access)/, '.jpg70?access')
+    open.call(this, method, url, async, user, pass)
+  }
+})(XMLHttpRequest.prototype.open)
+
 document.getElementById('root').remove()
 
 let store = createStore(
