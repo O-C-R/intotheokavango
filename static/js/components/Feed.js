@@ -19,6 +19,8 @@ class Feed extends React.Component {
         return b.date - a.date
       })
       .map(post => {
+        if (post.type === '360Image') return null
+
         return (
           <Post format={format} data={post} key={post.key}>
             {post.content}

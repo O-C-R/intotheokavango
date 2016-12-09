@@ -70,6 +70,7 @@ const okavangoReducer = (
         var id = f.id
         var flag = true
         if (!f.geometry) flag = false
+        console.log(f.properties)
         if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
         if (flag) {
           features[id] = featureReducer(expedition.features[id], action, f)

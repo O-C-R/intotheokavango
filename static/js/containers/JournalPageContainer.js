@@ -30,7 +30,9 @@ const mapStateToProps = (state, ownProps) => {
       }
 
       if (type === 'image') {
-        if (expeditionID !== 'okavango_14') {
+        if (p.properties.Make === 'RICOH') {
+          type = '360Image'
+        } else if (expeditionID !== 'okavango_14') {
           content = p.properties.Notes
           images = [p.properties.Url.replace('http://', 'https://')]
           link = p.properties.InstagramID
