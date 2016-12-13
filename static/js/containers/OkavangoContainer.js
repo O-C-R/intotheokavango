@@ -2,6 +2,7 @@
 import { connect } from 'react-redux'
 import Okavango from '../components/Okavango'
 import * as actions from '../actions.js'
+import { parseDate } from '../utils'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -21,7 +22,7 @@ const mapStateToProps = (state, ownProps) => {
 const formatPost = (p, expeditionID) => {
   var key = p.id
   var type = p.properties.FeatureType
-  var date = new Date(p.properties.DateTime)
+  var date = parseDate(p.properties.DateTime)
   var location = p.geometry.coordinates
   var author = p.properties.Member
   var title, content, images, link, dimensions, next, previous

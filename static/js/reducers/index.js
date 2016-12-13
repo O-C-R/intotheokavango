@@ -2,6 +2,7 @@
 import * as actions from '../actions'
 import * as d3 from 'd3'
 import randomColor from 'randomcolor'
+import { parseDate } from '../utils'
 
 const okavangoReducer = (
   state = {
@@ -19,7 +20,6 @@ const okavangoReducer = (
   action
 ) => {
   var expeditions, features, id, expeditionID, expedition, days
-
   switch (action.type) {
     case actions.CLOSE_LIGHTBOX:
       return {
@@ -70,7 +70,7 @@ const okavangoReducer = (
         var id = f.id
         var flag = true
         if (!f.geometry) flag = false
-        console.log(f.properties)
+        // console.log(f.properties)
         if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
         if (flag) {
           features[id] = featureReducer(expedition.features[id], action, f)
@@ -79,7 +79,7 @@ const okavangoReducer = (
 
       Object.keys(features).forEach((id) => {
         var feature = features[id]
-        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
         if (!postsByDay[day]) postsByDay[day] = {}
         postsByDay[day][id] = feature
       })
@@ -244,7 +244,7 @@ const okavangoReducer = (
       Object.keys(features).forEach((id) => {
         var feature = features[id]
         // assign feature to day
-        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
         var type = feature.properties.FeatureType
         if (!featuresByDay[day]) featuresByDay[day] = {}
         if (!featuresByDay[day][type]) featuresByDay[day][type] = {}
@@ -259,7 +259,7 @@ const okavangoReducer = (
               color: expedition.memberColors[d3.values(members).length % expedition.memberColors.length]
             }
           }
-          var dayID = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+          var dayID = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
           if (!featuresByMember[memberID]) featuresByMember[memberID] = {}
           if (!featuresByMember[memberID][dayID]) featuresByMember[memberID][dayID] = {}
           featuresByMember[memberID][dayID][id] = feature
@@ -278,7 +278,7 @@ const okavangoReducer = (
           var timeRange = [new Date(), new Date(0)]
           var featureRange = []
           d3.values(bucket).forEach((f) => {
-            var dateTime = new Date(f.properties.DateTime)
+            var dateTime = parseDate(f.properties.DateTime)
             if (timeRange[0].getTime() > dateTime.getTime()) {
               timeRange[0] = dateTime
               featureRange[0] = f
@@ -537,10 +537,10 @@ const expeditionReducer = (
           var fillingDays = [days[+incompleteRange[0] - 1], days[+incompleteRange[1] + 1]]
           var fillingBeacons = [
             d3.values(fillingDays[0].beacons).slice(0).sort((a, b) => {
-              return new Date(b.properties.DateTime).getTime() - new Date(a.properties.DateTime).getTime()
+              return parseDate(b.properties.DateTime).getTime() - parseDate(a.properties.DateTime).getTime()
             })[0],
             d3.values(fillingDays[1].beacons).slice(0).sort((a, b) => {
-              return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+              return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
             })[0]
           ]
 
@@ -605,13 +605,13 @@ const expeditionReducer = (
         d3.values(state.featuresByTile[t]).forEach((f) => {
           if (!features[f.properties.FeatureType]) features[f.properties.FeatureType] = []
           features[f.properties.FeatureType].push(f)
-          var day = Math.floor((new Date(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+          var day = Math.floor((parseDate(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
           if (currentDays.indexOf(day) === -1) currentDays.push(day)
         })
 
         // this def could be written more elegantly...
         d3.values(state.ambitsByTile[t]).forEach((f) => {
-          var day = Math.floor((new Date(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
+          var day = Math.floor((parseDate(f.properties.DateTime).getTime() - state.start.getTime()) / (1000 * 3600 * 24))
           if (currentDays.indexOf(day) === -1) currentDays.push(day)
         })
 
@@ -626,7 +626,7 @@ const expeditionReducer = (
               radius: f.properties.radius,
               color: f.properties.color,
               type: f.properties.FeatureType,
-              date: new Date(f.properties.DateTime),
+              date: parseDate(f.properties.DateTime),
               name: f.properties.SpeciesName,
               count: f.properties.Count
             }
@@ -693,7 +693,7 @@ const expeditionReducer = (
 
       allAmbits
         .sort((a, b) => {
-          return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+          return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
         })
         .forEach(f => {
           var name = f.properties.Member
@@ -727,7 +727,8 @@ const expeditionReducer = (
       var dayCount = data.Days + 1
       // removing +1 here because we receive beacons before any other features on current day
       // var dayCount = data.Days
-      var start = new Date(new Date(data.StartDate).getTime() + 2 * (1000 * 3600))
+
+      var start = new Date(parseDate(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
       // currentDate is 2 days before last beacon
       var currentDate = new Date(end.getTime() - 2 * (1000 * 3600 * 24))
@@ -786,7 +787,7 @@ const dayReducer = (
 
       Object.keys(features.beacon).forEach((k) => {
         var f = features.beacon[k]
-        var d = new Date(f.properties.DateTime)
+        var d = parseDate(f.properties.DateTime)
         if (d.getTime() < start.getTime()) start = d
         if (d.getTime() > end.getTime()) end = d
       })

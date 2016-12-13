@@ -1,6 +1,7 @@
 
 import fetch from 'isomorphic-fetch'
 import * as d3 from 'd3'
+import { parseDate } from './utils'
 // import { animate } from './animation'
 
 function timestampToString (t) {
@@ -77,7 +78,7 @@ export function checkFeedContent () {
       }
       visibleElements.forEach(p => {
         var feature = expedition.features[p]
-        var day = Math.floor((new Date(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+        var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
         if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
       })
       for (var i = 0; i < visibleDays.length - 1; i++) {
@@ -224,6 +225,7 @@ export function jumpTo (date, expeditionID) {
 export const START = 'START'
 
 export function startAnimation () {
+  console.log('start animation')
   return {
     type: START
   }
@@ -363,7 +365,7 @@ export function fetchExpeditions () {
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(new Date('2016-08-30 09:30:00+00:00'), null, null, true)))
+      .then(() => dispatch(fetchDay(parseDate('2016-08-30 09:30:00+00:00'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {
@@ -448,7 +450,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
               // dispatch(updateTime(initialDate || date, false, expeditionID))
-              dispatch(updateTime(new Date('2016-08-30 09:30:00+00:00'), false, expeditionID))
+              dispatch(updateTime(parseDate('2016-08-30 09:30:00+00:00'), false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)

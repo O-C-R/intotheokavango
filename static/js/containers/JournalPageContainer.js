@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import JournalPage from '../components/JournalPage'
 import * as actions from '../actions.js'
 import * as d3 from 'd3'
+import { parseDate } from '../utils'
 
 const mapStateToProps = (state, ownProps) => {
   const expeditionID = state.selectedExpedition
@@ -14,7 +15,7 @@ const mapStateToProps = (state, ownProps) => {
     posts: d3.values(expedition.features).map(p => {
       var key = p.id
       var type = p.properties.FeatureType
-      var date = new Date(p.properties.DateTime)
+      var date = parseDate(p.properties.DateTime)
       var location = p.geometry.coordinates
       var author = p.properties.Member
       var title, content, images, link, dimensions

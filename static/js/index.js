@@ -87,8 +87,6 @@ var render = function () {
   )
 }
 
-console.log('hello world')
-
 store.subscribe(render)
 store.dispatch(fetchExpeditions())
 

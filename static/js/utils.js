@@ -1,4 +1,28 @@
 
+function validateDate (d) {
+  if (Object.prototype.toString.call(d) === '[object Date]') {
+    if (isNaN(d.getTime())) {
+      return false
+    } else {
+      return true
+    }
+  } else {
+    return false
+  }
+}
+
+export function parseDate (d) {
+  if (validateDate(d)) return d
+
+  var dd = new Date(d)
+  if (validateDate(dd)) return dd
+
+  dd = d.slice(0, -2).split(/[^0-9]/)
+  d = new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dd[3], dd[4], dd[5]) - (dd[6] * 3600000))
+  if (validateDate(d)) return d
+  else throw ('invalid date', d)
+}
+
 export function dateToString (d, short) {
   var month = d.getUTCMonth() + 1
   var day = d.getUTCDate()

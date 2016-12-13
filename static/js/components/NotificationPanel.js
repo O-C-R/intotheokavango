@@ -2,6 +2,7 @@
 import React, {PropTypes} from 'react'
 import ReactDOM from 'react-dom'
 import Notification from './Notification'
+import { parseDate } from '../utils'
 
 class NotificationPanel extends React.Component {
   constructor (props) {
@@ -29,12 +30,12 @@ class NotificationPanel extends React.Component {
         return post.type !== 'image' || post.properties.Make !== 'RICOH'
       })
       .sort((a, b) => {
-        return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+        return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
       })
 
     const currentNotifications = notifications
       .filter(post => {
-        const d = new Date(post.properties.DateTime)
+        const d = parseDate(post.properties.DateTime)
         return d.getTime() >= start && d.getTime() < end
       })
 
@@ -76,7 +77,7 @@ class NotificationPanel extends React.Component {
       if (forward) {
         for (let i = 0; i < notifications.length; i++) {
           const notification = notifications[i]
-          const d = new Date(notification.properties.DateTime)
+          const d = parseDate(notification.properties.DateTime)
           if (d.getTime() > currentDate.getTime()) {
             return this.setState({
               ...this.state,
@@ -87,7 +88,7 @@ class NotificationPanel extends React.Component {
       } else {
         for (let i = notifications.length - 1; i >= 0; i--) {
           const notification = notifications[i]
-          const d = new Date(notification.properties.DateTime)
+          const d = parseDate(notification.properties.DateTime)
           if (d.getTime() < currentDate.getTime()) {
             return this.setState({
               ...this.state,

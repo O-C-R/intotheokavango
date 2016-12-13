@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import autobind from 'autobind-decorator'
 import * as d3 from 'd3'
 import ViewportMercator from 'viewport-mercator-project'
-import { lerp } from '../utils'
+import { lerp, parseDate } from '../utils'
 import WebGLOverlay from './WebGLOverlay'
 import MapGL from 'react-map-gl'
 import THREE from '../react-three-renderer/node_modules/three'
@@ -63,7 +63,7 @@ class BackgroundMap extends React.Component {
       // look for most current beacon
       const day = expedition.days[currentDay]
       var beacons = d3.values(day.beacons).sort((a, b) => {
-        return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+        return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
       })
       var beaconCount = beacons.length
       var beaconIndex
@@ -71,8 +71,8 @@ class BackgroundMap extends React.Component {
       var ratioBetweenBeacons = 0
       if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
         for (var i = 0; i < beaconCount - 1; i++) {
-          b1 = new Date(beacons[i].properties.DateTime).getTime()
-          b2 = new Date(beacons[i + 1].properties.DateTime).getTime()
+          b1 = parseDate(beacons[i].properties.DateTime).getTime()
+          b2 = parseDate(beacons[i + 1].properties.DateTime).getTime()
           if (currentDate.getTime() >= b1 && currentDate.getTime() < b2) {
             beaconIndex = i
             timeToNextBeacon = b2 - currentDate.getTime()
@@ -83,8 +83,8 @@ class BackgroundMap extends React.Component {
         if (beaconIndex < 0) beaconIndex = beaconCount - 1
       } else {
         for (i = beaconCount - 1; i > 0; i--) {
-          b1 = new Date(beacons[i].properties.DateTime).getTime()
-          b2 = new Date(beacons[i - 1].properties.DateTime).getTime()
+          b1 = parseDate(beacons[i].properties.DateTime).getTime()
+          b2 = parseDate(beacons[i - 1].properties.DateTime).getTime()
           if (currentDate.getTime() <= b1 && currentDate.getTime() > b2) {
             beaconIndex = i
             timeToNextBeacon = currentDate.getTime() - b2
@@ -107,15 +107,15 @@ class BackgroundMap extends React.Component {
       Object.keys(members).forEach(memberID => {
         var member = members[memberID]
         var ambits = d3.values(expedition.featuresByMember[memberID][currentDay]).sort((a, b) => {
-          return new Date(a.properties.DateTime).getTime() - new Date(b.properties.DateTime).getTime()
+          return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
         })
         var ambitCount = ambits.length
         var ambitIndex = -1
         var ratioBetweenAmbits = 0
         if (expedition.playback === 'forward' || expedition.playback === 'fastForward' || expedition.playback === 'pause') {
           for (var i = 0; i < ambitCount - 1; i++) {
-            b1 = new Date(ambits[i].properties.DateTime).getTime()
-            b2 = new Date(ambits[i + 1].properties.DateTime).getTime()
+            b1 = parseDate(ambits[i].properties.DateTime).getTime()
+            b2 = parseDate(ambits[i + 1].properties.DateTime).getTime()
             if (currentDate.getTime() >= b1 && currentDate.getTime() < b2) {
               ambitIndex = i
               ratioBetweenAmbits = (currentDate.getTime() - b1) / (b2 - b1)
@@ -128,8 +128,8 @@ class BackgroundMap extends React.Component {
           }
         } else {
           for (i = ambitCount - 1; i > 0; i--) {
-            b1 = new Date(ambits[i].properties.DateTime).getTime()
-            b2 = new Date(ambits[i - 1].properties.DateTime).getTime()
+            b1 = parseDate(ambits[i].properties.DateTime).getTime()
+            b2 = parseDate(ambits[i - 1].properties.DateTime).getTime()
             if (currentDate.getTime() <= b1 && currentDate.getTime() > b2) {
               ambitIndex = i
               ratioBetweenAmbits = (currentDate.getTime() - b1) / (b2 - b1)
