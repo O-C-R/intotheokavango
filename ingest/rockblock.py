@@ -23,9 +23,7 @@ def parse(request):
         elif values[2] == 'LO':        
             labels = 't_utc','Station','MessageType','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
         else:
-            log.error("Message type not recognized")
-            log.debug(values)
-            return None, "Message type not recognized"
+            raise ValueError("Message type not recognized")
 
         feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
         for l, label in enumerate(labels):
