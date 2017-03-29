@@ -14,13 +14,13 @@ def parse(request):
 
     try:
         values = data.split(",")
-        if value[2] == 'ST':
+        if values[2] == 'ST':
             labels = 't_utc','Station','VBat','Charge','HasSd','HasGps','BatSleep','DeepSleep','TxFailures','TxSkipped','WeatherReceived','AtlasReceived','SonarReceived','DeadFor','AvgTxTime'
-        elif value[2] == 'WE':
+        elif values[2] == 'WE':
             labels = 't_utc','Station','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
-        elif value[2] == 'AT':
+        elif values[2] == 'AT':
             labels = 't_utc','Station','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
-        elif value[2] == 'LO':        
+        elif values[2] == 'LO':        
             labels = 't_utc','Station','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
         else:
             log.error("Message type not recognized")
