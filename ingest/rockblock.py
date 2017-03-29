@@ -15,19 +15,17 @@ def parse(request):
     try:
         values = data.split(",")
         if values[2] == 'ST':
-            labels = 't_utc','Station','VBat','Charge','HasSd','HasGps','BatSleep','DeepSleep','TxFailures','TxSkipped','WeatherReceived','AtlasReceived','SonarReceived','DeadFor','AvgTxTime'
+            labels = 't_utc','Station','MessageType','VBat','Charge','HasSd','HasGps','BatSleep','DeepSleep','TxFailures','TxSkipped','WeatherReceived','AtlasReceived','SonarReceived','DeadFor','AvgTxTime'
         elif values[2] == 'WE':
-            labels = 't_utc','Station','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
+            labels = 't_utc','Station','MessageType','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
         elif values[2] == 'AT':
-            labels = 't_utc','Station','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
+            labels = 't_utc','Station','MessageType','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
         elif values[2] == 'LO':        
-            labels = 't_utc','Station','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
+            labels = 't_utc','Station','MessageType','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
         else:
             log.error("Message type not recognized")
             log.debug(values)
             return None, "Message type not recognized"
-
-        del values[2]
 
         feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
         for l, label in enumerate(labels):
