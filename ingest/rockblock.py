@@ -36,7 +36,7 @@ def parse(request):
         log.warning(log.exc(e))
         log.info("Trying previous schema...")
         
-    try:
+    try:            
         label_sets = [  ['t_utc', 'Station', 'Temp', 'Humidity', 'Pressure', 'WindSpeed2m', 'WindDir2m', 'WindGust10m', 'WindGustDir1m', 'DailyRain'],
                         ['t_utc', 'Station', 'Temp', 'Humidity', 'Pressure', 'WindSpeed2m', 'WindDir2m', 'WindGust10m', 'WindGustDir1m', 'DailyRain', 'Battery'],
                         ['t_utc', 'Station', 'Latitude', 'Longitude', 'Altitude', 'Uptime'],
