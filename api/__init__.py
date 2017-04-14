@@ -137,6 +137,9 @@ class Api(server.Handler):
                 return self.error("Bad geometry")
             del self.request.arguments['region']
 
+        # filter results without geo
+        if geo:
+            search['geometry'] = {'$exists': True, '$ne': None}
 
         # special parsing for expeditionDay (overrides startDate / endDate)
         expedition_day = self.get_argument('expeditionDay', None)
@@ -200,7 +203,7 @@ class Api(server.Handler):
                 return self.csv(format_csv(result), "data.csv")
             results, total, returned = result
             if geo:
-                features = results['features']                
+                features = results['features']   
                 return self.json(features)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
