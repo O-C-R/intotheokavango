@@ -34,6 +34,7 @@ class Api(server.Handler):
         # add a header for unrestricted access
         self.set_header("Access-Control-Allow-Origin", "*")
         csv = False
+        geo = False
 
         # do the routing and load view module
         if not len(view_name):
@@ -51,6 +52,8 @@ class Api(server.Handler):
         if len(output):
             if output == "csv":
                 csv = True
+            elif output == "geo":
+                geo = True
             else:
                 feature_type = self.get_argument('FeatureType', None)
                 try:
@@ -196,7 +199,10 @@ class Api(server.Handler):
             if csv:
                 return self.csv(format_csv(result), "data.csv")
             results, total, returned = result
-            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+            if geo:
+                features = results['features']                
+                return self.json(features)
+            search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
         except Exception as e:
             return self.error(log.exc(e))
