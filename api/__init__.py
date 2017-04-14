@@ -202,14 +202,15 @@ class Api(server.Handler):
             if csv:
                 return self.csv(format_csv(result), "data.csv")
             results, total, returned = result
-            for feature in results['features']:
-                try:
-                    if feature['geometry']['coordinates'][2] is None:
-                        del feature['geometry']['coordinates'][2]
-                except Exception:
-                    pass
-            if geo:
-                return self.json(results['features'])
+            if 'features' in results:
+                for feature in results['features']:
+                    try:
+                        if feature['geometry']['coordinates'][2] is None:
+                            del feature['geometry']['coordinates'][2]
+                    except Exception:
+                        pass
+                if geo:
+                    return self.json(results['features'])
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
         except Exception as e:
