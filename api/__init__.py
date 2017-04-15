@@ -210,7 +210,7 @@ class Api(server.Handler):
                     except Exception:
                         pass
                 if geo:
-                    return self.json(results['features'])
+                    return self.json(results)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
         except Exception as e:
