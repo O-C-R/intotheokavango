@@ -19,7 +19,7 @@ def parse(request):
         elif values[2] == 'WE':
             labels = 't_utc','Station','MessageType','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
         elif values[2] == 'AT':
-            labels = 't_utc','Station','MessageType','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
+            labels = 't_utc','Station','MessageType','VBat','Charge','NOP','Orp','Do','Ph','EC1','EC2','EC3','EC4','WaterTemp'      # WaterTemp was lost
         elif values[2] == 'LO':        
             labels = 't_utc','Station','MessageType','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
         else:
