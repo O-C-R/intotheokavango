@@ -22,6 +22,8 @@ def parse(request):
             labels = 't_utc','Station','MessageType','VBat','Charge','NOP','Orp','Do','Ph','EC1','EC2','EC3','EC4','WaterTemp'      # WaterTemp was lost
         elif values[2] == 'LO':        
             labels = 't_utc','Station','MessageType','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
+        elif values[2] == 'SO':
+            labels = 't_utc','Station','MessageType','VBat','Charge','NOP','WaterLevelInM1','WaterLevelInM2','WaterLevelInM3','WaterLevelInM4','WaterLevelInM5'
         else:
             raise ValueError("Message type not recognized")
 
