@@ -11,7 +11,7 @@ results = db.features.aggregate([
         'properties.FeatureType': "sighting",
     }},
     { '$group': { 
-        '_id': { 'properties.t_utc': "$properties.t_utc", 'properties.Member': "$properties.Member"}, 
+        '_id': { 'properties.t_utc': "$properties.t_utc", 'properties.Member': "$properties.Member", 'properties.Expedition': "$properties.Expedition"}, 
         'uniqueIds': { '$addToSet': "$_id" },
         'count': { '$sum': 1 } 
     }}, 
@@ -21,8 +21,8 @@ results = db.features.aggregate([
 ], allowDiskUse=True)
 results = list(results)
 
-for result in results:
-    log.info(result)
+#for result in results:
+#    log.info(result)
 
 for result in results:
     feature_ids = result['uniqueIds']
