@@ -20,6 +20,10 @@ def parse(request):
 
         feature = {'FeatureType': "hydrology", 'Delivery': "devicemagic"}
         feature.update(data['inputs'])
+        for key, value in feature.items():
+            if type(value) == dict:
+                for k, v, in value.items():
+                    value[k] = strings.as_numeric(v)
         feature['Member'] = data['@dm:submitting_user'].split(' ')[0]
         dt = util.parse_date(data['@writeTime'])
         feature['t_utc'] = util.timestamp(dt)
