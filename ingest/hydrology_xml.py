@@ -19,14 +19,10 @@ def parse(request):
         log.debug(json.dumps(data, indent=4, default=lambda x: str(x)))
 
         feature = {'FeatureType': "hydrology", 'Delivery': "devicemagic"}
+        feature.update(data['inputs'])
         feature['Member'] = data['@dm:submitting_user'].split(' ')[0]
         dt = util.parse_date(data['@writeTime'])
-        data = data['inputs']
-
         feature['t_utc'] = util.timestamp(dt)
-
-        # purge blanks
-        feature = {key: value for (key, value) in feature.items() if type(value) != str or len(value.strip())}
 
     except Exception as e:
         log.error(log.exc(e))
