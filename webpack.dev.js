@@ -1,12 +1,30 @@
 var webpack = require('webpack')
 var path = require('path')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+function isExternal(module) {
+  var userRequest = module.userRequest;
+
+  if (typeof userRequest !== 'string') {
+    return false;
+  }
+
+  return userRequest.indexOf('bower_components') >= 0 ||
+         userRequest.indexOf('node_modules') >= 0 ||
+         userRequest.indexOf('libraries') >= 0;
+}
 
 module.exports = {
   cache: true,
   context: path.join(__dirname, ''),
   devtool: 'eval',
   entry: ['./static/js/index.js'],
+  resolve: {
+    alias: {
+      'webworkify': 'webworkify-webpack',
+      'sinon': 'sinon/pkg/sinon'
+    }
+  },
   module: {
     noParse: [
       /node_modules\/sinon\//
@@ -19,13 +37,18 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json-loader'
+      }, {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        include: path.resolve('node_modules/mapbox-gl-shaders/index.js'),
+        loader: 'transform/cacheable?brfs'
       },
       {
         test: /\.jsx?$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
         include: [
-          path.join(__dirname, 'static', 'js')
+            path.join(__dirname, 'static', 'js')
         ],
         query: {
           cacheDirectory: true,
@@ -40,6 +63,13 @@ module.exports = {
       {
         test: /\.(eot|svg|ttf|otf|woff|woff2)$/,
         loader: 'file?name=fonts/[name].[ext]'
+      }
+    ],
+    postLoaders: [
+      {
+        include: /node_modules\/mapbox-gl-shaders/,
+        loader: 'transform',
+        query: 'brfs'
       }
     ]
   },
@@ -63,18 +93,17 @@ module.exports = {
       context: path.join(__dirname),
       manifest: require('./dll/vendor-manifest.json')
     }),
+    // new webpack.optimize.CommonsChunkPlugin({
+    //   name: 'vendors',
+    //   minChunks: function(module) {
+    //     return isExternal(module);
+    //   }
+    // }),
     new HtmlWebpackPlugin({
       'title': 'INTO THE OKAVANGO',
       'filename': 'index.html',
       'template': 'templates/index.hbs',
       'hash': true
     })
-  ],
-  resolve: {
-    root: path.resolve(__dirname, 'src', 'js'),
-    modulesDirectories: ['node_modules'],
-    'gl-matrix': path.resolve('./node_modules/gl-matrix/dist/gl-matrix.js'),
-    'mapbox-gl/js/geo/transform': path.join(__dirname, '/node_modules/mapbox-gl/js/geo/transform'),
-    'mapbox-gl': path.join(__dirname, '/node_modules/mapbox-gl/dist/mapbox-gl.js')
-  }
+  ]
 }
