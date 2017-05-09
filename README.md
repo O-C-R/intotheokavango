@@ -142,13 +142,6 @@ ie, add an html document in the `templates/api` folder, like `map.html`, but not
 If they are bad, they won't crash the system
 
 
-#### Note about recent versions
-This code relies on pymongo>=3.0b, which has more concise collection queries  
-
-mongo 3.2.0 will support altitude in the geojson fields. We want this, but have to temporarily store altitude in the properties until this is released.
-
-
-
 
 #### Copyright/License
 

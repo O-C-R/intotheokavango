@@ -34,6 +34,7 @@ class Api(server.Handler):
         # add a header for unrestricted access
         self.set_header("Access-Control-Allow-Origin", "*")
         csv = False
+        geo = False
 
         # do the routing and load view module
         if not len(view_name):
@@ -51,6 +52,8 @@ class Api(server.Handler):
         if len(output):
             if output == "csv":
                 csv = True
+            elif output == "geo":
+                geo = True
             else:
                 feature_type = self.get_argument('FeatureType', None)
                 try:
@@ -134,6 +137,9 @@ class Api(server.Handler):
                 return self.error("Bad geometry")
             del self.request.arguments['region']
 
+        # filter results without geo
+        if geo:
+            search['geometry'] = {'$exists': True, '$ne': None}
 
         # special parsing for expeditionDay (overrides startDate / endDate)
         expedition_day = self.get_argument('expeditionDay', None)
@@ -196,7 +202,16 @@ class Api(server.Handler):
             if csv:
                 return self.csv(format_csv(result), "data.csv")
             results, total, returned = result
-            search = {key.replace('properties.', ''): value for (key, value) in search.items()}
+            if 'features' in results:
+                for feature in results['features']:
+                    try:
+                        if feature['geometry']['coordinates'][2] is None:
+                            del feature['geometry']['coordinates'][2]
+                    except Exception:
+                        pass
+                if geo:
+                    return self.json(results)
+            search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
         except Exception as e:
             return self.error(log.exc(e))

@@ -38,6 +38,12 @@ def parse(request):
             if modkey == "birdname":
                 data['SpeciesName'] = item
                 del data[key] 
+            elif modkey == "amphibian":
+                data['SpeciesName'] = item
+                del data[key]
+            elif modkey == "reptile":
+                data['SpeciesName'] = item
+                del data[key]
         if 'TeamMember' in data:
             data['Member'] = data['TeamMember']
             del data['TeamMember']          
