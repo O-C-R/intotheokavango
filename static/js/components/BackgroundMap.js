@@ -16,8 +16,8 @@ class BackgroundMap extends React.Component {
       animate: false,
       coordinates: [0, 0],
       viewport: {
-        latitude: -18.5699229,
-        longitude: 22.115456,
+        latitude: -12.7373785,
+        longitude: 15.8180427,
         zoom: 4,
         width: window.innerWidth,
         height: window.innerHeight,
@@ -258,7 +258,7 @@ class BackgroundMap extends React.Component {
           },
           paths: {
             ambitGeo: this.renderAmbitGeo(paths.ambitGeo, screenBounds, expedition, gb)
-          },
+          }
         }
       }
     }
@@ -279,7 +279,6 @@ class BackgroundMap extends React.Component {
     }
 
     return expedition.currentAmbits.map(route => {
-
       const vertices = route.coordinates
         .filter((p, i) => {
           if (route.coordinates[i - 1] && checkGeoBounds(route.coordinates[i - 1], gb)) return true
@@ -294,8 +293,8 @@ class BackgroundMap extends React.Component {
           return new THREE.Vector3(p[0], p[1], 0)
         })
 
-      var lastVertex = vertices[vertices.length - 1].clone()
-      for (let i = vertices.length; i < 200; i ++) {
+      var lastVertex = (vertices[vertices.length - 1] || new THREE.Vector3()).clone()
+      for (let i = vertices.length; i < 200; i++) {
         vertices[i] = lastVertex
       }
 

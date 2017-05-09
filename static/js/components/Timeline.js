@@ -31,7 +31,7 @@ class Timeline extends React.Component {
       const height = window.innerHeight - 72
       const width = window.innerWidth * 0.05
       const x = width * 0.58
-      var dayCount = expedition.dayCount + 1
+      var dayCount = expedition.dayCount
 
       var data = []
       for (var i = 0; i < dayCount; i++) {
