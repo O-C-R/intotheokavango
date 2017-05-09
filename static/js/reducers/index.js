@@ -166,9 +166,8 @@ const okavangoReducer = (
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
-      // console.log(action.data.results['okavango_16'])
       action.data.results['cubango_17'] = {
-        ...action.data.results['okavango_16'],
+        ...action.data.results['cubango_17'],
         StartDate: '2017-05-08T00:00:00+0200',
         Name: 'Cubango 17',
         Days: 1,
@@ -227,9 +226,8 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if (f.properties.Team === 'RiverMain') {
-          // if(f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'GB' || f.properties.Member === 'Jer' || f.properties.Member === 'Shah'){
-          // if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Chris' || f.properties.Member === 'Goetz'){
+        if ((f.properties.FeatureType === 'ambit_geo' && f.properties.Team === 'RiverMain') || (f.properties.FeatureType === 'beacon' && (f.properties.Satellite === 'WBT Primary' || f.properties.Satellite === 'WBT Secondary'))) {
+          if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'Water' || f.properties.Member === 'Kerllen' || f.properties.Member === 'Chris') {
             features[id] = featureReducer(expedition.features[id], action, f)
             if (f.properties.FeatureType === 'ambit_geo') {
               if (!members[f.properties.Member]) {
@@ -238,7 +236,7 @@ const okavangoReducer = (
                 }
               }
             }
-          // }
+          }
         }
       })
 
