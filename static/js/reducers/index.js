@@ -166,13 +166,21 @@ const okavangoReducer = (
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
+      console.log(action.data.results['okavango_16'])
+      action.data.results['cubango_17'] = {
+        ...action.data.results['okavango_16'],
+        StartDate: '2017-05-08T00:00:00+0200',
+        Name: 'Cubango 17',
+        Days: 1,
+        GeoBounds: [13, -8, 23.51488, -19.92886]
+      }
       Object.keys(action.data.results).forEach((id) => {
         var e = action.data.results[id]
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
           // latestExpedition = id
-          latestExpedition = 'okavango_16'
+          latestExpedition = 'cubango_17'
         }
       })
 
@@ -220,7 +228,8 @@ const okavangoReducer = (
       action.data.forEach((f) => {
         var id = f.id
         if (f.properties.Team === 'RiverMain') {
-          if(f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'GB' || f.properties.Member === 'Jer' || f.properties.Member === 'Shah'){
+          // if(f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'GB' || f.properties.Member === 'Jer' || f.properties.Member === 'Shah'){
+          // if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Chris' || f.properties.Member === 'Goetz'){
             features[id] = featureReducer(expedition.features[id], action, f)
             if (f.properties.FeatureType === 'ambit_geo') {
               if (!members[f.properties.Member]) {
@@ -229,7 +238,7 @@ const okavangoReducer = (
                 }
               }
             }
-          }
+          // }
         }
       })
 
@@ -445,7 +454,7 @@ const expeditionReducer = (
     postsByDay: {},
     featuresByMember: {},
     mainFocus: 'Explorers',
-    secondaryFocus: 'Steve',
+    secondaryFocus: 'Chris',
     coordinates: [0, 0],
     current360Images: [],
     currentGeoBounds: [0, 0],
