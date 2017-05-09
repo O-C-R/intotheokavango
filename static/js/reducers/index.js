@@ -166,7 +166,7 @@ const okavangoReducer = (
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
-      console.log(action.data.results['okavango_16'])
+      // console.log(action.data.results['okavango_16'])
       action.data.results['cubango_17'] = {
         ...action.data.results['okavango_16'],
         StartDate: '2017-05-08T00:00:00+0200',
