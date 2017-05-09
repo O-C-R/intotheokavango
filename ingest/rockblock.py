@@ -1,6 +1,7 @@
 import json, codecs, os
 from ingest import ingest_form_vars
 from housepy import config, log, util, strings
+from mongo import db, DESCENDING
 
 def parse(request):
     log.info("rockblock.parse")
@@ -30,6 +31,14 @@ def parse(request):
         feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
         for l, label in enumerate(labels):
             feature[label] = strings.as_numeric(values[l])
+
+        try:
+            if 'Latitude' not in feature and 'Station' in feature:
+                result = db.features.find({'properties.Station': feature['Station'], 'geometry.coordinates': {'$ne': None}}).sort([('properties.t_utc', DESCENDING)]).limit(1)[0]
+                feature['Latitude'], feature['Longitude'] = result['geometry']['coordinates'][1], result['geometry']['coordinates'][0]
+        except Exception as e:
+            log.warning(log.exc(e))
+
         log.debug(feature)
 
         return feature
@@ -59,6 +68,14 @@ def parse(request):
             if label == '0':
                 continue
             feature[label] = strings.as_numeric(values[l])
+
+        try:
+            if 'Latitude' not in feature and 'Station' in feature:
+                result = db.features.find({'properties.Station': feature['Station'], 'geometry.coordinates': {'$ne': None}}).sort([('properties.t_utc', DESCENDING)]).limit(1)[0]
+                feature['Latitude'], feature['Longitude'] = result['geometry']['coordinates'][1], result['geometry']['coordinates'][0]
+        except Exception as e:
+            log.warning(log.exc(e))
+            
         log.debug(feature)
         return feature
     except Exception as e:
