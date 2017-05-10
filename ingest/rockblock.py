@@ -31,6 +31,8 @@ def parse(request):
         feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
         for l, label in enumerate(labels):
             feature[label] = strings.as_numeric(values[l])
+            if feature[label] == "NaN":
+                feature[label] = None
 
         try:
             if 'Latitude' not in feature and 'Station' in feature:
@@ -68,6 +70,8 @@ def parse(request):
             if label == '0':
                 continue
             feature[label] = strings.as_numeric(values[l])
+            if feature[label] == "NaN":
+                feature[label] = None
 
         try:
             if 'Latitude' not in feature and 'Station' in feature:
