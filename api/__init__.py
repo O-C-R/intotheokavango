@@ -209,6 +209,9 @@ class Api(server.Handler):
                             del feature['geometry']['coordinates'][2]
                     except Exception:
                         pass
+                    for field in feature['properties']:
+                        if feature['properties'][field].lower() == "nan":
+                            feature['properties'][field] = None
                 if geo:
                     return self.json(results)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
