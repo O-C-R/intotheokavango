@@ -210,7 +210,7 @@ class Api(server.Handler):
                     except Exception:
                         pass
                     for field in feature['properties']:
-                        if type(feature['properties'][label]) is float and math.isnan(feature['properties'][label]):
+                        if type(feature['properties'][field]) is float and math.isnan(feature['properties'][field]):
                             feature['properties'][field] = None
                 if geo:
                     return self.json(results)
