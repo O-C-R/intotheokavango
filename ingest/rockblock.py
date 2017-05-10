@@ -1,4 +1,4 @@
-import json, codecs, os
+import json, codecs, os, math
 from ingest import ingest_form_vars
 from housepy import config, log, util, strings
 from mongo import db, DESCENDING
@@ -31,7 +31,7 @@ def parse(request):
         feature = {'FeatureType': "sensor", 'Delivery': "rockblock"}
         for l, label in enumerate(labels):
             feature[label] = strings.as_numeric(values[l])
-            if feature[label] == "NaN":
+            if type(feature[label]) is float and math.isnan(feature[label]):
                 feature[label] = None
 
         try:
@@ -70,9 +70,8 @@ def parse(request):
             if label == '0':
                 continue
             feature[label] = strings.as_numeric(values[l])
-            if feature[label] == "NaN":
+            if type(feature[label]) is float and math.isnan(feature[label]):
                 feature[label] = None
-
         try:
             if 'Latitude' not in feature and 'Station' in feature:
                 result = db.features.find({'properties.Station': feature['Station'], 'geometry.coordinates': {'$ne': None}}).sort([('properties.t_utc', DESCENDING)]).limit(1)[0]

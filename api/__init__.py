@@ -1,4 +1,4 @@
-import geojson, datetime, pytz, json, os, importlib, datetime
+import geojson, datetime, pytz, json, os, importlib, datetime, math
 from housepy import server, config, log, util, strings
 from mongo import ASCENDING, DESCENDING, ObjectId
 
@@ -210,7 +210,7 @@ class Api(server.Handler):
                     except Exception:
                         pass
                     for field in feature['properties']:
-                        if feature['properties'][field] == "NaN":
+                        if type(feature['properties'][label]) is float and math.isnan(feature['properties'][label]):
                             feature['properties'][field] = None
                 if geo:
                     return self.json(results)
