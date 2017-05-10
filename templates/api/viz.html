@@ -5,21 +5,252 @@
     <script type="text/javascript" src="/static/js/d3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> 
     <script src="/static/js/viz.js"></script>
+
+{% endblock head %}
+
+{% block body %}
+    {{ search }}
+    <div id="dataPage">
+        <!-- <div id="api"> -->
+            <!-- <div id="totalsViz"></div> -->
+            <!-- <div id="timelineViz"></div> -->
+        <div id="leftContainer">
+            <div id="leftMenu">
+                <select id="leftDropdown">
+                    <option value="CT">Cuito Source Lake</option>
+                    <option value="BU">BU</option>
+                    <option value="DE">DE</option>
+                    <option value="JD">JD</option>
+                    <option value="MN">MN</option>
+                    <option value="CV">Cuanavale Source Lake</option>
+                    <option value="KM">Kembo Source Lake</option>
+                    <option value="HL">Menongue Base</option>
+                    <option value="CL">Cuando Source Lake</option>
+                    <option value="LB">Lunge-Bungo River Source</option>
+                    <option value="CB">Cubango River source</option>
+                    <option vaule="NG">Ngepi Camp</option>
+                    <option value="SH">Shakawe River Lodge</option>
+                </select>
+            </div>
+            <div id="timelineVizLeft"></div>
+        </div>
+        <div id="rightContainer">
+            <div id="rightMenu">
+                <select id="rightDropdown">
+                    <option value="">None Selected</option>
+                    <option value="CT">Cuito Source Lake</option>
+                    <option value="BU">BU</option>
+                    <option value="DE">DE</option>
+                    <option value="JD">JD</option>
+                    <option value="MN">MN</option>
+                    <option value="CV">Cuanavale Source Lake</option>
+                    <option value="KM">Kembo Source Lake</option>
+                    <option value="HL">Menongue Base</option>
+                    <option value="CL">Cuando Source Lake</option>
+                    <option value="LB">Lunge-Bungo River Source</option>
+                    <option value="CB">Cubango River source</option>
+                    <option vaule="NG">Ngepi Camp</option>
+                    <option value="SH">Shakawe River Lodge</option>
+                </select>
+            </div>
+            <div id="timelineVizRight"></div>
+        </div>
+    </div>
     <script type="text/javascript">
         // var totalsVizDiv = $("#totalsViz");
         // var timelineVizDiv = $("#timelineViz");
-        var d3Page = d3Graph("#totalsViz", "#timelineViz");
+        var d3Page = d3Graph("#timelineVizLeft", "#timelineVizRight", "#totalsViz");
         
         path_to_data = "{{ query }}";
         feature_type = "{{ feature_type }}";
-        // totalsVizDiv.hide();
-        // timelineVizDiv.hide();
 
-        
-        console.log(feature_type);
-        //"http://dev.intotheokavango.org" +path_to_data
-        d3Page.loadData(path_to_data, feature_type);
-        
+        console.log("window", window.location.href);
+        console.log(window.location.origin);
+        console.log(window.location.pathname);
+        console.log(window.location.search);
+
+        var origin = window.location.origin;
+        var pathname = window.location.pathname;
+        var search = window.location.search;
+
+        var dataUrl;
+
+        dataUrl = search;
+
+        console.log("FEATURE", feature_type);
+
+        //populate selected dropdowns on load - no selection on right if no station2 param
+        var searchArray = search.split('&');
+
+        function reloadPage(url) {
+            window.location = url;
+        }
+
+        function generateNewWindowUrl(query) {
+            var newUrl = origin + pathname + query;
+            return newUrl;
+        }
+
+        function generateNewDataUrl(query) {
+            //take out viz from path
+            var newUrl = origin + '/api/features' + query;
+            return newUrl;
+        }
+
+        function generateNewQuery(value, isRightDropDown) {
+            console.log("newValue", value, "isRight", isRightDropDown);
+            var newUrl = '';
+            if (isRightDropDown) {
+                //None Selected Case
+                if (value === '') {
+                    var searchSplit = search.split('&station2');
+                    newUrl = searchSplit[0];
+                    //console.log('none selected', newUrl);
+                } else {
+                    if (search.includes('station2=' + value)) {
+                        //do nothing - keep same url
+                        //search includes same station2 code
+                        newUrl = search;
+                        //console.log('same selection', newUrl);
+                    } else if (search.includes('station2=')) {
+                        //search includes station2 but different code
+                        searchArray.forEach(function(entry, index) {
+                            if (entry.includes('station2=')) {
+                                entry = 'station2=' + value;
+                            }
+                            if (index < 1) {
+                                newUrl += entry;
+                            } else {
+                                newUrl += '&' + entry;
+                            }
+                        });
+                        //console.log('new selection', newUrl);
+                    } else {
+                        //search doesn't include station2
+                        newUrl = search + '&station2=' + value;
+                        //console.log('add selection', newUrl);
+                    }
+                }
+            } else { //left dropdown
+                if (search.includes('station=' + value)) {
+                    //do nothing - keep same url
+                    //search includes same station2 code
+                    newUrl = search;
+                } else if (search.includes('station=')) {
+                    //search includes station2 but different code
+                    searchArray.forEach(function(entry, index) {
+                        if (entry.includes('station=')) {
+                            entry = 'station=' + value;
+                        }
+                        if (index < 1) {
+                            newUrl += entry;
+                        } else {
+                            newUrl += '&' + entry;
+                        }
+                    });
+                }
+            }
+            return newUrl;
+        }
+
+        function update(station, isRightDropDown) {
+            var newQuery = generateNewQuery(station, isRightDropDown);
+            console.log(newQuery);
+            var newUrl = generateNewWindowUrl(newQuery);
+            console.log(newUrl);
+            reloadPage(newUrl);
+        }
+
+        d3.select("#leftDropdown").on("change", function() {
+            var newStation = d3.select(this).property("value");
+            update(newStation, false);
+        });
+
+        d3.select("#rightDropdown").on("change", function() {
+            var newStation2 = d3.select(this).property("value");
+            update(newStation2, true);
+        });
+
+        //update dropdown based on URL
+        searchArray.forEach(function(entry, index) {
+            //console.log(entry, index);
+            if (entry.includes('station=')) {
+                var entryArray = entry.split('=');
+                console.log(entryArray);
+                stationCode = entryArray[1];
+                d3.select("#leftDropdown").property("value", stationCode);
+            }
+            if (entry.includes('station2=')) {
+                var entryArray = entry.split('=');
+                console.log(entryArray);
+                station2Code = entryArray[1];
+                d3.select("#rightDropdown").property("value", station2Code);
+            } else {
+                console.log(entry);
+                d3.select("#rightDropdown").property("value", "");
+            }
+        });
+
+        console.log(dataUrl);
+
+        var https = 'https://intotheokavango.org';
+        var path = '/api/features';
+        var url = https + path + dataUrl;
+        console.log(url);
+
+        if (feature_type === 'sensor') {
+            var station1 = '';
+            var station2 = '';
+
+            if (dataUrl.includes('station2=')) {
+                //make two station urls
+                var split = dataUrl.split('&');
+                console.log(split);
+                var baseQuery = '';
+                split.forEach(function(entry, index) {
+                    //console.log(index, entry);
+                    if (entry.includes('station')) {
+                        if (entry.includes('station=')) {
+                            station1 = baseQuery + '&' + entry;
+                        } else if (entry.includes('station2=')) {
+                            var stationCode = entry.split('station2=');
+                            station2 = baseQuery + '&' + 'station=' + stationCode[1];
+                        }
+                    } else {
+                        //make base url
+                        if (index < 1) {
+                            baseQuery += entry;
+                        } else if (index >=1 && !station1 === ''){
+                            station1 += '&' + entry;
+                        } else if (index >= 1 && !station2 === ''){
+                            station2 += '&' + entry;
+                        } else {
+                            baseQuery += '&' + entry;
+                        }
+                    }
+                });
+            } else {
+                //don't make two urls - use the dataUrl?
+                station1 = dataUrl;
+            }
+            station1Url = https + path + station1;
+            station2Url = https + path + station2;
+            console.log(station1Url);
+            console.log(station2Url);
+
+            if (station2 === '') {
+                //only fetch station1 data, only left
+                d3Page.loadData(station1Url, feature_type, false);
+  
+            } else {
+                //load left and right
+                d3Page.loadData(station1Url, feature_type, false);
+                d3Page.loadData(station2Url, feature_type, true);
+            }
+        }
+
+        //d3Page.loadData(dataUrl, feature_type, isRightSide);
+
          // path_to_data = "/api/features?FeatureType=sighting&BirdName=Hippo";
          // feature_type = "sighting";
 
@@ -27,16 +258,4 @@
         // feature_type = "None";
     
     </script>
-    
-
-{% endblock head %}
-
-{% block body %}
-    {{ search }}
-        <div id="dataPage">
-        <div id="api">
-            <!-- <div id="totalsViz"></div> -->
-            <div id="timelineViz"></div>
-        </div>
-    </div>
 {% endblock body %}

@@ -1,14 +1,15 @@
-   body {
+  html, body {
   line-height: 1;
   width:100%;
   margin: 0px;
+  background-color: #0b042d;
 }
 
     #dataPage{
       width:100%;
       height: auto;
       min-height:800px;
-      background-color: rgba(4, 0, 26, 0.95);
+      background-color: #0b042d;
     }
     #dataPage h1{
       font-family: 'Montserrat';
@@ -18,8 +19,6 @@
       letter-spacing: 0.1em;
       color: white;
     }
-
-
 
     .api-query-control h2 {
       font-family: 'Montserrat';
@@ -44,7 +43,7 @@
     #totalsViz {
         width: 800px;
         height: 200px;
-        background-color: rgba(4, 0, 26, 0.62);
+        background-color: #0b042d;
         padding: 9.5px;
         margin-top:8px;
         margin-bottom:20px;
@@ -183,7 +182,7 @@
       min-height:525px;
       padding: 10px;
       margin-top:8px;
-      background-color: rgba(4, 0, 26, 0.62);
+      background-color: #0b042d;
     }
 
     #vizContainer {
@@ -233,16 +232,10 @@
     }
 
     .line {
-      fill: none;
+/*      fill: none;*/
       stroke: #4bff87;
       stroke-width: 1.5px;
     }
-
-    .line {
-      fill: none;
-      stroke: #4bff87;
-      stroke-width: 1.5px;
-    } 
 
     .rect {
       fill: #4bff87;
@@ -255,8 +248,36 @@
         stroke: #4bff87;
     }
 
-    #dataPage path {
-        /*stroke: #4bff87;*/
+/*    #dataPage path {
+        stroke: #4bff87;
         stroke-width: 1px;
         fill: none;
+    }
+*/
+
+    #leftContainer {
+      width: 50%;
+      float: left;
+    }
+
+    #timelineVizLeft {
+      width:100%;
+      height: auto;
+      min-height:525px;
+      padding: 10px;
+      margin-top:8px;
+      background-color: #0b042d;
+    }
+
+    #rightContainer {
+      margin-left: 50%;
+    }
+
+    #timelineVizRight {
+      width:100%;
+      height: auto;
+      min-height:525px;
+      padding: 10px;
+      margin-top:8px;
+      background-color: #0b042d;
     }
