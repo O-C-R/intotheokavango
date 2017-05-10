@@ -4,7 +4,7 @@ import {dateToString} from '../utils'
 
 const DateSelector = ({expeditions, expeditionID, currentDate}) => {
   var expedition = expeditions[expeditionID]
-  var dayCount = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+  var dayCount = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24)) + 1
   var dateString = dateToString(currentDate)
 
   return (

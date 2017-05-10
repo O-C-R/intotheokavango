@@ -13,15 +13,15 @@ class IntroductionBox extends React.Component {
       currentPosts: [],
       posts: [
         {
-          content: <p key="0">The Okavango Delta is one of the world’s last great wetland wildernesses.</p>,
+          content: <p key="0">The Okavango River System is one of the last pristine watersheds on earth.</p>,
           timeRange: [0, 6000]
         },
         {
-          content: <p key="1">A team of Ba’Yei, scientists, engineers and adventurers is journeying a 345 kilometers crossing the delta, finding new species and exploring new ground.</p>,
+          content: <p key="1">Right now, A team of Ba’yei, scientists and explorers are navigating the Cubango River from its source in the Angolan Highlands to the confluence of the Okavango River.</p>,
           timeRange: [6000, 13000]
         },
         {
-          content: <p key="2">Join us in real-time as we explore<br/><span>the beating heart of our planet.</span></p>,
+          content: <p key="2">Join the team in real time as they explore this remote and crucially important ecosystem.</p>,
           timeRange: [13000, 21000]
         }
       ]

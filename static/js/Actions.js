@@ -365,7 +365,7 @@ export function fetchExpeditions () {
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(parseDate('2016-08-30 09:30:00+00:00'), null, null, true)))
+      .then(() => dispatch(fetchDay(parseDate('2017-05-09T07:55:39+0200'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {
@@ -383,7 +383,7 @@ export function fetchExpeditions () {
 
 export function fetchTotalSightings (id) {
   return function (dispatch, getState) {
-    return fetch('https://intotheokavango.org/api/sightings?FeatureType=sighting&limit=0&Expedition=' + id)
+    return fetch('https://intotheokavango.org/api/features?FeatureType=sighting&limit=0&Expedition=' + id)
       .then(response => response.json())
       .then(json => dispatch(receiveTotalSightings(id, json)))
   }
@@ -450,7 +450,7 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
               // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
               // dispatch(updateTime(initialDate || date, false, expeditionID))
-              dispatch(updateTime(parseDate('2016-08-30 09:30:00+00:00'), false, expeditionID))
+              dispatch(updateTime(parseDate('2017-05-09T07:55:39+0200'), false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)
