@@ -166,13 +166,13 @@ const okavangoReducer = (
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
-      action.data.results['cubango_17'] = {
-        ...action.data.results['cubango_17'],
-        StartDate: '2017-05-08T00:00:00+0200',
-        Name: 'Cubango 17',
-        Days: 1,
-        GeoBounds: [13, -8, 23.51488, -19.92886]
-      }
+      // action.data.results['cubango_17'] = {
+      //   ...action.data.results['cubango_17'],
+      //   StartDate: '2017-05-08T00:00:00+0200',
+      //   Name: 'Cubango 17',
+      //   Days: 1,
+      //   GeoBounds: [13, -8, 23.51488, -19.92886]
+      // }
       Object.keys(action.data.results).forEach((id) => {
         var e = action.data.results[id]
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
