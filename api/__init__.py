@@ -210,7 +210,7 @@ class Api(server.Handler):
                     except Exception:
                         pass
                     for field in feature['properties']:
-                        if type(feature['properties'][field]) is str and feature['properties'][field].lower() == "nan":
+                        if feature['properties'][field] == "NaN":
                             feature['properties'][field] = None
                 if geo:
                     return self.json(results)
