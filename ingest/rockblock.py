@@ -18,10 +18,10 @@ def parse(request):
         if values[2] == 'ST':
             labels = 't_utc','Station','MessageType','VBat','Charge','HasSd','HasGps','BatSleep','DeepSleep','TxFailures','TxSkipped','WeatherReceived','AtlasReceived','SonarReceived','DeadFor','AvgTxTime'
         elif values[2] == 'WE':
-            labels = 't_utc','Station','MessageType','VBat','Charge','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
+            labels = 't_utc','Station','MessageType','VBat','Charge','NOP','Temp','Hum','Press','WindSpeed2','WindDir2','WindGust10','WindGustDir10','DailyRain'
         elif values[2] == 'AT':
             labels = 't_utc','Station','MessageType','VBat','Charge','NOP','Orp','Do','Ph','EC1','EC2','EC3','EC4','WaterTemp'      # WaterTemp was lost
-        elif values[2] == 'LO':        
+        elif values[2] == 'LO':   
             labels = 't_utc','Station','MessageType','VBat','Charge','Latitude','Longitude','Altitude','Uptime'
         elif values[2] == 'SO':
             labels = 't_utc','Station','MessageType','VBat','Charge','NOP','WaterLevelInM1','WaterLevelInM2','WaterLevelInM3','WaterLevelInM4','WaterLevelInM5'
