@@ -2,14 +2,14 @@
   line-height: 1;
   width:100%;
   margin: 0px;
-  background-color: #0b042d;
+  background-color: #fff;
 }
 
     #dataPage{
       width:100%;
       height: auto;
       min-height:800px;
-      background-color: #0b042d;
+      background-color: #fff;
     }
     #dataPage h1{
       font-family: 'Montserrat';
@@ -17,7 +17,7 @@
       text-transform: uppercase;
       line-height: 1.5em;
       letter-spacing: 0.1em;
-      color: white;
+      color: gray;
     }
 
     .api-query-control h2 {
@@ -182,7 +182,7 @@
       min-height:525px;
       padding: 10px;
       margin-top:8px;
-      background-color: #0b042d;
+      background-color: #fff;
     }
 
     #vizContainer {
@@ -201,7 +201,7 @@
 
     .axis text {
       font: 10px 'Sentinel SSm A', 'Sentinel SSm B';
-      fill: #fff;
+      fill: gray;
     }
 
     .axis .title {
@@ -216,24 +216,24 @@
     .axis path,
     .axis line {
       fill: none;
-      stroke: #333;
+      stroke: gray;
       shape-rendering: crispEdges;
     }
 
     .temperature .label {
-      color: white;
+      color: gray;
       font: 12px 'Gotham A', 'Gotham B', Helvetica, Arial;
     }
 
     .title {
       font-weight: bold;
       font: 12px sans-serif;
-      fill: #fff;
+      fill: gray;
     }
 
     .line {
 /*      fill: none;*/
-      stroke: #4bff87;
+      stroke: #0099ff;
       stroke-width: 1.5px;
     }
 
@@ -266,7 +266,7 @@
       min-height:525px;
       padding: 10px;
       margin-top:8px;
-      background-color: #0b042d;
+      background-color: #fff;
     }
 
     #rightContainer {
@@ -279,5 +279,5 @@
       min-height:525px;
       padding: 10px;
       margin-top:8px;
-      background-color: #0b042d;
+      background-color: #fff;
     }

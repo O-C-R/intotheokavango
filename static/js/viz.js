@@ -759,7 +759,7 @@ var d3Graph = function(timelineVizLeftId, timelineVizRightId, totalsVizID){
               .data([parsedData])
               // .attr("class", "line")
               .attr("d", line)
-              .attr("stroke", "#4bff87")
+              .attr("stroke", "#0099ff")
               .attr("stroke-width", "1.5px")
               .attr("fill", "none");
 
@@ -804,7 +804,7 @@ var d3Graph = function(timelineVizLeftId, timelineVizRightId, totalsVizID){
         var title = svg.append("text")
             .attr("x", 0)
             .attr("y", 20)
-            .style("fill", "white")
+            .style("fill", "whigrate")
             .style("font-size", "18px")
             .text("TOTAL SIGHTINGS");
 
