@@ -1333,8 +1333,8 @@ var d3Graph = function(timelineVizLeftId, timelineVizRightId, totalsVizID){
                     console.log("parsedWindGustDirData size: " + parsedWindGustDirData.length);
                     if (parsedWindGustDirData.length > 0) makeTimeSeriesViz(parsedWindGustDirData, feature_type, "WindGustDir", isRightSide);
 
-                    console.log("parsedDailyRainData size: " + parsedDailyRainData.length);
-                    if (parsedDailyRainData.length > 0) makeTimeSeriesViz(parsedDailyRainData, feature_type, "DailyRain", isRightSide);
+                    // console.log("parsedDailyRainData size: " + parsedDailyRainData.length);
+                    // if (parsedDailyRainData.length > 0) makeTimeSeriesViz(parsedDailyRainData, feature_type, "DailyRain", isRightSide);
                 }
                 if (feature_type === "tweet") {
                     console.log("TWEET");
