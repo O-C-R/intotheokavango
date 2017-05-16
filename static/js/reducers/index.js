@@ -731,9 +731,7 @@ const expeditionReducer = (
       })
 
     case actions.RECEIVE_EXPEDITIONS:
-      var dayCount = data.Days + 1
-      // removing +1 here because we receive beacons before any other features on current day
-      // var dayCount = data.Days
+      var dayCount = data.Days
 
       var start = new Date(parseDate(data.StartDate).getTime() + 2 * (1000 * 3600))
       var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))

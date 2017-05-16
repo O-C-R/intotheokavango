@@ -449,8 +449,8 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
             if (incompleteDays.length === 0) {
               // not sure why I need this '|| date'
               if (!state.animate && initialize) dispatch(startAnimation())
-              // dispatch(updateTime(initialDate || date, false, expeditionID))
-              dispatch(updateTime(parseDate('2017-05-09T07:55:39+0200'), false, expeditionID))
+              dispatch(updateTime(initialDate || date, false, expeditionID))
+              // dispatch(updateTime(parseDate('2017-05-09T07:55:39+0200'), false, expeditionID))
               dispatch(hideLoadingWheel())
             } else {
               // console.log('incomplete days', incompleteDays)
