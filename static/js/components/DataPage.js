@@ -18,10 +18,7 @@ const DataPage = () => {
         </div> 
       )
     },
-    {'key':2, 'title':'Explore', 'content':
-      (<APIExplorer/>)
-    },
-    {'key':3, 'title':'Documentation', 'content':
+    {'key':2, 'title':'Documentation', 'content':
       (
         <div>
           <h3>What is an API?</h3>
