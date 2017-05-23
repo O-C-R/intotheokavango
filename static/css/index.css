@@ -198,8 +198,14 @@ ul{
     position: absolute;
     text-align: center;
     padding-top: 45%;
+    transition: opacity 1s;
   }
-    
+
+    #loadingWheel.hidden {
+      pointer-events: none;
+      opacity: 0;
+    }
+
     #loadingWheel .wheel{
       border: 12px solid #F8D143;
       border-top: 12px solid white;

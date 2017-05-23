@@ -35,6 +35,9 @@ export default class Okavango extends React.Component {
           }}
         >
         </div>
+        <div id="loadingWheel" className={(isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden'}>
+          <div class="wheel"></div>
+        </div>
         <Navigation
           activeLinks={!isInitialLoad && contentActive}
           setPage={setPage}
@@ -48,11 +51,6 @@ export default class Okavango extends React.Component {
             if (lightBoxActive) closeLightBox()
           }}
         >
-          {isFetching ? (
-            <div id="loadingWheel">
-              <div class="wheel"></div>
-            </div>
-          ) : null}
           <Timeline
             expeditionID={expeditionID}
             expedition={expedition}

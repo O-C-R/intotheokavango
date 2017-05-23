@@ -11,7 +11,7 @@ const okavangoReducer = (
     isInitialLoad: true,
     mapStateNeedsUpdate: false,
     animate: false,
-    isFetching: false,
+    isFetching: true,
     selectedExpedition: null,
     expeditions: {},
     speciesColors: {},
@@ -137,7 +137,6 @@ const okavangoReducer = (
 
     case actions.HIDE_LOADING_WHEEL:
       return Object.assign({}, state, {
-        isInitialLoad: false,
         mapStateNeedsUpdate: true,
         isFetching: false
       })
@@ -145,6 +144,7 @@ const okavangoReducer = (
     case actions.START:
       return Object.assign({}, state, {
         mapStateNeedsUpdate: true,
+        isInitialLoad: false,
         animate: true
       })
 
