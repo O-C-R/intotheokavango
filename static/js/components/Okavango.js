@@ -8,7 +8,7 @@ import IntroductionBox from './IntroductionBox'
 
 export default class Okavango extends React.Component {
   render () {
-    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage, show360Picture, lightBoxActive, lightBoxPost, closeLightBox} = this.props
+    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, isInitialLoad, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage, show360Picture, lightBoxActive, lightBoxPost, closeLightBox} = this.props
     var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
 
     return (
@@ -35,7 +35,11 @@ export default class Okavango extends React.Component {
           }}
         >
         </div>
+        <div id="loadingWheel" className={(isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden'}>
+          <div class="wheel"></div>
+        </div>
         <Navigation
+          activeLinks={!isInitialLoad && contentActive}
           setPage={setPage}
           pathName={location.pathname}
         />
@@ -47,11 +51,6 @@ export default class Okavango extends React.Component {
             if (lightBoxActive) closeLightBox()
           }}
         >
-          {isFetching ? (
-            <div id="loadingWheel">
-              <div class="wheel"></div>
-            </div>
-          ) : null}
           <Timeline
             expeditionID={expeditionID}
             expedition={expedition}

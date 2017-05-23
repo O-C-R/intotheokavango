@@ -78,8 +78,10 @@ export function checkFeedContent () {
       }
       visibleElements.forEach(p => {
         var feature = expedition.features[p]
-        var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+        if (feature) {
+          var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+          if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+        }
       })
       for (var i = 0; i < visibleDays.length - 1; i++) {
         if (Math.abs(visibleDays[i] - visibleDays[i + 1])) {
@@ -448,10 +450,13 @@ export function fetchDay (date, initialDate, _expeditionID, initialize) {
             })
             if (incompleteDays.length === 0) {
               // not sure why I need this '|| date'
-              if (!state.animate && initialize) dispatch(startAnimation())
-              dispatch(updateTime(initialDate || date, false, expeditionID))
-              // dispatch(updateTime(parseDate('2017-05-09T07:55:39+0200'), false, expeditionID))
-              dispatch(hideLoadingWheel())
+              if (!state.animate && initialize) {
+                console.log('STARTING HERE');
+                dispatch(startAnimation())
+                dispatch(updateTime(initialDate || date, false, expeditionID))
+                // dispatch(updateTime(parseDate('2017-05-09T07:55:39+0200'), false, expeditionID))
+                dispatch(hideLoadingWheel())
+              }
             } else {
               // console.log('incomplete days', incompleteDays)
               var nextTarget = -1

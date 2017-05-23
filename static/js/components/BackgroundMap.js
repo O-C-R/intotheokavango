@@ -243,7 +243,7 @@ class BackgroundMap extends React.Component {
       const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
       const gb = [west, north, east, south]
 
-      if (expedition.zoom < 14) {
+      if (expedition.zoom < 10) {
         return {
           particles,
           paths
@@ -293,10 +293,12 @@ class BackgroundMap extends React.Component {
           return new THREE.Vector3(p[0], p[1], 0)
         })
 
-      var lastVertex = vertices[vertices.length - 1].clone()
-      if (!!lastVertex) {
-        for (let i = vertices.length; i < 200; i++) {
-          vertices[i] = lastVertex
+      if (vertices.length > 0) {
+        var lastVertex = vertices[vertices.length - 1].clone()
+        if (!!lastVertex) {
+          for (let i = vertices.length; i < 200; i++) {
+            vertices[i] = lastVertex
+          }
         }
       }
 

@@ -124,9 +124,9 @@ class Timeline extends React.Component {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
-        <g transform={'translate(' + 0 + ',' + padding[1] + ')'} style={{pointerEvents: 'none'}}>
+        {/*<g transform={'translate(' + 0 + ',' + padding[1] + ')'} style={{pointerEvents: 'none'}}>
           <SightingGraph sightings={totalSightings} width={width} height={height - padding[1] * 2}/>
-        </g>
+        </g>*/}
         <line x1={x} x2={x} y1={range[0]} y2={range[1]} style={{stroke: 'white'}}/>
         <g>{ days }</g>
         <g transform={'translate(' + (x - 20) + ',' + cursorY + ')'} style={{pointerEvents: 'none'}}>
