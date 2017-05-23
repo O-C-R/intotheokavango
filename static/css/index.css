@@ -251,6 +251,9 @@ ul{
           vertical-align:middle;
           text-align: center;
         }
+          #navigation li.disabled {
+            opacity: 0.5;
+          }
 
           #navigation li a{
             display:inline-block;

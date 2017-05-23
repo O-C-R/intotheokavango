@@ -8,6 +8,7 @@ const MIN_ZOOM = 14;
 
 const okavangoReducer = (
   state = {
+    isInitialLoad: true,
     mapStateNeedsUpdate: false,
     animate: false,
     isFetching: false,
@@ -136,6 +137,7 @@ const okavangoReducer = (
 
     case actions.HIDE_LOADING_WHEEL:
       return Object.assign({}, state, {
+        isInitialLoad: false,
         mapStateNeedsUpdate: true,
         isFetching: false
       })
