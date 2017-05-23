@@ -78,8 +78,10 @@ export function checkFeedContent () {
       }
       visibleElements.forEach(p => {
         var feature = expedition.features[p]
-        var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
-        if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+        if (feature) {
+          var day = Math.floor((parseDate(feature.properties.DateTime).getTime() - expedition.start.getTime()) / (1000 * 3600 * 24))
+          if (visibleDays.indexOf(day) === -1) visibleDays.push(day)
+        }
       })
       for (var i = 0; i < visibleDays.length - 1; i++) {
         if (Math.abs(visibleDays[i] - visibleDays[i + 1])) {
