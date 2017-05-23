@@ -19,7 +19,7 @@ const ControlPanel = ({pathName, expeditionID, expeditions, currentDate, playbac
     <div className="controlPanel">
       <DateSelector expeditions={expeditions} expeditionID={expeditionID} currentDate={currentDate} />
       {pathName === '/map' ? <PlaybackSelector mode={playback} onPlaybackChange={onPlaybackChange}/> : null}
-      {pathName === '/map' && window.innerWidth > 768 ? <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/> : null}
+      {/* {pathName === '/map' && window.innerWidth > 768 ? <ZoomSelector onZoomChange={onZoomChange} viewport={viewport}/> : null} */}
     </div>
   )
 }

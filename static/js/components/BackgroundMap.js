@@ -243,7 +243,7 @@ class BackgroundMap extends React.Component {
       const south = currentGeoBounds[3] + (currentGeoBounds[3] - currentGeoBounds[1]) * 0.25
       const gb = [west, north, east, south]
 
-      if (expedition.zoom < 14) {
+      if (expedition.zoom < 10) {
         return {
           particles,
           paths

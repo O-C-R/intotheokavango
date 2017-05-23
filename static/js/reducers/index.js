@@ -4,6 +4,8 @@ import * as d3 from 'd3'
 import randomColor from 'randomcolor'
 import { parseDate } from '../utils'
 
+const MIN_ZOOM = 14;
+
 const okavangoReducer = (
   state = {
     mapStateNeedsUpdate: false,
@@ -435,8 +437,8 @@ const expeditionReducer = (
     playback: 'forward',
     layout: 'rows',
     initialZoom: 4,
-    targetZoom: 15,
-    zoom: 15,
+    targetZoom: MIN_ZOOM,
+    zoom: MIN_ZOOM,
     isFetching: false,
     geoBounds: [-8, -21.5, 25.5, 12],
     tileSize: 10,
@@ -757,8 +759,8 @@ const expeditionReducer = (
 
     case actions.SET_CONTROL:
       if (action.target === 'zoom') {
-        if (action.mode === 'increment') action.mode = Math.max(1, Math.min(15, state.zoom + 1))
-        if (action.mode === 'decrement') action.mode = Math.max(1, Math.min(15, state.zoom - 1))
+        if (action.mode === 'increment') action.mode = Math.max(1, Math.min(MIN_ZOOM, state.zoom + 1))
+        if (action.mode === 'decrement') action.mode = Math.max(1, Math.min(MIN_ZOOM, state.zoom - 1))
       }
       return Object.assign({}, state, {
         [action.target]: action.mode
