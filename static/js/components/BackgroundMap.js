@@ -293,10 +293,12 @@ class BackgroundMap extends React.Component {
           return new THREE.Vector3(p[0], p[1], 0)
         })
 
-      var lastVertex = vertices[vertices.length - 1].clone()
-      if (!!lastVertex) {
-        for (let i = vertices.length; i < 200; i++) {
-          vertices[i] = lastVertex
+      if (vertices.length > 0) {
+        var lastVertex = vertices[vertices.length - 1].clone()
+        if (!!lastVertex) {
+          for (let i = vertices.length; i < 200; i++) {
+            vertices[i] = lastVertex
+          }
         }
       }
 
