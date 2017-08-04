@@ -213,6 +213,14 @@ class Api(server.Handler):
                         if type(feature['properties'][field]) is float and math.isnan(feature['properties'][field]):
                             feature['properties'][field] = None
                 if geo:
+                    ## cola
+                    for feature in results['features']:
+                        keys = feature.keys()
+                        for key in keys:
+                            if type(feature[key]) == dict:
+                                for k, v in feature[key].items():
+                                    feature["key_" + k] = v
+                                del feature[key]
                     return self.json(results)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
