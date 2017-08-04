@@ -215,13 +215,13 @@ class Api(server.Handler):
                 if geo:
                     ## cola
                     for feature in results['features']:
-                        keys = list(feature.keys())
+                        keys = list(feature['properties'].keys())
                         for key in keys:
-                            if type(feature[key]) == dict:
-                                ks = list(feature[key].keys())
+                            if type(feature['properties'][key]) == dict:
+                                ks = list(feature['properties'][key].keys())
                                 for k in ks:
-                                    feature[key + "_" + k] = feature[key][k]
-                                del feature[key]
+                                    feature['properties'][key + "_" + k] = feature['properties'][key][k]
+                                del feature['properties'][key]
                     return self.json(results)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
             return self.json({'order': order, 'limit': limit, 'total': total, 'returned': len(results) if returned is None else returned, 'filter': search, 'results': results, 'resolution': resolution if resolution != 0 else "full"})
