@@ -215,10 +215,10 @@ class Api(server.Handler):
                 if geo:
                     ## cola
                     for feature in results['features']:
-                        keys = feature.keys()
+                        keys = list(feature.keys())
                         for key in keys:
                             if type(feature[key]) == dict:
-                                ks = feature[key].keys()
+                                ks = list(feature[key].keys())
                                 for k in ks:
                                     feature["key_" + k] = feature[key][k]
                                 del feature[key]
