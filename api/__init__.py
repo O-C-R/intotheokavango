@@ -218,8 +218,9 @@ class Api(server.Handler):
                         keys = feature.keys()
                         for key in keys:
                             if type(feature[key]) == dict:
-                                for k, v in feature[key].items():
-                                    feature["key_" + k] = v
+                                ks = feature[key].keys()
+                                for k in ks:
+                                    feature["key_" + k] = feature[key][k]
                                 del feature[key]
                     return self.json(results)
             search = {key.replace('properties.', ''): value for (key, value) in search.items()}            
