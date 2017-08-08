@@ -1,8 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import ViewportMercator from 'viewport-mercator-project'
 
-import THREE from '../react-three-renderer/node_modules/three'
-import React3 from '../react-three-renderer'
+import THREE from 'three'
+import React3 from 'react-three-renderer'
 
 import autobind from 'autobind-decorator'
 

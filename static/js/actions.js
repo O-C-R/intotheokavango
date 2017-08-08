@@ -367,7 +367,7 @@ export function fetchExpeditions () {
     return fetch('https://intotheokavango.org/api/expeditions')
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
-      .then(() => dispatch(fetchDay(parseDate('2017-05-09T07:55:39+0200'), null, null, true)))
+      .then(() => dispatch(fetchDay(parseDate('2017-08-06T07:55:39+0200'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {

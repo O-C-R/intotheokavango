@@ -5,7 +5,7 @@ import ViewportMercator from 'viewport-mercator-project'
 import { lerp, parseDate } from '../utils'
 import WebGLOverlay from './WebGLOverlay'
 import MapGL from 'react-map-gl'
-import THREE from '../react-three-renderer/node_modules/three'
+import THREE from 'three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {

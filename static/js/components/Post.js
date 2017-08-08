@@ -1,8 +1,8 @@
 
 import React, {PropTypes} from 'react'
 import { dateToString } from '../utils'
-import THREE from '../react-three-renderer/node_modules/three'
-import React3 from '../react-three-renderer'
+import THREE from 'three'
+import React3 from 'react-three-renderer'
 import autobind from 'autobind-decorator'
 
 class Post extends React.Component {

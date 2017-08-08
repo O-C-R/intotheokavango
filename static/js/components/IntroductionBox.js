@@ -17,11 +17,11 @@ class IntroductionBox extends React.Component {
           timeRange: [0, 6000]
         },
         {
-          content: <p key="1">Right now, A team of Ba’yei, scientists and explorers are navigating the Cubango River from its source in the Angolan Highlands to the confluence of the Okavango River.</p>,
+          content: <p key="1">Right now, A team of Ba’yei, scientists and explorers are crossing the Okavango Delta in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
           timeRange: [6000, 13000]
         },
         {
-          content: <p key="2">Join the team in real time as they explore this remote and crucially important ecosystem.</p>,
+          content: <p key="2">Join the team in real time as they explore this verdant and vitally important ecosystem.</p>,
           timeRange: [13000, 21000]
         }
       ]

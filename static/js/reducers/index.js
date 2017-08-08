@@ -170,6 +170,7 @@ const okavangoReducer = (
       expeditions = {}
       var latestDate = new Date(0)
       var latestExpedition
+
       // action.data.results['cubango_17'] = {
       //   ...action.data.results['cubango_17'],
       //   StartDate: '2017-05-08T00:00:00+0200',
@@ -177,13 +178,15 @@ const okavangoReducer = (
       //   Days: 1,
       //   GeoBounds: [13, -8, 23.51488, -19.92886]
       // }
+
+
       Object.keys(action.data.results).forEach((id) => {
         var e = action.data.results[id]
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
           // latestExpedition = id
-          latestExpedition = 'cubango_17'
+          latestExpedition = 'okavango_17'
         }
       })
 
