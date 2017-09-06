@@ -179,10 +179,18 @@ const okavangoReducer = (
       //   GeoBounds: [13, -8, 23.51488, -19.92886]
       // }
 
+      Object.keys(action.data.results).forEach(id => {
+        action.data.results[id] = {
+          ...action.data.results[id],
+          Days: 14
+        }
+      })
 
       Object.keys(action.data.results).forEach((id) => {
         var e = action.data.results[id]
         expeditions[id] = expeditionReducer(state.expeditions[id], action, e)
+
+
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
           // latestExpedition = id

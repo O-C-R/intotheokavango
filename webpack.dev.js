@@ -25,6 +25,9 @@ module.exports = {
       'sinon': 'sinon/pkg/sinon'
     }
   },
+  node:{
+    "child_process": "empty"
+  },
   module: {
     noParse: [
       /node_modules\/sinon\//

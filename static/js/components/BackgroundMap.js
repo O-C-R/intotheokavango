@@ -279,6 +279,7 @@ class BackgroundMap extends React.Component {
     }
 
     return expedition.currentAmbits.map(route => {
+
       const vertices = route.coordinates
         .filter((p, i) => {
           if (route.coordinates[i - 1] && checkGeoBounds(route.coordinates[i - 1], gb)) return true
@@ -296,7 +297,7 @@ class BackgroundMap extends React.Component {
       if (vertices.length > 0) {
         var lastVertex = vertices[vertices.length - 1].clone()
         if (!!lastVertex) {
-          for (let i = vertices.length; i < 200; i++) {
+          for (let i = vertices.length; i < 1000; i++) {
             vertices[i] = lastVertex
           }
         }

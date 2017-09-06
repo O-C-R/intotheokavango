@@ -235,7 +235,7 @@ export default class WebGLOverlay extends Component {
       })
 
     const lines = paths.ambitGeo.map((p, i) => {
-
+      // console.log(p.vertices.length)
       return (
         <line key={i}>
           <geometry
