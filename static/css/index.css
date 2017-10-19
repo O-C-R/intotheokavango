@@ -189,7 +189,7 @@ ul{
 
   #loadingWheel{
     width: 100%;
-    height: 55%;
+    height: 100%;
     position: absolute;
     background: rgba(4,0,26,0.8);
     top: 0;
@@ -197,7 +197,6 @@ ul{
     z-index: 75;
     position: absolute;
     text-align: center;
-    padding-top: 45%;
     transition: opacity 1s;
   }
 
@@ -216,6 +215,8 @@ ul{
       display: inline-block;
       width: 10px;
       height: 10px;
+      position: absolute;
+      top: 45%;
     }
 
     @keyframes spin {
@@ -305,6 +306,27 @@ ul{
         #content div.logos a{
           margin-right:20px;
         }
+
+        #content div.cta {
+          text-align: center;
+        }
+
+          #content div.cta a p {
+            text-align: center;
+            display: inline-block;
+            margin: auto;
+            border: 1px solid #F8D143;
+            padding: 5px 10px;
+            border-radius: 3px;
+            border-color: #F8D143;
+            color: #F8D143;
+            transition: color 0.15s, border-color 0.15s;
+          }
+
+            #content div.cta a:hover p {
+              color: white;
+              border-color: white;
+            }
 
       #lightBox{
         top: 0;

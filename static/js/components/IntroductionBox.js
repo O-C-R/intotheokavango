@@ -13,16 +13,12 @@ class IntroductionBox extends React.Component {
       currentPosts: [],
       posts: [
         {
-          content: <p key="0">The Okavango River System is one of the last pristine watersheds on earth.</p>,
+          content: <p key="0">Beginning in 2015,a group of Ba'yei, scientists and explorers have been exploring the Okavango River System in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
           timeRange: [0, 6000]
         },
         {
-          content: <p key="1">Right now, A team of Ba’yei, scientists and explorers are crossing the Okavango Delta in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
+          content: <p key="1">You can use this platform to explore what the team saw and experienced on their last expedition through this verdant and vitally important ecosystem.</p>,
           timeRange: [6000, 13000]
-        },
-        {
-          content: <p key="2">Join the team in real time as they explore this verdant and vitally important ecosystem.</p>,
-          timeRange: [13000, 21000]
         }
       ]
     }
@@ -111,7 +107,6 @@ class IntroductionBox extends React.Component {
     return (
       <div id="IntroductionBox">
         {container()}
-        <div id="skip-button" onClick={this.skip}>SKIP</div>
       </div>
     )
   }
