@@ -13,12 +13,16 @@ class IntroductionBox extends React.Component {
       currentPosts: [],
       posts: [
         {
-          content: <p key="0">Beginning in 2015,a group of Ba'yei, scientists and explorers have been exploring the Okavango River System in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
+          content: <p key="0"></p>,
           timeRange: [0, 6000]
         },
         {
-          content: <p key="1">You can use this platform to explore what the team saw and experienced on their last expedition through this verdant and vitally important ecosystem.</p>,
+          content: <p key="1">Beginning in 2015,a group of Ba'yei, scientists and explorers have been exploring the Okavango River System in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
           timeRange: [6000, 13000]
+        },
+        {
+          content: <p key="2">You can use this platform to explore what the team saw and experienced on their last expedition through this verdant and vitally important ecosystem.</p>,
+          timeRange: [13000, 21000]
         }
       ]
     }
@@ -103,7 +107,8 @@ class IntroductionBox extends React.Component {
       )
     }
 
-    if (complete || !animate) return <div></div>
+    // if (complete || !animate) return <div></div>
+    if (complete) return <div></div>
     return (
       <div id="IntroductionBox">
         {container()}

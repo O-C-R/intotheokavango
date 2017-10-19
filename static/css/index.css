@@ -297,6 +297,14 @@ ul{
         bottom:55px;
       }
 
+      #aboutPage .content {
+        padding: 50px 25% 50px 25%;
+      }
+
+      #aboutPage h1 {
+        margin-bottom: 50px;
+      }
+
       #content #aboutPage div.logos{
         bottom:0;
         position:relative;
@@ -309,14 +317,18 @@ ul{
 
         #content div.cta {
           text-align: center;
+          padding: 0 25%;
         }
 
           #content div.cta a p {
             text-align: center;
             display: inline-block;
             margin: auto;
+            margin-bottom: 100px;
             border: 1px solid #F8D143;
-            padding: 5px 10px;
+            font-size: 28px;
+            line-height: 42px;
+            padding: 15px 15px;
             border-radius: 3px;
             border-color: #F8D143;
             color: #F8D143;
@@ -966,6 +978,7 @@ ul{
       width: 44%;
       left: 0;
       padding: 0 28%;
+      z-index: 100;
     }
 
       #IntroductionBox p{
@@ -1078,6 +1091,7 @@ ul{
     #feed div.post div.type img{
       margin: 0;
     }
+
 
   #aboutPage div.column{
     display: block !important;
