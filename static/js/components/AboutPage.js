@@ -6,7 +6,7 @@ const AboutPage = () => {
     <div className='page'  id="aboutPage">
 
       <div className="pageWrapper">
-        <iframe className="vimeo" src="https://player.vimeo.com/video/124421450?autoplay=0&api=1" width={window.innerWidth * 0.9} height={window.innerWidth * 0.9 * 0.525} frameBorder="0"allowFullScreen></iframe>
+        <img src="static/img/DJFNfrWWAAAahYm.jpg" width={window.innerWidth * 0.9} height={window.innerWidth * 0.9 * 0.525}/>
         <div className="content">
           <h1>
             What We’re Doing
@@ -24,7 +24,7 @@ const AboutPage = () => {
         <div className="columnWrapper cta">
           <a href="https://www.nationalgeographic.org/projects/okavango/">
             <p>
-              To find out more, visit The Okavango Wilderness Project page.
+              The National Geographic Okavango Wilderness Project
             </p>
           </a>
         </div>
