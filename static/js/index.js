@@ -67,7 +67,7 @@ let store = createStore(
 
 const routes = (
   <Route path="/" component={OkavangoContainer}>
-    <IndexRoute component={MapPage}/>
+    <IndexRoute component={AboutPage}/>
     <Route path="map" component={MapPage}/>
     <Route path="journal" component={JournalPageContainer}/>
     <Route path="data" component={DataPage}/>

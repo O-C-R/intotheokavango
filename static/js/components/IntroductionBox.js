@@ -41,8 +41,9 @@ class IntroductionBox extends React.Component {
     const { enableContent } = this.props
     const { posts, startDate } = this.state
 
-    if (!(location.pathname === '/' || location.pathname === '/map')) {
-      this.state.complete = true
+    if (!(location.pathname === '/map')) {
+    //   this.state.complete = true
+      requestAnimationFrame(this.tick)
       return
     }
 

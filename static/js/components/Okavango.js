@@ -8,13 +8,12 @@ import IntroductionBox from './IntroductionBox'
 
 export default class Okavango extends React.Component {
   render () {
-    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, isInitialLoad, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, initialPage, show360Picture, lightBoxActive, lightBoxPost, closeLightBox} = this.props
+    const {children, expedition, animate, updateMap, fetchDay, setControl, jumpTo, isFetching, isInitialLoad, mapStateNeedsUpdate, setPage, expeditionID, contentActive, enableContent, show360Picture, lightBoxActive, lightBoxPost, closeLightBox} = this.props
     var height = {height: window.innerWidth > 768 ? window.innerHeight - 100 : window.innerHeight - 120}
 
     return (
       <div id="root">
         <BackgroundMap
-          initialPage={initialPage}
           expeditionID={expeditionID}
           isFetching={isFetching}
           animate={animate}
@@ -30,12 +29,12 @@ export default class Okavango extends React.Component {
         <div
           id="nightOverlay"
           style={{
-            opacity: (location.pathname === '/map' || location.pathname === '/') && !lightBoxActive ? 0 : 1,
+            opacity: (location.pathname === '/map') && !lightBoxActive ? 0 : 1,
             zIndex: lightBoxActive ? 1 : 0
           }}
         >
         </div>
-        <div id="loadingWheel" className={(isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden'}>
+        <div id="loadingWheel" className={ location.pathname !== '/about' && location.pathname !== '/' &&  (isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden' }>
           <div class="wheel"></div>
         </div>
         <Navigation
@@ -58,7 +57,7 @@ export default class Okavango extends React.Component {
           />
           <div
             id="pageContainer"
-            className={location.pathname === '/map' || location.pathname === '/' ? 'disabled' : ''}
+            className={location.pathname === '/map' ? 'disabled' : ''}
           >
             <LightBox
               active={lightBoxActive}
@@ -70,7 +69,7 @@ export default class Okavango extends React.Component {
           </div>
           <div
             class="logos"
-            style={{display: (location.pathname === '/map' || location.pathname === '/' ? 'block' : 'none')}}
+            style={{display: (location.pathname === '/map' ? 'block' : 'none')}}
           >
             <a
               href="http://www.nationalgeographic.com/"
@@ -133,7 +132,6 @@ Okavango.propTypes = {
   setPage: PropTypes.func.isRequired,
   contentActive: PropTypes.bool.isRequired,
   enableContent: PropTypes.func.isRequired,
-  initialPage: PropTypes.string.isRequired,
   show360Picture: PropTypes.func.isRequired,
   lightBoxActive: PropTypes.bool.isRequired,
   lightBoxPost: PropTypes.object,

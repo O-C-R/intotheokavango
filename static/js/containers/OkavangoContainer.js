@@ -13,7 +13,6 @@ const mapStateToProps = (state, ownProps) => {
     mapStateNeedsUpdate: state.mapStateNeedsUpdate,
     expeditionID: state.selectedExpedition,
     contentActive: state.contentActive,
-    initialPage: state.initialPage,
     lightBoxActive: state.lightBoxActive,
     lightBoxPost: state.lightBoxPost ? formatPost(state.lightBoxPost, state.selectedExpedition) : null
   }

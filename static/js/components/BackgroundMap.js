@@ -32,9 +32,9 @@ class BackgroundMap extends React.Component {
     let newState = {}
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
     const currentFrameDate = Date.now()
-    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
+    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
-    if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
+    if (animate && !isFetching && location.pathname === '/map') {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
@@ -157,8 +157,6 @@ class BackgroundMap extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      // if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
-      if (!(initialPage === '/' || initialPage === '/map')) zoom = this.state.viewport.targetZoom
 
       newState = {
         ...newState,
@@ -406,7 +404,7 @@ class BackgroundMap extends React.Component {
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70'
 
     return (
-      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map' || location.pathname === '/') ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map') ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
@@ -436,7 +434,6 @@ BackgroundMap.propTypes = {
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
-  initialPage: PropTypes.string.isRequired,
   contentActive: PropTypes.bool,
   show360Picture: PropTypes.func.isRequired,
   lightBoxActive: PropTypes.bool.isRequired

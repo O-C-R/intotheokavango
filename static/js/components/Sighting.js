@@ -26,9 +26,9 @@ class Sighting extends React.Component {
   tick (pastFrameDate) {
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60)
     const currentFrameDate = Date.now()
-    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap, initialPage} = this.props
+    const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
-    if (animate && !isFetching && location.pathname === '/map' || location.pathname === '/') {
+    if (animate && !isFetching && location.pathname === '/map') {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
@@ -151,7 +151,6 @@ class Sighting extends React.Component {
       })
 
       var zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor)
-      if (!(initialPage === '/' || initialPage === '/map') || (!this.state.contentActive && this.props.contentActive)) zoom = this.state.viewport.targetZoom
 
       this.setState({
         currentDate,
@@ -320,7 +319,7 @@ class Sighting extends React.Component {
       // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
           // onChangeViewport={this.onChangeViewport}
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? -100 : -100)}}>
+      <div id="mapbox" style={{zIndex: (location.pathname === '/map' ? -100 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
@@ -367,7 +366,6 @@ Sighting.propTypes = {
   fetchDay: PropTypes.func.isRequired,
   setControl: PropTypes.func.isRequired,
   mapStateNeedsUpdate: PropTypes.bool.isRequired,
-  initialPage: PropTypes.string.isRequired,
   contentActive: PropTypes.bool
 }
 
