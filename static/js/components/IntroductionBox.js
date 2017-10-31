@@ -9,20 +9,20 @@ class IntroductionBox extends React.Component {
     this.state = {
       complete: false,
       contentEnabled: false,
-      startDate: 0,
+      startDate: -1,
       currentPosts: [],
       posts: [
         {
           content: <p key="0"></p>,
-          timeRange: [0, 6000]
+          timeRange: [0, 4000]
         },
         {
           content: <p key="1">Beginning in 2015,a group of Ba'yei, scientists and explorers have been exploring the Okavango River System in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
-          timeRange: [6000, 13000]
+          timeRange: [4000, 11000]
         },
         {
           content: <p key="2">You can use this platform to explore what the team saw and experienced on their last expedition through this verdant and vitally important ecosystem.</p>,
-          timeRange: [13000, 21000]
+          timeRange: [11000, 19000]
         }
       ]
     }
@@ -41,8 +41,14 @@ class IntroductionBox extends React.Component {
     const { enableContent } = this.props
     const { posts, startDate } = this.state
 
-    if (!(location.pathname === '/map')) {
-    //   this.state.complete = true
+    if (location.pathname !== '/map') {
+      requestAnimationFrame(this.tick)
+      return
+    } else if (startDate === -1) {
+      this.setState({
+        ...this.state,
+        startDate: Date.now()
+      })
       requestAnimationFrame(this.tick)
       return
     }
@@ -85,11 +91,6 @@ class IntroductionBox extends React.Component {
   }
 
   componentDidMount () {
-    this.setState({
-      ...this.state,
-      startDate: Date.now()
-    })
-    // console.log('aga componentDidMount')
     requestAnimationFrame(this.tick)
   }
 
