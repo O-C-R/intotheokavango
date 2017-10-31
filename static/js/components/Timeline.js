@@ -111,7 +111,7 @@ class Timeline extends React.Component {
     return (
       <svg 
         id="timeline" 
-        className={location.pathname === '/data' || location.pathname === '/about' || location.pathname === '/' ? 'invisible' : 'visible'} 
+        className={location.pathname === '/about' || location.pathname === '/' ? 'invisible' : 'visible'} 
         style={{height: height + 'px'}} 
         onMouseOut={this.onMouseOut} 
         onMouseMove={this.onMouseMove} 

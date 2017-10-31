@@ -283,7 +283,7 @@ ul{
 
     #content{
       padding:0 5%;
-      overflow-y: overlay;
+      overflow-y: auto;
       transition: opacity 0.8s;
     }
 
@@ -295,10 +295,6 @@ ul{
       #content div.logos{
         position:absolute;
         bottom:55px;
-      }
-
-      #aboutPage .content {
-        padding: 50px 25% 50px 25%;
       }
 
       #aboutPage h1 {
@@ -315,18 +311,25 @@ ul{
           margin-right:20px;
         }
 
+        #aboutPage .pageWrapper {
+          padding: 50px 25% 50px 25%;
+        }
+
+        #aboutPage .pageWrapper p, #aboutPage .pageWrapper img.photo {
+          margin-bottom: 50px;
+        }
+
         #content div.cta {
           text-align: center;
-          padding: 0 25%;
         }
 
           #content div.cta a p {
             text-align: center;
-            display: inline-block;
+            display: block;
             margin: auto;
-            margin-bottom: 100px;
+            margin-bottom: 75px;
             border: 1px solid #F8D143;
-            font-size: 24px;
+            font-size: 22px;
             line-height: 42px;
             padding: 15px 15px;
             border-radius: 3px;
@@ -334,6 +337,11 @@ ul{
             color: #F8D143;
             transition: color 0.15s, border-color 0.15s;
           }
+
+            #content div.cta a p img {
+              margin-left: 10px;
+              vertical-align: sub;
+            }
 
             #content div.cta a:hover p {
               color: white;

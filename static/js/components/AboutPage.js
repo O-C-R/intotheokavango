@@ -6,25 +6,35 @@ const AboutPage = () => {
     <div className='page'  id="aboutPage">
 
       <div className="pageWrapper">
-        <img src="static/img/DJFNfrWWAAAahYm.jpg" width={window.innerWidth * 0.9} height={window.innerWidth * 0.9 * 0.525}/>
+        <div className="cta">
+          <a href="https://www.nationalgeographic.org/projects/okavango/">
+            <p>
+              The National Geographic Okavango Wilderness Project
+              <img src="static/img/external-link.svg" width="25px"/>
+            </p>
+          </a>
+        </div>
         <div className="content">
+  
           <h1>
             What We’re Doing
           </h1>
           <p>
-            The greater Okavango River Basin is the largest freshwater wetland in southern Africa—and the main source of water for a million people. Its delta, located in northern Botswana, is one of Africa’s richest places for biodiversity, and home to the world’s largest remaining elephant population as well as lions, cheetahs, wild dogs, and hundreds of species of birds. But the delta’s future is uncertain. Its health is linked to that of rivers that originate in Angola, then converge and flow through Namibia into Botswana. These rivers are vital to the region’s future, but are currently unprotected outside of Botswana.
+            The Okavango Delta is one of the most important sites for biodiversity, hosting the largest population of African elephants in addition to lions, cheetahs, wild dogs and hundreds of species of birds. Yet the future of this oasis is directly linked to its source - over 800 miles to the north in the central highlands of Angola. This water tower, which flows through Angola, Namibia and Botswana, is the main source of water for over a million people, providing the lifeline for the region. While the Delta itself has been declared a World Heritage Site, the rivers and wilderness areas it depends on remain unprotected.
           </p>
+          <img src="static/img/about-cuito.jpg" className="photo" width="100%"/>
           <p>
-            Beginning in 2015, National Geographic Explorer Dr. Steve Boyes and an interdisciplinary team including Angolan, Namibian, and South African scientists began working together to explore and protect the rivers in Angola. Through a series of unique canoe- and mountain bike–based expeditions into the least known, most inaccessible parts of the watershed in southeastern Angola, they have been surveying the sources of the river systems and collecting data to help inform strategies to protect them.
+            Beginning in 2015, National Geographic Fellow, Dr. Steve Boyes, assembled a team of regional and international scientists to embark on a multi-year journey to explore and protect the headwaters and rivers in Angola. Covering thousands of miles on foot, bike, and mokoro, or traditional canoe, the team is discovering an area that has long been hidden behind a curtain of landmines – a legacy of past conflict. Their findings, which include potential new species to science and to Angola, countless species range extensions, and an intricate ecosystem that regulates the ebb and flow of the entire basin system, highlight the need to protect this area before it is too late.
           </p>
-          <p>
-            The team is using their scientific and survey work to build connections among governments, non-governmental organizations, and local communities to help inform planning for the long-term goal of establishing sustainable management of the Okavango watershed’s source rivers to protect them forever.
-          </p>
+          <img src="static/img/about-elephants.jpg" className="photo" width="100%"/>
+
         </div>
-        <div className="columnWrapper cta">
+
+        <div className="cta">
           <a href="https://www.nationalgeographic.org/projects/okavango/">
             <p>
               The National Geographic Okavango Wilderness Project
+              <img src="static/img/external-link.svg" width="25px"/>
             </p>
           </a>
         </div>

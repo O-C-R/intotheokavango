@@ -1,30 +1,7 @@
 
 /*
 
-  move 360 videos to side
-
-  GENERAL
-    expedition year selection
-    deep linking
-    Fix intro
-    animate timeline cursor and direction
-  MAP
-    separate normal map interaction vs introduction
-    round sightings location
-    rollover member markers
-    map interactions
-  JOURNAL
-    bind timeline
-    permalinks and location buttons
-    grid visualization
-  API
-    Data explorer
-  MISC
-    Upgrade react-three-renderer to NPM version
-  CODE
-    switch state and props to immutable.js
-    properly set key props
-    swith to sylus
+  background scroll
 
 */
 
@@ -70,7 +47,6 @@ const routes = (
     <IndexRoute component={AboutPage}/>
     <Route path="map" component={MapPage}/>
     <Route path="journal" component={JournalPageContainer}/>
-    <Route path="data" component={DataPage}/>
     <Route path="about" component={AboutPage}/>
     <Route path="share" component={SharePage}/>
   </Route>
