@@ -1,16 +1,19 @@
 {
   "rules": {
+    "semi": 0,
+    "spaced-comment": 0,
     "no-extra-parens": 0,
     "react/jsx-uses-vars": 1,
     "react/jsx-uses-react": 1,
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   },
   "ecmaFeatures": {
-    "jsx": true,
+    "jsx": true
   },
   "env": {
     "node": false,
     "browser": true,
-    "es6": true,
+    "es6": true
   },
   "parser": "babel-eslint",
   "plugins": [
