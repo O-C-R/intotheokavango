@@ -924,7 +924,7 @@ var d3Graph = function(timelineVizLeftId, timelineVizRightId, totalsVizID){
     //first get the array of species names from the api
     var species = [];
     var getSpeciesSightingsTotals = function() {
-        var speciesUrl = "http://intotheokavango.org/api/species";
+        var speciesUrl = "http://23.23.124.78/api/species";
         d3.json(speciesUrl, function(error, data) {
             
         })
@@ -955,7 +955,7 @@ var d3Graph = function(timelineVizLeftId, timelineVizRightId, totalsVizID){
 
     //get the totals for all features, recursively - then draw a totals bar chart viz
     var getFeatureTotalData = function(featureType) {
-        var url = "http://intotheokavango.org/api/features?FeatureType=" + featureType + "";
+        var url = "http://23.23.124.78/api/features?FeatureType=" + featureType + "";
         d3.json(url, function(error, data) {
             console.log(featureType + " data");
             var featuresCountObj = {};
