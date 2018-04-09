@@ -713,9 +713,9 @@ const expeditionReducer = (
         })
 
       allAmbits
-        .sort((a, b) => {
-          return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
-        })
+        // .sort((a, b) => {
+        //   return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
+        // })
         .forEach(f => {
           var name = f.properties.Member
           if (!currentAmbits[name]) {

@@ -22,3 +22,5 @@ detritus
 processors/disabled/*
 .idea
 test_mongo.py
+main.*.js
+vendors.*.js

@@ -5,12 +5,12 @@ import ViewportMercator from 'viewport-mercator-project'
 import { lerp, parseDate } from '../utils'
 import WebGLOverlay from './WebGLOverlay'
 import MapGL from 'react-map-gl'
-import THREE from 'three'
+import * as THREE from 'three'
 
 class BackgroundMap extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {
+    this.simpleState = {
       frameCount: 0,
       contentActive: false,
       animate: false,
@@ -25,6 +25,7 @@ class BackgroundMap extends React.Component {
         isDragging: false
       }
     }
+    this.prevState = {...this.simpleState};
   }
 
   @autobind
@@ -32,14 +33,20 @@ class BackgroundMap extends React.Component {
     let newState = {};
     const speedFactor = (Date.now() - pastFrameDate) / (1000 / 60);
     const currentFrameDate = Date.now();
+
+    if (currentFrameDate - pastFrameDate < 33) {
+      requestAnimationFrame(() => { this.tick(pastFrameDate) })
+      return;
+    }
+
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props;
     let b1, b2;
     if (animate && !isFetching && location.pathname === '/map') {
       // increment time
       let dateOffset = 0;
       let forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause';
-      if (this.state.beaconIndex === (forward ? 0 : 1) || this.state.beaconIndex === (forward ? d3.values(this.state.day.beacons).length - 2 : d3.values(this.state.day.beacons).length - 1)) {
-        let offset = this.state.timeToNextBeacon > 0 ? Math.min(100000, this.state.timeToNextBeacon + 1) : 100000;
+      if (this.simpleState.beaconIndex === (forward ? 0 : 1) || this.simpleState.beaconIndex === (forward ? d3.values(this.simpleState.day.beacons).length - 2 : d3.values(this.simpleState.day.beacons).length - 1)) {
+        let offset = this.simpleState.timeToNextBeacon > 0 ? Math.min(100000, this.simpleState.timeToNextBeacon + 1) : 100000;
         if (expedition.playback === 'fastBackward' || expedition.playback === 'backward') dateOffset = -1 * offset;
         if (expedition.playback === 'forward' || expedition.playback === 'fastForward') dateOffset = offset
       } else {
@@ -48,14 +55,14 @@ class BackgroundMap extends React.Component {
         if (expedition.playback === 'forward') dateOffset = 4000;
         if (expedition.playback === 'fastForward') dateOffset = 25000
       }
-      let currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime() + 1, this.state.currentDate.getTime() + dateOffset))));
+      let currentDate = new Date(Math.min(expedition.end.getTime() - 1, (Math.max(expedition.start.getTime() + 1, this.simpleState.currentDate.getTime() + dateOffset))));
 
       // pause playback if time reaches beginning or end
       if ((currentDate.getTime() === expedition.end.getTime() - 1 && (expedition.playback === 'forward' || expedition.playback === 'fastForward')) || (currentDate.getTime() === expedition.start.getTime() + 1 && (expedition.playback === 'backward' || expedition.playback === 'fastBackward'))) setControl('playback', 'pause');
 
       // checks current day
       let currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24));
-      if (currentDay !== this.state.currentDay) {
+      if (currentDay !== this.simpleState.currentDay) {
         // new day
         fetchDay(currentDate)
       }
@@ -164,7 +171,7 @@ class BackgroundMap extends React.Component {
         }
       });
 
-      let zoom = lerp(this.state.viewport.zoom, this.state.viewport.targetZoom, Math.pow(this.state.viewport.zoom / this.state.viewport.targetZoom, 2) / 250 * speedFactor);
+      let zoom = lerp(this.simpleState.viewport.zoom, this.simpleState.viewport.targetZoom, Math.pow(this.simpleState.viewport.zoom / this.simpleState.viewport.targetZoom, 2) / 250 * speedFactor);
 
       newState = {
         ...newState,
@@ -177,41 +184,51 @@ class BackgroundMap extends React.Component {
         members,
         contentActive: this.props.contentActive,
         viewport: {
-          ...this.state.viewport,
+          ...this.simpleState.viewport,
           longitude: coordinates[0],
           latitude: coordinates[1],
           zoom: zoom
         }
       };
 
-      if (this.state.frameCount % 60 === 0) {
-        const { unproject } = ViewportMercator({ ...this.state.viewport });
+      if (this.simpleState.frameCount % 60 === 0) {
+        const { unproject } = ViewportMercator({ ...this.simpleState.viewport });
         const nw = unproject([0, 0]);
         const se = unproject([window.innerWidth, window.innerHeight]);
         const viewGeoBounds = [nw[0], nw[1], se[0], se[1]];
-        updateMap(this.state.currentDate, [this.state.viewport.longitude, this.state.viewport.latitude], viewGeoBounds, this.state.viewport.zoom, expeditionID)
+        updateMap(this.simpleState.currentDate, [this.simpleState.viewport.longitude, this.simpleState.viewport.latitude], viewGeoBounds, this.simpleState.viewport.zoom, expeditionID)
       }
     }
 
     // TODO fix setState -- it might just need an object or something that doesn't trigger React
 
-    this.setState({
-      ...this.state,
+    this.prevState = this.simpleState;
+
+    this.simpleState = {
+      ...this.simpleState,
       ...newState,
       animate,
-      frameCount: this.state.frameCount + 1
-    });
+      frameCount: this.simpleState.frameCount + 1
+    };
+
+    if (this.simpleState.frameCount % 60 !== 0) { // don't force update is map has been updated
+      this.forceUpdate();
+    }
 
     requestAnimationFrame(() => { this.tick(currentFrameDate) })
   }
 
-  shouldComponentUpdate (_, nextState) {
-    return !!(this.props.expedition && this.props.expedition.playback !== 'pause' && nextState.frameCount !== this.state.frameCount)
+  shouldComponentUpdate (_1, _2) {
+    return !!(
+      this.props.expedition &&
+      this.props.expedition.playback !== 'pause' &&
+      this.simpleState.frameCount !== this.prevState.frameCount
+    )
   }
 
   componentWillReceiveProps (nextProps) {
     const {animate, expedition, mapStateNeedsUpdate} = nextProps;
-    // console.log('new', animate, this.state.animate)
+    // console.log('new', animate, this.simpleState.animate)
     if (animate) {
       const currentDate = expedition.currentDate;
       // note: currentDay has a 1 day offset with API expeditionDay, which starts at 1
@@ -219,16 +236,16 @@ class BackgroundMap extends React.Component {
       const day = expedition.days[currentDay];
 
       if (mapStateNeedsUpdate) {
-        this.state.currentDate = currentDate;
-        this.state.currentDay = currentDay;
-        this.state.day = day;
-        this.state.frameCount = 0
+        this.simpleState.currentDate = currentDate;
+        this.simpleState.currentDay = currentDay;
+        this.simpleState.day = day;
+        this.simpleState.frameCount = 0
       }
 
-      if (!this.state.animate) {
-        this.state.animate = animate;
-        this.state.viewport = {
-          ...this.state.viewport,
+      if (!this.simpleState.animate) {
+        this.simpleState.animate = animate;
+        this.simpleState.viewport = {
+          ...this.simpleState.viewport,
           zoom: expedition.initialZoom,
           targetZoom: expedition.targetZoom
         };
@@ -392,9 +409,9 @@ class BackgroundMap extends React.Component {
 
   @autobind
   renderMembers (geometry, screenBounds, _expedition, _gb) {
-    if (!this.state.members) return geometry;
-    return Object.keys(this.state.members).map(name => {
-      const member = this.state.members[name];
+    if (!this.simpleState.members) return geometry;
+    return Object.keys(this.simpleState.members).map(name => {
+      const member = this.simpleState.members[name];
       const position = this.mapToScreen(member.coordinates, screenBounds);
       return {
         name,
@@ -405,7 +422,7 @@ class BackgroundMap extends React.Component {
 
   render () {
     const { expedition, show360Picture, lightBoxActive } = this.props;
-    const { viewport, currentDate } = this.state;
+    const { viewport, currentDate } = this.simpleState;
     const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiaWFhYWFuIiwiYSI6ImNpbXF1ZW4xOTAwbnl3Ymx1Y2J6Mm5xOHYifQ.6wlNzSdcTlonLBH-xcmUdQ';
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70';
 

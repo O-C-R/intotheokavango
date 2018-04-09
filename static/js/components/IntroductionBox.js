@@ -1,6 +1,6 @@
 
 import React, {PropTypes} from 'react'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import TransitionGroup from 'react-transition-group/TransitionGroup'
 import autobind from 'autobind-decorator'
 
 class IntroductionBox extends React.Component {
@@ -103,9 +103,9 @@ class IntroductionBox extends React.Component {
 
     const container = () => {
       return (
-        <ReactCSSTransitionGroup transitionName="notif" transitionEnterTimeout={500} transitionLeaveTimeout={200}>
+        <TransitionGroup classNames="notif" timeout={{exit: 200, enter: 500}}>
           {posts}
-        </ReactCSSTransitionGroup>
+        </TransitionGroup>
       )
     }
 
