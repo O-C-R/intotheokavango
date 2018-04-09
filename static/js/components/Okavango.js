@@ -72,20 +72,11 @@ export default class Okavango extends React.Component {
             style={{display: (location.pathname === '/map' ? 'block' : 'none')}}
           >
             <a
-              href="http://www.nationalgeographic.com/"
+              href="https://www.nationalgeographic.org/"
             >
               <img
                 src="static/img/natgeoLogo.svg"
                 alt="National Geographic Logo"
-                height="35px"
-              />
-            </a>
-            <a
-              href="http://conservify.org/"
-            >
-              <img
-                src="static/img/conservify.png"
-                alt="Conservify Logo"
                 height="35px"
               />
             </a>
