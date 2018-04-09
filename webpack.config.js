@@ -74,10 +74,12 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
+    public: true,
     proxy: {
       '/api/v1/*': 'http://localhost:3000'
     },
-    historyApiFallback: true
+    historyApiFallback: true,
+    disableHostCheck: true
   },
   output: {
     path: path.join(__dirname, 'static', 'js'),

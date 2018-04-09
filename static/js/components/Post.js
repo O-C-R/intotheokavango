@@ -1,7 +1,7 @@
 
 import React, {PropTypes} from 'react'
 import { dateToString } from '../utils'
-import THREE from 'three'
+import * as THREE from 'three'
 import React3 from 'react-three-renderer'
 import autobind from 'autobind-decorator'
 

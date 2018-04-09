@@ -33,8 +33,8 @@ const DataPage = () => {
           <p>The output returns the data as JSON if nothing is specified, otherwise you can specify <code>map</code> to see the data plotted spatially or <code>viz</code> for a graph.</p>
           <p>The query defines the filter (ex: <code>FeatureType=sighting</code>). Multiple filters are appended with <code>&</code> in between.</p>
           <h3>API Endpoints</h3>
-          <p>The following list outlines all possible methods for accessing features in the Okavango Database. These methods are also known as endpoints, and are requested with a URL. For example, to load all of the elephant sightings (limited to the first 100 by default), you would request: <code><a href="http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant" target="_blank">
-    http://intotheokavango.org/api/features?FeatureType=sighting&SpeciesName=Elephant</a></code></p>
+          <p>The following list outlines all possible methods for accessing features in the Okavango Database. These methods are also known as endpoints, and are requested with a URL. For example, to load all of the elephant sightings (limited to the first 100 by default), you would request: <code><a href="http://23.23.124.78/api/features?FeatureType=sighting&SpeciesName=Elephant" target="_blank">
+    http://23.23.124.78/api/features?FeatureType=sighting&SpeciesName=Elephant</a></code></p>
           <p>The Elephant sightings could be filtered further, by the expedition member who saw them, geographic region, or day of expedition, for example. Each API endpoint call contains the following general information:</p>
           <p><code>limit:</code> the amount of entries returned. The default limit is 100, but this can be changed (ex: <code>limit=30</code>). Larger limits tax the database, so it is recommended to keep your limit request as small as possible.</p>
           <p><code>resolution:</code> returns a feature for every <code>resolution</code> seconds. This might be useful if you want a larger sample set or time period, but don’t want to overload a graph with every single data point. <code>full</code> returns all features.</p>
@@ -49,9 +49,9 @@ const DataPage = () => {
           <p><code>expeditionDay:</code> returns data from a specific day of the expedition (ex: <code>expeditionDay=1</code>)</p>
           <h4>View Endpoints:</h4>
           <p>These endpoints offer overviews of all the members, expeditions and species that could be used to further filter features in the database.</p>
-          <p><code>members:</code> reveals an array of features associated with each member. Endpoint url: <code><a href="http://intotheokavango.org/api/members" target="_blank">http://intotheokavango.org/api/members</a></code></p>
-          <p><code>expeditions:</code> reveals all of the expeditions to the Okavango Delta, along with start date and duration. Endpoint url: <code><a href="http://intotheokavango.org/api/expeditions" target="_blank">http://intotheokavango.org/api/expeditions</a></code></p>
-          <p><code>species:</code> reveals all of the species sightings on the expeditions. Endpoint url: <code><a href="http://intotheokavango.org/api/species" target="_blank">http://intotheokavango.org/api/species</a></code></p>
+          <p><code>members:</code> reveals an array of features associated with each member. Endpoint url: <code><a href="http://23.23.124.78/api/members" target="_blank">http://23.23.124.78/api/members</a></code></p>
+          <p><code>expeditions:</code> reveals all of the expeditions to the Okavango Delta, along with start date and duration. Endpoint url: <code><a href="http://23.23.124.78/api/expeditions" target="_blank">http://23.23.124.78/api/expeditions</a></code></p>
+          <p><code>species:</code> reveals all of the species sightings on the expeditions. Endpoint url: <code><a href="http://23.23.124.78/api/species" target="_blank">http://23.23.124.78/api/species</a></code></p>
           <h4>Features Endpoints:</h4>
           <p>If you try to call the features view, the format looks quite different from the other view endpoints. This is because the Features view contains the bulk of what’s in the database, and is the main collection to be searched and filtered.</p>
           <p>The primary way to filter the features is by <code>FeatureType</code> (ex: <code>FeatureType=ambit</code>).</p>

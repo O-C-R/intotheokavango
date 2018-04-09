@@ -81,7 +81,8 @@ module.exports = {
     proxy: {
       '/api/v1/*': 'http://localhost:3000'
     },
-    historyApiFallback: true
+    historyApiFallback: true,
+    disableHostCheck: true
   },
   output: {
     path: path.join(__dirname),
