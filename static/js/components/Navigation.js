@@ -6,9 +6,9 @@ const Navigation = ({pathName, setPage, activeLinks}) => {
     <div id="header">
       <div id="navigation">
         <ul>
-          <NavigationItem enabled={activeLinks} setPage={setPage} active={pathName === '/map'}>Map</NavigationItem>
+          <NavigationItem enabled={activeLinks} setPage={setPage} active={pathName === '/' || pathName === '/map'}>Map</NavigationItem>
           <NavigationItem enabled={activeLinks} setPage={setPage} active={pathName === '/journal'}>Journal</NavigationItem>
-          <NavigationItem enabled={activeLinks} setPage={setPage} active={pathName === '/' || pathName === '/about'}>About</NavigationItem>
+          <NavigationItem enabled={activeLinks} setPage={setPage} active={pathName === '/about'}>About</NavigationItem>
         </ul>
       </div>
       <h1>INTO THE OKAVANGO</h1>

@@ -28,7 +28,7 @@ class Sighting extends React.Component {
     const currentFrameDate = Date.now()
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props
     var b1, b2
-    if (animate && !isFetching && location.pathname === '/map') {
+    if (animate && !isFetching && (location.pathname === '/map' || location.pathname === '/')) {
       // increment time
       var dateOffset = 0
       var forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause'
@@ -319,7 +319,7 @@ class Sighting extends React.Component {
       // <div id="mapbox" style={{zIndex: (location.pathname === '/map' || location.pathname === '/' ? 0 : -100)}}>
           // onChangeViewport={this.onChangeViewport}
     return (
-      <div id="mapbox" style={{zIndex: (location.pathname === '/map' ? -100 : -100)}}>
+      <div id="mapbox" style={{zIndex: ((location.pathname === '/map' || location.pathname === '/') ? -100 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}

@@ -29,12 +29,12 @@ export default class Okavango extends React.Component {
         <div
           id="nightOverlay"
           style={{
-            opacity: (location.pathname === '/map') && !lightBoxActive ? 0 : 1,
+            opacity: ((location.pathname === '/map' || location.pathname === '/')) && !lightBoxActive ? 0 : 1,
             zIndex: lightBoxActive ? 1 : 0
           }}
         >
         </div>
-        <div id="loadingWheel" className={ location.pathname !== '/about' && location.pathname !== '/' &&  (isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden' }>
+        <div id="loadingWheel" className={ location.pathname !== '/about' && (isInitialLoad || isFetching || !enableContent || !animate) ? 'visible' : 'hidden' }>
           <div class="wheel"></div>
         </div>
         <Navigation
@@ -57,7 +57,7 @@ export default class Okavango extends React.Component {
           />
           <div
             id="pageContainer"
-            className={location.pathname === '/map' ? 'disabled' : ''}
+            className={(location.pathname === '/map' || location.pathname === '/') ? 'disabled' : ''}
           >
             <LightBox
               active={lightBoxActive}
@@ -69,7 +69,7 @@ export default class Okavango extends React.Component {
           </div>
           <div
             class="logos"
-            style={{display: (location.pathname === '/map' ? 'block' : 'none')}}
+            style={{display: ((location.pathname === '/map' || location.pathname === '/') ? 'block' : 'none')}}
           >
             <a
               href="https://www.nationalgeographic.org/"

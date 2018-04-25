@@ -41,7 +41,7 @@ class BackgroundMap extends React.Component {
 
     const {expeditionID, animate, expedition, fetchDay, setControl, isFetching, updateMap} = this.props;
     let b1, b2;
-    if (animate && !isFetching && location.pathname === '/map') {
+    if (animate && !isFetching && (location.pathname === '/map' || location.pathname === '/')) {
       // increment time
       let dateOffset = 0;
       let forward = expedition.playback === 'fastForward' || expedition.playback === 'forward' || expedition.playback === 'pause';
@@ -427,7 +427,7 @@ class BackgroundMap extends React.Component {
     const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-v9?format=jpg70';
 
     return (
-      <div id="mapbox" style={{zIndex: (!lightBoxActive && (location.pathname === '/map') ? 0 : -100)}}>
+      <div id="mapbox" style={{zIndex: (!lightBoxActive && ((location.pathname === '/map' || location.pathname === '/')) ? 0 : -100)}}>
         <MapGL
           {...viewport}
           mapStyle={MAPBOX_STYLE}
