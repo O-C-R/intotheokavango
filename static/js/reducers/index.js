@@ -596,9 +596,18 @@ const expeditionReducer = (
       delete days[state.dayCount]
 
       // console.log('fill following days:', completedDays, days)
+
+      const sortedDays = {};
+      Object.keys(days).forEach(dayId => {
+        const sortedBeacons = d3.values(days[dayId].beacons).sort((a, b) => {
+          return parseDate(b.properties.DateTime).getTime() - parseDate(a.properties.DateTime).getTime()
+        });
+        sortedDays[dayId] = Object.assign({}, days[dayId], {sortedBeacons});
+      });
+
       return Object.assign({}, state, {
-        days: days
-      })
+        days: sortedDays
+      });
 
     case actions.UPDATE_TIME:
       return Object.assign({}, state, {

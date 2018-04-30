@@ -1034,11 +1034,13 @@ ul{
   transition: opacity 300ms ease-in;
 }
 
-.notif-leave {
+.notif-leave,
+.notif-exit {
   opacity: 1;
 }
 
-.notif-leave.notif-leave-active {
+.notif-leave.notif-leave-active,
+.notif-exit.notif-exit-active {
   opacity: 0.01;
   transition: opacity 300ms ease-in;
 }

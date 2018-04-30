@@ -14,6 +14,8 @@ class BackgroundMap extends React.Component {
       frameCount: 0,
       contentActive: false,
       animate: false,
+      sortedBeacons: null,
+      sortedAmbits: {},
       coordinates: [0, 0],
       viewport: {
         latitude: -12.7373785,
@@ -72,10 +74,13 @@ class BackgroundMap extends React.Component {
 
       // TODO: fix SORT
 
-      let beacons = d3.values(day.beacons);
-      //.sort((a, b) => {
-      //  return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
-      //})
+      if (!this.simpleState.sortedBeacons || this.simpleState.frameCount % 60 === 0) {
+        this.simpleState.sortedBeacons = d3.values(day.beacons)
+          .sort((a, b) => {
+            return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
+          });
+      }
+      let beacons = this.simpleState.sortedBeacons;
       let beaconCount = beacons.length;
       let beaconIndex;
       let timeToNextBeacon = 0;
@@ -119,11 +124,19 @@ class BackgroundMap extends React.Component {
         let member = members[memberID];
 
         // TODO: fix SORT
+        if (!this.simpleState.sortedAmbits[memberID]) {
+          this.simpleState.sortedAmbits[memberID] = {};
+        }
 
-        let ambits = d3.values(expedition.featuresByMember[memberID][currentDay]);
-          //.sort((a, b) => {
-          //return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
-        //})
+        if (!this.simpleState.sortedAmbits[memberID][currentDay] ||
+          this.simpleState.frameCount % 60 === 0) {
+          this.simpleState.sortedAmbits[memberID][currentDay] = d3.values(expedition.featuresByMember[memberID][currentDay])
+            .sort((a, b) => {
+              return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
+            });
+        }
+        let ambits = this.simpleState.sortedAmbits[memberID][currentDay];
+
         let ambitCount = ambits.length;
         let ambitIndex = -1;
         let ratioBetweenAmbits = 0;
@@ -199,8 +212,6 @@ class BackgroundMap extends React.Component {
         updateMap(this.simpleState.currentDate, [this.simpleState.viewport.longitude, this.simpleState.viewport.latitude], viewGeoBounds, this.simpleState.viewport.zoom, expeditionID)
       }
     }
-
-    // TODO fix setState -- it might just need an object or something that doesn't trigger React
 
     this.prevState = this.simpleState;
 
