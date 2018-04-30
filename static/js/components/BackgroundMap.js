@@ -66,6 +66,8 @@ class BackgroundMap extends React.Component {
       let currentDay = Math.floor((currentDate.getTime() - expedition.start.getTime()) / (1000 * 3600 * 24));
       if (currentDay !== this.simpleState.currentDay) {
         // new day
+        this.simpleState.sortedBeacons = null;
+        this.simpleState.sortedAmbits = {};
         fetchDay(currentDate)
       }
 
@@ -74,7 +76,7 @@ class BackgroundMap extends React.Component {
 
       // TODO: fix SORT
 
-      if (!this.simpleState.sortedBeacons || this.simpleState.frameCount % 60 === 0) {
+      if (!this.simpleState.sortedBeacons) {
         this.simpleState.sortedBeacons = d3.values(day.beacons)
           .sort((a, b) => {
             return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
@@ -113,6 +115,15 @@ class BackgroundMap extends React.Component {
       // set map coordinates to current beacon
       let currentBeacon = beacons[beaconIndex + (forward ? 0 : 0)];
       let nextBeacon = beacons[beaconIndex + (forward ? 1 : -1)];
+
+      // Something went wrong with the cache, bail out
+      if (!currentBeacon || !nextBeacon) {
+        this.simpleState.sortedBeacons = null;
+        this.simpleState.sortedAmbits = {};
+        requestAnimationFrame(() => { this.tick(currentFrameDate) });
+        return;
+      }
+
       let coordinates = [
         lerp(currentBeacon.geometry.coordinates[0], nextBeacon.geometry.coordinates[0], ratioBetweenBeacons),
         lerp(currentBeacon.geometry.coordinates[1], nextBeacon.geometry.coordinates[1], ratioBetweenBeacons)
@@ -128,8 +139,7 @@ class BackgroundMap extends React.Component {
           this.simpleState.sortedAmbits[memberID] = {};
         }
 
-        if (!this.simpleState.sortedAmbits[memberID][currentDay] ||
-          this.simpleState.frameCount % 60 === 0) {
+        if (!this.simpleState.sortedAmbits[memberID][currentDay]) {
           this.simpleState.sortedAmbits[memberID][currentDay] = d3.values(expedition.featuresByMember[memberID][currentDay])
             .sort((a, b) => {
               return parseDate(a.properties.DateTime).getTime() - parseDate(b.properties.DateTime).getTime()
@@ -175,6 +185,15 @@ class BackgroundMap extends React.Component {
         if (currentID >= 0 && currentID < ambits.length && nextID >= 0 && nextID < ambits.length) {
           let currentAmbits = ambits[currentID];
           let nextAmbit = ambits[nextID];
+
+          // Something went wrong with the cache, bail out
+          if (!currentAmbits || !nextAmbit) {
+            this.simpleState.sortedBeacons = null;
+            this.simpleState.sortedAmbits = {};
+            requestAnimationFrame(() => { this.tick(currentFrameDate) });
+            return;
+          }
+
           member.coordinates = [
             lerp(currentAmbits.geometry.coordinates[0], nextAmbit.geometry.coordinates[0], ratioBetweenAmbits),
             lerp(currentAmbits.geometry.coordinates[1], nextAmbit.geometry.coordinates[1], ratioBetweenAmbits)
