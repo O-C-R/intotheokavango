@@ -1,6 +1,7 @@
 
 import React, {PropTypes} from 'react'
 import TransitionGroup from 'react-transition-group/TransitionGroup'
+import CSSTransition from 'react-transition-group/CSSTransition'
 import autobind from 'autobind-decorator'
 
 class IntroductionBox extends React.Component {
@@ -53,13 +54,15 @@ class IntroductionBox extends React.Component {
       return
     }
 
-    const now = Date.now() - startDate
-    var currentPosts = []
+    const now = Date.now() - startDate;
+    let currentPosts = [];
     posts.forEach(p => {
       if (p.timeRange[0] <= now && p.timeRange[1] > now) {
-        currentPosts.push(p)
+        currentPosts.push(
+            p
+        )
       }
-    })
+    });
 
     if (now > posts[posts.length - 1].timeRange[1] - 6000 && !this.state.contentEnabled) {
       this.state.contentEnabled = true
@@ -97,13 +100,17 @@ class IntroductionBox extends React.Component {
   render () {
     const { currentPosts, complete } = this.state
     const { animate } = this.props
-    const posts = currentPosts.map(p => {
-      return p.content
+    const posts = currentPosts.map((p, i) => {
+      return (<CSSTransition
+        key={i}
+        classNames="notif"
+        timeout={{exit: 200, enter: 500}}
+      ><div>{p.content}</div></CSSTransition>);
     })
 
     const container = () => {
       return (
-        <TransitionGroup classNames="notif" timeout={{exit: 200, enter: 500}}>
+        <TransitionGroup>
           {posts}
         </TransitionGroup>
       )
