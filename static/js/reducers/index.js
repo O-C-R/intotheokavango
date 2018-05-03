@@ -193,7 +193,8 @@ const okavangoReducer = (
         if (expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24) > latestDate.getTime()) {
           latestDate = new Date(expeditions[id].start.getTime() + expeditions[id].dayCount * (1000 * 3600 * 24))
           // TODO: update this section to let user choose from expeditions
-          latestExpedition = 'okavango_17'
+          //latestExpedition = 'okavango_17'
+          latestExpedition = 'cuando_18';
         }
       })
 
