@@ -1081,7 +1081,7 @@ ul{
 
   .controlPanel {
     width: 90%;
-    top: 120px;
+    top: 0px;
   }
 
     .controlPanel div.dateSelector{
@@ -1106,6 +1106,21 @@ ul{
       margin: 0;
     }
 
+  #aboutPage h1 {
+    font-size: 26px;
+    line-height: 30px;
+    margin-bottom: 25px;
+  }
+
+  #aboutPage .pageWrapper {
+    padding: 50px 10% 50px 10%;
+  }
+
+  #content div.cta a p {
+    font-size: 16px;
+    line-height: 32px;
+    margin-bottom: 50px;
+  }
 
   #aboutPage div.column{
     display: block !important;
@@ -1156,7 +1171,7 @@ ul{
 
   #IntroductionBox {
     bottom: initial;
-    top: 20%;
+    top: 25%;
     width: 65%;
   }
 }
