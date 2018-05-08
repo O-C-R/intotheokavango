@@ -97,7 +97,7 @@ function loadData () {
 
         initMap();
 
-        var url = "http://23.23.124.78" + path_to_data;
+        var url = "http://data.intotheokavango.org" + path_to_data;
         //console.log(url);
         $.getJSON(url, function(data) {
             var featureCollection = data['results'];
