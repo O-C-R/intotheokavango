@@ -18,11 +18,11 @@ class IntroductionBox extends React.Component {
           timeRange: [0, 4000]
         },
         {
-          content: <p key="1">Beginning in 2015,a group of Ba'yei, scientists and explorers have been exploring the Okavango River System in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
+          content: <p key="1">Right now,a group of Ba'yei, scientists and explorers have are exploring the Cuando River, one of the sources of the Okavango Delta in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
           timeRange: [4000, 11000]
         },
         {
-          content: <p key="2">You can use this platform to explore what the team saw and experienced on their last expedition through this verdant and vitally important ecosystem.</p>,
+          content: <p key="2">You can use this platform to explore what the team is seeing and experiencing on their expedition through this remote and vitally important ecosystem.</p>,
           timeRange: [11000, 19000]
         }
       ]
