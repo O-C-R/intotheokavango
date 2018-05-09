@@ -18,7 +18,7 @@ class IntroductionBox extends React.Component {
           timeRange: [0, 4000]
         },
         {
-          content: <p key="1">Right now,a group of Ba'yei, scientists and explorers have are exploring the Cuando River, one of the sources of the Okavango Delta in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
+          content: <p key="1">Right now, a group of Ba'yei, scientists and explorers are exploring the Cuando River, one of the sources of the Okavango Delta, in traditional flat-bottomed boats, gathering crucial biodiversity and environmental data.</p>,
           timeRange: [4000, 11000]
         },
         {
