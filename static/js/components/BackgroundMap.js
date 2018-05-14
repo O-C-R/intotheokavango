@@ -70,7 +70,6 @@ class BackgroundMap extends React.Component {
         this.simpleState.sortedAmbits = {};
         fetchDay(currentDate)
       }
-
       // look for most current beacon
       const day = expedition.days[currentDay];
 
