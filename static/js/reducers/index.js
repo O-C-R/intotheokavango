@@ -241,8 +241,8 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if ((f.properties.FeatureType === 'ambit_geo' && f.properties.Team === 'CuandoMain') || (f.properties.FeatureType === 'beacon' && (f.properties.Satellite === 'WBT Primary' || f.properties.Satellite === 'WBT Secondary'))) {
-          if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'Water' || f.properties.Member === 'Kerllen' || f.properties.Member === 'Chris') {
+        if ((f.properties.FeatureType === 'ambit_geo' && f.properties.Team === 'CuandoMain') || (f.properties.FeatureType === 'beacon' && f.properties.Team === 'RiverMain' && (f.properties.Satellite === 'WBT Primary' || f.properties.Satellite === 'WBT Secondary'))) {
+          if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'Water' || f.properties.Member === 'Kerllen') {
             features[id] = featureReducer(expedition.features[id], action, f)
             if (f.properties.FeatureType === 'ambit_geo') {
               if (!members[f.properties.Member]) {
