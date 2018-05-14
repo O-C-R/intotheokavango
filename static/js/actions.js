@@ -368,7 +368,7 @@ export function fetchExpeditions () {
       .then(response => response.json())
       .then(json => dispatch(receiveExpeditions(json)))
       // TODO change this date, if it ties to cuando_18 vs okavango_17
-      .then(() => dispatch(fetchDay(parseDate('2017-08-06T07:55:39+0200'), null, null, true)))
+      .then(() => dispatch(fetchDay(parseDate('2018-05-11T00:00:00+0200'), null, null, true)))
       .then(() => {
         var state = getState()
         // Object.keys(state.expeditions).forEach((id) => {

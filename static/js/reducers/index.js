@@ -181,7 +181,7 @@ const okavangoReducer = (
       Object.keys(action.data.results).forEach(id => {
         action.data.results[id] = {
           ...action.data.results[id],
-          Days: 14
+          Days: Math.min(action.data.results[id].Days, 100)
         }
       })
 
@@ -241,7 +241,7 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if ((f.properties.FeatureType === 'ambit_geo' && f.properties.Team === 'RiverMain') || (f.properties.FeatureType === 'beacon' && (f.properties.Satellite === 'WBT Primary' || f.properties.Satellite === 'WBT Secondary'))) {
+        if ((f.properties.FeatureType === 'ambit_geo' && f.properties.Team === 'CuandoMain') || (f.properties.FeatureType === 'beacon' && (f.properties.Satellite === 'WBT Primary' || f.properties.Satellite === 'WBT Secondary'))) {
           if (f.properties.FeatureType !== 'ambit_geo' || f.properties.Member === 'Steve' || f.properties.Member === 'Water' || f.properties.Member === 'Kerllen' || f.properties.Member === 'Chris') {
             features[id] = featureReducer(expedition.features[id], action, f)
             if (f.properties.FeatureType === 'ambit_geo') {
@@ -377,7 +377,7 @@ const okavangoReducer = (
       features = {}
       action.data.forEach((f) => {
         var id = f.id
-        if (f.properties.Team === 'RiverMain') {
+        if (f.properties.Team === 'CuandoMain') {
           var flag = true
           if (f.properties.FeatureType === 'sighting') {
             if (!f.properties.Taxonomy) f.properties.color = 0xb4b4b4
@@ -755,12 +755,13 @@ const expeditionReducer = (
       })
 
     case actions.RECEIVE_EXPEDITIONS:
-      var dayCount = data.Days
+      var dayCount = data.Days + 2
 
       var start = new Date(parseDate(data.StartDate).getTime() + 2 * (1000 * 3600))
-      var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
-      // currentDate is 2 days before last beacon
-      var currentDate = new Date(end.getTime() - 2 * (1000 * 3600 * 24))
+
+      var end = new Date(start.getTime() + (dayCount - 1) * (1000 * 3600 * 24))
+      // currentDate is 1 day before last beacon
+      var currentDate = new Date(end.getTime() - 1 * (1000 * 3600 * 24))
 
       var name = data.Name
 
