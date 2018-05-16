@@ -155,7 +155,7 @@ export function fetchPostsByDay (_expeditionID, date, expeditionDay) {
       daysToFetch
     })
 
-    var queryString = 'http://data.intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,image,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
+    var queryString = 'http://data.intotheokavango.org/api/features?limit=0&FeatureType=blog,audio,instagram,tweet&limit=0&Expedition=' + state.selectedExpedition + '&startDate=' + range[0] + '&endDate=' + range[1]
     // console.log('querying posts:', queryString)
     fetch(queryString)
       .then(response => response.json())

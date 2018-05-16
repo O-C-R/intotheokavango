@@ -30,7 +30,7 @@ const mapStateToProps = (state, ownProps) => {
         }
       }
 
-      if (type === 'image') {
+      if (type === 'image' && false) {  // TODO: re-enable the images once the API supports captions from Insta
         if (p.properties.Make === 'RICOH') {
           type = '360Image'
         } else if (expeditionID !== 'okavango_14') {
@@ -44,6 +44,14 @@ const mapStateToProps = (state, ownProps) => {
           link = p.properties.InstagramID
           dimensions = p.properties.Size
         }
+      }
+
+      if (type === 'instagram') {
+        type = 'image';
+        content = p.properties.Caption;
+        images = [p.properties.ImageUrl.replace('http://', 'https://')];
+        link = p.properties.Url;
+        dimensions = p.properties.Dimensions;
       }
 
       if (type === 'blog') {
