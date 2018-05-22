@@ -761,7 +761,7 @@ const expeditionReducer = (
 
       var end = new Date(start.getTime() + (dayCount - 1) * (1000 * 3600 * 24))
       // currentDate is 1 day before last beacon
-      var currentDate = new Date(end.getTime() - 1 * (1000 * 3600 * 24))
+      var currentDate = new Date(end.getTime() - 3 * (1000 * 3600 * 24))
 
       var name = data.Name
 
