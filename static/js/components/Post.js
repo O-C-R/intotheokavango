@@ -129,6 +129,9 @@ class Post extends React.Component {
             var d = new Date(data.date)
             return (<p>{dateToString(d, true)}</p>)
           } else if (format === 'full') {
+            if (m === 'link') {
+              return (<a href={data.link} target={'_blank'}><img width="16" height="16" key={i} src={'/static/img/icon-' + m + '.png'}/></a>)
+            }
             return (<img width="16" height="16" key={i} src={'/static/img/icon-' + m + '.png'}/>)
           }
         })()

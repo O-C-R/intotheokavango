@@ -71,7 +71,10 @@ const okavangoReducer = (
       action.data.forEach((f) => {
         var id = f.id
         var flag = true
-        if (!f.geometry) flag = false
+        if (!f.geometry) {
+          f.geometry = {type: 'Point', coordinates: [18.89397, -13.09036]};
+        }
+
         // console.log(f.properties)
         if (f.properties.FeatureType === 'image' && f.properties.Make === 'RICOH') flag = false
         if (flag) {
