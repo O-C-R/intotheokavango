@@ -758,12 +758,12 @@ const expeditionReducer = (
       })
 
     case actions.RECEIVE_EXPEDITIONS:
-      var dayCount = data.Days + 2
+      var dayCount = data.Days
 
       var start = new Date(parseDate(data.StartDate).getTime() + 2 * (1000 * 3600))
 
-      var end = new Date(start.getTime() + (dayCount - 1) * (1000 * 3600 * 24))
-      // currentDate is 1 day before last beacon
+      var end = new Date(start.getTime() + dayCount * (1000 * 3600 * 24))
+      // currentDate is 3 day before last beacon
       var currentDate = new Date(end.getTime() - 3 * (1000 * 3600 * 24))
 
       var name = data.Name
